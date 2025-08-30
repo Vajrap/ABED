@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  app:
+    image: KingsMaker
+    container_name: KingsMakerServer
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: bun run Server/index.ts
+    ports:
+      - "7890:7890"
+    restart: unless-stopped
