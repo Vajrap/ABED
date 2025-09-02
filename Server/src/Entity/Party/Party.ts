@@ -1,13 +1,32 @@
-import type { LocationId } from "../../InterFacesEnumsAndTypes/Enums";
+import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
-import type { Character } from "../Character/Character";
+import { Character } from "../Character/Character";
 import type { ItemId } from "../Item/Item";
+import type { PartyBehavior } from "./PartyBehavior";
+
+type PartyCharacters = [
+  Character | "none",
+  Character | "none",
+  Character | "none",
+  Character | "none",
+  Character | "none",
+  Character | "none",
+];
 
 export class Party {
   partyID: string;
-  characters: Character[];
+  // characters: (Character | "none")[];
+  characters: PartyCharacters = [
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+  ];
   isTraveling: boolean = false;
-  location: LocationId;
+  location: LocationsEnum;
+  behavior: PartyBehavior;
   inventory: Partial<Record<ItemId, number>> = {};
   gold: number = 0;
   justArrived: boolean = false;
@@ -50,14 +69,22 @@ export class Party {
       [TimeOfDay.night]: UserInputAction.none,
     },
   };
-  constructor(data: { partyOwner: Character; location: LocationId }) {
-    this.partyID = data.partyOwner.id;
+  constructor(data: {
+    leaderId: string;
+    characters: PartyCharacters;
+    location: LocationsEnum;
+    behavior: PartyBehavior;
+  }) {
+    this.partyID = data.leaderId;
     this.location = data.location;
-    this.characters = [data.partyOwner];
+    this.characters = data.characters;
+    this.behavior = data.behavior;
   }
 
   isAllDead(): boolean {
-    return this.characters.every((character) => character.vitals.isDead);
+    return this.characters.every(
+      (character) => character === "none" || character.vitals.isDead,
+    );
   }
 }
 

@@ -1,14 +1,9 @@
-import {
-  ATTRIBUTE_KEYS,
-  type AttributeKey,
-  type LocationId,
-} from "../../InterFacesEnumsAndTypes/Enums";
-import type { TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
+import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
+import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 import { statMod } from "../../Utils/statMod";
 import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
 import type { Character } from "../Character/Character";
 import type { Party } from "../Party/Party";
-
 
 export class Battle {
   id: string;
@@ -335,23 +330,14 @@ export class BattleReport {
   constructor(
     partyA: Party,
     partyB: Party,
-    location: LocationId,
+    location: LocationsEnum,
     gameTime: GameTimeInterface,
   ) {}
 }
 
-export interface GameTimeInterface {
-  dayPassed: number;
-  gameDateDay: number;
-  gameDateHour: number;
-  gameDateMonth: number;
-  gameDateYear: number;
-  phase: TimeOfDay;
-}
-
 export class GameLocation {
-  id: LocationId;
-  constructor(id: LocationId) {
+  id: LocationsEnum;
+  constructor(id: LocationsEnum) {
     this.id = id;
   }
 }

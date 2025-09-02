@@ -23,6 +23,7 @@ import type { LightnessSkillId } from "../LightnessSkill/enum";
 import type { SkillId } from "../Skill/enums";
 import type { BreathingSkillId } from "../BreathingSkill/enum";
 import { CharacterBehavior } from "./Subclass/Behavior/CharacterBehavior";
+import { CharacterTitle } from "./Subclass/Title/Title";
 
 export class Character {
   id: string = "";
@@ -44,6 +45,8 @@ export class Character {
   fame: CharacterFame = new CharacterFame();
 
   behavior: CharacterBehavior = new CharacterBehavior();
+
+  title: CharacterTitle = new CharacterTitle();
 
   // Skills
   // TODO: write condition, might be config setting

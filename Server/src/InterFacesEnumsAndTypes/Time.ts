@@ -42,3 +42,22 @@ export enum Season {
   frostVeil = "frostVeil",
   longDark = "longDark",
 }
+
+export interface GameTimeInterface {
+  dayPassed: number;
+  gameDateDay: number;
+  gameDateHour: number;
+  gameDateMonth: number;
+  gameDateYear: number;
+  phase: TimeOfDay;
+}
+
+export enum SeasonEnum {
+  Seeding = "Seeding",
+  RainFall = "RainFall",
+  GreenTide = "GreenTide",
+  HarvestMoon = "HarvestMoon",
+  SunDry = "SunDry",
+  Frostveil = "Frostveil",
+  LongDark = "LongDark",
+}
