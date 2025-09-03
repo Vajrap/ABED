@@ -24,6 +24,12 @@ import type { SkillId } from "../Skill/enums";
 import type { BreathingSkillId } from "../BreathingSkill/enum";
 import { CharacterBehavior } from "./Subclass/Behavior/CharacterBehavior";
 import { CharacterTitle } from "./Subclass/Title/Title";
+import {
+  defaultActionSequence,
+  type CharacterActionSequence,
+} from "./Subclass/Action/CharacterAction";
+import { ActionInput } from "./Subclass/Action/ActionInput";
+import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 
 export class Character {
   id: string = "";
@@ -48,6 +54,8 @@ export class Character {
 
   title: CharacterTitle = new CharacterTitle();
 
+  actionSequence: CharacterActionSequence = defaultActionSequence;
+  informations: Record<string, number> = {};
   // Skills
   // TODO: write condition, might be config setting
   skills: Map<SkillId, CharacterSkillObject> = new Map();
@@ -93,6 +101,7 @@ export class Character {
     needs: CharacterNeeds;
     vitals: CharacterVitals;
     fame: CharacterFame;
+    actionSequence: CharacterActionSequence;
     statTracker?: number;
   }) {
     this.id = data.id;
@@ -111,11 +120,16 @@ export class Character {
     this.needs = data.needs;
     this.vitals = data.vitals;
     this.fame = data.fame;
+    this.actionSequence = data.actionSequence;
     this.statTracker = data.statTracker || 0;
   }
 
   get levelUpStatNeeded(): number {
     return 5 + this.level * 2;
+  }
+
+  getActionFor(day: DayOfWeek, time: TimeOfDay): ActionInput {
+    return this.actionSequence[day][time];
   }
 
   clearBuffAndDebuff(): Character {
@@ -145,12 +159,6 @@ type CharacterInternalSkillObject = {
   level: TierEnum;
   exp: number;
   type: ElementKey;
-};
-
-type CharacterLightnessSkillObject = {
-  id: LightnessSkillId;
-  level: TierEnum;
-  exp: number;
 };
 
 type BuffAndDebuffRecord = {

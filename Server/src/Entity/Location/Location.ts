@@ -3,34 +3,86 @@ import type { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 import { rollTwenty } from "../../Utils/Dice";
+import { statMod } from "../../Utils/statMod";
+import {
+  ActionInput,
+  specialActions,
+} from "../Character/Subclass/Action/ActionInput";
 import type { News } from "../News/News";
 import type { Party } from "../Party/Party";
 import type { SubRegion } from "./SubRegion";
 
-
 export type UserInputAction = {
-  type: LocationActionEnum
-}
+  type: ActionInput;
+};
 
+type RandomEvents = {
+  rest: RandomEventUnits;
+  train: RandomEventUnits;
+  learn: RandomEventUnits;
+  stroll: RandomEventUnits;
+  artisan: RandomEventUnits;
+};
+
+type RandomEventUnits = {
+  worst: (() => News)[];
+  bad: (() => News)[];
+  good: (() => News)[];
+  best: (() => News)[];
+};
+
+const defaultRandomEvents: RandomEvents = {
+  rest: {
+    worst: [],
+    bad: [],
+    good: [],
+    best: [],
+  },
+  train: {
+    worst: [],
+    bad: [],
+    good: [],
+    best: [],
+  },
+  learn: {
+    worst: [],
+    bad: [],
+    good: [],
+    best: [],
+  },
+  stroll: {
+    worst: [],
+    bad: [],
+    good: [],
+    best: [],
+  },
+  artisan: {
+    worst: [],
+    bad: [],
+    good: [],
+    best: [],
+  },
+};
+
+type InnSetUp = {};
 
 export class Location {
   id: LocationsEnum;
   subRegion: SubRegionEnum;
   region: RegionEnum;
   parties: Party[] = [];
-  innType: any[] = [];
+  innType: InnSetUp[] = [];
   connectedLocations: { location: Location; distance: number }[] = [];
-  actions: LocationActionEnum[]
+  actions: ActionInput[];
+  randomEvents: RandomEvents;
 
   /*
-    normally the chance for any event to occur is DC 15 == about 25% chance
-    Need a better think through, cause this means 'ANY KIND' 'GOOD OR BAD' event have the same possibility of occuring.
-    The better idea would be, a list of all possible event with dice face number?
+    We need a list of all possible event with dice face number.
     And might need range, like
     > 1 worst event
-    > 2-5 bad event, battle, raid, etc
-    > 6-14 nothing happended,
-    > 15-19 good event, like treasure, quest, etc
+    > 2-4 bad event, battle, raid, etc
+    > 5-16 nothing happended,
+    > 17-19 good event, like treasure, quest, etc
     > 20 critically good event?
 
     This way, team average luck modifier plays some role in it.
@@ -39,19 +91,20 @@ export class Location {
     Also, we need to think about random event for specific kind of Character action, like train, learn, craft.
     Cause we might need to trimmed down only possible event on each actions.
   */
-  eventDC: number = 15;
 
   constructor(
     id: LocationsEnum,
     subRegion: SubRegion,
     connectedLocations: { location: Location; distance: number }[],
-    actions: LocationActionEnum[]
+    actions: ActionInput[],
+    randomEvents?: RandomEvents,
   ) {
     this.id = id;
     this.subRegion = subRegion.id;
     this.region = subRegion.region;
     this.connectedLocations = connectedLocations;
     this.actions = actions;
+    this.randomEvents = randomEvents ? randomEvents : defaultRandomEvents;
   }
 
   getDistanceTo(location: Location): number | undefined {
@@ -120,135 +173,117 @@ export class Location {
 
   // TODO, this should return NEWS[]
   async processActions(day: DayOfWeek, phase: TimeOfDay): Promise<News[]> {
+    let news = [];
     if (this.parties.length === 0) return [];
 
-    for (let party of this.parties) {
-      const action = party.actionSequence[day][phase];
+    /*
+      Action processing idea
+      - since now we move from party scale action to character scale action, that means the resolving would happen per character instead
+      - but since 'travel' is party wide, which masked character's action, that means we need to skip party that current action is travel
 
-      if (!this.actions.includes(action.type)) {
-        console.warn(
-          `Party with ID:${party.partyID} Action: ${action.type} at ${day}: ${phase} not allowed in ${this.id};`,
-        );
-        action.type = LocationActionEnum.Rest;
+    */
+    for (let party of this.parties) {
+      // Skip travelling party
+      const partyAction = party.travelSequence[day][phase];
+      if (partyAction === ActionInput.Travel) continue;
+      // Special action like event or some special things that the leader choose, this will overwrite character's action and dealth with as a party
+      if (specialActions.includes(partyAction)) {
+        // TODO: deal with special action, might be story or something tied to the location, having special effect
+        continue;
       }
 
-      if (action.type === LocationActionEnum.Travel) return;
+      for (const character of party.characters) {
+        if (character === "none") continue;
+        let action = character.actionSequence[day][phase];
+        if (action === ActionInput.Travel) continue;
+        if (!this.actions.includes(action)) action = ActionInput.Rest;
 
-      switch (action.type) {
-        case LocationActionEnum.Rest ||
-          LocationActionEnum.Inn ||
-          LocationActionEnum.Camping ||
-          LocationActionEnum.HouseRest:
-          handleRestAction(party, this, action.type);
-          break;
-        case LocationActionEnum.TrainAttribute ||
-          LocationActionEnum.TrainProficiency ||
-          LocationActionEnum.TrainArtisan ||
-          LocationActionEnum.TrainSkill:
-          handleTrainAction(party, this, action.detail);
-          break;
-        case LocationActionEnum.LearnSkill:
-          handleLearnSkillAction(party, this, action.detail);
-          break;
-        case LocationActionEnum.Craft:
-          handleCraftAction(party, this);
-          break;
-        case LocationActionEnum.None:
-          event_rest_force(party);
-          break;
-        case LocationActionEnum.Stroll:
-          handleStrollAction(party, this);
-          break;
+        // Still needs to determine if we think of random event as differed per action, or is it location wide?
+        // For example, if roll = 20, would event appeared from action=train and action=rest and action = craft the same thing?
+        // A quick instinct would says, no?
+        let randomEncounter =
+          rollTwenty().total +
+          statMod(character.attribute.getStat("luck").total);
+        const eventCategory = getEventCategory(randomEncounter);
+
+        switch (action) {
+          case ActionInput.Rest:
+          case ActionInput.Inn:
+          case ActionInput.Camping:
+          case ActionInput.HouseRest:
+          case ActionInput.None: {
+            let result: News = eventCategory
+              ? this.handleSpecialEvent("rest", eventCategory)
+              : handleRestAction();
+            news.push(result);
+            break;
+          }
+          case ActionInput.TrainAttribute:
+          case ActionInput.TrainProficiency:
+          case ActionInput.TrainArtisan:
+          case ActionInput.TrainSkill: {
+            let result: News = eventCategory
+              ? this.handleSpecialEvent("train", eventCategory)
+              : handleTrainAction();
+            news.push(result);
+            break;
+          }
+          case ActionInput.LearnSkill: {
+            let result: News = eventCategory
+              ? this.handleSpecialEvent("train", eventCategory)
+              : handleLearnSkillAction();
+            news.push(result);
+            break;
+          }
+          case ActionInput.Craft: {
+            let result: News = eventCategory
+              ? this.handleSpecialEvent("artisan", eventCategory)
+              : handleCraftAction();
+            news.push(result);
+            break;
+          }
+          case ActionInput.Stroll: {
+            let result: News = eventCategory
+              ? this.handleSpecialEvent("stroll", eventCategory)
+              : handleStrollAction();
+            news.push(result);
+            break;
+          }
+          default: {
+            let result: News = eventCategory
+              ? this.handleSpecialEvent("rest", eventCategory)
+              : handleRestAction();
+            news.push(result);
+            break;
+          }
+        }
       }
     }
+    return news;
   }
+
+  private handleSpecialEvent(
+    actionType: keyof RandomEvents,
+    category: keyof RandomEventUnits,
+  ): News | null {
+    const events = this.randomEvents[actionType][category];
+    const event =
+      events.length > 0
+        ? events[Math.floor(Math.random() * events.length)]
+        : null;
+    if (event) {
+      const news = event();
+      return news;
+    }
+    return null;
   }
 }
 
-
-
-export enum LocationActionEnum {
-  Rest = "Rest",
-  Inn = "Inn",
-  Camping = "Camping",
-  HouseRest = "House Rest",
-  Travel = "Travel",
-  TrainAttribute = "Train Attribute",
-  TrainProficiency = "Train Proficiency",
-  TrainArtisan = "Train Artisan",
-  TrainSkill = "Train Skill",
-  LearnSkill = "Learn Skill",
-  Stroll = "Stroll",
-  Craft = "Craft",
-  // Blacksmith = 'Blacksmith',
-  // Apothecary = 'Apothecary',
-  // Tailor = 'Tailor',
-  // Armorer = 'Armorer',
-  // Jeweler = 'Jeweler',
-  // Arcanist = 'Arcanist',
-  // Grocery = 'Grocery',
-  // Tavern = 'Tavern',
-  // HeavensDecreeMeeting = 'Heavens Decree Meeting',
-  // ChurchOfLaoh = 'Church of Laoh',
-  // GreatTempleOfLaoh = 'Great Temple of Laoh',
-  // CultOfNizarith = 'Cult of Nizarith',
-  // ShrineOfGelthoran = 'Shrine of Gelthoran',
-  // MajorShrineOfGelthoran = 'Major Shrine of Gelthoran',
-  // ShrineOfAqorath = 'Shrine of Aqorath',
-  // MajorShrineOfAqorath = 'Major Shrine of Aqorath',
-  // ShrineOfValthoria = 'Shrine of Valthoria',
-  // MajorShrineOfValthoria = 'Major Shrine of Valthoria',
-  // ShrineOfPyrnthanas = 'Shrine of Pyrnthanas',
-  // MajorShrineOfPyrnthanas = 'Major Shrine of Pyrnthanas',
-  // Barrack = 'Barrack',
-  // KnightOrder = 'Knight Order',
-  // MagicSchool = 'Magic School',
-  // MagicAcademy = 'Magic Academy',
-  // ChurchOfLaohMagicLearning = 'Church of Laoh Magic Learning',
-  // CultOfNizarithMagicLearning = 'Cult of Nizarith Magic Learning',
-  // AdventureGuild = 'Adventure Guild',
-  // BountyBoard = 'Bounty Board',
-  // Arena = 'Arena',
-  None = "None",
-}
-
-export enum LocationEventEnum {
-  BattleEvent = "battleEvent",
-
-  //Resting events
-  RestInnPoor = "restInnPoor",
-  RestInnComfortable = "restInnComfortable",
-  RestInnPremium = "restInnPremium",
-  RestInnLuxury = "restInnLuxury",
-  RestHouse = "restHouse",
-  RestCamp = "restCamp",
-
-  //Training events
-  TrainAttribute = "trainAttribute",
-  TrainProficiency = "trainProficiency",
-  TrainArtisan = "trainArtisan",
-
-  //Skill events
-  SkillLearn = "skillLearn",
-  SkillTrain = "skillTrain",
-
-  //Crafting events
-  Craft = "craft",
-
-  //Explorations and Travel events
-  StrollEvent = "strollEvent", //Stroll event take 3 arguments, the party, the player, and the event() -> {} to execute, maybe about gaining insight or call a check to call for another event
-
-  //Dialogue events
-  DialogueEvent = "dialogueEvent", //Dialogue with NPC, take player character and NPCDialogue (needed implementation) -> NPC Dialogue class would be needed, determine the dialogue tree and the outcome
-
-  //Quest events
-  QuestGiverEvent = "questGiverEvent", //Take character and quest, might check if the character has the quest already, if true -> update quest instead.
-  QuestUpdateEvent = "questUpdateEvent",
-  QuestCompleteEvent = "questCompleteEvent",
-
-  //Item events
-  ItemPickupEvent = "itemPickupEvent", //Take character and item, add item to character inventory
-  ItemShopEvent = "itemShopEvent", //Take character and shop, open shop interface, buy/sell items
-
-  None = "none",
+function getEventCategory(roll: number): keyof RandomEventUnits | null {
+  if (roll === 1) return "worst";
+  if (roll >= 2 && roll <= 3) return "bad";
+  if (roll >= 4 && roll <= 17) return null; // no event
+  if (roll >= 18 && roll <= 19) return "good";
+  if (roll === 20) return "best";
+  return null;
 }

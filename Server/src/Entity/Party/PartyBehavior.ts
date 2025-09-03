@@ -59,141 +59,24 @@ export class PartyBehavior {
 	This ensures intelligent leaders assess battles **more accurately**,
 	while agility influences reaction speed in encounters.
 	*/
-  combatPolicy: "engage" | "strategic" | "evasive";
-
-  /*
-		Trade System Flags:
-		This system determines how a party engages in trade, including buying and selling behavior.
-
-		: tradeEngagement - Determines if the party will engage in trade.
-			- "trade": The party participates in trade.
-			- "noTrade": The party does not engage in trade.
-
-		-------------------
-		SELLING CONFIGURATION
-		-------------------
-		: selling.strategy - Defines how the party sells items.
-			- "sellSome": The party sells items if they meet stock and rarity criteria.
-			- "sellNone": The party does not sell items.
-			- "sellAtMarkUp": The party sells items if their price exceeds a certain threshold (based on market price)
-			while also meeting stock and rarity criteria.
-
-		: selling.markupPercentage - The percentage above the base price at which items will be sold (only applies to "sellAtMarkUp").
-		: selling.rarityThreshold - The **maximum** rarity of an item that can be sold.
-		: selling.itemList - List of items the party is willing to sell.
-			- Each entry contains:
-				- `itemName: string` → Name of the item.
-				- `stockThreshold: number` → Minimum stock required before selling.
-
-		- **"sellSome" and "sellAtMarkUp"** always follow `stockThreshold`, `rarityThreshold`, and `itemList`.
-
-		-------------------
-		BUYING CONFIGURATION
-		-------------------
-		: buying.strategy - Defines how the party buys items.
-			- "buySome": The party buys items if they meet stock and rarity criteria.
-			- "buyNone": The party does not buy items.
-			- "buyAtDiscount": The party buys items if their price drops below a certain threshold (based on market price)
-			while also meeting stock and rarity criteria.
-
-		: buying.discountPercentage - The percentage below the base price at which items will be purchased (only applies to "buyAtDiscount").
-		: buying.rarityThreshold - The **minimum** rarity of an item that can be purchased.
-		: buying.itemList - List of items the party is willing to buy.
-			- Each entry contains:
-				- `itemName: string` → Name of the item.
-				- `stockThreshold: number` → Maximum stock the party wants to keep.
-
-		- **"buySome" and "buyAtDiscount"** always follow `stockThreshold`, `rarityThreshold`, and `itemList`.
-
-		: autoBuyEssentials - Determines if the party will **automatically** buy essential items (e.g., food, water).
-			- `true`: The party will always buy essential items when available.
-			- `false`: The party does not auto-buy essentials.
-	*/
-  trade: {
-    engagement: "trade" | "noTrade";
-    selling: {
-      strategy: "sellSome" | "sellNone" | "sellAtMarkUp";
-      markupPercentage: number;
-      rarityThreshold: number;
-      itemList: Record<string, number>;
-    };
-    buying: {
-      strategy: "buySome" | "buyNone" | "buyAtDiscount";
-      discountPercentage: number;
-      rarityThreshold: number;
-      itemList: Record<string, number>;
-      autoBuyEssentials: boolean;
-    };
-  };
-  /*
-	Crafting System Configuration:
-	The crafting system determines how a party will engage in crafting activities.
-	When the party has the 'craft' action set, at the designated time, the party will evaluate the `craftingList` to determine if crafting is possible.
-
-	- If the `craftingList` is empty, the party will not craft anything and will fall back to resting.
-	- If the `craftingList` contains items, the party will evaluate whether crafting is possible.
-
-	**Criteria for Crafting:**
-	1. The party must have enough resources to craft the item.
-	2. The crafting strategy must be met:
-	   - **"craftAll"**: Craft as many as possible with available resources.
-	   - **"craftInRange"**: Craft if the item quantity is below `quantityLow` but does not exceed `quantityHigh`.
-	   - **"craftOne"**: Craft a single item only if its quantity is 0.
-	3. If resources are insufficient but `allowTradeForMaterials` is `true`, the party will attempt to buy materials from the market. If materials are successfully acquired, crafting will proceed.
-
-	If none of the items in `craftingList` meet these criteria (including after trade attempts), the party will default to a rest action.
-
-	**Crafting Execution:**
-	- The party will assign crafting to the character with the highest skill in the required crafting category.
-	- Some blueprints may require specific facilities such as a **Blacksmith**, **Alchemy Lab**, or **Cooking Station**.
-	*/
-  craft: {
-    craftingList: {
-      [order: number]: {
-        bluePrintID: string;
-        quantityLow: number;
-        quantityHigh: number;
-        allowTradeForMaterials: boolean;
-        strategy: "craftInRange" | "craftAll" | "craftOne";
-      };
-    };
-  };
+  combatPolicy: "bold" | "measured" | "careful";
 
   // During the game, many events may happened, the risk taking behavior of the party will be used as a modifier factor to determine the outcome of the event.
-  riskTaking: "reckless" | "cautious" | "balanced";
+  riskTaking: "bold" | "measured" | "careful";
 
   // Travel Pace affected the speed of the party when traveling on the map.
-  travelPace: "fast" | "normal" | "slow";
+  travelPace: "bold" | "measured" | "careful";
 
   // Event Response flags affect how the party reacts to events.
-  eventResponse: "friendly" | "neutral" | "hostile";
+  eventResponse: "bold" | "measured" | "careful";
 
   useCampSupplies: boolean = false;
 
   constructor(init?: Partial<PartyBehavior>) {
     this.type = init?.type ?? PartyType.peasant;
-    this.combatPolicy = init?.combatPolicy ?? "strategic";
-    this.trade = init?.trade ?? {
-      engagement: "noTrade",
-      selling: {
-        strategy: "sellNone",
-        markupPercentage: 0,
-        rarityThreshold: 0,
-        itemList: {},
-      },
-      buying: {
-        strategy: "buyNone",
-        discountPercentage: 0,
-        rarityThreshold: 0,
-        itemList: {},
-        autoBuyEssentials: false,
-      },
-    };
-    this.riskTaking = init?.riskTaking ?? "balanced";
-    this.travelPace = init?.travelPace ?? "normal";
-    this.eventResponse = init?.eventResponse ?? "neutral";
-    this.craft = init?.craft ?? {
-      craftingList: {},
-    };
+    this.combatPolicy = init?.combatPolicy ?? "measured";
+    this.riskTaking = init?.riskTaking ?? "measured";
+    this.travelPace = init?.travelPace ?? "measured";
+    this.eventResponse = init?.eventResponse ?? "measured";
   }
 }
