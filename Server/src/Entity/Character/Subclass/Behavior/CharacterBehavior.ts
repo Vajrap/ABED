@@ -1,3 +1,4 @@
+import { InnLevel } from "../../../Location/Config/Inn";
 import { CharacterCraftingPreference } from "./subclasses/CharacterCraftingPreference";
 import { CharacterTradePolicy } from "./subclasses/CharacterTradePolicy";
 
@@ -15,6 +16,8 @@ export class CharacterBehavior {
   // Event Response flags affect how the party reacts to events.
   eventResponse: "bold" | "measured" | "careful";
 
+  preferredInnType: InnLevel;
+
   useCampSupplies: boolean;
 
   constructor(init?: Partial<CharacterBehavior>) {
@@ -25,6 +28,7 @@ export class CharacterBehavior {
     this.riskTaking = init?.riskTaking ?? "measured";
     this.travelPace = init?.travelPace ?? "measured";
     this.eventResponse = init?.eventResponse ?? "measured";
+    this.preferredInnType = init?.preferredInnType ?? InnLevel.Comfortable;
     this.useCampSupplies = init?.useCampSupplies ?? false;
   }
 }

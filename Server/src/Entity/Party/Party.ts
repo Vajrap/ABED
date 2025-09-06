@@ -4,9 +4,9 @@ import { Character } from "../Character/Character";
 import type { ItemId } from "../Item/Item";
 import { PartyType, type PartyBehavior } from "./PartyBehavior";
 import {
-  defaultTravelSequence,
-  type PartyTravelSequence,
-} from "./TravelSequence/PartyTravelSequence";
+  defaultPartyAction,
+  type PartyActionSequence,
+} from "./ActionlSequence/PartyActionSequence";
 
 type PartyCharacters = [
   Character | "none",
@@ -33,7 +33,7 @@ export class Party {
 
   justArrived: boolean = false;
   informations: Record<string, number> = {};
-  travelSequence: PartyTravelSequence = defaultTravelSequence;
+  actionSequence: PartyActionSequence = defaultPartyAction;
   leader: Character;
 
   constructor(data: {

@@ -58,3 +58,9 @@ export enum ActionInput {
 }
 
 export const specialActions: ActionInput[] = [];
+
+export const groupRest = [
+  ActionInput.Inn,
+  ActionInput.HouseRest,
+  ActionInput.Camping,
+];

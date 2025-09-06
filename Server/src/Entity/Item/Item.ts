@@ -54,28 +54,37 @@ export class Bone extends ItemResource {}
 export class ItemMisc extends Item {}
 
 export enum SwordId {
-  ironSword = "iron_sword",
+  ironSword = "ironSword",
 }
 
 export enum AxeId {
-  ironAxe = "iron_axe",
+  ironAxe = "ironAxe",
 }
 
 export type WeaponId = SwordId | AxeId;
 
 export enum ArmorId {
-  LeatherArmor = "leather_armor",
+  leatherArmor = "leatherArmor",
 }
 export type EquipmentId = WeaponId | ArmorId;
 
 // Consumables
 export enum PotionId {
-  HealingPotion = "healing_potion",
+  healingPotion = "healingPotion",
 }
 export enum FoodId {
-  Bread = "bread",
+  bread = "bread",
 }
-export type ConsumableId = PotionId | FoodId;
+
+export enum UsableId {
+  campKit = "campKit",
+}
+
+export enum MiscItemId {
+  gold = "gold",
+}
+
+export type ConsumableId = PotionId | FoodId | UsableId;
 
 // Top-level
-export type ItemId = EquipmentId | ConsumableId;
+export type ItemId = EquipmentId | ConsumableId | MiscItemId;

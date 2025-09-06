@@ -30,6 +30,8 @@ import {
 } from "./Subclass/Action/CharacterAction";
 import { ActionInput } from "./Subclass/Action/ActionInput";
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
+import type { CharNewsInterface } from "../News/News";
+import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 
 export class Character {
   id: string = "";
@@ -145,6 +147,16 @@ export class Character {
       }
     }
     return this;
+  }
+
+  intoNewsInterface(subRegion: SubRegionEnum): CharNewsInterface {
+    return {
+      name: this.name,
+      title: this.title.string(),
+      fame: this.fame.getString(subRegion),
+      portrait: this.portrait ?? "",
+      level: this.level,
+    };
   }
 }
 

@@ -9,8 +9,12 @@ export class CharacterFame {
     );
   }
 
-  get(region: SubRegionEnum) {
-    return this.fameMap.get(region) ?? 0;
+  get(subRegion: SubRegionEnum): number {
+    return this.fameMap.get(subRegion) ?? 0;
+  }
+
+  getString(subRegion: SubRegionEnum): string {
+    return toFameString(this.get(subRegion));
   }
 
   set(region: SubRegionEnum, value: number) {
@@ -28,4 +32,16 @@ export class CharacterFame {
   static fromJSON(data: Record<SubRegionEnum, number>) {
     return new CharacterFame(data);
   }
+}
+
+// Fame string
+function toFameString(value: number): string {
+  if (value >= 12000) return "Legendary";
+  if (value >= 6000) return "Heroic";
+  if (value >= 2500) return "Famous";
+  if (value >= 1000) return "Renowned";
+  if (value >= 400) return "Recognized";
+  if (value >= 150) return "Familiar";
+  if (value >= 50) return "Known";
+  return "No Name";
 }

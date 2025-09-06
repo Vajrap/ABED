@@ -1,6 +1,8 @@
 import { config } from "dotenv";
 import { GameTime } from "./GameTime/GameTime";
 import type { DayOfWeek, TimeOfDay } from "../InterFacesEnumsAndTypes/Time";
+import type { News } from "../Entity/News/News";
+import { locationManager } from "../Entity/Location/Manager/LocationManager";
 
 export async function runSchedule() {
   const now = new Date();
@@ -23,11 +25,11 @@ async function runGameLoop() {
   try {
     GameTime.advanceOnePhrase();
     handleGameMilestones();
-    await processEvents(
+    const news = await processEvents(
       GameTime.getCurrentGameDayOfWeek(),
       GameTime.getCurrentGamePhase(),
     );
-    await sendPartyData();
+    await sendPartyData(news);
     console.log("Game loop executed successfully.");
   } catch (error) {
     console.error("Error during game loop:", error);
@@ -94,12 +96,17 @@ function handleGameMilestones() {
 }
 
 async function processEvents(day: DayOfWeek, phase: TimeOfDay) {
-  // await locationManager.processEncounters(day, phase);
-  // await locationManager.processActions(day, phase);
-  // await travelManager.allTravel(day, phase);
+  // Since news are dealth with in the location, maybe we use location manager to deal with the WS instead of returning back here and go through send partyData?
+  // Else we need some new filtering function, which... a bit redundant,
+  const enc: News[] = await locationManager.processEncounters(day, phase);
+  const act: News[] = await locationManager.processActions(day, phase);
+  // const tra: News[] = await travelManager.allTravel(day, phase);
+  const news: News[] = [...enc, ...act, ...tra];
+
+  // postman.goForth(news)
 }
 
-async function sendPartyData() {
+async function sendPartyData(news: News[]) {
   // webSocketManager.userConnections.forEach((ws, userID) => {
   //   if (ws.readyState !== ws.OPEN) return;
   //   const clientParty = partyManager.getPartyByID(userID);
