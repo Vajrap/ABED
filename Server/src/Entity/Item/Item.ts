@@ -84,6 +84,8 @@ export enum MiscItemId {
   gold = "gold",
 }
 
+export enum BookId {}
+
 export type ConsumableId = PotionId | FoodId | UsableId;
 
 // Top-level

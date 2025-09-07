@@ -1,0 +1,37 @@
+import { LocationsEnum } from "../../../../InterFacesEnumsAndTypes/Enums/Location";
+import { RegionEnum } from "../../../../InterFacesEnumsAndTypes/Enums/Region";
+import { SubRegionEnum } from "../../../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import type { Character } from "../../../Character/Character";
+import type { ActionInput } from "../../../Character/Subclass/Action/ActionInput";
+import {
+  createNews,
+  type NewsContext,
+  type NewsWithScope,
+} from "../../../News/News";
+import type { LocationInns } from "../../Config/Inn";
+
+export function handleTrainAction(
+  characters: Character[],
+  type: ActionInput,
+  contest: NewsContext,
+  config?: LocationInns,
+): NewsWithScope {
+  return {
+    scope: {
+      kind: "world",
+    },
+    news: createNews({
+      scope: {
+        kind: "world",
+      },
+      tokens: [],
+      context: {
+        region: RegionEnum.CentralPlain,
+        subRegion: SubRegionEnum.FyonarCapitalDistrict,
+        location: LocationsEnum.PlagueWaterCrossing,
+        partyId: "",
+        characterIds: [],
+      },
+    }),
+  };
+}

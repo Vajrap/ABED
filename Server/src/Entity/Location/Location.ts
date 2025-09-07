@@ -1,14 +1,20 @@
+import type {
+  ArtisanKey,
+  AttributeKey,
+  ProficiencyKey,
+} from "../../InterFacesEnumsAndTypes/Enums";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 import { rollTwenty } from "../../Utils/Dice";
 import { statMod } from "../../Utils/statMod";
+import type { Character } from "../Character/Character";
 import {
   ActionInput,
   groupRest,
   specialActions,
-} from "../Character/Subclass/Action/ActionInput";
+} from "../Character/Subclass/Action/CharacterAction";
 import type {
   News,
   NewsContext,
@@ -16,6 +22,7 @@ import type {
   NewsWithScope,
 } from "../News/News";
 import type { Party } from "../Party/Party";
+import type { SkillId } from "../Skill/enums";
 import type { LocationInns } from "./Config/Inn";
 import { handleRestAction } from "./Events/handlers/rest";
 import type { SubRegion } from "./SubRegion";
@@ -155,240 +162,52 @@ export class Location {
     this.parties = this.parties.filter((p) => p !== party);
   }
 
-  // TODO, this should return NEWS[]
   async processEncounters(): Promise<NewsEmittedFromLocationStructure> {
-    let result: NewsEmittedFromLocationStructure = {
-      worldScope: [],
-      regionScope: new Map(),
-      subRegionScope: new Map(),
-      locationScope: new Map(),
-      partyScope: new Map(),
-      privateScope: new Map(),
-    };
-    if (this.parties.length < 2) return result;
+    const result = createEmptyNewsStructure();
 
-    const shuffled = [...this.parties].sort(() => Math.random() - 0.5);
-
-    const candidates: Party[] = shuffled.filter(
-      () => rollTwenty().total % 2 === 1,
-    );
-
+    const candidates = getEncounterCandidates(this.parties);
     if (candidates.length < 2) return result;
 
-    const encountered = new Set<Party>();
-    const news: News[] = [];
+    const encounterPairs = pairEncounterCandidates(candidates);
+    const newsList = generateEncounterNews(encounterPairs);
 
-    for (let i = 0; i < candidates.length - 1; i++) {
-      const candidateA = candidates[i]!;
-      if (encountered.has(candidateA)) continue;
-
-      for (let j = i + 1; j < candidates.length; j++) {
-        const candidateB = candidates[j]!;
-        if (encountered.has(candidateB)) continue;
-
-        // news.push(this.checkAndTriggerEncounterEvent(candidateA, candidateB));
-        encountered.add(candidateA);
-        encountered.add(candidateB);
-      }
-    }
-
-    for (const n of news) {
-      switch (n.scope.kind) {
-        case "world":
-          result.worldScope.push(n);
-          break;
-        case "region": {
-          const reg = result.regionScope.get(n.scope.region);
-          if (!reg) {
-            result.regionScope.set(n.scope.region, [n]);
-            break;
-          } else {
-            reg.push(n);
-            result.regionScope.set(n.scope.region, reg);
-          }
-          break;
-        }
-        case "subRegion": {
-          const subReg = result.subRegionScope.get(n.scope.subRegion);
-          if (!subReg) {
-            result.subRegionScope.set(n.scope.subRegion, [n]);
-            break;
-          } else {
-            subReg.push(n);
-            result.subRegionScope.set(n.scope.subRegion, subReg);
-          }
-          break;
-        }
-        case "location": {
-          const loc = result.locationScope.get(n.scope.location);
-          if (!loc) {
-            result.locationScope.set(n.scope.location, [n]);
-            break;
-          } else {
-            loc.push(n);
-            result.locationScope.set(n.scope.location, loc);
-          }
-          break;
-        }
-        case "party": {
-          const party = result.partyScope.get(n.scope.partyId);
-          if (!party) {
-            result.partyScope.set(n.scope.partyId, [n]);
-            break;
-          } else {
-            party.push(n);
-            result.partyScope.set(n.scope.partyId, party);
-          }
-          break;
-        }
-        case "private": {
-          // TODO::
-          break;
-        }
-      }
+    for (const n of newsList) {
+      pushNewsToScope(result, n);
     }
 
     return result;
   }
 
-  // TODO, this should return NEWS[]
   async processActions(
     day: DayOfWeek,
     phase: TimeOfDay,
   ): Promise<NewsEmittedFromLocationStructure> {
-    let news: NewsEmittedFromLocationStructure = {
-      worldScope: [],
-      regionScope: new Map(),
-      subRegionScope: new Map(),
-      locationScope: new Map(),
-      partyScope: new Map(),
-      privateScope: new Map(),
-    };
+    const results: NewsEmittedFromLocationStructure =
+      createEmptyNewsStructure();
+    if (this.parties.length === 0) return results;
 
-    if (this.parties.length === 0) return [];
+    for (const party of this.parties) {
+      if (shouldSkipPartyActions(party, day, phase)) continue;
 
-    /*
-      Action processing idea
-      - since now we move from party scale action to character scale action, that means the resolving would happen per character instead
-      - but since 'travel' is party wide, which masked character's action, that means we need to skip party that current action is travel
+      const context = buildNewsContext(this, party);
 
-    */
-    for (let party of this.parties) {
-      // Skip travelling party
-      const partyAction = party.actionSequence[day][phase];
-      if (partyAction === ActionInput.Travel) {
-        continue;
-      }
-
-      const context: NewsContext = {
-        region: this.region,
-        subRegion: this.subRegion,
-        location: this.id,
-        partyId: party.partyID,
-        characterIds: party.characters
-          .filter((character) => character !== "none")
-          .map((character) => character.id),
-      };
-
-      // Skip Special resting Party (exclude ActionInput.Resting, that's for individual)
-      // Special action like event or some special things that the leader choose, this will overwrite character's action and dealth with as a party
-      if (specialActions.includes(partyAction)) {
-        continue;
-      }
-      // Group Rests handler
-
-      if (groupRest.includes(partyAction)) {
-        const characters = party.characters.filter(
-          (character) => character !== "none",
-        );
-        const result = handleRestAction(
-          characters,
-          partyAction === ActionInput.None ? ActionInput.Rest : partyAction,
+      if (isGroupRest(party.actionSequence[day][phase])) {
+        const result = processGroupResting(
+          party,
+          party.actionSequence[day][phase],
           context,
           this.innType,
         );
-        let partyNews = news.partyScope.get(party.partyID);
-        if (!partyNews) {
-          news.partyScope.set(party.partyID, [result.news]);
-        } else {
-          partyNews.push(result.news);
-        }
+        if (result)
+          addToMapArray(results.partyScope, party.partyID, result.news);
         continue;
       }
 
-      for (const character of party.characters) {
-        if (character === "none") continue;
-        context.characterIds = [character.id];
-        let action = character.actionSequence[day][phase];
-        if (action === ActionInput.Travel) continue;
-        if (!this.actions.includes(action)) action = ActionInput.Rest;
-
-        // Still needs to determine if we think of random event as differed per action, or is it location wide?
-        // For example, if roll = 20, would event appeared from action=train and action=rest and action = craft the same thing?
-        // A quick instinct would says, no?
-        let randomEncounter =
-          rollTwenty().total +
-          statMod(character.attribute.getStat("luck").total);
-        const eventCategory = getEventCategory(randomEncounter);
-
-        switch (action) {
-          case ActionInput.Rest:
-          case ActionInput.None: {
-            let result: NewsWithScope | null = eventCategory
-              ? this.handleSpecialEvent("rest", eventCategory)
-              : handleRestAction([character], ActionInput.Rest, context);
-            if (result) {
-              const characterNews = news.privateScope.get(character.id);
-              if (!characterNews) {
-                news.privateScope.set(character.id, [result.news]);
-              } else {
-                characterNews.push(result.news);
-              }
-            }
-            break;
-          }
-          case ActionInput.TrainAttribute:
-          case ActionInput.TrainProficiency:
-          case ActionInput.TrainArtisan:
-          case ActionInput.TrainSkill: {
-            let result: News | null = eventCategory
-              ? this.handleSpecialEvent("train", eventCategory)
-              : handleTrainAction();
-            if (result) news.push(result);
-            break;
-          }
-          case ActionInput.LearnSkill: {
-            let result: News | null = eventCategory
-              ? this.handleSpecialEvent("train", eventCategory)
-              : handleLearnSkillAction();
-            if (result) news.push(result);
-            break;
-          }
-          case ActionInput.Craft: {
-            let result: News | null = eventCategory
-              ? this.handleSpecialEvent("artisan", eventCategory)
-              : handleCraftAction();
-            if (result) news.push(result);
-            break;
-          }
-          case ActionInput.Stroll: {
-            let result: News | null = eventCategory
-              ? this.handleSpecialEvent("stroll", eventCategory)
-              : handleStrollAction();
-            if (result) news.push(result);
-            break;
-          }
-          default: {
-            let result: News | null = eventCategory
-              ? this.handleSpecialEvent("rest", eventCategory)
-              : handleRestAction([character], ActionInput.Rest);
-            if (result) news.push(result);
-            break;
-          }
-        }
-      }
+      const groups = groupCharacterActions(party, day, phase, this.actions);
+      processCharacterGroups(groups, context, results);
     }
-    return news;
+
+    return results;
   }
 
   private handleSpecialEvent(
@@ -401,8 +220,12 @@ export class Location {
         ? events[Math.floor(Math.random() * events.length)]
         : null;
     if (event) {
-      const news = event();
-      return news;
+      return {
+        scope: {
+          kind: "world",
+        },
+        news: event(),
+      };
     }
     return null;
   }
@@ -415,4 +238,269 @@ function getEventCategory(roll: number): keyof RandomEventUnits | null {
   if (roll >= 18 && roll <= 19) return "good";
   if (roll === 20) return "best";
   return null;
+}
+
+type ArtisanAction = {
+  character: Character;
+  actionInput: ActionInput;
+};
+
+type CharacterGroups = {
+  resting: Character[];
+  trainAttribute: Map<AttributeKey, Character[]>;
+  trainArtisan: Map<ArtisanKey, Character[]>;
+  trainProficiency: Map<ProficiencyKey, Character[]>;
+  trainSkill: Map<SkillId, Character[]>;
+  learnSkill: Map<SkillId, Character[]>;
+  strolling: Character[];
+  tavern: Character[];
+  artisanActions: ArtisanAction[];
+};
+
+function groupCharacterActions(
+  party: Party,
+  day: DayOfWeek,
+  phase: TimeOfDay,
+  validActions: ActionInput[],
+): CharacterGroups {
+  const groups: CharacterGroups = {
+    resting: [],
+    trainAttribute: new Map(),
+    trainArtisan: new Map(),
+    trainProficiency: new Map(),
+    trainSkill: new Map(),
+    learnSkill: new Map(),
+    strolling: [],
+    tavern: [],
+    artisanActions: [],
+  };
+
+  for (const character of party.characters.filter((c) => c !== "none")) {
+    const action = character.actionSequence[day][phase];
+
+    if (action.type === ActionInput.Travel) continue;
+    if (!validActions.includes(action.type)) {
+      groups.resting.push(character);
+      continue;
+    }
+
+    switch (action.type) {
+      case ActionInput.Rest:
+        groups.resting.push(character);
+        break;
+
+      case ActionInput.TrainAttribute:
+        addToMapArray(groups.trainAttribute, action.attribute, character);
+        break;
+
+      case ActionInput.TrainArtisan:
+        addToMapArray(groups.trainArtisan, action.artisan, character);
+        break;
+
+      case ActionInput.TrainProficiency:
+        addToMapArray(groups.trainProficiency, action.proficiency, character);
+        break;
+
+      case ActionInput.TrainSkill:
+        addToMapArray(groups.trainSkill, action.skillId, character);
+        break;
+
+      case ActionInput.LearnSkill:
+        addToMapArray(groups.learnSkill, action.skillId, character);
+        break;
+
+      case ActionInput.Stroll:
+        groups.strolling.push(character);
+        break;
+
+      case ActionInput.Tavern:
+        groups.tavern.push(character);
+        break;
+
+      case ActionInput.Read:
+      case ActionInput.Craft:
+      case ActionInput.Mining:
+      case ActionInput.WoodCutting:
+      case ActionInput.Foraging:
+      case ActionInput.Smelting:
+      case ActionInput.Tanning:
+      case ActionInput.Carpentry:
+      case ActionInput.Weaving:
+      case ActionInput.Enchanting:
+        groups.artisanActions.push({ character, actionInput: action.type });
+        break;
+    }
+  }
+
+  return groups;
+}
+
+// Utility to add to a Map<K, V[]>
+function addToMapArray<K, V>(map: Map<K, V[]>, key: K, value: V) {
+  const existing = map.get(key);
+  if (existing) {
+    existing.push(value);
+  } else {
+    map.set(key, [value]);
+  }
+}
+
+function getEncounterCandidates(parties: Party[]): Party[] {
+  if (parties.length < 2) return [];
+  const shuffled = [...parties].sort(() => Math.random() - 0.5);
+  return shuffled.filter(() => rollTwenty().total % 2 === 1);
+}
+
+function pairEncounterCandidates(candidates: Party[]): [Party, Party][] {
+  const pairs: [Party, Party][] = [];
+  const encountered = new Set<Party>();
+
+  for (let i = 0; i < candidates.length - 1; i++) {
+    const a = candidates[i]!;
+    if (encountered.has(a)) continue;
+
+    for (let j = i + 1; j < candidates.length; j++) {
+      const b = candidates[j]!;
+      if (encountered.has(b)) continue;
+
+      pairs.push([a, b]);
+      encountered.add(a);
+      encountered.add(b);
+      break; // one pairing per party
+    }
+  }
+
+  return pairs;
+}
+
+function generateEncounterNews(pairs: [Party, Party][]): News[] {
+  const news: News[] = [];
+  for (const [a, b] of pairs) {
+    // Placeholder - replace with actual logic
+    // const result = checkAndTriggerEncounterEvent(a, b);
+    // if (result) news.push(result);
+  }
+  return news;
+}
+
+function pushNewsToScope(result: NewsEmittedFromLocationStructure, news: News) {
+  switch (news.scope.kind) {
+    case "world":
+      result.worldScope.push(news);
+      break;
+    case "region":
+      addToMapArray(result.regionScope, news.scope.region, news);
+      break;
+    case "subRegion":
+      addToMapArray(result.subRegionScope, news.scope.subRegion, news);
+      break;
+    case "location":
+      addToMapArray(result.locationScope, news.scope.location, news);
+      break;
+    case "party":
+      addToMapArray(result.partyScope, news.scope.partyId, news);
+      break;
+    case "private":
+      // TODO: handle private scope
+      break;
+  }
+}
+
+function createEmptyNewsStructure(): NewsEmittedFromLocationStructure {
+  return {
+    worldScope: [],
+    regionScope: new Map(),
+    subRegionScope: new Map(),
+    locationScope: new Map(),
+    partyScope: new Map(),
+    privateScope: new Map(),
+  };
+}
+
+function shouldSkipPartyActions(
+  party: Party,
+  day: DayOfWeek,
+  phase: TimeOfDay,
+): boolean {
+  const action = party.actionSequence[day][phase];
+  return action === ActionInput.Travel || specialActions.includes(action);
+}
+
+function buildNewsContext(location: Location, party: Party): NewsContext {
+  return {
+    region: location.region,
+    subRegion: location.subRegion,
+    location: location.id,
+    partyId: party.partyID,
+    characterIds: party.characters.filter((c) => c !== "none").map((c) => c.id),
+  };
+}
+
+function isGroupRest(action: ActionInput): boolean {
+  return groupRest.includes(action);
+}
+
+function processGroupResting(
+  party: Party,
+  action: ActionInput,
+  context: NewsContext,
+  innType: LocationInns,
+): NewsWithScope | null {
+  const characters = party.characters.filter((c) => c !== "none");
+  return handleRestAction(
+    characters,
+    action === ActionInput.None ? ActionInput.Rest : action,
+    context,
+    innType,
+  );
+}
+
+function processCharacterGroups(
+  groups: CharacterGroups,
+  context: NewsContext,
+  news: NewsEmittedFromLocationStructure,
+) {
+  // Solo Artisan
+  for (const c of groups.artisanActions) {
+    const roll =
+      rollTwenty().total + statMod(c.character.attribute.getStat("luck").total);
+    const category = getEventCategory(roll);
+    if (category) {
+      const result = handleSpecialEvent(c.character, category, context);
+      if (result) pushToMap(news.privateScope, c.character.id, result.news);
+    } else {
+      const result = handelArtisanAction(c.character, c.actionInput, context);
+      if (result) pushToMap(news.privateScope, c.character.id, result.news);
+    }
+  }
+
+  // Rest
+  for (const c of groups.resting) {
+    const result = handleRestAction([c], ActionInput.Rest, context);
+    if (result) pushToMap(news.privateScope, c.id, result.news);
+  }
+
+  // Group
+  handleStrollling(groups.strolling, context);
+  handleTavern(groups.tavern, context);
+
+  groups.trainArtisan.forEach((chars, artisan) => {
+    // implement
+  });
+
+  groups.trainAttribute.forEach((chars, attr) => {
+    // implement
+  });
+
+  groups.trainProficiency.forEach((chars, prof) => {
+    // implement
+  });
+
+  groups.trainSkill.forEach((chars, skill) => {
+    // implement
+  });
+
+  groups.learnSkill.forEach((chars, skill) => {
+    // implement
+  });
 }

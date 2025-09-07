@@ -1,5 +1,5 @@
 import { DayOfWeek, TimeOfDay } from "../../../InterFacesEnumsAndTypes/Time";
-import { ActionInput } from "../../Character/Subclass/Action/ActionInput";
+import { ActionInput } from "../../Character/Subclass/Action/CharacterAction";
 
 export type PartyActionSequence = {
   [DayOfWeek.laoh]: {
