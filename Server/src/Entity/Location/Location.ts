@@ -320,12 +320,72 @@ function groupCharacterActions(
 }
 
 // Utility to add to a Map<K, V[]>
-function addToMapArray<K, V>(map: Map<K, V[]>, key: K, value: V) {
-  const existing = map.get(key);
-  if (existing) {
-    existing.push(value);
+function addToWorldScope(news: NewsEmittedFromLocationStructure, item: News) {
+  news.worldScope.push(item);
+}
+
+function addToRegionScope(
+  news: NewsEmittedFromLocationStructure,
+  region: RegionEnum,
+  item: News,
+) {
+  const arr = news.regionScope.get(region);
+  if (arr) {
+    arr.push(item);
   } else {
-    map.set(key, [value]);
+    news.regionScope.set(region, [item]);
+  }
+}
+
+function addToSubRegionScope(
+  news: NewsEmittedFromLocationStructure,
+  subRegion: SubRegionEnum,
+  item: News,
+) {
+  const arr = news.subRegionScope.get(subRegion);
+  if (arr) {
+    arr.push(item);
+  } else {
+    news.subRegionScope.set(subRegion, [item]);
+  }
+}
+
+function addToLocationScope(
+  news: NewsEmittedFromLocationStructure,
+  location: LocationsEnum,
+  item: News,
+) {
+  const arr = news.locationScope.get(location);
+  if (arr) {
+    arr.push(item);
+  } else {
+    news.locationScope.set(location, [item]);
+  }
+}
+
+function addToPartyScope(
+  news: NewsEmittedFromLocationStructure,
+  partyId: string,
+  item: News,
+) {
+  const arr = news.partyScope.get(partyId);
+  if (arr) {
+    arr.push(item);
+  } else {
+    news.partyScope.set(partyId, [item]);
+  }
+}
+
+function addToPrivateScope(
+  news: NewsEmittedFromLocationStructure,
+  characterId: string,
+  item: News,
+) {
+  const arr = news.privateScope.get(characterId);
+  if (arr) {
+    arr.push(item);
+  } else {
+    news.privateScope.set(characterId, [item]);
   }
 }
 

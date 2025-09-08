@@ -2,7 +2,7 @@ import { LocationsEnum } from "../../../../InterFacesEnumsAndTypes/Enums/Locatio
 import { RegionEnum } from "../../../../InterFacesEnumsAndTypes/Enums/Region";
 import { SubRegionEnum } from "../../../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import type { Character } from "../../../Character/Character";
-import type { ActionInput } from "../../../Character/Subclass/Action/ActionInput";
+import type { ActionInput } from "../../../Character/Subclass/Action/CharacterAction";
 import {
   createNews,
   type NewsContext,
