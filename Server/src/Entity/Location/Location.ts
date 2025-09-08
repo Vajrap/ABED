@@ -25,6 +25,7 @@ import type { Party } from "../Party/Party";
 import type { SkillId } from "../Skill/enums";
 import type { LocationInns } from "./Config/Inn";
 import { handleRestAction } from "./Events/handlers/rest";
+import { handleTrainAction } from "./Events/handlers/train";
 import type { SubRegion } from "./SubRegion";
 
 export type UserInputAction = {
@@ -40,11 +41,14 @@ type RandomEvents = {
 };
 
 type RandomEventUnits = {
-  worst: (() => News)[];
-  bad: (() => News)[];
-  good: (() => News)[];
-  best: (() => News)[];
+  worst: RandomEventSubUnit;
+  bad: RandomEventSubUnit;
+  good: RandomEventSubUnit;
+  best: RandomEventSubUnit;
 };
+
+type RandomEventHandler = (characters: Character[]) => News;
+export type RandomEventSubUnit = RandomEventHandler[];
 
 const defaultRandomEvents: RandomEvents = {
   rest: {
@@ -204,30 +208,10 @@ export class Location {
       }
 
       const groups = groupCharacterActions(party, day, phase, this.actions);
-      processCharacterGroups(groups, context, results);
+      processCharacterGroups(groups, context, results, this.randomEvents);
     }
 
     return results;
-  }
-
-  private handleSpecialEvent(
-    actionType: keyof RandomEvents,
-    category: keyof RandomEventUnits,
-  ): NewsWithScope | null {
-    const events = this.randomEvents[actionType][category];
-    const event =
-      events.length > 0
-        ? events[Math.floor(Math.random() * events.length)]
-        : null;
-    if (event) {
-      return {
-        scope: {
-          kind: "world",
-        },
-        news: event(),
-      };
-    }
-    return null;
   }
 }
 
@@ -459,48 +443,140 @@ function processCharacterGroups(
   groups: CharacterGroups,
   context: NewsContext,
   news: NewsEmittedFromLocationStructure,
+  events: RandomEvents,
 ) {
   // Solo Artisan
-  for (const c of groups.artisanActions) {
-    const roll =
-      rollTwenty().total + statMod(c.character.attribute.getStat("luck").total);
-    const category = getEventCategory(roll);
-    if (category) {
-      const result = handleSpecialEvent(c.character, category, context);
-      if (result) pushToMap(news.privateScope, c.character.id, result.news);
-    } else {
-      const result = handelArtisanAction(c.character, c.actionInput, context);
-      if (result) pushToMap(news.privateScope, c.character.id, result.news);
-    }
+  for (const { character, actionInput } of groups.artisanActions) {
+    resolveGroupRandomEvent(
+      [character],
+      events.artisan,
+      () => handelArtisanAction(character, actionInput, context),
+      "private",
+      news,
+      character.id,
+    );
   }
 
   // Rest
   for (const c of groups.resting) {
-    const result = handleRestAction([c], ActionInput.Rest, context);
-    if (result) pushToMap(news.privateScope, c.id, result.news);
+    resolveGroupRandomEvent(
+      [c],
+      events.rest,
+      () => handleRestAction([c], ActionInput.Rest, context),
+      "private",
+      news,
+      c.id,
+    );
   }
 
   // Group
-  handleStrollling(groups.strolling, context);
-  handleTavern(groups.tavern, context);
+  // Tavern and strolling might not use the luck roll for random encounter, but the location should provide list of possible events separate into groups
+  // Grouping just like the same as RE, worst bad natural good best, each with multiple possible events, and we randomly pick.
+  if (groups.strolling.length > 0) {
+  }
 
-  groups.trainArtisan.forEach((chars, artisan) => {
-    // implement
+  if (groups.tavern.length > 0) {
+  }
+
+  // Training, subAction grouping
+  groups.trainArtisan.forEach((chars, artisanKey) => {
+    resolveGroupRandomEvent(
+      chars,
+      events.train,
+      () => handleTrainAction(chars, artisanKey, context),
+      "party",
+      news,
+      context.partyId,
+    );
   });
 
-  groups.trainAttribute.forEach((chars, attr) => {
-    // implement
+  groups.trainAttribute.forEach((chars, attributeKey) => {
+    resolveGroupRandomEvent(
+      chars,
+      events.train,
+      () => handleTrainAction(chars, attributeKey, context),
+      "party",
+      news,
+      context.partyId,
+    );
   });
 
-  groups.trainProficiency.forEach((chars, prof) => {
-    // implement
+  groups.trainProficiency.forEach((chars, proficiencyKey) => {
+    resolveGroupRandomEvent(
+      chars,
+      events.train,
+      () => handleTrainAction(chars, proficiencyKey, context),
+      "party",
+      news,
+      context.partyId,
+    );
   });
 
-  groups.trainSkill.forEach((chars, skill) => {
-    // implement
+  groups.trainSkill.forEach((chars, skillId) => {
+    resolveGroupRandomEvent(
+      chars,
+      events.train,
+      () => {},
+      "party",
+      news,
+      context.partyId,
+    );
   });
 
-  groups.learnSkill.forEach((chars, skill) => {
-    // implement
+  groups.learnSkill.forEach((chars, skillId) => {
+    resolveGroupRandomEvent(
+      chars,
+      events.learn,
+      () => {},
+      "party",
+      news,
+      context.partyId,
+    );
   });
+
+  return news;
+}
+
+function resolveGroupRandomEvent(
+  characters: Character[],
+  eventSource: RandomEventUnits,
+  fallback: () => NewsWithScope | null,
+  scopeType: "private" | "party",
+  news: NewsEmittedFromLocationStructure,
+  scopeKey: string,
+) {
+  const luckAvg = Math.floor(
+    characters.reduce(
+      (sum, c) => sum + statMod(c.attribute.getTotal("luck")),
+      0,
+    ) / characters.length,
+  );
+  const roll = rollTwenty().total + luckAvg;
+  const category = getEventCategory(roll);
+
+  if (category) {
+    const candidates = eventSource[category];
+    if (candidates.length > 0) {
+      const event = candidates[Math.floor(Math.random() * candidates.length)];
+      const result = event!(characters);
+      if (result) {
+        addToMapArray(
+          scopeType === "private" ? news.privateScope : news.partyScope,
+          scopeKey,
+          result,
+        );
+        return;
+      }
+    }
+  }
+
+  // fallback
+  const result = fallback();
+  if (result) {
+    addToMapArray(
+      scopeType === "private" ? news.privateScope : news.partyScope,
+      scopeKey,
+      result.news,
+    );
+  }
 }
