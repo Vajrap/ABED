@@ -47,7 +47,7 @@ type RandomEventUnits = {
   best: RandomEventSubUnit;
 };
 
-type RandomEventHandler = (characters: Character[]) => News;
+type RandomEventHandler = (characters: Character[]) => NewsWithScope;
 export type RandomEventSubUnit = RandomEventHandler[];
 
 const defaultRandomEvents: RandomEvents = {
@@ -202,8 +202,7 @@ export class Location {
           context,
           this.innType,
         );
-        if (result)
-          addToMapArray(results.partyScope, party.partyID, result.news);
+        if (result) addToPartyScope(results, party.partyID, result.news);
         continue;
       }
 
@@ -261,6 +260,15 @@ function groupCharacterActions(
 
   for (const character of party.characters.filter((c) => c !== "none")) {
     const action = character.actionSequence[day][phase];
+
+    function addToMapArray<K, V>(map: Map<K, V[]>, key: K, value: V) {
+      const existing = map.get(key);
+      if (existing) {
+        existing.push(value);
+      } else {
+        map.set(key, [value]);
+      }
+    }
 
     if (action.type === ActionInput.Travel) continue;
     if (!validActions.includes(action.type)) {
@@ -433,19 +441,22 @@ function pushNewsToScope(result: NewsEmittedFromLocationStructure, news: News) {
       result.worldScope.push(news);
       break;
     case "region":
-      addToMapArray(result.regionScope, news.scope.region, news);
+      addToRegionScope(result, news.scope.region, news);
       break;
     case "subRegion":
-      addToMapArray(result.subRegionScope, news.scope.subRegion, news);
+      addToSubRegionScope(result, news.scope.subRegion, news);
       break;
     case "location":
-      addToMapArray(result.locationScope, news.scope.location, news);
+      addToLocationScope(result, news.scope.location, news);
       break;
     case "party":
-      addToMapArray(result.partyScope, news.scope.partyId, news);
+      addToPartyScope(result, news.scope.partyId, news);
       break;
     case "private":
       // TODO: handle private scope
+      for (const charId of news.scope.characterIds) {
+        addToPrivateScope(result, charId, news);
+      }
       break;
   }
 }
@@ -504,7 +515,7 @@ function processCharacterGroups(
   context: NewsContext,
   news: NewsEmittedFromLocationStructure,
   events: RandomEvents,
-) {
+): NewsEmittedFromLocationStructure {
   // Solo Artisan
   for (const { character, actionInput } of groups.artisanActions) {
     resolveGroupRandomEvent(
@@ -601,10 +612,8 @@ function resolveGroupRandomEvent(
   characters: Character[],
   eventSource: RandomEventUnits,
   fallback: () => NewsWithScope | null,
-  scopeType: "private" | "party",
-  news: NewsEmittedFromLocationStructure,
-  scopeKey: string,
 ) {
+  let results: NewsWithScope[] = [];
   const luckAvg = Math.floor(
     characters.reduce(
       (sum, c) => sum + statMod(c.attribute.getTotal("luck")),
@@ -620,23 +629,40 @@ function resolveGroupRandomEvent(
       const event = candidates[Math.floor(Math.random() * candidates.length)];
       const result = event!(characters);
       if (result) {
-        addToMapArray(
-          scopeType === "private" ? news.privateScope : news.partyScope,
-          scopeKey,
-          result,
-        );
+        results.push(result);
         return;
       }
     }
   }
 
-  // fallback
   const result = fallback();
   if (result) {
-    addToMapArray(
-      scopeType === "private" ? news.privateScope : news.partyScope,
-      scopeKey,
-      result.news,
-    );
+    results.push(result);
+  }
+}
+
+function addNewsWithScopeToNewsEmittedFromLocationStruct(
+  nws: NewsWithScope,
+  nefls: NewsEmittedFromLocationStructure,
+) {
+  switch (nws.scope.kind) {
+    case "private":
+      addToPrivateScope(nefls, "characterId", nws.news);
+      break;
+    case "party":
+      nefls.partyScope.push(nws);
+      break;
+    case "location":
+      nefls.locationScope.push(nws);
+      break;
+    case "subRegion":
+      nefls.subRegionScope.push(nws);
+      break;
+    case "region":
+      nefls.regionScope.push(nws);
+      break;
+    case "world":
+      nefls.worldScope.push(nws);
+      break;
   }
 }

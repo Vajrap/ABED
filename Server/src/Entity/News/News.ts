@@ -93,7 +93,7 @@ export type NewsEmittedFromLocationStructure = {
   privateScope: Map<string, News[]>;
 };
 
-// each event should emit this, and the handler might be the one dealing with then, putting into the map
+// each event should emit this, and the handler might be the one dealing with them, putting it back into the map
 export type NewsWithScope = {
   scope: NewsScope;
   news: News;

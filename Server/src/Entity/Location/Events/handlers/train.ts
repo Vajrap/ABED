@@ -13,7 +13,7 @@ import type { LocationInns } from "../../Config/Inn";
 export function handleTrainAction(
   characters: Character[],
   type: ActionInput,
-  contest: NewsContext,
+  context: NewsContext,
   config?: LocationInns,
 ): NewsWithScope {
   return {
