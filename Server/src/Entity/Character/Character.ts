@@ -25,10 +25,11 @@ import type { BreathingSkillId } from "../BreathingSkill/enum";
 import { CharacterBehavior } from "./Subclass/Behavior/CharacterBehavior";
 import { CharacterTitle } from "./Subclass/Title/Title";
 import {
+  ActionInput,
   defaultActionSequence,
+  type CharacterAction,
   type CharacterActionSequence,
 } from "./Subclass/Action/CharacterAction";
-import { ActionInput } from "./Subclass/Action/ActionInput";
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 import type { CharNewsInterface } from "../News/News";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
@@ -126,11 +127,7 @@ export class Character {
     this.statTracker = data.statTracker || 0;
   }
 
-  get levelUpStatNeeded(): number {
-    return 5 + this.level * 2;
-  }
-
-  getActionFor(day: DayOfWeek, time: TimeOfDay): ActionInput {
+  getActionFor(day: DayOfWeek, time: TimeOfDay): CharacterAction {
     return this.actionSequence[day][time];
   }
 

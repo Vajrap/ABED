@@ -516,94 +516,80 @@ function processCharacterGroups(
   news: NewsEmittedFromLocationStructure,
   events: RandomEvents,
 ): NewsEmittedFromLocationStructure {
+  let allNews: NewsWithScope[] = [];
   // Solo Artisan
   for (const { character, actionInput } of groups.artisanActions) {
-    resolveGroupRandomEvent(
-      [character],
-      events.artisan,
-      () => handelArtisanAction(character, actionInput, context),
-      "private",
-      news,
-      character.id,
+    const result = resolveGroupRandomEvent([character], events.artisan, () =>
+      handelArtisanAction(character, actionInput, context),
     );
+    allNews.push(...result);
   }
 
   // Rest
   for (const c of groups.resting) {
-    resolveGroupRandomEvent(
-      [c],
-      events.rest,
-      () => handleRestAction([c], ActionInput.Rest, context),
-      "private",
-      news,
-      c.id,
+    const result = resolveGroupRandomEvent([c], events.rest, () =>
+      handleRestAction([c], ActionInput.Rest, context),
     );
+    allNews.push(...result);
   }
 
   // Group
   // Tavern and strolling might not use the luck roll for random encounter, but the location should provide list of possible events separate into groups
   // Grouping just like the same as RE, worst bad natural good best, each with multiple possible events, and we randomly pick.
+  // These resolve functions might need to receive the location or at least set of possible events from location itself
   if (groups.strolling.length > 0) {
+    const result: NewsWithScope[] = resolveStrollingAction();
+    allNews.push(...result);
   }
 
   if (groups.tavern.length > 0) {
+    const result: NewsWithScope[] = resolveTavernAction();
+    allNews.push(...result);
   }
 
   // Training, subAction grouping
   groups.trainArtisan.forEach((chars, artisanKey) => {
-    resolveGroupRandomEvent(
-      chars,
-      events.train,
-      () => handleTrainAction(chars, artisanKey, context),
-      "party",
-      news,
-      context.partyId,
+    const result = resolveGroupRandomEvent(chars, events.train, () =>
+      handleTrainAction(chars, artisanKey, context),
     );
+    allNews.push(...result);
   });
 
   groups.trainAttribute.forEach((chars, attributeKey) => {
-    resolveGroupRandomEvent(
-      chars,
-      events.train,
-      () => handleTrainAction(chars, attributeKey, context),
-      "party",
-      news,
-      context.partyId,
+    const result = resolveGroupRandomEvent(chars, events.train, () =>
+      handleTrainAction(chars, attributeKey, context),
     );
+    allNews.push(...result);
   });
 
   groups.trainProficiency.forEach((chars, proficiencyKey) => {
-    resolveGroupRandomEvent(
-      chars,
-      events.train,
-      () => handleTrainAction(chars, proficiencyKey, context),
-      "party",
-      news,
-      context.partyId,
+    const result = resolveGroupRandomEvent(chars, events.train, () =>
+      handleTrainAction(chars, proficiencyKey, context),
     );
+    allNews.push(...result);
   });
 
   groups.trainSkill.forEach((chars, skillId) => {
-    resolveGroupRandomEvent(
-      chars,
-      events.train,
-      () => {},
-      "party",
-      news,
-      context.partyId,
-    );
+    const result = resolveGroupRandomEvent(chars, events.train, () => {});
+    allNews.push(...result);
   });
 
   groups.learnSkill.forEach((chars, skillId) => {
-    resolveGroupRandomEvent(
-      chars,
-      events.learn,
-      () => {},
-      "party",
-      news,
-      context.partyId,
-    );
+    const result = resolveGroupRandomEvent(chars, events.learn, () => {});
+    allNews.push(...result);
   });
+
+  for (const n of allNews) {
+    addNewsWithScopeToNewsEmittedFromLocationStruct({
+      nws: n,
+      nefls: news,
+      location: context.location,
+      subRegion: context.subRegion,
+      region: context.region,
+      characterIds: n.news.context.characterIds,
+      partyId: n.news.context.partyId,
+    });
+  }
 
   return news;
 }
@@ -612,7 +598,7 @@ function resolveGroupRandomEvent(
   characters: Character[],
   eventSource: RandomEventUnits,
   fallback: () => NewsWithScope | null,
-) {
+): NewsWithScope[] {
   let results: NewsWithScope[] = [];
   const luckAvg = Math.floor(
     characters.reduce(
@@ -630,7 +616,7 @@ function resolveGroupRandomEvent(
       const result = event!(characters);
       if (result) {
         results.push(result);
-        return;
+        return results;
       }
     }
   }
@@ -639,30 +625,40 @@ function resolveGroupRandomEvent(
   if (result) {
     results.push(result);
   }
+
+  return results;
 }
 
-function addNewsWithScopeToNewsEmittedFromLocationStruct(
-  nws: NewsWithScope,
-  nefls: NewsEmittedFromLocationStructure,
-) {
-  switch (nws.scope.kind) {
+function addNewsWithScopeToNewsEmittedFromLocationStruct(data: {
+  nws: NewsWithScope;
+  nefls: NewsEmittedFromLocationStructure;
+  location: LocationsEnum;
+  subRegion: SubRegionEnum;
+  region: RegionEnum;
+  characterIds: string[];
+  partyId: string;
+}): NewsEmittedFromLocationStructure {
+  switch (data.nws.scope.kind) {
     case "private":
-      addToPrivateScope(nefls, "characterId", nws.news);
+      for (const characterId of data.characterIds) {
+        addToPrivateScope(data.nefls, characterId, data.nws.news);
+      }
       break;
     case "party":
-      nefls.partyScope.push(nws);
+      addToPartyScope(data.nefls, data.partyId, data.nws.news);
       break;
     case "location":
-      nefls.locationScope.push(nws);
+      addToLocationScope(data.nefls, data.location, data.nws.news);
       break;
     case "subRegion":
-      nefls.subRegionScope.push(nws);
+      addToSubRegionScope(data.nefls, data.subRegion, data.nws.news);
       break;
     case "region":
-      nefls.regionScope.push(nws);
+      addToRegionScope(data.nefls, data.region, data.nws.news);
       break;
     case "world":
-      nefls.worldScope.push(nws);
+      addToWorldScope(data.nefls, data.nws.news);
       break;
   }
+  return data.nefls;
 }
