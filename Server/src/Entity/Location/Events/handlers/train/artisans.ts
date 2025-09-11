@@ -68,29 +68,3 @@ export function handleTrainArtisans(
   }
   return results;
 }
-
-// export function handleTrainAction(
-//   characters: Character[],
-//   type: ActionInput,
-//   context: NewsContext,
-//   config?: LocationInns,
-// ): NewsWithScope {
-//   return {
-//     scope: {
-//       kind: "world",
-//     },
-//     news: createNews({
-//       scope: {
-//         kind: "world",
-//       },
-//       tokens: [],
-//       context: {
-//         region: RegionEnum.CentralPlain,
-//         subRegion: SubRegionEnum.FyonarCapitalDistrict,
-//         location: LocationsEnum.PlagueWaterCrossing,
-//         partyId: "",
-//         characterIds: [],
-//       },
-//     }),
-//   };
-// }

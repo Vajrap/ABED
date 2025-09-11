@@ -24,8 +24,17 @@ import type {
 import type { Party } from "../Party/Party";
 import type { SkillId } from "../Skill/enums";
 import type { LocationInns } from "./Config/Inn";
+import { handelArtisanAction } from "./Events/handlers/artisans/handleArtisans";
+import { handleCraftAction } from "./Events/handlers/craft/handleCraftAction";
+import { handleLearnSkill } from "./Events/handlers/learn/handleLearnSkill";
+import { handleReadAction } from "./Events/handlers/read/handleReadAction";
 import { handleRestAction } from "./Events/handlers/rest";
-import { handleTrainAction } from "./Events/handlers/train";
+import { resolveStrollingAction } from "./Events/handlers/strolling/resolveStrollingAction";
+import { resolveTavernAction } from "./Events/handlers/tavern/resolveTavernAction";
+import { handleTrainArtisans } from "./Events/handlers/train/artisans";
+import { handleTrainAttribute } from "./Events/handlers/train/attribute";
+import { handleTrainProficiency } from "./Events/handlers/train/proficiency";
+import { handleTrainSkill } from "./Events/handlers/train/skill";
 import type { SubRegion } from "./SubRegion";
 
 export type UserInputAction = {
@@ -234,10 +243,12 @@ type CharacterGroups = {
   trainArtisan: Map<ArtisanKey, Character[]>;
   trainProficiency: Map<ProficiencyKey, Character[]>;
   trainSkill: Map<SkillId, Character[]>;
-  learnSkill: Map<SkillId, Character[]>;
+  learnSkill: {character: Character, skillId: SkillId}[];
   strolling: Character[];
   tavern: Character[];
   artisanActions: ArtisanAction[];
+  reading: Character[];
+  crafting: Character[];
 };
 
 function groupCharacterActions(
@@ -252,10 +263,12 @@ function groupCharacterActions(
     trainArtisan: new Map(),
     trainProficiency: new Map(),
     trainSkill: new Map(),
-    learnSkill: new Map(),
+    learnSkill: [],
     strolling: [],
     tavern: [],
     artisanActions: [],
+    reading: [],
+    crafting: [],
   };
 
   for (const character of party.characters.filter((c) => c !== "none")) {
@@ -298,7 +311,7 @@ function groupCharacterActions(
         break;
 
       case ActionInput.LearnSkill:
-        addToMapArray(groups.learnSkill, action.skillId, character);
+        groups.learnSkill.push({ character, skillId: action.skillId });
         break;
 
       case ActionInput.Stroll:
@@ -310,7 +323,13 @@ function groupCharacterActions(
         break;
 
       case ActionInput.Read:
+        groups.reading.push(character);
+        break;
+
       case ActionInput.Craft:
+        groups.crafting.push(character);
+        break;
+
       case ActionInput.Mining:
       case ActionInput.WoodCutting:
       case ActionInput.Foraging:
@@ -519,10 +538,10 @@ function processCharacterGroups(
   let allNews: NewsWithScope[] = [];
   // Solo Artisan
   for (const { character, actionInput } of groups.artisanActions) {
-    const result = resolveGroupRandomEvent([character], events.artisan, () =>
-      handelArtisanAction(character, actionInput, context),
+    const results = resolveGroupRandomEvent([character], events.artisan, () =>
+      handelArtisanAction(character, context),
     );
-    allNews.push(...result);
+    allNews.push(...results);
   }
 
   // Rest
@@ -550,34 +569,48 @@ function processCharacterGroups(
   // Training, subAction grouping
   groups.trainArtisan.forEach((chars, artisanKey) => {
     const result = resolveGroupRandomEvent(chars, events.train, () =>
-      handleTrainAction(chars, artisanKey, context),
+      handleTrainArtisans(chars, artisanKey, context),
     );
     allNews.push(...result);
   });
 
   groups.trainAttribute.forEach((chars, attributeKey) => {
     const result = resolveGroupRandomEvent(chars, events.train, () =>
-      handleTrainAction(chars, attributeKey, context),
+      handleTrainAttribute(chars, attributeKey, context),
     );
     allNews.push(...result);
   });
 
   groups.trainProficiency.forEach((chars, proficiencyKey) => {
     const result = resolveGroupRandomEvent(chars, events.train, () =>
-      handleTrainAction(chars, proficiencyKey, context),
+      handleTrainProficiency(chars, proficiencyKey, context),
     );
     allNews.push(...result);
   });
 
   groups.trainSkill.forEach((chars, skillId) => {
-    const result = resolveGroupRandomEvent(chars, events.train, () => {});
+    const result = resolveGroupRandomEvent(chars, events.train, () =>
+      handleTrainSkill(chars, skillId, context),
+    );
     allNews.push(...result);
   });
 
-  groups.learnSkill.forEach((chars, skillId) => {
-    const result = resolveGroupRandomEvent(chars, events.learn, () => {});
+  groups.reading.forEach((c) => {
+    const result = handleReadAction(c)
     allNews.push(...result);
   });
+
+  groups.crafting.forEach((c) => {
+    const result = handleCraftAction(c, context);
+    allNews.push(...result);
+  });
+
+  for (const {character, skillId} of groups.learnSkill) {
+    const result = resolveGroupRandomEvent([character], events.learn, () =>
+      handleLearnSkill(character, skillId, context),
+    );
+    allNews.push(...result);
+  }
 
   for (const n of allNews) {
     addNewsWithScopeToNewsEmittedFromLocationStruct({
@@ -597,7 +630,7 @@ function processCharacterGroups(
 function resolveGroupRandomEvent(
   characters: Character[],
   eventSource: RandomEventUnits,
-  fallback: () => NewsWithScope | null,
+  fallback: () => NewsWithScope | NewsWithScope[] | null,
 ): NewsWithScope[] {
   let results: NewsWithScope[] = [];
   const luckAvg = Math.floor(
@@ -623,7 +656,8 @@ function resolveGroupRandomEvent(
 
   const result = fallback();
   if (result) {
-    results.push(result);
+    if (Array.isArray(result)) results.push(...result);
+    else results.push(result);
   }
 
   return results;

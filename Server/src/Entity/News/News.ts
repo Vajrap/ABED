@@ -86,11 +86,11 @@ type ItemInterface = {
 
 export type NewsEmittedFromLocationStructure = {
   worldScope: News[];
-  regionScope: Map<RegionEnum, News>;
-  subRegionScope: Map<SubRegionEnum, News>;
-  locationScope: Map<LocationsEnum, News>;
-  partyScope: Map<string, News>;
-  privateScope: Map<string, News>;
+  regionScope: Map<RegionEnum, News[]>;
+  subRegionScope: Map<SubRegionEnum, News[]>;
+  locationScope: Map<LocationsEnum, News[]>;
+  partyScope: Map<string, News[]>;
+  privateScope: Map<string, News[]>;
 };
 
 // each event should emit this, and the handler might be the one dealing with then, putting into the map
