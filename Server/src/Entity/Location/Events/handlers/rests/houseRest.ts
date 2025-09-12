@@ -1,5 +1,5 @@
 import type { Character } from "../../../../Character/Character";
-import type { News, NewsContext, NewsWithScope } from "../../../../News/News";
+import type { NewsContext, NewsWithScope } from "../../../../News/News";
 import { normalRest } from "./normalRest";
 
 export function houseRest(

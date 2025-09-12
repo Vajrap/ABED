@@ -1,10 +1,6 @@
 import type { Character } from "../../../Character/Character";
-import { ActionInput } from "../../../Character/Subclass/Action/ActionInput";
-import {
-  type NewsContext,
-  type NewsEmittedFromLocationStructure,
-  type NewsWithScope,
-} from "../../../News/News";
+import { ActionInput } from "../../../Character/Subclass/Action/CharacterAction";
+import { type NewsContext, type NewsWithScope } from "../../../News/News";
 import { InnLevel, type LocationInns } from "../../Config/Inn";
 import { campingRest } from "./rests/campingRest";
 import { houseRest } from "./rests/houseRest";
@@ -20,7 +16,7 @@ export function handleRestAction(
     | ActionInput.HouseRest,
   context: NewsContext,
   config?: LocationInns,
-): NewsWithScope {
+): NewsWithScope | null {
   switch (type) {
     case ActionInput.Rest: {
       return normalRest(characters, context);
@@ -42,6 +38,8 @@ export function handleRestAction(
       return campingRest(characters, context);
     case ActionInput.HouseRest:
       return houseRest(characters, context);
+    default:
+      return null;
   }
 }
 

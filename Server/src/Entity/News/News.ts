@@ -9,7 +9,8 @@ export type NewsScope =
   | { kind: "subRegion"; subRegion: SubRegionEnum }
   | { kind: "location"; location: LocationsEnum }
   | { kind: "party"; partyId: string }
-  | { kind: "private"; characterIds: string[] };
+  | { kind: "private"; characterIds: string[] }
+  | { kind: "none" };
 
 export type NewsContext = {
   region: RegionEnum;

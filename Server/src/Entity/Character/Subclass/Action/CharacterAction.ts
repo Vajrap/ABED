@@ -7,6 +7,14 @@ import { DayOfWeek, TimeOfDay } from "../../../../InterFacesEnumsAndTypes/Time";
 import type { BookId, ItemId } from "../../../Item/Item";
 import type { SkillId } from "../../../Skill/enums";
 
+export enum restEnums {
+  None = "None",
+  Rest = "Rest",
+  Inn = "Inn",
+  Camping = "Camping",
+  HouseRest = "House Rest",
+}
+
 // Input on character scope
 export enum ActionInput {
   None = "None",

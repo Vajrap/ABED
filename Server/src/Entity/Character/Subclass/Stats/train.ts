@@ -11,21 +11,32 @@ import { statMod } from "../../../../Utils/statMod";
 import type { Character } from "../../Character";
 import type { StatBlock } from "./CharacterStatArchetype";
 
-export function trainAttribute(character: Character, key: AttributeKey): Character {
-  if (character.level >= 30 || character.attribute.getStat(key).base >= 30) return character;
-  return trainInvoker.trainStat(character, character.attribute.getStat(key))
+export function trainAttribute(
+  character: Character,
+  key: AttributeKey,
+): Character {
+  if (character.level >= 30 || character.attribute.getStat(key).base >= 30)
+    return character;
+  return trainInvoker.trainStat(character, character.attribute.getStat(key));
 }
 
-export function trainProficiency(character: Character, key: ProficiencyKey): Character {
-  if (character.level >= 30 || character.proficiencies.getStat(key).base >= 30) return character;
-  return trainInvoker.trainStat(character, character.proficiencies.getStat(key))
+export function trainProficiency(
+  character: Character,
+  key: ProficiencyKey,
+): Character {
+  if (character.level >= 30 || character.proficiencies.getStat(key).base >= 30)
+    return character;
+  return trainInvoker.trainStat(
+    character,
+    character.proficiencies.getStat(key),
+  );
 }
 
 export function trainArtisan(character: Character, key: ArtisanKey): Character {
-  if (character.level >= 30 || character.artisans.getStat(key).base >= 30) return character;
-  return trainInvoker.trainStat(character, character.artisans.getStat(key))
+  if (character.level >= 30 || character.artisans.getStat(key).base >= 30)
+    return character;
+  return trainInvoker.trainStat(character, character.artisans.getStat(key));
 }
-
 
 export function trainStat(character: Character, status: StatBlock): Character {
   const expNeeded = getExpNeededForStat(status.base);
@@ -61,18 +72,12 @@ function whenStatup(
 
 // -- CONSUME STAT TRACKER AND LEVEL UP AS NEEDED
 function processLevelUps(character: Character) {
-  while (character.level < 30) {
-    const needed = character.levelUpStatNeeded;
+  while (true) {
+    const needed = 5 + character.level * 2;
     if (character.statTracker < needed) break;
 
     character.statTracker -= needed;
     levelUp(character);
-  }
-
-  // if capped, clamp tracker to "full"
-  if (character.level >= 30) {
-    const needed = character.levelUpStatNeeded;
-    character.statTracker = needed;
   }
 }
 

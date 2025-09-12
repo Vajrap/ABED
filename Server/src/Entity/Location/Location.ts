@@ -1,3 +1,4 @@
+import { act } from "react";
 import type {
   ArtisanKey,
   AttributeKey,
@@ -200,18 +201,22 @@ export class Location {
     if (this.parties.length === 0) return results;
 
     for (const party of this.parties) {
-      if (shouldSkipPartyActions(party, day, phase)) continue;
+      const action = party.actionSequence[day][phase];
+
+      if (action === ActionInput.Travel || specialActions.includes(action))
+        continue;
 
       const context = buildNewsContext(this, party);
 
       if (isGroupRest(party.actionSequence[day][phase])) {
         const result = processGroupResting(
           party,
-          party.actionSequence[day][phase],
+          action,
           context,
           this.innType,
         );
-        if (result) addToPartyScope(results, party.partyID, result.news);
+        if (result && result.scope.kind != "none")
+          addToPartyScope(results, party.partyID, result.news);
         continue;
       }
 
@@ -243,7 +248,7 @@ type CharacterGroups = {
   trainArtisan: Map<ArtisanKey, Character[]>;
   trainProficiency: Map<ProficiencyKey, Character[]>;
   trainSkill: Map<SkillId, Character[]>;
-  learnSkill: {character: Character, skillId: SkillId}[];
+  learnSkill: { character: Character; skillId: SkillId }[];
   strolling: Character[];
   tavern: Character[];
   artisanActions: ArtisanAction[];
@@ -491,15 +496,6 @@ function createEmptyNewsStructure(): NewsEmittedFromLocationStructure {
   };
 }
 
-function shouldSkipPartyActions(
-  party: Party,
-  day: DayOfWeek,
-  phase: TimeOfDay,
-): boolean {
-  const action = party.actionSequence[day][phase];
-  return action === ActionInput.Travel || specialActions.includes(action);
-}
-
 function buildNewsContext(location: Location, party: Party): NewsContext {
   return {
     region: location.region,
@@ -516,7 +512,12 @@ function isGroupRest(action: ActionInput): boolean {
 
 function processGroupResting(
   party: Party,
-  action: ActionInput,
+  action:
+    | ActionInput.None
+    | ActionInput.Rest
+    | ActionInput.Inn
+    | ActionInput.Camping
+    | ActionInput.HouseRest,
   context: NewsContext,
   innType: LocationInns,
 ): NewsWithScope | null {
@@ -596,7 +597,7 @@ function processCharacterGroups(
   });
 
   groups.reading.forEach((c) => {
-    const result = handleReadAction(c)
+    const result = handleReadAction(c);
     allNews.push(...result);
   });
 
@@ -605,7 +606,7 @@ function processCharacterGroups(
     allNews.push(...result);
   });
 
-  for (const {character, skillId} of groups.learnSkill) {
+  for (const { character, skillId } of groups.learnSkill) {
     const result = resolveGroupRandomEvent([character], events.learn, () =>
       handleLearnSkill(character, skillId, context),
     );
