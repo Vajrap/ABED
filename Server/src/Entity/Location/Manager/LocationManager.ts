@@ -14,15 +14,11 @@ import { subregionRepository } from "../Repository/subregion";
 import type { SubRegion } from "../SubRegion";
 
 class LocationManager {
-  regions: Map<RegionEnum, Region> = new Map();
-  subRegions: Map<SubRegionEnum, SubRegion> = new Map();
-  locations: Map<LocationsEnum, Location> = new Map();
+  regions: Map<RegionEnum, Region> = regionRepository;
+  subRegions: Map<SubRegionEnum, SubRegion> = subregionRepository;
+  locations: Map<LocationsEnum, Location> = locationRepository;
 
-  constructor() {
-    for (const region of regionRepository) this.regions.set(region.id, region);
-    for (const sub of subregionRepository) this.subRegions.set(sub.id, sub);
-    for (const loc of locationRepository) this.locations.set(loc.id, loc);
-  }
+  constructor() {}
 
   async processEncounters(
     day: DayOfWeek,

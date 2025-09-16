@@ -2,9 +2,7 @@ import { Elysia } from "elysia";
 import { Game } from "./Game";
 import { z } from "zod";
 import { isBodyValid } from "./Utils/isBodyValid";
-
-const game = new Game();
-await game.start();
+import Report from "./Utils/Reporter";
 
 const app = new Elysia();
 
@@ -30,10 +28,14 @@ app
 
   .listen(7777);
 
-console.log("Server running on port 7777 — let the seals be broken");
+Report.info("Server running on port 7777 — let the seals be broken");
+
+const game = new Game();
+await game.start();
 
 function mockHandleLogin(body: any) {
   if (!isBodyValid(LoginSchema, body)) {
+    Report.error(`Wrong message type in Login Schema with body ${body}`);
     return { success: false, message: `Wrong message type` };
   } else {
     // validate session

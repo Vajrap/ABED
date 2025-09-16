@@ -1,4 +1,3 @@
-import { act } from "react";
 import type {
   ArtisanKey,
   AttributeKey,

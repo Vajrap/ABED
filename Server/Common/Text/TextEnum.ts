@@ -1,0 +1,5 @@
+export type RemoveLocationError =
+  | "PARTY_NOT_FOUND"
+  | "CANNOT_REMOVE_STARTING_LOCATION"
+  | "MUST_STOP_TRAVELING"
+  | "CAN_ONLY_REMOVE_LAST";

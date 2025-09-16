@@ -335,13 +335,6 @@ export class BattleReport {
   ) {}
 }
 
-export class GameLocation {
-  id: LocationsEnum;
-  constructor(id: LocationsEnum) {
-    this.id = id;
-  }
-}
-
 export enum BattleType {
   Normal = "Normal",
   Training = "Training",

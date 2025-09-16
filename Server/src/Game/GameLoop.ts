@@ -1,8 +1,12 @@
 import { config } from "dotenv";
 import { GameTime } from "./GameTime/GameTime";
 import type { DayOfWeek, TimeOfDay } from "../InterFacesEnumsAndTypes/Time";
-import type { News } from "../Entity/News/News";
+import type {
+  News,
+  NewsEmittedFromLocationStructure,
+} from "../Entity/News/News";
 import { locationManager } from "../Entity/Location/Manager/LocationManager";
+import Report from "../Utils/Reporter";
 
 export async function runSchedule() {
   const now = new Date();
@@ -11,7 +15,7 @@ export async function runSchedule() {
 
   const delay = nextScheduledTime.getTime() - now.getTime();
 
-  console.log(
+  Report.info(
     `Next game loop scheduled for ${nextScheduledTime.toLocaleTimeString()}`,
   );
 
@@ -96,12 +100,67 @@ function handleGameMilestones() {
 }
 
 async function processEvents(day: DayOfWeek, phase: TimeOfDay) {
+  /*
+  Game process
+  The game run on phase, each phase equal to 6 hrs in game, and 15 minutes in real life, the equation is said here only once.
+
+  6hrs in game = 15 minutes real life
+  1 days in game = 1 hr in real life (4 phases)
+  Since a day in real life consist of 24 hours we make it a month in game, so normally one month has 24 days in game
+    - A week in game consist of 6 days so in one month (24 days) we also get 4 weeks
+  1 months in game (24 days) = 1 day in real life
+    - Since a week in real life only consist of 7 days, so we use 2 weeks in real life for a game years that means a years has 14 months,
+  1 year in game (14 months) = 2 weeks in real life
+  The game have 7 seasons, each seasons would last 2 months in game (2 days in real life)
+
+  When server start, we'll try to map it to 'Sunday' so the 1st and 8th month will be always on Sunday
+
+  : Season and month
+    1st - 2nd = Seeding
+    3rd - 4th = RainFall
+    5th - 6th = GreenTide
+    7th - 8th = HarvestMoon
+    9th - 10th = SunDry
+    11th - 12th = Frostveil
+    13th - 14th = LongDark
+
+  : DayOfWeek
+    1st day = laoh (white)
+    2nd day = rowana (black)
+    3rd day = aftree (red)
+    4th day = udur (blue)
+    5th day = matris (yellow)
+    6th day = seethar (green)
+
+  When a phase start, we check first if its fall on any of those,
+  - New Year, new season, new month, new week, new day, or just new phase
+  : New years (for sure, we have the festival, but that's on monthly scale check)
+    -
+  : New Season
+    - Weather Interpretation change on all subregions
+    - Goods Price adaption
+    -
+  : New Month
+  : New Week
+  : New Day
+    - Subregion draws weather card, weather scale change
+
+  And then the phase event
+  - Process Encounters
+  - Process Actions
+  - Process Travels
+  */
   // Since news are dealth with in the location, maybe we use location manager to deal with the WS instead of returning back here and go through send partyData?
   // Else we need some new filtering function, which... a bit redundant,
-  const enc: News[] = await locationManager.processEncounters(day, phase);
-  const act: News[] = await locationManager.processActions(day, phase);
-  // const tra: News[] = await travelManager.allTravel(day, phase);
-  const news: News[] = [...enc, ...act, ...tra];
+  const enc: NewsEmittedFromLocationStructure =
+    await locationManager.processEncounters(day, phase);
+  const act: NewsEmittedFromLocationStructure =
+    await locationManager.processActions(day, phase);
+  const tra: NewsEmittedFromLocationStructure = await travelManager.allTravel(
+    day,
+    phase,
+  );
+  // const news: News[] = [...enc, ...act, ...tra];
 
   // postman.goForth(news)
 }

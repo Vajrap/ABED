@@ -1,13 +1,41 @@
-version: '3.9'
+version: "3.9"
 
 services:
   app:
-    image: KingsMaker
-    container_name: KingsMakerServer
-    working_dir: /app
+    build: .
+    container_name: ABED_SERVER
+    working_dir: /app/Server
     volumes:
-      - .:/app
-    command: bun run Server/index.ts
+      - ./Server:/app/Server
+      - ./logs:/var/log/app
+    command: bun run src/index.ts
     ports:
       - "7890:7890"
     restart: unless-stopped
+
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - ./loki-data:/loki
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yaml
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  grafana-data:
