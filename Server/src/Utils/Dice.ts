@@ -1,27 +1,34 @@
-import type { DiceEnum } from "../InterFacesEnumsAndTypes/Enums";
+export function roll(amount: number) {
+  if (amount < 1) throw new Error("Invalid amount");
 
-export function rollDice(
-  diceEnum: DiceEnum | string,
-  seed?: number
-): DiceRollResult {
-  const dice: string = diceEnum; // The Enums is just like { "1d4", "1d8"...}
-  let [diceCount, diceSides] = dice.split("d").map(Number);
-  if (!diceCount || !diceSides) {
-    throw new Error("Invalid dice format");
-  }
+  return {
+    d: (faces: number) => {
+      if (faces < 1) throw new Error("Invalid face");
 
-  const rng = seed !== undefined ? seededRNG(seed) : Math.random;
+      const doRoll = (seed?: number): DiceRollResult => {
+        const rng = seed !== undefined ? seededRNG(seed) : Math.random;
+        const rolls = Array.from(
+          { length: amount },
+          () => Math.floor(rng() * faces) + 1,
+        );
+        return new DiceRollResult(rolls);
+      };
 
-  let rolls = Array.from(
-    { length: diceCount },
-    () => Math.floor(rng() * diceSides) + 1,
-  );
+      // Roll immediately with no seed
+      const result = doRoll();
 
-  return new DiceRollResult(rolls);
+      // Attach .seed to the result
+      return Object.assign(result, {
+        seed: (s: number) => doRoll(s),
+      });
+    },
+  };
 }
 
 export function rollTwenty(seed?: number): DiceRollResult {
-  return rollDice("1d20", seed);
+  let res = roll(1).d(20);
+  if (seed) res.seed(seed);
+  return res;
 }
 
 class DiceRollResult {
@@ -33,6 +40,24 @@ class DiceRollResult {
   get total(): number {
     return this.rolls.reduce((acc, curr) => acc + curr, 0);
   }
+
+  highest(): number;
+  highest(count: number): number[];
+  highest(count?: number): number | number[] {
+    if (count === undefined) {
+      return Math.max(...this.rolls);
+    }
+    return this.rolls.sort((a, b) => b - a).slice(0, count);
+  }
+
+  lowest(): number;
+  lowest(count: number): number[];
+  lowest(count?: number): number | number[] {
+    if (count === undefined) {
+      return Math.min(...this.rolls);
+    }
+    return this.rolls.sort((a, b) => a - b).slice(0, count);
+  }
 }
 
 function seededRNG(seed: number): () => number {
@@ -40,5 +65,5 @@ function seededRNG(seed: number): () => number {
   return () => {
     s = (1664525 * s + 1013904223) >>> 0;
     return s / 0x100000000;
-  }
+  };
 }

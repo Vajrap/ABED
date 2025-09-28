@@ -4,12 +4,12 @@ import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegio
 
 // SCOPE
 export type NewsScope =
-  | { kind: "world" }
-  | { kind: "region"; region: RegionEnum }
-  | { kind: "subRegion"; subRegion: SubRegionEnum }
-  | { kind: "location"; location: LocationsEnum }
-  | { kind: "party"; partyId: string }
-  | { kind: "private"; characterIds: string[] }
+  | { kind: "worldScope" }
+  | { kind: "regionScope"; region: RegionEnum }
+  | { kind: "subRegionScope"; subRegion: SubRegionEnum }
+  | { kind: "locationScope"; location: LocationsEnum }
+  | { kind: "partyScope"; partyId: string }
+  | { kind: "privateScope"; characterId: string }
   | { kind: "none" };
 
 export type NewsContext = {
@@ -99,3 +99,14 @@ export type NewsWithScope = {
   scope: NewsScope;
   news: News;
 };
+
+export function emptyNewsStruct(): NewsEmittedFromLocationStructure {
+  return {
+    worldScope: [],
+    regionScope: new Map(),
+    subRegionScope: new Map(),
+    locationScope: new Map(),
+    partyScope: new Map(),
+    privateScope: new Map(),
+  };
+}

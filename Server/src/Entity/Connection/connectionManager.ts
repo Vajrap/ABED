@@ -9,7 +9,7 @@ export type ClientContext = {
   subRegionId: SubRegionEnum;
   locationId: LocationsEnum;
   partyId: string;
-  characterIds: string[];
+  characterId: string;
 };
 
 class ConnectionManager {
@@ -53,9 +53,7 @@ class ConnectionManager {
       case "party":
         return context.partyId === scope.partyId;
       case "private":
-        return scope.characterIds.some((id) =>
-          context.characterIds.includes(id),
-        );
+        return context.characterId === scope.characterId;
       default:
         return false;
     }

@@ -49,6 +49,7 @@ export class Character {
   battleStats: CharacterBattleStats = new CharacterBattleStats();
   elements: CharacterElements = new CharacterElements();
   proficiencies: CharacterProficiencies = new CharacterProficiencies();
+
   needs: CharacterNeeds = new CharacterNeeds();
   vitals: CharacterVitals = new CharacterVitals({});
   fame: CharacterFame = new CharacterFame();

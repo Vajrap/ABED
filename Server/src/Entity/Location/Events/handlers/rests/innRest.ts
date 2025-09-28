@@ -51,7 +51,7 @@ export function innRest(
   applyRestBenefits(characters, 1.3);
 
   const news = createNews({
-    scope: { kind: "private", characterIds: characters.map((char) => char.id) },
+    scope: { kind: "private", characterId: characters.map((char) => char.id) },
     tokens: [
       {
         t: "party",
@@ -68,7 +68,7 @@ export function innRest(
   return {
     scope: {
       kind: "private",
-      characterIds: context.characterIds,
+      characterId: context.characterIds,
     },
     news,
   };

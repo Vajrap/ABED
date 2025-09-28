@@ -1,6 +1,6 @@
 import type { DiceEnum } from "../../InterFacesEnumsAndTypes/Enums";
 import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
-import { rollDice } from "../../Utils/Dice";
+import { roll } from "../../Utils/Dice";
 import { statMod } from "../../Utils/statMod";
 import type { Character } from "../Character/Character";
 import type { Skill } from "./Skill";
@@ -98,7 +98,7 @@ function learnSkill(character: Character, skill: Skill): boolean {
   const rawProgress = character.skillLearningProgress.get(skill.id);
   let progress: number = rawProgress !== undefined ? rawProgress : 0;
   const { base, bonusDice } = getBaseAndBonusRange(skill.tier);
-  const randomBonus = rollDice(bonusDice).total;
+  const randomBonus = roll(bonusDice).total;
   const intBonus = Math.round(
     statMod(character.attribute.getTotal("intelligence") / 2),
   );

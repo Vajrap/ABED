@@ -1,5 +1,5 @@
 import { expect, describe, beforeEach, afterEach, it, mock } from "bun:test";
-import { rollDice, rollTwenty } from "../../../src/Utils/Dice";
+import { roll, rollTwenty } from "../../../src/Utils/Dice";
 import {
   CharacterArtisansFactory,
   CharacterAttributesFactory,

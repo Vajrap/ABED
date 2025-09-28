@@ -12,7 +12,7 @@ export function normalRest(
 ): NewsWithScope {
   applyRestBenefits(characters, 1);
   const news = createNews({
-    scope: { kind: "private", characterIds: characters.map((c) => c.id) },
+    scope: { kind: "private", characterId: characters.map((c) => c.id) },
     tokens: [
       {
         t: "char",
@@ -25,7 +25,7 @@ export function normalRest(
   return {
     scope: {
       kind: "private",
-      characterIds: context.characterIds,
+      characterId: context.characterIds,
     },
     news: news,
   };

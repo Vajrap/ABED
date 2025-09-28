@@ -1,31 +1,45 @@
 import { describe, expect, test } from "bun:test";
-import { rollDice, rollTwenty } from "../../src/Utils/Dice";
-import { DiceEnum } from "../../src/InterFacesEnumsAndTypes/Enums";
+import { roll, rollTwenty } from "../../src/Utils/Dice";
 
 const SEEDS = [0, 1, 42, 1337] as const;
 
-test.each(DiceEnum.map((d) => [d] as const))(
+type TestDice = {
+  amount: number;
+  face: number;
+};
+
+const testCases = [
+  { amount: 1, face: 6 },
+  { amount: 2, face: 8 },
+  { amount: 3, face: 10 },
+  { amount: 4, face: 12 },
+  { amount: 5, face: 20 },
+];
+
+test.each(testCases.map((dice) => [dice.amount, dice.face] as const))(
   "When roll with %s should return array with the same number of elements",
-  (dice: (typeof DiceEnum)[number]) => {
-    const [count] = dice.split("d").map(Number) as [number, number];
-    const result = rollDice(dice);
-    expect(result.rolls.length).toBe(count);
+  (amount, face) => {
+    const result = roll(amount).d(face);
+    expect(result.rolls.length).toBe(amount);
   },
 );
 
 describe("Seeded determinism", () => {
-  test.each(
-    DiceEnum.flatMap((d) => SEEDS.map((s) => [d, s] as const))
-  )("Same seed gives identical rolls for %s (seed=%d)", (dice, seed) => {
-    const a = rollDice(dice, seed).rolls;
-    const b = rollDice(dice, seed).rolls;
-    expect(b).toEqual(a);
-  });
+  test.each(testCases.flatMap((d) => SEEDS.map((s) => [d, s] as const)))(
+    "Same seed gives identical rolls for %s (seed=%d)",
+    (dice, seed) => {
+      const a = roll(dice.amount).d(dice.face).seed(seed).rolls;
+      const b = roll(dice.amount).d(dice.face).seed(seed).rolls;
+      expect(b).toEqual(a);
+    },
+  );
 
-  test.each(DiceEnum.map((d) => [d] as const))(
+  test.each(testCases.map((d) => [d.amount, d.face] as const))(
     "Different seeds usually give different results for %s (non-flaky check)",
-    (dice) => {
-      const results = SEEDS.map((s) => rollDice(dice, s).rolls.map(String).join(","));
+    (a, f) => {
+      const results = SEEDS.map((s) =>
+        roll(a).d(f).rolls.map(String).join(","),
+      );
       const unique = new Set(results);
       expect(unique.size).toBeGreaterThan(1);
     },

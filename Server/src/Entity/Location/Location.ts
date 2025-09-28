@@ -7,6 +7,14 @@ import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location
 import type { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
+import {
+  addToLocationScope,
+  addToPartyScope,
+  addToPrivateScope,
+  addToRegionScope,
+  addToSubRegionScope,
+  addToWorldScope,
+} from "../../Utils/addNewsToScope";
 import { rollTwenty } from "../../Utils/Dice";
 import { statMod } from "../../Utils/statMod";
 import type { Character } from "../Character/Character";
@@ -47,6 +55,7 @@ type RandomEvents = {
   learn: RandomEventUnits;
   stroll: RandomEventUnits;
   artisan: RandomEventUnits;
+  travel: RandomEventUnits;
 };
 
 type RandomEventUnits = {
@@ -90,6 +99,12 @@ const defaultRandomEvents: RandomEvents = {
     good: [],
     best: [],
   },
+  travel: {
+    worst: [],
+    bad: [],
+    good: [],
+    best: [],
+  },
 };
 
 export class Location {
@@ -101,6 +116,7 @@ export class Location {
   connectedLocations: { location: Location; distance: number }[] = [];
   actions: ActionInput[];
   randomEvents: RandomEvents;
+  weatherScale: number;
 
   /*
     We need a list of all possible event with dice face number.
@@ -125,6 +141,7 @@ export class Location {
     actions: ActionInput[],
     randomEvents?: RandomEvents,
     innConfig?: LocationInns,
+    weatherScale?: number,
   ) {
     this.id = id;
     this.subRegion = subRegion.id;
@@ -140,6 +157,40 @@ export class Location {
           Luxury: null,
           Premium: null,
         };
+    this.weatherScale = weatherScale ?? 0;
+  }
+
+  getRandomEventFor(
+    action: "rest" | "train" | "learn" | "stroll" | "artisan" | "travel",
+    roll: number,
+  ): RandomEventHandler | null {
+    if (roll >= 5 && roll <= 16) {
+      return null;
+    }
+    const set = this.randomEvents[action];
+    let sub: RandomEventSubUnit | null = null;
+
+    if (roll === 1) {
+      sub = set.worst;
+    }
+    if (roll >= 2 && roll <= 4) {
+      sub = set.bad;
+    }
+    if (roll >= 17 && roll <= 19) {
+      sub = set.good;
+    }
+    if (roll === 20) {
+      sub = set.best;
+    }
+
+    if (!sub) {
+      return null;
+    }
+
+    // sub is just an array of handlers
+    const handler = sub[Math.floor(Math.random() * sub.length)];
+
+    return handler ?? null;
   }
 
   getDistanceTo(location: Location): number | undefined {
@@ -350,76 +401,6 @@ function groupCharacterActions(
   return groups;
 }
 
-// Utility to add to a Map<K, V[]>
-function addToWorldScope(news: NewsEmittedFromLocationStructure, item: News) {
-  news.worldScope.push(item);
-}
-
-function addToRegionScope(
-  news: NewsEmittedFromLocationStructure,
-  region: RegionEnum,
-  item: News,
-) {
-  const arr = news.regionScope.get(region);
-  if (arr) {
-    arr.push(item);
-  } else {
-    news.regionScope.set(region, [item]);
-  }
-}
-
-function addToSubRegionScope(
-  news: NewsEmittedFromLocationStructure,
-  subRegion: SubRegionEnum,
-  item: News,
-) {
-  const arr = news.subRegionScope.get(subRegion);
-  if (arr) {
-    arr.push(item);
-  } else {
-    news.subRegionScope.set(subRegion, [item]);
-  }
-}
-
-function addToLocationScope(
-  news: NewsEmittedFromLocationStructure,
-  location: LocationsEnum,
-  item: News,
-) {
-  const arr = news.locationScope.get(location);
-  if (arr) {
-    arr.push(item);
-  } else {
-    news.locationScope.set(location, [item]);
-  }
-}
-
-function addToPartyScope(
-  news: NewsEmittedFromLocationStructure,
-  partyId: string,
-  item: News,
-) {
-  const arr = news.partyScope.get(partyId);
-  if (arr) {
-    arr.push(item);
-  } else {
-    news.partyScope.set(partyId, [item]);
-  }
-}
-
-function addToPrivateScope(
-  news: NewsEmittedFromLocationStructure,
-  characterId: string,
-  item: News,
-) {
-  const arr = news.privateScope.get(characterId);
-  if (arr) {
-    arr.push(item);
-  } else {
-    news.privateScope.set(characterId, [item]);
-  }
-}
-
 function getEncounterCandidates(parties: Party[]): Party[] {
   if (parties.length < 2) return [];
   const shuffled = [...parties].sort(() => Math.random() - 0.5);
@@ -428,23 +409,12 @@ function getEncounterCandidates(parties: Party[]): Party[] {
 
 function pairEncounterCandidates(candidates: Party[]): [Party, Party][] {
   const pairs: [Party, Party][] = [];
-  const encountered = new Set<Party>();
-
-  for (let i = 0; i < candidates.length - 1; i++) {
-    const a = candidates[i]!;
-    if (encountered.has(a)) continue;
-
-    for (let j = i + 1; j < candidates.length; j++) {
-      const b = candidates[j]!;
-      if (encountered.has(b)) continue;
-
-      pairs.push([a, b]);
-      encountered.add(a);
-      encountered.add(b);
-      break; // one pairing per party
-    }
+  for (let i = 0; i < candidates.length - 1; i += 2) {
+    const a = candidates[i];
+    const b = candidates[i + 1];
+    if (!a || !b) continue;
+    pairs.push([a, b]);
   }
-
   return pairs;
 }
 
@@ -460,24 +430,24 @@ function generateEncounterNews(pairs: [Party, Party][]): News[] {
 
 function pushNewsToScope(result: NewsEmittedFromLocationStructure, news: News) {
   switch (news.scope.kind) {
-    case "world":
+    case "worldScope":
       result.worldScope.push(news);
       break;
-    case "region":
+    case "regionScope":
       addToRegionScope(result, news.scope.region, news);
       break;
-    case "subRegion":
+    case "subRegionScope":
       addToSubRegionScope(result, news.scope.subRegion, news);
       break;
-    case "location":
+    case "locationScope":
       addToLocationScope(result, news.scope.location, news);
       break;
-    case "party":
+    case "partyScope":
       addToPartyScope(result, news.scope.partyId, news);
       break;
-    case "private":
+    case "privateScope":
       // TODO: handle private scope
-      for (const charId of news.scope.characterIds) {
+      for (const charId of news.scope.characterId) {
         addToPrivateScope(result, charId, news);
       }
       break;
@@ -673,24 +643,24 @@ function addNewsWithScopeToNewsEmittedFromLocationStruct(data: {
   partyId: string;
 }): NewsEmittedFromLocationStructure {
   switch (data.nws.scope.kind) {
-    case "private":
+    case "privateScope":
       for (const characterId of data.characterIds) {
         addToPrivateScope(data.nefls, characterId, data.nws.news);
       }
       break;
-    case "party":
+    case "partyScope":
       addToPartyScope(data.nefls, data.partyId, data.nws.news);
       break;
-    case "location":
+    case "locationScope":
       addToLocationScope(data.nefls, data.location, data.nws.news);
       break;
-    case "subRegion":
+    case "subRegionScope":
       addToSubRegionScope(data.nefls, data.subRegion, data.nws.news);
       break;
-    case "region":
+    case "regionScope":
       addToRegionScope(data.nefls, data.region, data.nws.news);
       break;
-    case "world":
+    case "worldScope":
       addToWorldScope(data.nefls, data.nws.news);
       break;
   }

@@ -1,45 +1,40 @@
-import { CharacterAlignmentEnum } from "../../../../InterFacesEnumsAndTypes/Enums";
+import {
+  ChaoticAlignmentMap,
+  CharacterAlignmentEnum,
+  EvilAlignmentMap,
+  GoodAlignmentMap,
+} from "../../../../InterFacesEnumsAndTypes/Enums";
 
 export class CharacterAlignment {
-  law: number = 0;
-  chaos: number = 0;
   good: number = 0;
   evil: number = 0;
-  constructor(data:{
-    law?: number,
-    chaos?: number,
-    good?: number,
-    evil?: number,
-  }) {
-    this.law = data.law ?? 0;
-    this.chaos = data.chaos ?? 0;
+  constructor(data: { good?: number; evil?: number }) {
     this.good = data.good ?? 0;
     this.evil = data.evil ?? 0;
   }
 
   alignment(): CharacterAlignmentEnum {
-    let lawChaos: "LAWFUL" | "NEUTRAL" | "CHAOTIC" = "NEUTRAL";
-    let goodEvil: "GOOD" | "NEUTRAL" | "EVIL" = "NEUTRAL";
-
-    if (this.law - this.chaos > 10) {
-      lawChaos = "LAWFUL";
-    } else if (this.chaos - this.law > 10) {
-      lawChaos = "CHAOTIC";
+    // 1. If both value >= 30, and spreading < 30 use Chaotic side Enum
+    const diff = Math.abs(this.good - this.evil);
+    if (this.good >= 30 && this.evil >= 30 && diff < 30) {
+      // Chaotic
+      return ChaoticAlignmentMap[turnMax(diff)];
+    } else {
+      if (this.good > this.evil) {
+        // Good
+        return GoodAlignmentMap[turnMax(this.good)];
+      } else {
+        // Evil
+        return EvilAlignmentMap[turnMax(this.evil)];
+      }
     }
-
-    if (this.good - this.evil > 10) {
-      goodEvil = "GOOD";
-    } else if (this.evil - this.good > 10) {
-      goodEvil = "EVIL";
-    }
-
-    const alignmentKey =
-      `${lawChaos}_${goodEvil}` as keyof typeof CharacterAlignmentEnum;
-
-    if (!(alignmentKey in CharacterAlignmentEnum)) {
-      throw new Error(`Invalid alignment: ${alignmentKey}`);
-    }
-
-    return CharacterAlignmentEnum[alignmentKey];
   }
 }
+
+const turnMax = (val: number): 29 | 49 | 69 | 89 | 100 => {
+  if (val < 30) return 29;
+  if (val < 49) return 49;
+  if (val < 69) return 69;
+  if (val < 89) return 89;
+  else return 100;
+};

@@ -25,16 +25,47 @@ export enum CharacterType {
 }
 
 export enum CharacterAlignmentEnum {
-  LAWFUL_GOOD = "LawfulGood",
-  LAWFUL_NEUTRAL = "LawfulNeutral",
-  LAWFUL_EVIL = "LawfulEvil",
-  NEUTRAL_GOOD = "NaturalGood",
-  NEUTRAL_NEUTRAL = "Natural",
-  NEUTRAL_EVIL = "NaturalEvil",
-  CHAOTIC_GOOD = "ChaoticGood",
-  CHAOTIC_NEUTRAL = "ChaoticNeutral",
-  CHAOTIC_EVIL = "ChaoticEvil",
+  Initiate = "Initiate",
+  // Good Side
+  Kind = "Kind",
+  Noble = "Noble",
+  Saint = "Saint",
+  Divine = "Divine",
+  // Evil Side
+  Cruel = "Cruel",
+  Vile = "Vile",
+  Tyrant = "Tyrant",
+  Infernal = "Infernal",
+  // Chaotic Side
+  Mad = "Mad",
+  Lunatic = "Lunatic",
+  Maniac = "Maniac",
+  Anarch = "Anarch",
 }
+
+export const GoodAlignmentMap = {
+  29: CharacterAlignmentEnum.Initiate,
+  49: CharacterAlignmentEnum.Kind,
+  69: CharacterAlignmentEnum.Noble,
+  89: CharacterAlignmentEnum.Saint,
+  100: CharacterAlignmentEnum.Divine,
+};
+
+export const EvilAlignmentMap = {
+  29: CharacterAlignmentEnum.Initiate,
+  49: CharacterAlignmentEnum.Cruel,
+  69: CharacterAlignmentEnum.Vile,
+  89: CharacterAlignmentEnum.Tyrant,
+  100: CharacterAlignmentEnum.Infernal,
+};
+
+export const ChaoticAlignmentMap = {
+  29: CharacterAlignmentEnum.Initiate,
+  49: CharacterAlignmentEnum.Mad,
+  69: CharacterAlignmentEnum.Lunatic,
+  89: CharacterAlignmentEnum.Maniac,
+  100: CharacterAlignmentEnum.Anarch,
+};
 
 export const ATTRIBUTE_KEYS = [
   "charisma",
@@ -66,6 +97,14 @@ export const ARTISAN_KEYS = [
   "cooking",
   "alchemy",
   "enchanting",
+  "fishing",
+  "hunting",
+  "masonry",
+  "tailoring",
+  "brewing",
+  "performance",
+  "tinkering",
+  "electrics",
 ] as const;
 export type ArtisanKey = (typeof ARTISAN_KEYS)[number];
 
@@ -93,18 +132,40 @@ export type ExpandedElementKey = (typeof EXPANDED_ELEMENT_KEYS)[number];
 
 export const PROFICIENCY_KEYS = [
   "bareHand",
-  "sword",
-  "blade",
+  // Sword
   "dagger",
-  "spear",
+  "sword",
+  "rapier",
+  "greatSword",
+  // Blade
+  "machete",
+  "blade",
+  "scimitar",
+  "zanmadao",
+  // Axe
   "axe",
+  "warAxe",
+  "halberd",
+  // Spear
+  "spear",
+  "javelin",
+  // Mace
   "mace",
-  "shield",
+  "flail",
+  "warHammer",
+  // Throwing-Range
+  "throwingKnife",
+  "crossbow",
   "bow",
+  "gun",
+  // Magic
   "magicWand",
   "staff",
   "tome",
   "orb",
+  "relic",
+  // Shield
+  "shield",
 ] as const;
 
 export type ProficiencyKey = (typeof PROFICIENCY_KEYS)[number];

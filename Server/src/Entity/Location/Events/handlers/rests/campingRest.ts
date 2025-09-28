@@ -46,7 +46,7 @@ export function campingRest(
 
   applyRestBenefits(characters, willUse ? 1.3 : 1);
   const news = createNews({
-    scope: { kind: "private", characterIds: characters.map((char) => char.id) },
+    scope: { kind: "private", characterId: characters.map((char) => char.id) },
     tokens: [
       {
         t: "char",

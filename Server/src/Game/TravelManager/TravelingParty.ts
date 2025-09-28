@@ -104,6 +104,21 @@ export class TravelingParty {
     return mood / this.party.characters.length;
   }
 
+  getTravelBonus(): number {
+    const bonus = this.party.characters
+      .filter((c) => c !== "none")
+      .reduce(
+        (sum, c) =>
+          sum +
+          (c.needs.getBonus("mood") +
+            c.needs.getBonus("energy") +
+            c.needs.getBonus("satiety")) /
+            3,
+        0,
+      );
+    return Math.floor(bonus / this.party.characters.length);
+  }
+
   getAverageAgility(): number {
     const agi = this.party.characters
       .filter((c) => c !== "none")

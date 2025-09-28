@@ -56,6 +56,10 @@ export class Party {
     this.setup();
   }
 
+  getCharacters(): Character[] {
+    return this.characters.filter((character) => character !== "none");
+  }
+
   setTravelSpeed(speed: "bold" | "measured" | "careful") {
     this.behavior.travelPace = speed;
   }

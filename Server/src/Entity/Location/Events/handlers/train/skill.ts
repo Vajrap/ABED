@@ -17,17 +17,17 @@ type SkillRepository = {
 
 class Skill {
   constructor(
-    public id: SkillId, 
-    public maxLevel: number, 
-    public tier: TierEnum
-    ) {}
+    public id: SkillId,
+    public maxLevel: number,
+    public tier: TierEnum,
+  ) {}
 }
 
 const skillRepository: SkillRepository = {
   get: (id: SkillId) => {
     // Mock implementation, replace with actual data retrieval
     return new Skill(id, 10, TierEnum.common); // Example skill with max level 10
-  }
+  },
 };
 
 export function handleTrainSkill(
@@ -41,7 +41,7 @@ export function handleTrainSkill(
     if (!skill) continue;
 
     if (character.level >= 20) continue;
-    
+
     // TODO:
     const skillObj = skillRepository.get(target); // This should give us skill object, not done yet
     if (!skillObj) continue;
@@ -51,26 +51,26 @@ export function handleTrainSkill(
     const expGained =
       rollTwenty().total +
       statMod(character.attribute.getStat("intelligence").total);
-    
+
     skill.exp += expGained;
     if (skill.exp >= expNeeded) {
       skill.exp -= expNeeded;
       skill.level += 1;
-    
-    const statTrackGain = Math.max(statMod(skill.level), 0) + 1;
 
-    gainStatTracker(character, statTrackGain);
+      const statTrackGain = Math.max(statMod(skill.level), 0) + 1;
+
+      gainStatTracker(character, statTrackGain);
     }
 
     const news: NewsWithScope = {
       scope: {
         kind: "private",
-        characterIds: [character.id],
+        characterId: [character.id],
       },
       news: createNews({
         scope: {
           kind: "private",
-          characterIds: [character.id],
+          characterId: [character.id],
         },
         tokens: [
           {
