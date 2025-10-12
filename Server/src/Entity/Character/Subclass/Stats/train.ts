@@ -9,6 +9,7 @@ import {
 import { rollTwenty } from "../../../../Utils/Dice";
 import { statMod } from "../../../../Utils/statMod";
 import type { Character } from "../../Character";
+import { addBaseVitals } from "../Vitals/addBaseVitals";
 import type { StatBlock } from "./CharacterStatArchetype";
 
 export function trainAttribute(
@@ -106,6 +107,8 @@ function levelUp(character: Character): Character {
     if (crit20()) character.artisans.mutateBase(art, 1);
   }
 
+  addBaseVitals(character);
+  
   return character;
 }
 

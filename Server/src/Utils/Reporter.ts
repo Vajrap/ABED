@@ -11,16 +11,44 @@ interface LogEntry {
 }
 
 class Report {
-  private static logFile = path.join("/var/log/app", "game.log"); // mounted volume
-  private static writeStream = fs.createWriteStream(Report.logFile, {
-    flags: "a",
-  });
+  // Use logs directory that's mounted in docker-compose
+  private static logDir =
+    process.env.NODE_ENV === "production" ? "/var/log/app" : "./logs";
+  private static logFile = path.join(Report.logDir, "game.log");
+  private static writeStream: fs.WriteStream | null = null;
+
+  // Initialize write stream with directory creation
+  private static initializeLogger() {
+    if (!Report.writeStream) {
+      try {
+        // Ensure log directory exists
+        if (!fs.existsSync(Report.logDir)) {
+          fs.mkdirSync(Report.logDir, { recursive: true });
+        }
+
+        Report.writeStream = fs.createWriteStream(Report.logFile, {
+          flags: "a",
+        });
+
+        // Handle write stream errors
+        Report.writeStream.on("error", (err) => {
+          console.error("Log file write error:", err);
+        });
+      } catch (error) {
+        console.error("Failed to initialize logger:", error);
+        // Fallback to console-only logging
+        Report.writeStream = null;
+      }
+    }
+  }
 
   private static log(
     level: LogLevel,
     msg: string,
     context?: Record<string, unknown>,
   ) {
+    // Ensure logger is initialized
+    Report.initializeLogger();
     const entry: LogEntry = {
       ts: new Date().toISOString(),
       level,
@@ -46,8 +74,14 @@ class Report {
       );
     }
 
-    // 2) File (structured JSON, one per line)
-    Report.writeStream.write(JSON.stringify(entry) + "\n");
+    // 2) File (structured JSON, one per line) - only if writeStream is available
+    if (Report.writeStream) {
+      try {
+        Report.writeStream.write(JSON.stringify(entry) + "\n");
+      } catch (error) {
+        console.error("Failed to write to log file:", error);
+      }
+    }
   }
 
   static info(msg: string, context?: Record<string, unknown>) {

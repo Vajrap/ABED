@@ -7,3 +7,27 @@
 {"ts":"2025-09-13T10:44:28.394Z","level":"INFO","msg":"Next game loop scheduled for 10:45:00 AM"}
 {"ts":"2025-09-13T10:44:28.394Z","level":"INFO","msg":"Server is up and running at 9/13/2025, 10:44:28 AM"}
 {"ts":"2025-09-13T10:45:00.027Z","level":"INFO","msg":"Next game loop scheduled for 11:00:00 AM"}
+{"ts":"2025-10-03T14:59:05.742Z","level":"INFO","msg":"Server running on port 7777"}
+{"ts":"2025-10-03T14:59:05.802Z","level":"INFO","msg":"Next game loop scheduled for 3:00:00 PM"}
+{"ts":"2025-10-03T14:59:05.802Z","level":"INFO","msg":"Server is up and running at 10/3/2025, 2:59:05 PM"}
+{"ts":"2025-10-03T15:00:00.066Z","level":"INFO","msg":"Next game loop scheduled for 3:15:00 PM"}
+{"ts":"2025-10-03T15:06:59.644Z","level":"INFO","msg":"Server running on port 7777"}
+{"ts":"2025-10-03T15:06:59.661Z","level":"INFO","msg":"Next game loop scheduled for 3:15:00 PM"}
+{"ts":"2025-10-03T15:06:59.661Z","level":"INFO","msg":"Server is up and running at 10/3/2025, 3:06:59 PM"}
+{"ts":"2025-10-03T15:15:00.043Z","level":"INFO","msg":"Next game loop scheduled for 3:30:00 PM"}
+{"ts":"2025-10-03T15:30:00.044Z","level":"INFO","msg":"Next game loop scheduled for 3:45:00 PM"}
+{"ts":"2025-10-03T15:45:00.047Z","level":"INFO","msg":"Next game loop scheduled for 4:00:00 PM"}
+{"ts":"2025-10-03T16:00:00.042Z","level":"INFO","msg":"Next game loop scheduled for 4:15:00 PM"}
+{"ts":"2025-10-03T16:43:12.224Z","level":"INFO","msg":"Next game loop scheduled for 4:45:00 PM"}
+{"ts":"2025-10-03T16:45:00.045Z","level":"INFO","msg":"Next game loop scheduled for 5:00:00 PM"}
+{"ts":"2025-10-03T17:00:00.039Z","level":"INFO","msg":"Next game loop scheduled for 5:15:00 PM"}
+{"ts":"2025-10-03T17:09:31.016Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:09:31.283Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:09:31.646Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:09:32.234Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:09:33.234Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:09:35.068Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:09:38.493Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:09:45.138Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:09:58.178Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}
+{"ts":"2025-10-03T17:10:24.026Z","level":"ERROR","msg":"Server startup failed: Error: Failed to connect to database"}

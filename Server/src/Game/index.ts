@@ -1,10 +1,14 @@
 import Report from "../Utils/Reporter";
 import { characterManager } from "./CharacterManager";
 import { runSchedule } from "./GameLoop";
+import type { GameState } from "./GameState";
 
 export class Game {
   //db=db;
   characterManager = characterManager;
+  gameState: GameState = {
+    globalEventOccurred: false,
+  };
 
   async start() {
     try {
@@ -20,11 +24,8 @@ export class Game {
   }
 
   private async initialize() {
-    runSchedule();
+    runSchedule(this.gameState);
     Report.info(`Server is up and running at ${new Date().toLocaleString()}`);
-    characterManager.characters.forEach((c) => {
-      console.log(`Character loaded: ${c.id}`);
-    });
   }
 
   public async save() {

@@ -31,4 +31,21 @@ export class CharacterBehavior {
     this.preferredInnType = init?.preferredInnType ?? InnLevel.Comfortable;
     this.useCampSupplies = init?.useCampSupplies ?? false;
   }
+
+  toJSON() {
+    return {
+      tradePolicy: this.tradePolicy,
+      battlePolicy: this.battlePolicy,
+      craftingPreference: this.craftingPreference,
+      riskTaking: this.riskTaking,
+      travelPace: this.travelPace,
+      eventResponse: this.eventResponse,
+      preferredInnType: this.preferredInnType,
+      useCampSupplies: this.useCampSupplies,
+    };
+  }
+
+  static fromJSON(data: Partial<CharacterBehavior>) {
+    return new CharacterBehavior(data);
+  }
 }

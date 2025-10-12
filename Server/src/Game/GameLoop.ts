@@ -2,8 +2,6 @@ import { config } from "dotenv";
 import { GameTime } from "./GameTime/GameTime";
 import type { DayOfWeek, TimeOfDay } from "../InterFacesEnumsAndTypes/Time";
 import {
-  emptyNewsStruct,
-  type News,
   type NewsEmittedFromLocationStructure,
 } from "../Entity/News/News";
 import { locationManager } from "../Entity/Location/Manager/LocationManager";
@@ -11,8 +9,10 @@ import { travelManager } from "./TravelManager";
 import Report from "../Utils/Reporter";
 import { postman } from "../Entity/News/Postman";
 import { mergeNewsStructures } from "../Utils/mergeNewsStructure";
+import type { GameState } from "./GameState";
+import { drawSubRegionsWeatherCard, subregionRepository } from "../Entity/Location/Repository/subregion";
 
-export async function runSchedule() {
+export async function runSchedule(state: GameState ) {
   const now = new Date();
 
   const nextScheduledTime = nextScheduleTick(now);
@@ -24,15 +24,16 @@ export async function runSchedule() {
   );
 
   setTimeout(async () => {
-    await runGameLoop();
-    runSchedule();
+    await runGameLoop(state);
+    // TODO: Can be repetitive,
+    runSchedule(state);
   }, delay);
 }
 
-async function runGameLoop() {
+async function runGameLoop(state: GameState) {
   try {
     GameTime.advanceOnePhrase();
-    const mileStoneNews = handleGameMilestones();
+    const mileStoneNews = handleGameMilestones(state);
     const news = await processEvents(
       GameTime.getCurrentGameDayOfWeek(),
       GameTime.getCurrentGamePhase(),
@@ -67,7 +68,7 @@ const nextScheduleTick = (now: Date) => {
 };
 
 // TODO:: Mile stone consist of more than just Dating, it might have some events declaration, see example
-function handleGameMilestones(): NewsEmittedFromLocationStructure {
+function handleGameMilestones(state: GameState): NewsEmittedFromLocationStructure {
   const { gameDateHour, gameDateDay, gameDateMonth } = GameTime;
 
   let allNews: NewsEmittedFromLocationStructure = {
@@ -98,11 +99,17 @@ function handleGameMilestones(): NewsEmittedFromLocationStructure {
     // New year
     // https://www.notion.so/Draw-Global-Event-Card-2737d01e172a801aa596f75ab9503fb5?source=copy_link
     // If a Global Event occurred last year, draw a new Global Event card
-    // Adjust goods prices by yearly accumulated production
+    if (state.globalEventOccurred) {
+      /*
+        const card = drawGlobalEventCard();
+        const result: NewsEmittedFromLocationStructure = card.effect(state);
+        allNews = mergeNewsStructures(allNews, result);
+      */
+      state.globalEventOccurred = false;
+    }
 
-    // Executor
-    const news = emptyNewsStruct();
-    allNews = mergeNewsStructures(allNews, news);
+    // Adjust goods prices by yearly accumulated production
+    // Market.adjustYearlyPrices();
   }
 
   if (
@@ -112,42 +119,39 @@ function handleGameMilestones(): NewsEmittedFromLocationStructure {
   ) {
     // New season
     // - Refill resources based on the refilling table if it’s the right season
-    // Update weather Interpretation
+    locationManager.refillResources();
+    // Market.adjustSeasonalPrices();
 
-    // Executor
-    const news = emptyNewsStruct();
-    allNews = mergeNewsStructures(allNews, news);
+    // Update weather Interpretation: Do nothing here. It's handled in location itself.
   }
 
   if (gameDateDay === 1 && gameDateHour === 1) {
     // New Month
     // Draw Region Event Card, Trigger event effect and update global event scale
-
-    // Executor
-    const news = emptyNewsStruct();
-    allNews = mergeNewsStructures(allNews, news);
+    /*
+      const card = drawRegionEventCard();
+      const result: NewsEmittedFromLocationStructure = card.effect(state);
+      allNews = mergeNewsStructures(allNews, result);
+    */
   }
 
   if ([1, 7, 13, 19].includes(gameDateDay) && gameDateHour === 1) {
     // New Week
     // Draw Subregion Event Card
+    /*
+      const card = drawSubregionEventCard();
+      const result: NewsEmittedFromLocationStructure = card.effect(state);
+      allNews = mergeNewsStructures(allNews, result);
+    */
     // Some events target a random location in that subregion
     // If an event requires a ‘Location Specialty’, draw from that pile
     // If a location lacks specialty events, proceed with no extra effect
-
-    // Executor
-    const news = emptyNewsStruct();
-    allNews = mergeNewsStructures(allNews, news);
   }
 
   if (gameDateHour === 1) {
     // New day
-    // Subregions draw weather cards
-    // Local weather scales update
-
-    // Executor
-    const news = emptyNewsStruct();
-    allNews = mergeNewsStructures(allNews, news);
+    // Draw weather cards for all subregions update accordingly
+    drawSubRegionsWeatherCard();
   }
 
   return allNews;

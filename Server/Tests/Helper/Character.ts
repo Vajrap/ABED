@@ -16,6 +16,10 @@ import {
   type BattleStatKey,
   type ElementKey,
 } from "../../src/InterFacesEnumsAndTypes/Enums";
+import {
+  defaultActionSequence,
+  type CharacterActionSequence,
+} from "../../src/Entity/Character/Subclass/Action/CharacterAction";
 
 /* ---------------------------------------
    Shared tiny helper for patching a stat
@@ -65,7 +69,7 @@ export class CharacterFactory {
       type: CharacterType.humanoid,
       gender: "NONE",
       level: 1,
-      alignment: new CharacterAlignment({ law: 0, chaos: 0, good: 0, evil: 0 }),
+      alignment: new CharacterAlignment({ good: 0, evil: 0 }),
       artisans: new CharacterArtisans(),
       attribute: new CharacterAttributes(),
       battleStats: new CharacterBattleStats(),
@@ -75,6 +79,7 @@ export class CharacterFactory {
       vitals: new CharacterVitals({}),
       statTracker: 0,
       fame: new CharacterFame(),
+      actionSequence: defaultActionSequence(),
     });
   }
 

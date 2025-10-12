@@ -152,4 +152,5 @@ export enum LocationsEnum {
   CintertideLighthouse = "CintertideLighthouse",
   BlackmarketOfAshport = "BlackmarketOfAshport",
   NightReefDocks = "NightReefDocks",
+  None = "None",
 }

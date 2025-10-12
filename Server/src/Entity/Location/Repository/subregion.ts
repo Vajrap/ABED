@@ -2,3 +2,9 @@ import type { SubRegionEnum } from "../../../InterFacesEnumsAndTypes/Enums/SubRe
 import type { SubRegion } from "../SubRegion";
 
 export const subregionRepository: Map<SubRegionEnum, SubRegion> = new Map();
+
+export const drawSubRegionsWeatherCard = () => {
+  for (const [_, subRegion] of subregionRepository) {
+    subRegion.handleDailyWeatherUpdate();
+  }
+}

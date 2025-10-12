@@ -1,46 +1,73 @@
-import { Elysia } from "elysia";
 import { Game } from "./Game";
-import { z } from "zod";
-import { isBodyValid } from "./Utils/isBodyValid";
 import Report from "./Utils/Reporter";
+import { initializeDatabase, shutdownDatabase } from "./Database/init";
+import { apiRoutes } from "./API";
+import dotenv from "dotenv";
+import express from 'express';
+import cors from 'cors';
 
-const app = new Elysia();
+dotenv.config();
 
-const LoginSchema = z.object({
-  id: z.string(),
-  password: z.string(),
+export const app = express();
+
+// CORS configuration
+app.use(cors({
+  origin: function(_, callback){callback(null, true)},
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  optionsSuccessStatus: 204
+}));
+
+// Body parsing middleware
+app.use(express.json());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`🔥 ${req.method} ${req.url}`);
+  next();
 });
 
-app
-  // We will always use REST for client -> server requests even if it's about game logic
-  .post("/login", async ({ body }) => {})
-  .post("/regist", async ({ body }) => {})
-  .post("/guest", async ({ body }) => {})
-  .post("/autoAuth", async ({ body }) => {})
-  .post("/logout", async ({ body }) => {})
+// API routes
+app.use('/api', apiRoutes);
 
-  // Ws will be only for server -> client communication; so the only thing client send to server is ping heartbeat
-  .ws("/game", {
-    open(ws) {},
-    message(ws, data) {},
-    close(ws) {},
-  })
+// Error handling middleware
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
 
-  .listen(7777);
+const PORT = process.env.PORT || 7890;
 
-Report.info("Server running on port 7777 — let the seals be broken");
+async function startServer() {
+  try {
+    // Initialize database first
+    await initializeDatabase();
 
-const game = new Game();
-await game.start();
+    const game = new Game();
+    await game.start();
 
-function mockHandleLogin(body: any) {
-  if (!isBodyValid(LoginSchema, body)) {
-    Report.error(`Wrong message type in Login Schema with body ${body}`);
-    return { success: false, message: `Wrong message type` };
-  } else {
-    // validate session
-    // validate if user exist
-    // validate if password is right
-    return { success: true };
+    // Start the server
+    const server = app.listen(PORT, () => {
+      Report.info(`Server running on port ${PORT}`);
+      Report.info("🎉 Server startup completed successfully");
+      console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    });
+
+    // Handle graceful shutdown
+    process.on('SIGINT', async () => {
+      console.log('\n🛑 Shutting down server...');
+      server.close(async () => {
+        await shutdownDatabase();
+        process.exit(0);
+      });
+    });
+
+  } catch (error) {
+    Report.error(`Server startup failed: ${error}`);
+    await shutdownDatabase();
+    process.exit(1);
   }
 }
+
+// Start the server
+startServer();

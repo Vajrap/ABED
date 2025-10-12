@@ -12,6 +12,11 @@ class CharacterManager {
         return character
     }
 
+    getUserCharacterByUserId(userId: string): Character | null {
+        const character = this.characters.find(c => c.userId === userId);
+        return character || null;
+    }
+
     addCharacter(character: Character) {
         this.characters.push(character);
     }

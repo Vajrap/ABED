@@ -3,6 +3,7 @@ import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 import { statMod } from "../../Utils/statMod";
 import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
 import type { Character } from "../Character/Character";
+import type { Location } from "../Location/Location";
 import type { Party } from "../Party/Party";
 
 export class Battle {
@@ -11,14 +12,14 @@ export class Battle {
   partyA: Party;
   partyB: Party;
   battleReport: BattleReport;
-  location: GameLocation;
+  location: Location;
   gameTime: GameTimeInterface;
   battleType: BattleType;
   allParticipants: Character[];
   constructor(
     partyA: Party,
     partyB: Party,
-    location: GameLocation,
+    location: Location,
     gameTime: GameTimeInterface,
     battleType: BattleType,
   ) {
@@ -31,8 +32,12 @@ export class Battle {
     this.gameTime = gameTime;
     this.battleType = battleType;
     this.allParticipants = [
-      ...partyA.characters.filter((char) => !char.vitals.isDead),
-      ...partyB.characters.filter((char) => !char.vitals.isDead),
+      ...partyA.characters.filter(
+        (char): char is Character => char !== "none" && !char.vitals.isDead,
+      ),
+      ...partyB.characters.filter(
+        (char): char is Character => char !== "none" && !char.vitals.isDead,
+      ),
     ];
   }
 

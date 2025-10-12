@@ -7,6 +7,7 @@ import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location
 import type { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
+import type { ResourceGenerateCapacity, ResourceGenerationConfig } from "../../InterFacesEnumsAndTypes/Interfaces/Resource";
 import {
   addToLocationScope,
   addToPartyScope,
@@ -44,6 +45,10 @@ import { handleTrainAttribute } from "./Events/handlers/train/attribute";
 import { handleTrainProficiency } from "./Events/handlers/train/proficiency";
 import { handleTrainSkill } from "./Events/handlers/train/skill";
 import type { SubRegion } from "./SubRegion";
+import type { WeatherVolatility } from "./WeatherCard/WeatherCard";
+import { Weather } from "../../InterFacesEnumsAndTypes/Weather";
+import { subregionRepository } from "./Repository/subregion";
+import Report from "../../Utils/Reporter";
 
 export type UserInputAction = {
   type: ActionInput;
@@ -117,6 +122,9 @@ export class Location {
   actions: ActionInput[];
   randomEvents: RandomEvents;
   weatherScale: number;
+  volatility: WeatherVolatility;
+  // New resource generation system
+  resourceGeneration: ResourceGenerationConfig;
 
   /*
     We need a list of all possible event with dice face number.
@@ -139,9 +147,11 @@ export class Location {
     subRegion: SubRegion,
     connectedLocations: { location: Location; distance: number }[],
     actions: ActionInput[],
+    volatility: WeatherVolatility,
     randomEvents?: RandomEvents,
     innConfig?: LocationInns,
     weatherScale?: number,
+    resourceGeneration?: ResourceGenerationConfig,
   ) {
     this.id = id;
     this.subRegion = subRegion.id;
@@ -157,7 +167,9 @@ export class Location {
           Luxury: null,
           Premium: null,
         };
-    this.weatherScale = weatherScale ?? 0;
+    this.volatility = volatility;
+    this.weatherScale = weatherScale ?? getStartingWeatherScale(volatility);
+    this.resourceGeneration = resourceGeneration ?? this.getDefaultResourceGeneration();
   }
 
   getRandomEventFor(
@@ -275,6 +287,141 @@ export class Location {
     }
 
     return results;
+  }
+
+  refillResources() {
+    for (const party of this.parties) {
+      for (const character of party.characters) {
+        if (character === "none") continue;
+
+        character.vitals.hp.setCurrent(character.vitals.hp.max);
+        character.vitals.mp.setCurrent(character.vitals.mp.max);
+        character.vitals.sp.setCurrent(character.vitals.sp.max);
+        character.needs.set({ mood: 100, energy: 100, satiety: 100 });
+      }
+    }
+  }
+
+  // Resource generation methods
+  private getDefaultResourceGeneration(): ResourceGenerationConfig {
+    return {
+      capacity: {
+        // Mineral resources
+        ore: 0,
+        gemstone: 0,
+        
+        // Organic/forestry resources
+        wood: 0,
+        
+        
+        // Foraging resources
+        herbs: 0,
+        silk: 0,
+
+        // Aquatic resources
+        fish: 0,
+        
+        // Agricultural resources
+        grain: 0,
+        vegetables: 0,
+        fruits: 0,
+        
+        // Livestock resources
+        livestock: 0
+      },
+      rate: {
+        // Mineral resources
+        ore: 0,
+        gemstone: 0,
+        
+        // Organic/forestry resources
+        wood: 0,
+        
+        
+        // Foraging resources
+        herbs: 0,
+        silk: 0,
+
+        // Aquatic resources
+        fish: 0,
+        
+        // Agricultural resources
+        grain: 0,
+        vegetables: 0,
+        fruits: 0,
+        
+        // Livestock resources
+        livestock: 0
+      },
+      stockpile: {
+        // Mineral resources
+        ore: 0,
+        gemstone: 0,
+        
+        // Organic/forestry resources
+        wood: 0,
+        
+        
+        // Foraging resources
+        herbs: 0,
+        silk: 0,
+
+        // Aquatic resources
+        fish: 0,
+        
+        // Agricultural resources
+        grain: 0,
+        vegetables: 0,
+        fruits: 0,
+        
+        // Livestock resources
+        livestock: 0
+      }
+    };
+  }
+
+  // Generate resources based on capacity and rates
+  generateResources(): void {
+    const { capacity, rate, stockpile } = this.resourceGeneration;
+    
+    // Generate each resource type
+    Object.keys(rate).forEach(resourceType => {
+      const currentStockpile = stockpile[resourceType as keyof typeof stockpile];
+      const generationRate = rate[resourceType as keyof typeof rate];
+      const maxCapacity = capacity[resourceType as keyof typeof capacity];
+      
+      const roll = rollTwenty().total;
+      const fluctuation = (roll - 10) / 100;
+      const generated = generationRate * (1 + fluctuation);
+
+      let newAmount = currentStockpile + generated;
+      if (newAmount > maxCapacity) {
+        newAmount = maxCapacity;
+      } else if (newAmount < 0) {
+        newAmount = 0;
+      }
+
+      stockpile[resourceType as keyof typeof stockpile] = newAmount;
+    });
+  }
+
+  // Get available resources for artisan actions
+  getAvailableResources(): ResourceGenerateCapacity {
+    return { ...this.resourceGeneration.stockpile };
+  }
+
+  getWeather(): Weather {
+    const subRegion = subregionRepository.get(this.subRegion);
+    if (!subRegion) {
+      Report.error(`SubRegion ${this.subRegion} not found`);
+      return Weather.Clear;
+    }
+    const weather = subRegion.weatherInterpretation.get(this.weatherScale);
+    if (!weather) {
+      Report.error(`Weather ${this.weatherScale} not found`);
+      return Weather.Clear;
+    }
+    return weather;
   }
 }
 
@@ -665,4 +812,24 @@ function addNewsWithScopeToNewsEmittedFromLocationStruct(data: {
       break;
   }
   return data.nefls;
+}
+
+
+function getStartingWeatherScale(volatility: WeatherVolatility): number {
+  switch (volatility) {
+    case "TRANQUIL":
+      return 20 + Math.random() * 20; // ~20–40
+    case "CALM":
+      return 30 + Math.random() * 25; // ~30–55
+    case "STABLE":
+      return 40 + Math.random() * 20; // ~40–60
+    case "BALANCE":
+      return 45 + Math.random() * 30; // ~45–75
+    case "UNSTABLE":
+      return 55 + Math.random() * 25; // ~55–80
+    case "VOLATILE":
+      return 65 + Math.random() * 25; // ~65–90
+    case "EXTREME":
+      return 75 + Math.random() * 25; // ~75–100
+  }
 }

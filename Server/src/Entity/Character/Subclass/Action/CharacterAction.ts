@@ -132,44 +132,46 @@ export type CharacterActionSequence = {
   };
 };
 
-export const defaultActionSequence: CharacterActionSequence = {
-  [DayOfWeek.laoh]: {
-    [TimeOfDay.morning]: { type: ActionInput.None },
-    [TimeOfDay.afternoon]: { type: ActionInput.None },
-    [TimeOfDay.evening]: { type: ActionInput.None },
-    [TimeOfDay.night]: { type: ActionInput.None },
-  },
-  [DayOfWeek.rowana]: {
-    [TimeOfDay.morning]: { type: ActionInput.None },
-    [TimeOfDay.afternoon]: { type: ActionInput.None },
-    [TimeOfDay.evening]: { type: ActionInput.None },
-    [TimeOfDay.night]: { type: ActionInput.None },
-  },
-  [DayOfWeek.aftree]: {
-    [TimeOfDay.morning]: { type: ActionInput.None },
-    [TimeOfDay.afternoon]: { type: ActionInput.None },
-    [TimeOfDay.evening]: { type: ActionInput.None },
-    [TimeOfDay.night]: { type: ActionInput.None },
-  },
-  [DayOfWeek.udur]: {
-    [TimeOfDay.morning]: { type: ActionInput.None },
-    [TimeOfDay.afternoon]: { type: ActionInput.None },
-    [TimeOfDay.evening]: { type: ActionInput.None },
-    [TimeOfDay.night]: { type: ActionInput.None },
-  },
-  [DayOfWeek.matris]: {
-    [TimeOfDay.morning]: { type: ActionInput.None },
-    [TimeOfDay.afternoon]: { type: ActionInput.None },
-    [TimeOfDay.evening]: { type: ActionInput.None },
-    [TimeOfDay.night]: { type: ActionInput.None },
-  },
-  [DayOfWeek.seethar]: {
-    [TimeOfDay.morning]: { type: ActionInput.None },
-    [TimeOfDay.afternoon]: { type: ActionInput.None },
-    [TimeOfDay.evening]: { type: ActionInput.None },
-    [TimeOfDay.night]: { type: ActionInput.None },
-  },
-};
+export function defaultActionSequence(): CharacterActionSequence {
+  return {
+    [DayOfWeek.laoh]: {
+      [TimeOfDay.morning]: { type: ActionInput.None },
+      [TimeOfDay.afternoon]: { type: ActionInput.None },
+      [TimeOfDay.evening]: { type: ActionInput.None },
+      [TimeOfDay.night]: { type: ActionInput.None },
+    },
+    [DayOfWeek.rowana]: {
+      [TimeOfDay.morning]: { type: ActionInput.None },
+      [TimeOfDay.afternoon]: { type: ActionInput.None },
+      [TimeOfDay.evening]: { type: ActionInput.None },
+      [TimeOfDay.night]: { type: ActionInput.None },
+    },
+    [DayOfWeek.aftree]: {
+      [TimeOfDay.morning]: { type: ActionInput.None },
+      [TimeOfDay.afternoon]: { type: ActionInput.None },
+      [TimeOfDay.evening]: { type: ActionInput.None },
+      [TimeOfDay.night]: { type: ActionInput.None },
+    },
+    [DayOfWeek.udur]: {
+      [TimeOfDay.morning]: { type: ActionInput.None },
+      [TimeOfDay.afternoon]: { type: ActionInput.None },
+      [TimeOfDay.evening]: { type: ActionInput.None },
+      [TimeOfDay.night]: { type: ActionInput.None },
+    },
+    [DayOfWeek.matris]: {
+      [TimeOfDay.morning]: { type: ActionInput.None },
+      [TimeOfDay.afternoon]: { type: ActionInput.None },
+      [TimeOfDay.evening]: { type: ActionInput.None },
+      [TimeOfDay.night]: { type: ActionInput.None },
+    },
+    [DayOfWeek.seethar]: {
+      [TimeOfDay.morning]: { type: ActionInput.None },
+      [TimeOfDay.afternoon]: { type: ActionInput.None },
+      [TimeOfDay.evening]: { type: ActionInput.None },
+      [TimeOfDay.night]: { type: ActionInput.None },
+    },
+  };
+}
 
 export type CharacterAction =
   | { type: ActionInput.None }

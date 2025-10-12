@@ -1,6 +1,10 @@
+import { randomUUID } from "crypto";
+import { GameTime } from "../../Game/GameTime/GameTime";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import type { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
+import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 
 // SCOPE
 export type NewsScope =
@@ -43,12 +47,28 @@ enum NewsTag {
 }
 
 // NEWS ITEM
+/*
+  Now, news system will be tied to character, each news has its own id and timestamp that related to GameTimeInterface
+  When a Character encounter with any News, the id will be collected into character's news; 
+  also newly met News will shown up to FE client next time they 
+    Login, once logged in, show NewsInterface or 
+    Open the News menu, or
+    Is currently Logged in, through WebSocket, and shown in NewsInterface
+  That means we need to track, which news has been seen too.
+  TODO: Add, News and UnSeenNews to Character class
+
+  Next, since in the game, it's possible for character to exchange news with other character,
+  So... I think, News should also have 'Secret Tier' which tells if it is something secret or not,
+  think of catrastophic event like Regional flood, even if it's Huge and legendary in scale, But it's not secret,
+*/
 export interface News {
-  ts: number; // epoch ms
+  id: string;
+  ts: GameTimeInterface; // epoch ms
   scope: NewsScope;
   tags?: NewsTag[]; // "craft","legendary","combat"
   tokens: NewsToken[]; // rich, UI-resolvable content
   context: NewsContext;
+  secretTier: TierEnum;
 }
 
 export function createNews(data: {
@@ -60,13 +80,19 @@ export function createNews(data: {
     system?: "craft" | "combat" | "quest" | string;
   };
   context: NewsContext;
+  secretTier: TierEnum;
+  tags?: NewsTag[];
 }): News {
-  const ts = Date.now();
+  const id = randomUUID();
+  const ts = GameTime.getCurrentGameDate()
   return {
+    id,
     ts,
     scope: data.scope,
+    tags: data.tags,
     tokens: data.tokens,
     context: data.context,
+    secretTier: data.secretTier,
   };
 }
 

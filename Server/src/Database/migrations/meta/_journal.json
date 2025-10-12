@@ -1,0 +1,41 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1759504457858,
+      "tag": "0000_lumpy_taskmaster",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1759582799053,
+      "tag": "0001_sour_clint_barton",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1759607685073,
+      "tag": "0002_fine_blue_shield",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1759611562634,
+      "tag": "0003_small_earthquake",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1759976209933,
+      "tag": "0004_white_imperial_guard",
+      "breakpoints": true
+    }
+  ]
+}

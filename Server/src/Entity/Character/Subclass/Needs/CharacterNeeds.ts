@@ -52,6 +52,7 @@ export class CharacterNeeds {
   toJSON() {
     return { mood: this.mood, energy: this.energy, satiety: this.satiety };
   }
+  
   static fromJSON(data: Partial<CharacterNeeds> = {}) {
     return new CharacterNeeds(data);
   }

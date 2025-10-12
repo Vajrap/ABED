@@ -12,6 +12,23 @@ services:
     ports:
       - "7890:7890"
     restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://abed_user:abed_password@postgres:5432/abed_db
+
+  postgres:
+    image: postgres:15
+    container_name: ABED_POSTGRES
+    ports:
+      - "40316:5432"
+    environment:
+      POSTGRES_DB: abed_db
+      POSTGRES_USER: abed_user
+      POSTGRES_PASSWORD: abed_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   loki:
     image: grafana/loki:2.9.0
@@ -39,3 +56,4 @@ services:
 
 volumes:
   grafana-data:
+  postgres_data:

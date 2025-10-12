@@ -19,13 +19,11 @@ import type { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import type { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
 import type { TraitEnum } from "../Trait.ts/enum";
 import { DeckCondition } from "./Subclass/DeckCondition/DeckCondition";
-import type { LightnessSkillId } from "../LightnessSkill/enum";
 import type { SkillId } from "../Skill/enums";
 import type { BreathingSkillId } from "../BreathingSkill/enum";
 import { CharacterBehavior } from "./Subclass/Behavior/CharacterBehavior";
 import { CharacterTitle } from "./Subclass/Title/Title";
 import {
-  ActionInput,
   defaultActionSequence,
   type CharacterAction,
   type CharacterActionSequence,
@@ -33,16 +31,22 @@ import {
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 import type { CharNewsInterface } from "../News/News";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import type { CharacterRoleEnum } from "./Subclass/Title/Role/enum";
+import type { CharacterEpithetEnum } from "./Subclass/Title/Epithet/enum";
 
 export class Character {
   id: string = "";
+  userId: string | null = null;
   partyID: string | null = null;
+
   name: string = "";
-  type: CharacterType = CharacterType.humanoid;
   gender: "MALE" | "FEMALE" | "NONE" = "NONE";
+  race: string = "";
+  type: CharacterType = CharacterType.humanoid;
   level: number = 1;
   portrait: string | null = null;
   background: string | null = null;
+
   alignment: CharacterAlignment = new CharacterAlignment({});
   artisans: CharacterArtisans = new CharacterArtisans();
   attribute: CharacterAttributes = new CharacterAttributes();
@@ -57,8 +61,9 @@ export class Character {
   behavior: CharacterBehavior = new CharacterBehavior();
 
   title: CharacterTitle = new CharacterTitle();
-
-  actionSequence: CharacterActionSequence = defaultActionSequence;
+  possibleEpithets: CharacterEpithetEnum[] = [];
+  possibleRoles: CharacterRoleEnum[] = [];
+  actionSequence: CharacterActionSequence = defaultActionSequence();
   informations: Record<string, number> = {};
   // Skills
   // TODO: write condition, might be config setting
@@ -75,7 +80,7 @@ export class Character {
   breathingSkillsLearningProgress: Map<BreathingSkillId, number> = new Map();
   planarAptitude: CharacterPlanarAptitude = new CharacterPlanarAptitude();
 
-  relations: Map<number, { value: number; status: RelationStatusEnum }> =
+  relations: Map<string, { value: number; status: RelationStatusEnum }> =
     new Map();
   traits: TraitEnum[] = [];
 
@@ -87,6 +92,14 @@ export class Character {
 
   statTracker: number;
   abGuage = 0;
+
+  news: string[] = [];
+  unseenNews: string[] = [];
+
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy: string;
 
   constructor(data: {
     id: string;
@@ -100,13 +113,17 @@ export class Character {
     artisans: CharacterArtisans;
     attribute: CharacterAttributes;
     battleStats: CharacterBattleStats;
-    elements: CharacterElements;
     proficiencies: CharacterProficiencies;
+    elements: CharacterElements;
     needs: CharacterNeeds;
     vitals: CharacterVitals;
     fame: CharacterFame;
     actionSequence: CharacterActionSequence;
     statTracker?: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+    createdBy?: string;
+    updatedBy?: string;
   }) {
     this.id = data.id;
     this.name = data.name;
@@ -126,6 +143,10 @@ export class Character {
     this.fame = data.fame;
     this.actionSequence = data.actionSequence;
     this.statTracker = data.statTracker || 0;
+    this.createdAt = data.createdAt || new Date();
+    this.updatedAt = data.updatedAt || new Date();
+    this.createdBy = data.createdBy || "";
+    this.updatedBy = data.updatedBy || "";
   }
 
   getActionFor(day: DayOfWeek, time: TimeOfDay): CharacterAction {
@@ -156,15 +177,37 @@ export class Character {
       level: this.level,
     };
   }
+
+  addItemToInventory(item: ItemId, quantity: number) {
+    this.inventory.set(item, (this.inventory.get(item) ?? 0) + quantity);
+  }
+
+  removeItemFromInventory(item: ItemId, quantity: number) {
+    this.inventory.set(item, (this.inventory.get(item) ?? 0) - quantity);
+    if (this.inventory.get(item) === 0) {
+      this.inventory.delete(item);
+    }
+  }
+
+  addEpithet(epithet: CharacterEpithetEnum) {
+    if (!this.possibleEpithets.includes(epithet)) {
+      this.possibleEpithets.push(epithet);
+    }
+  }
+  addRole(role: CharacterRoleEnum) {
+    if (!this.possibleRoles.includes(role)) {
+      this.possibleRoles.push(role);
+    }
+  }
 }
 
-type CharacterSkillObject = {
+export type CharacterSkillObject = {
   id: SkillId;
   level: TierEnum;
   exp: number;
 };
 
-type CharacterInternalSkillObject = {
+export type CharacterInternalSkillObject = {
   id: BreathingSkillId;
   level: TierEnum;
   exp: number;

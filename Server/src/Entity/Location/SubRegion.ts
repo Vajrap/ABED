@@ -1,5 +1,8 @@
 import type { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import type { Weather } from "../../InterFacesEnumsAndTypes/Weather";
+import { getLocationBySubRegion, locationRepository } from "./Repository/location";
+import { getRandomWeatherDeviant } from "./WeatherCard/getRandomWeatherDeviant";
 import { WeatherDeck, type WeatherVolatility } from "./WeatherCard/WeatherCard";
 
 export class SubRegion {
@@ -8,7 +11,7 @@ export class SubRegion {
   speedBonus: SubRegionSpeedBonus;
   volatility: WeatherVolatility;
   weatherDeck: WeatherDeck;
-  weatherScale: number;
+  weatherInterpretation: Map<number, Weather>;
   // possibleEnemies: MobCharacterEnum[];
   // randomEventsDeck: RandomEventCard[];
   // discardedEventCards: RandomEventCard[] = [];
@@ -17,13 +20,14 @@ export class SubRegion {
     region: RegionEnum,
     speedBonus: SubRegionSpeedBonus,
     volatility: WeatherVolatility,
+    weatherInterpretation: Map<number, Weather>,
   ) {
     this.id = id;
     this.region = region;
     this.speedBonus = speedBonus;
     this.volatility = volatility;
     this.weatherDeck = new WeatherDeck(volatility);
-    this.weatherScale = getStartingScale(volatility);
+    this.weatherInterpretation = weatherInterpretation;
   }
 
   get regionName(): string {
@@ -34,10 +38,16 @@ export class SubRegion {
     return this.speedBonus[mode];
   }
 
-  drawWeatherCard() {
-    const card = this.weatherDeck.drawCard();
-    this.weatherScale += card.value;
-    return card;
+  handleDailyWeatherUpdate() {
+    const card = this.drawWeatherCard();
+    for (const location of getLocationBySubRegion(this.id)){
+      const updateVal = card.value + getRandomWeatherDeviant();
+      location.weatherScale += updateVal;
+    }
+  }
+
+  private drawWeatherCard() {
+    return this.weatherDeck.drawCard();
   }
 }
 
@@ -46,22 +56,3 @@ type SubRegionSpeedBonus = {
   horse: number;
   caravan: number;
 };
-
-function getStartingScale(volatility: WeatherVolatility): number {
-  switch (volatility) {
-    case "TRANQUIL":
-      return 20 + Math.random() * 20; // ~20–40
-    case "CALM":
-      return 30 + Math.random() * 25; // ~30–55
-    case "STABLE":
-      return 40 + Math.random() * 20; // ~40–60
-    case "BALANCE":
-      return 45 + Math.random() * 30; // ~45–75
-    case "UNSTABLE":
-      return 55 + Math.random() * 25; // ~55–80
-    case "VOLATILE":
-      return 65 + Math.random() * 25; // ~65–90
-    case "EXTREME":
-      return 75 + Math.random() * 25; // ~75–100
-  }
-}

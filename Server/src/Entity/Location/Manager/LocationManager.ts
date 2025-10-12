@@ -18,8 +18,6 @@ class LocationManager {
   subRegions: Map<SubRegionEnum, SubRegion> = subregionRepository;
   locations: Map<LocationsEnum, Location> = locationRepository;
 
-  constructor() {}
-
   async processEncounters(
     day: DayOfWeek,
     phase: TimeOfDay,
@@ -166,6 +164,13 @@ class LocationManager {
     }
     // return news;
     return news;
+  }
+
+  // TODO:
+  refillResources() {
+    for (const [_, location] of this.locations) {
+      location.refillResources();
+    }
   }
 }
 

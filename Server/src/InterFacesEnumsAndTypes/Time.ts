@@ -32,24 +32,15 @@ export enum DayOfWeek {
   matris = "matris",
   seethar = "seethar",
 }
-
-export enum Season {
-  seeding = "seeding",
-  rainFall = "rainFall",
-  greenTide = "greenTide",
-  harvestMoon = "harvestMoon",
-  sunDry = "sunDry",
-  frostVeil = "frostVeil",
-  longDark = "longDark",
-}
-
 export interface GameTimeInterface {
   dayPassed: number;
   gameDateDay: number;
   gameDateHour: number;
-  gameDateMonth: number;
+  gameDateSeason: number;
   gameDateYear: number;
   phase: TimeOfDay;
+  day: DayOfWeek;
+  season: SeasonEnum;
 }
 
 export enum SeasonEnum {
@@ -61,3 +52,4 @@ export enum SeasonEnum {
   Frostveil = "Frostveil",
   LongDark = "LongDark",
 }
+

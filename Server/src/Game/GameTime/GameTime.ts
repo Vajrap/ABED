@@ -7,13 +7,16 @@ import {
 
 export class GameTime {
   static inGameHoursPerDay: number = 4; // 4 phases in a game day: morning, afternoon, evening, night => 15 min per phase, 1 hour per day
-  static inGameDaysPerMonth: number = 24; // 24 days in a game month => if we set 24 days per month, 1 month will be 1 real day, so if we separate in to week, 4 weeks per month, we should have 6 days per week; 6 days would go hand in hand with 6 firstborn gods!
-  static inGameMonthsPerYear: number = 14; // 14 months in a game year
+  static inGameDaysPerWeek: number = 6; // 6 days in a game week
+  static inGameDaysPerSeason: number = 48; // 48 days in a game season => One season equal to 2 real days
+  static inGameSeasonsPerYear: number = 7; // 7 seasons in a game year
+  
+  static inGameWeeksPerSeason: number = 8; // 8 weeks in a game season
 
   static dayPassed: number = 0;
-  static gameDateHour: number = 1;
-  static gameDateDay: number = 1;
-  static gameDateMonth: number = 1;
+  static gameDateHour: 1 | 2 | 3 | 4 = 1;
+  static gameDateDay: 1 | 2 | 3 | 4 | 5 | 6 = 1;
+  static gameDateSeason: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 1;
   static gameDateYear: number = 0;
   static timerInterval: NodeJS.Timeout | null = null;
 
@@ -22,11 +25,11 @@ export class GameTime {
     if (this.gameDateHour > GameTime.inGameHoursPerDay) {
       this.gameDateHour = 1;
       this.gameDateDay++;
-      if (this.gameDateDay > GameTime.inGameDaysPerMonth) {
+      if (this.gameDateDay > GameTime.inGameDaysPerSeason) {
         this.gameDateDay = 1;
-        this.gameDateMonth++;
-        if (this.gameDateMonth > GameTime.inGameMonthsPerYear) {
-          this.gameDateMonth = 1;
+        this.gameDateSeason++;
+        if (this.gameDateSeason > GameTime.inGameSeasonsPerYear) {
+          this.gameDateSeason = 1;
           this.gameDateYear++;
         }
       }
@@ -35,16 +38,29 @@ export class GameTime {
 
   static setGameTime(
     dayPassed: number,
-    gameDateDay: number,
-    gameDateHour: number,
-    gameDateMonth: number,
+    gameDateDay: 1 | 2 | 3 | 4 | 5 | 6,
+    gameDateHour: 1 | 2 | 3 | 4,
+    gameDateSeason: 1 | 2 | 3 | 4 | 5 | 6 | 7,
     gameDateYear: number,
   ) {
     GameTime.dayPassed = dayPassed;
     GameTime.gameDateDay = gameDateDay;
     GameTime.gameDateHour = gameDateHour;
-    GameTime.gameDateMonth = gameDateMonth;
+    GameTime.gameDateSeason = gameDateSeason;
     GameTime.gameDateYear = gameDateYear;
+  }
+
+  static getCurrentGameDateTime(): GameTimeInterface  {
+    return {
+      dayPassed: GameTime.dayPassed,
+      gameDateDay: GameTime.gameDateDay,
+      gameDateHour: GameTime.gameDateHour,
+      gameDateSeason: GameTime.gameDateSeason,
+      gameDateYear: GameTime.gameDateYear,
+      phase: GameTime.getCurrentGamePhase(),
+      day: GameTime.getCurrentGameDayOfWeek(),
+      season: GameTime.getCurrentGameSeason(),
+    };
   }
 
   static getCurrentGameDate(): GameTimeInterface {
@@ -52,9 +68,11 @@ export class GameTime {
       dayPassed: GameTime.dayPassed,
       gameDateDay: GameTime.gameDateDay,
       gameDateHour: GameTime.gameDateHour,
-      gameDateMonth: GameTime.gameDateMonth,
+      gameDateSeason: GameTime.gameDateSeason,
       gameDateYear: GameTime.gameDateYear,
       phase: GameTime.getCurrentGamePhase(),
+      day: GameTime.getCurrentGameDayOfWeek(),
+      season: GameTime.getCurrentGameSeason(),
     };
   }
 
@@ -65,9 +83,7 @@ export class GameTime {
       TimeOfDay.afternoon,
       TimeOfDay.evening,
     ];
-    return (
-      phases[(GameTime.gameDateHour - 1) % phases.length] || TimeOfDay.night
-    );
+    return phases[(GameTime.gameDateHour - 1)] as TimeOfDay;
   }
 
   static getCurrentGameDayOfWeek(): DayOfWeek {
@@ -84,39 +100,36 @@ export class GameTime {
 
   static getCurrentGameSeason(): SeasonEnum {
     if (
-      GameTime.gameDateMonth < 1 ||
-      GameTime.gameDateMonth > GameTime.inGameMonthsPerYear
+      GameTime.gameDateSeason < 1 ||
+      GameTime.gameDateSeason > GameTime.inGameSeasonsPerYear
     ) {
       console.warn(
-        `Unexpected gameDateMonth: ${GameTime.gameDateMonth}, defaulting to LongDark.`,
+        `Unexpected gameDateSeason: ${GameTime.gameDateSeason}, defaulting to LongDark.`,
       );
       return SeasonEnum.LongDark;
     }
 
-    switch (GameTime.gameDateMonth) {
+    switch (GameTime.gameDateSeason) {
       case 1:
-      case 2:
         return SeasonEnum.Seeding;
-      case 3:
-      case 4:
+      case 2:
         return SeasonEnum.RainFall;
-      case 5:
-      case 6:
+      case 3:
         return SeasonEnum.GreenTide;
-      case 7:
-      case 8:
+      case 4:
         return SeasonEnum.HarvestMoon;
-      case 9:
-      case 10:
+      case 5:
         return SeasonEnum.SunDry;
-      case 11:
-      case 12:
+      case 6:
         return SeasonEnum.Frostveil;
-      case 13:
-      case 14:
+      case 7:
         return SeasonEnum.LongDark;
       default:
         return SeasonEnum.LongDark;
     }
+  }
+
+  static getWeekNumber(): number {
+    return Math.floor(GameTime.gameDateDay / GameTime.inGameDaysPerWeek);
   }
 }

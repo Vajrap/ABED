@@ -8,6 +8,7 @@ export class CharacterTitle {
     this.epithet = epithet;
     this.role = role;
   }
+  
   string(): string {
     return `${this.epithet} ${this.role}`;
   }

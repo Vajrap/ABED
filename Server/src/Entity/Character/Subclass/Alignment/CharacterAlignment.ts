@@ -17,8 +17,9 @@ export class CharacterAlignment {
     // 1. If both value >= 30, and spreading < 30 use Chaotic side Enum
     const diff = Math.abs(this.good - this.evil);
     if (this.good >= 30 && this.evil >= 30 && diff < 30) {
-      // Chaotic
-      return ChaoticAlignmentMap[turnMax(diff)];
+      // Chaotic - use average of good and evil
+      const average = (this.good + this.evil) / 2;
+      return ChaoticAlignmentMap[turnMax(average)];
     } else {
       if (this.good > this.evil) {
         // Good
@@ -29,12 +30,20 @@ export class CharacterAlignment {
       }
     }
   }
+
+  toJSON() {
+    return { good: this.good, evil: this.evil };
+  }
+
+  static fromJSON(data: { good?: number; evil?: number }) {
+    return new CharacterAlignment(data);
+  }
 }
 
 const turnMax = (val: number): 29 | 49 | 69 | 89 | 100 => {
   if (val < 30) return 29;
-  if (val < 49) return 49;
-  if (val < 69) return 69;
-  if (val < 89) return 89;
+  if (val < 50) return 49;
+  if (val < 70) return 69;
+  if (val < 90) return 89;
   else return 100;
 };

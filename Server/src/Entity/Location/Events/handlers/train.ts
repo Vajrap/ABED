@@ -18,11 +18,11 @@ export function handleTrainAction(
 ): NewsWithScope {
   return {
     scope: {
-      kind: "world",
+      kind: "worldScope",
     },
     news: createNews({
       scope: {
-        kind: "world",
+        kind: "worldScope",
       },
       tokens: [],
       context: {

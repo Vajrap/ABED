@@ -98,7 +98,7 @@ function learnSkill(character: Character, skill: Skill): boolean {
   const rawProgress = character.skillLearningProgress.get(skill.id);
   let progress: number = rawProgress !== undefined ? rawProgress : 0;
   const { base, bonusDice } = getBaseAndBonusRange(skill.tier);
-  const randomBonus = roll(bonusDice).total;
+  const randomBonus = roll(1).d(bonusDice).total;
   const intBonus = Math.round(
     statMod(character.attribute.getTotal("intelligence") / 2),
   );
@@ -118,25 +118,25 @@ function learnSkill(character: Character, skill: Skill): boolean {
 
 function getBaseAndBonusRange(tier: TierEnum): {
   base: number;
-  bonusDice: DiceEnum;
+  bonusDice: number;
 } {
   switch (tier) {
     case TierEnum.common:
-      return { base: 30, bonusDice: "1d6" };
+      return { base: 30, bonusDice: 6 };
     case TierEnum.uncommon:
-      return { base: 25, bonusDice: "1d6" };
+      return { base: 25, bonusDice: 6 };
     case TierEnum.rare:
-      return { base: 20, bonusDice: "1d6" };
+      return { base: 20, bonusDice: 6 };
     case TierEnum.epic:
-      return { base: 15, bonusDice: "1d4" };
+      return { base: 15, bonusDice: 4 };
     case TierEnum.legendary:
-      return { base: 10, bonusDice: "1d4" };
+      return { base: 10, bonusDice: 4 };
     case TierEnum.unique:
-      return { base: 5, bonusDice: "1d4" };
+      return { base: 5, bonusDice: 4 };
     case TierEnum.divine:
-      return { base: 1, bonusDice: "1d2" };
+      return { base: 1, bonusDice: 2 };
     default:
-      return { base: 0, bonusDice: "1d2" };
+      return { base: 0, bonusDice: 2 };
   }
 }
 

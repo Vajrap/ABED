@@ -85,6 +85,7 @@ export const ATTRIBUTE_KEYS = [
 export type AttributeKey = (typeof ATTRIBUTE_KEYS)[number];
 
 export const ARTISAN_KEYS = [
+  "agriculture",
   "mining",
   "smithing",
   "woodCutting",
@@ -98,7 +99,6 @@ export const ARTISAN_KEYS = [
   "alchemy",
   "enchanting",
   "fishing",
-  "hunting",
   "masonry",
   "tailoring",
   "brewing",

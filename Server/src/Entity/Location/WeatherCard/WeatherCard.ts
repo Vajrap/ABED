@@ -121,7 +121,15 @@ export class WeatherDeck {
   }
 
   reshuffle(): void {
-    this.cards = this.drawn.reverse();
+    // Fisher-Yates shuffle algorithm for random order
+    const shuffled = [...this.drawn];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = shuffled[i];
+      shuffled[i] = shuffled[j]!;
+      shuffled[j] = temp!;
+    }
+    this.cards = shuffled;
     this.drawn = [];
   }
 }
