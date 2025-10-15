@@ -1,6 +1,6 @@
-import type { LocationsEnum } from "../../../InterFacesEnumsAndTypes/Enums/Location";
-import type { SubRegionEnum } from "../../../InterFacesEnumsAndTypes/Enums/SubRegion";
-import type { Location } from "../Location";
+import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
+import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import type { Location } from "../Location/Location";
 
 // export const locationRepository: Location[] = [];
 

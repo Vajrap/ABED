@@ -1,6 +1,7 @@
 import { LocationsEnum } from "../../../../InterFacesEnumsAndTypes/Enums/Location";
 import { RegionEnum } from "../../../../InterFacesEnumsAndTypes/Enums/Region";
 import { SubRegionEnum } from "../../../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import { TierEnum } from "../../../../InterFacesEnumsAndTypes/Tiers";
 import type { Character } from "../../../Character/Character";
 import type { ActionInput } from "../../../Character/Subclass/Action/CharacterAction";
 import {
@@ -16,6 +17,7 @@ export function handleTrainAction(
   context: NewsContext,
   config?: LocationInns,
 ): NewsWithScope {
+  
   return {
     scope: {
       kind: "worldScope",
@@ -32,6 +34,7 @@ export function handleTrainAction(
         partyId: "",
         characterIds: [],
       },
+      secretTier: TierEnum.rare
     }),
   };
 }

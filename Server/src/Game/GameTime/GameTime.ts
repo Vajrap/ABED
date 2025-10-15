@@ -14,23 +14,26 @@ export class GameTime {
   static inGameWeeksPerSeason: number = 8; // 8 weeks in a game season
 
   static dayPassed: number = 0;
-  static gameDateHour: 1 | 2 | 3 | 4 = 1;
-  static gameDateDay: 1 | 2 | 3 | 4 | 5 | 6 = 1;
-  static gameDateSeason: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 1;
-  static gameDateYear: number = 0;
+  static hour: 1 | 2 | 3 | 4 = 1;
+  static dayOfWeek: 1 | 2 | 3 | 4 | 5 | 6 = 1;
+  static dayOfSeason: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 = 1;
+  static season: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 1;
+  static year: number = 0;
+
   static timerInterval: NodeJS.Timeout | null = null;
 
   static advanceOnePhrase() {
-    this.gameDateHour++;
-    if (this.gameDateHour > GameTime.inGameHoursPerDay) {
-      this.gameDateHour = 1;
-      this.gameDateDay++;
-      if (this.gameDateDay > GameTime.inGameDaysPerSeason) {
-        this.gameDateDay = 1;
-        this.gameDateSeason++;
-        if (this.gameDateSeason > GameTime.inGameSeasonsPerYear) {
-          this.gameDateSeason = 1;
-          this.gameDateYear++;
+    this.hour++;
+    if (this.hour > GameTime.inGameHoursPerDay) {
+      this.hour = 1;
+      this.dayOfWeek++;
+      this.dayOfSeason++;
+      if (this.dayOfSeason > GameTime.inGameDaysPerSeason) {
+        this.dayOfSeason = 1;
+        this.season++;
+        if (this.season > GameTime.inGameSeasonsPerYear) {
+          this.season = 1;
+          this.year++;
         }
       }
     }
@@ -38,41 +41,28 @@ export class GameTime {
 
   static setGameTime(
     dayPassed: number,
-    gameDateDay: 1 | 2 | 3 | 4 | 5 | 6,
-    gameDateHour: 1 | 2 | 3 | 4,
-    gameDateSeason: 1 | 2 | 3 | 4 | 5 | 6 | 7,
-    gameDateYear: number,
+    hour: 1 | 2 | 3 | 4,
+    dayOfWeek: 1 | 2 | 3 | 4 | 5 | 6,
+    dayOfSeason: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48,
+    season: 1 | 2 | 3 | 4 | 5 | 6 | 7,
+    year: number,
   ) {
     GameTime.dayPassed = dayPassed;
-    GameTime.gameDateDay = gameDateDay;
-    GameTime.gameDateHour = gameDateHour;
-    GameTime.gameDateSeason = gameDateSeason;
-    GameTime.gameDateYear = gameDateYear;
+    GameTime.hour = hour;
+    GameTime.dayOfWeek = dayOfWeek;
+    GameTime.dayOfSeason = dayOfSeason;
+    GameTime.season = season;
+    GameTime.year = year;
   }
 
   static getCurrentGameDateTime(): GameTimeInterface  {
     return {
+      hour: GameTime.hour,
+      dayOfWeek: GameTime.dayOfWeek,
+      dayOfSeason: GameTime.dayOfSeason,
+      season: GameTime.season,
       dayPassed: GameTime.dayPassed,
-      gameDateDay: GameTime.gameDateDay,
-      gameDateHour: GameTime.gameDateHour,
-      gameDateSeason: GameTime.gameDateSeason,
-      gameDateYear: GameTime.gameDateYear,
-      phase: GameTime.getCurrentGamePhase(),
-      day: GameTime.getCurrentGameDayOfWeek(),
-      season: GameTime.getCurrentGameSeason(),
-    };
-  }
-
-  static getCurrentGameDate(): GameTimeInterface {
-    return {
-      dayPassed: GameTime.dayPassed,
-      gameDateDay: GameTime.gameDateDay,
-      gameDateHour: GameTime.gameDateHour,
-      gameDateSeason: GameTime.gameDateSeason,
-      gameDateYear: GameTime.gameDateYear,
-      phase: GameTime.getCurrentGamePhase(),
-      day: GameTime.getCurrentGameDayOfWeek(),
-      season: GameTime.getCurrentGameSeason(),
+      year: GameTime.year,
     };
   }
 
@@ -83,7 +73,7 @@ export class GameTime {
       TimeOfDay.afternoon,
       TimeOfDay.evening,
     ];
-    return phases[(GameTime.gameDateHour - 1)] as TimeOfDay;
+    return phases[(GameTime.hour - 1)] as TimeOfDay;
   }
 
   static getCurrentGameDayOfWeek(): DayOfWeek {
@@ -95,21 +85,21 @@ export class GameTime {
       DayOfWeek.matris,
       DayOfWeek.seethar,
     ];
-    return days[GameTime.gameDateDay - 1] as DayOfWeek;
+    return days[GameTime.dayOfWeek - 1] as DayOfWeek;
   }
 
   static getCurrentGameSeason(): SeasonEnum {
     if (
-      GameTime.gameDateSeason < 1 ||
-      GameTime.gameDateSeason > GameTime.inGameSeasonsPerYear
+      GameTime.dayOfSeason < 1 ||
+      GameTime.dayOfSeason > GameTime.inGameSeasonsPerYear
     ) {
       console.warn(
-        `Unexpected gameDateSeason: ${GameTime.gameDateSeason}, defaulting to LongDark.`,
+        `Unexpected dayOfSeason: ${GameTime.dayOfSeason}, defaulting to LongDark.`,
       );
       return SeasonEnum.LongDark;
     }
 
-    switch (GameTime.gameDateSeason) {
+    switch (GameTime.dayOfSeason) {
       case 1:
         return SeasonEnum.Seeding;
       case 2:
@@ -130,6 +120,6 @@ export class GameTime {
   }
 
   static getWeekNumber(): number {
-    return Math.floor(GameTime.gameDateDay / GameTime.inGameDaysPerWeek);
+    return Math.floor(GameTime.dayOfWeek / GameTime.inGameDaysPerWeek);
   }
 }

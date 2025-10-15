@@ -1,4 +1,5 @@
 import type { ArtisanKey } from "../../../../../InterFacesEnumsAndTypes/Enums";
+import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
 import { rollTwenty } from "../../../../../Utils/Dice";
 import { statMod } from "../../../../../Utils/statMod";
 import type { Character } from "../../../../Character/Character";
@@ -39,13 +40,13 @@ export function handleTrainArtisans(
     }
     const news: NewsWithScope = {
       scope: {
-        kind: "party",
-        partyId: context.partyId,
+        kind: "privateScope",
+        characterId: character.id,
       },
       news: createNews({
         scope: {
-          kind: "party",
-          partyId: context.partyId,
+          kind: "privateScope",
+          characterId: character.id,
         },
         tokens: [
           {
@@ -62,6 +63,7 @@ export function handleTrainArtisans(
           },
         ],
         context,
+        secretTier: TierEnum.rare
       }),
     };
     results.push(news);

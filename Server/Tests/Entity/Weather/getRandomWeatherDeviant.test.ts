@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { getRandomWeatherDeviant } from "../../../src/Entity/Location/WeatherCard/getRandomWeatherDeviant";
+import { getRandomWeatherDeviant } from "../../../src/Entity/Card/WeatherCard/getRandomWeatherDeviant";
 
 describe("getRandomWeatherDeviant", () => {
   describe("Return value ranges", () => {

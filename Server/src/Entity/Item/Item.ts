@@ -1,5 +1,6 @@
 import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import { ItemCost } from "./Subclass/ItemCost";
+import type { ResourceType } from "../Market/types";
 
 export class Item {
   id: string;
@@ -10,7 +11,16 @@ export class Item {
   tier: TierEnum;
   cost: ItemCost;
   isCraftable: boolean = false;
-  resource: Map<string, number> = new Map();
+  resource: Map<string, number> = new Map(); // Crafting recipe
+  
+  /**
+   * Primary resource used for dynamic pricing
+   * 
+   * Items crafted from resources inherit price fluctuations from that resource.
+   * Example: Iron Sword uses "ore" as primary resource, so price follows ore market.
+   */
+  primaryResource?: ResourceType;
+  
   constructor(data: {
     id?: string;
     name?: string;
@@ -19,6 +29,7 @@ export class Item {
     weight?: number;
     tier?: TierEnum;
     cost?: ItemCost;
+    primaryResource?: ResourceType;
   }) {
     this.id = data.id ?? "";
     this.name = data.name ?? "";
@@ -27,6 +38,7 @@ export class Item {
     this.weight = data.weight ?? 0;
     this.tier = data.tier ?? TierEnum.common;
     this.cost = data.cost ?? new ItemCost({});
+    this.primaryResource = data.primaryResource;
   }
 }
 

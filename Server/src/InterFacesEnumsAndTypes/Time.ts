@@ -32,15 +32,16 @@ export enum DayOfWeek {
   matris = "matris",
   seethar = "seethar",
 }
+
+// Day have 2 axioms: Day of week and Day of season
 export interface GameTimeInterface {
+  hour: number; // 1 - 4
+  dayOfWeek: number; // 1 - 6
+  dayOfSeason: number; // 1 - 48
+  season: number; // 1 - 7
+  
   dayPassed: number;
-  gameDateDay: number;
-  gameDateHour: number;
-  gameDateSeason: number;
-  gameDateYear: number;
-  phase: TimeOfDay;
-  day: DayOfWeek;
-  season: SeasonEnum;
+  year: number;
 }
 
 export enum SeasonEnum {

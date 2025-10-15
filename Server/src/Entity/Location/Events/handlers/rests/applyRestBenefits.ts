@@ -2,10 +2,9 @@ import { rollTwenty } from "../../../../../Utils/Dice";
 import type { Character } from "../../../../Character/Character";
 
 export function applyRestBenefits(
-  characters: Character[],
+  character: Character,
   restFactor: number,
 ): void {
-  for (const character of characters) {
     character.vitals.incHp(
       character.vitals.hp.max! * (rollTwenty().total / 15) * restFactor,
     );
@@ -15,17 +14,16 @@ export function applyRestBenefits(
     character.vitals.incSp(
       character.vitals.sp.max! * (rollTwenty().total / 15) * restFactor,
     );
-    character.needs.add({
-      mood: Math.floor(
-        (rollTwenty().total +
-          character.attribute.getStat("charisma").total / 2) *
-          restFactor,
-      ),
-      energy: Math.floor(
-        (rollTwenty().total +
-          character.attribute.getStat("vitality").total / 2) *
-          restFactor,
-      ),
-    });
-  }
+    const addedMood = Math.floor(
+      (rollTwenty().total +
+        character.attribute.getStat("charisma").total / 2) *
+        restFactor,
+    );
+    const addedEnergy = Math.floor(
+      (rollTwenty().total +
+        character.attribute.getStat("vitality").total / 2) *
+        restFactor,
+    );
+    character.needs.increase("mood", addedMood);
+    character.needs.increase("energy", addedEnergy);
 }

@@ -8,9 +8,9 @@ import type {
 import type { NewsEmittedFromLocationStructure } from "../../News/News";
 import type { Location } from "../Location";
 import type { Region } from "../Regions";
-import { locationRepository } from "../Repository/location";
-import { regionRepository } from "../Repository/region";
-import { subregionRepository } from "../Repository/subregion";
+import { locationRepository } from "../../Repository/location";
+import { regionRepository } from "../../Repository/region";
+import { subregionRepository } from "../../Repository/subregion";
 import type { SubRegion } from "../SubRegion";
 
 class LocationManager {
@@ -166,10 +166,25 @@ class LocationManager {
     return news;
   }
 
-  // TODO:
+  /**
+   * Refill resources at all locations and report production to market
+   */
   refillResources() {
+    // Import market here to avoid circular dependencies
+    const { market } = require("../../Market/Market");
+    
     for (const [_, location] of this.locations) {
-      location.refillResources();
+      const generated = location.refillResources();
+      
+      // Report production to market tracker
+      for (const [resourceType, amount] of generated.entries()) {
+        market.resourceTracker.recordProduction(
+          location.id,
+          location.subRegion,
+          resourceType,
+          amount
+        );
+      }
     }
   }
 }

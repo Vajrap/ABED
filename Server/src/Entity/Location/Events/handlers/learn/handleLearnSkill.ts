@@ -59,13 +59,13 @@ export function handleLearnSkill(
     character.skills.set(skillId, { id: skillId, level: 1, exp: 0 }); // Assuming new skill starts at level 1 with 0 exp
     const news: NewsWithScope = {
       scope: {
-        kind: "private",
-        characterId: [character.id],
+        kind: "privateScope",
+        characterId: character.id,
       },
       news: createNews({
         scope: {
-          kind: "private",
-          characterId: [character.id],
+          kind: "privateScope",
+          characterId: character.id,
         },
         tokens: [
           {
@@ -82,6 +82,7 @@ export function handleLearnSkill(
           },
         ],
         context,
+        secretTier: TierEnum.epic,
       }),
     };
 

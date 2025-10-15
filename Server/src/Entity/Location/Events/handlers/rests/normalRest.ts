@@ -1,3 +1,4 @@
+import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
 import type { Character } from "../../../../Character/Character";
 import {
   createNews,
@@ -7,25 +8,26 @@ import {
 import { applyRestBenefits } from "./applyRestBenefits";
 
 export function normalRest(
-  characters: Character[],
+  character: Character,
   context: NewsContext,
 ): NewsWithScope {
-  applyRestBenefits(characters, 1);
+  applyRestBenefits(character, 1);
   const news = createNews({
-    scope: { kind: "private", characterId: characters.map((c) => c.id) },
+    scope: { kind: "privateScope", characterId: character.id },
     tokens: [
       {
         t: "char",
-        v: characters.map((c) => c.intoNewsInterface(context.subRegion)),
+        v: [character.intoNewsInterface(context.subRegion)],
       },
       { t: "text", v: `has taken a rest` },
     ],
     context,
+    secretTier: TierEnum.rare,
   });
   return {
     scope: {
-      kind: "private",
-      characterId: context.characterIds,
+      kind: "privateScope",
+      characterId: character.id,
     },
     news: news,
   };

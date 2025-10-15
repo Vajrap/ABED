@@ -9,10 +9,13 @@ import { travelManager } from "./TravelManager";
 import Report from "../Utils/Reporter";
 import { postman } from "../Entity/News/Postman";
 import { mergeNewsStructures } from "../Utils/mergeNewsStructure";
-import type { GameState } from "./GameState";
-import { drawSubRegionsWeatherCard, subregionRepository } from "../Entity/Location/Repository/subregion";
+import { gameState } from "./GameState";
+import { addToSubRegionScope } from "../Utils/addNewsToScope";
+import {drawSubRegionsWeatherCard} from "../Event/subRegionWeather.ts";
+import { drawGlobalEventCard } from "../Event/drawGlobalEventCard.ts";
+import { market } from "../Entity/Market/Market.ts";
 
-export async function runSchedule(state: GameState ) {
+export async function runSchedule() {
   const now = new Date();
 
   const nextScheduledTime = nextScheduleTick(now);
@@ -24,16 +27,16 @@ export async function runSchedule(state: GameState ) {
   );
 
   setTimeout(async () => {
-    await runGameLoop(state);
+    await runGameLoop();
     // TODO: Can be repetitive,
-    runSchedule(state);
+    await runSchedule();
   }, delay);
 }
 
-async function runGameLoop(state: GameState) {
+async function runGameLoop() {
   try {
     GameTime.advanceOnePhrase();
-    const mileStoneNews = handleGameMilestones(state);
+    const mileStoneNews = handleGameMilestones();
     const news = await processEvents(
       GameTime.getCurrentGameDayOfWeek(),
       GameTime.getCurrentGamePhase(),
@@ -68,8 +71,8 @@ const nextScheduleTick = (now: Date) => {
 };
 
 // TODO:: Mile stone consist of more than just Dating, it might have some events declaration, see example
-function handleGameMilestones(state: GameState): NewsEmittedFromLocationStructure {
-  const { gameDateHour, gameDateDay, gameDateMonth } = GameTime;
+function handleGameMilestones(): NewsEmittedFromLocationStructure {
+  const { hour, dayOfWeek, dayOfSeason, season } = GameTime;
 
   let allNews: NewsEmittedFromLocationStructure = {
     worldScope: [],
@@ -80,52 +83,40 @@ function handleGameMilestones(state: GameState): NewsEmittedFromLocationStructur
     privateScope: new Map(),
   };
 
-  switch (gameDateHour) {
-    case 1:
-      console.log("GamePhase: Morning");
-      break;
-    case 2:
-      console.log("GamePhase: Afternoon");
-      break;
-    case 3:
-      console.log("GamePhase: Evening");
-      break;
-    case 4:
-      console.log("GamePhase: Night");
-      break;
-  }
-
-  if (gameDateMonth === 1 && gameDateDay === 1 && gameDateHour === 1) {
+  // day of season and day of week seems a bit redundant, but we'll keep it for now
+  if (season === 1 && dayOfSeason === 1 && hour === 1) {
     // New year
     // https://www.notion.so/Draw-Global-Event-Card-2737d01e172a801aa596f75ab9503fb5?source=copy_link
     // If a Global Event occurred last year, draw a new Global Event card
-    if (state.globalEventOccurred) {
-      /*
-        const card = drawGlobalEventCard();
-        const result: NewsEmittedFromLocationStructure = card.effect(state);
-        allNews = mergeNewsStructures(allNews, result);
-      */
-      state.globalEventOccurred = false;
+    if (gameState.lastGlobalEventCardCompleted) {
+      const news = drawGlobalEventCard();
+
+      if (news) {
+        mergeNewsStructures(allNews, news)
+      }
+
+      gameState.lastGlobalEventCardCompleted = false;
     }
 
     // Adjust goods prices by yearly accumulated production
-    // Market.adjustYearlyPrices();
+    market.adjustYearlyPrices();
+    market.resourceTracker.resetYearlyTracking();
   }
 
   if (
-    [1, 3, 5, 7, 9, 11, 13].includes(gameDateMonth) &&
-    gameDateDay === 1 &&
-    gameDateHour === 1
+    dayOfSeason === 1 &&
+    hour === 1
   ) {
     // New season
-    // - Refill resources based on the refilling table if it’s the right season
+    // - Refill resources based on the refilling table if it's the right season
     locationManager.refillResources();
-    // Market.adjustSeasonalPrices();
-
-    // Update weather Interpretation: Do nothing here. It's handled in location itself.
+    
+    // Adjust seasonal prices (local shortage factors recalculated on-demand)
+    market.adjustSeasonalPrices();
   }
 
-  if (gameDateDay === 1 && gameDateHour === 1) {
+  // A season consist of 8 weeks, (2 months) a week is 6 days, so 25th will be the later half of the season, the 2nd month
+  if ((dayOfSeason === 1 || dayOfSeason === 25) && hour === 1) {
     // New Month
     // Draw Region Event Card, Trigger event effect and update global event scale
     /*
@@ -135,7 +126,11 @@ function handleGameMilestones(state: GameState): NewsEmittedFromLocationStructur
     */
   }
 
-  if ([1, 7, 13, 19].includes(gameDateDay) && gameDateHour === 1) {
+  if (dayOfWeek === 1 && hour === 1) {
+    // Check if global event card is completed
+    if (gameState.activeGlobalEventCards?.completionCondition()) {
+      gameState.lastGlobalEventCardCompleted = true;
+    }
     // New Week
     // Draw Subregion Event Card
     /*
@@ -148,10 +143,14 @@ function handleGameMilestones(state: GameState): NewsEmittedFromLocationStructur
     // If a location lacks specialty events, proceed with no extra effect
   }
 
-  if (gameDateHour === 1) {
+  if (hour === 1) {
     // New day
     // Draw weather cards for all subregions update accordingly
-    drawSubRegionsWeatherCard();
+    const weatherNews = drawSubRegionsWeatherCard();
+
+    for (const wn of weatherNews) {
+      addToSubRegionScope(allNews, wn.context.subRegion, wn);
+    }
   }
 
   return allNews;
@@ -170,9 +169,7 @@ async function processEvents(
     phase,
   );
 
-  const news = mergeNewsStructures(enc, act, tra);
-
-  return news;
+  return mergeNewsStructures(enc, act, tra);
 }
 
 async function sendPartyData(news: NewsEmittedFromLocationStructure) {

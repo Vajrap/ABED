@@ -1,4 +1,4 @@
-import { Season } from "../../../InterFacesEnumsAndTypes/Time";
+import { SeasonEnum } from "../../../InterFacesEnumsAndTypes/Time";
 
 export class ItemCost {
   baseCost: number;
@@ -7,13 +7,13 @@ export class ItemCost {
   marketCost: number;
   numberOfSellThisWeek: number;
   possibleDeviation: number;
-  seasonalDeviation: { [key in Season]: number };
+  seasonalDeviation: { [key in SeasonEnum]: number };
 
   constructor(data: {
     baseCost?: number;
     bonusCost?: number;
     possibleDeviation?: number;
-    seasonalDeviation?: { [key in Season]: number };
+    seasonalDeviation?: { [key in SeasonEnum]: number };
   }) {
     this.baseCost = data.baseCost ?? 0;
     this.bonusCost = data.bonusCost ?? 0;
@@ -22,13 +22,13 @@ export class ItemCost {
     this.numberOfSellThisWeek = 0;
     this.possibleDeviation = data.possibleDeviation ?? 1;
     this.seasonalDeviation = data.seasonalDeviation ?? {
-      [Season.seeding]: 1,
-      [Season.rainFall]: 1,
-      [Season.greenTide]: 1,
-      [Season.harvestMoon]: 1,
-      [Season.sunDry]: 1,
-      [Season.frostVeil]: 1,
-      [Season.longDark]: 1,
+      [SeasonEnum.Seeding]: 1,
+      [SeasonEnum.RainFall]: 1,
+      [SeasonEnum.GreenTide]: 1,
+      [SeasonEnum.HarvestMoon]: 1,
+      [SeasonEnum.SunDry]: 1,
+      [SeasonEnum.Frostveil]: 1,
+      [SeasonEnum.LongDark]: 1,
     };
   }
 }

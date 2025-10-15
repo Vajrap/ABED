@@ -84,7 +84,7 @@ export function createNews(data: {
   tags?: NewsTag[];
 }): News {
   const id = randomUUID();
-  const ts = GameTime.getCurrentGameDate()
+  const ts = GameTime.getCurrentGameDateTime()
   return {
     id,
     ts,

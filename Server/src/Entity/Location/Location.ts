@@ -45,10 +45,11 @@ import { handleTrainAttribute } from "./Events/handlers/train/attribute";
 import { handleTrainProficiency } from "./Events/handlers/train/proficiency";
 import { handleTrainSkill } from "./Events/handlers/train/skill";
 import type { SubRegion } from "./SubRegion";
-import type { WeatherVolatility } from "./WeatherCard/WeatherCard";
+import type { WeatherVolatility } from "../Card/WeatherCard/WeatherCard";
 import { Weather } from "../../InterFacesEnumsAndTypes/Weather";
-import { subregionRepository } from "./Repository/subregion";
 import Report from "../../Utils/Reporter";
+import { GameTime } from "../../Game/GameTime/GameTime";
+import { subregionRepository } from "../Repository/subregion";
 
 export type UserInputAction = {
   type: ActionInput;
@@ -289,19 +290,6 @@ export class Location {
     return results;
   }
 
-  refillResources() {
-    for (const party of this.parties) {
-      for (const character of party.characters) {
-        if (character === "none") continue;
-
-        character.vitals.hp.setCurrent(character.vitals.hp.max);
-        character.vitals.mp.setCurrent(character.vitals.mp.max);
-        character.vitals.sp.setCurrent(character.vitals.sp.max);
-        character.needs.set({ mood: 100, energy: 100, satiety: 100 });
-      }
-    }
-  }
-
   // Resource generation methods
   private getDefaultResourceGeneration(): ResourceGenerationConfig {
     return {
@@ -309,23 +297,23 @@ export class Location {
         // Mineral resources
         ore: 0,
         gemstone: 0,
-        
+
         // Organic/forestry resources
         wood: 0,
-        
-        
+
+
         // Foraging resources
         herbs: 0,
         silk: 0,
 
         // Aquatic resources
         fish: 0,
-        
+
         // Agricultural resources
         grain: 0,
         vegetables: 0,
         fruits: 0,
-        
+
         // Livestock resources
         livestock: 0
       },
@@ -333,23 +321,23 @@ export class Location {
         // Mineral resources
         ore: 0,
         gemstone: 0,
-        
+
         // Organic/forestry resources
         wood: 0,
-        
-        
+
+
         // Foraging resources
         herbs: 0,
         silk: 0,
 
         // Aquatic resources
         fish: 0,
-        
+
         // Agricultural resources
         grain: 0,
         vegetables: 0,
         fruits: 0,
-        
+
         // Livestock resources
         livestock: 0
       },
@@ -357,52 +345,97 @@ export class Location {
         // Mineral resources
         ore: 0,
         gemstone: 0,
-        
+
         // Organic/forestry resources
         wood: 0,
-        
-        
+
+
         // Foraging resources
         herbs: 0,
         silk: 0,
 
         // Aquatic resources
         fish: 0,
-        
+
         // Agricultural resources
         grain: 0,
         vegetables: 0,
         fruits: 0,
-        
+
         // Livestock resources
         livestock: 0
       }
     };
   }
 
-  // Generate resources based on capacity and rates
-  generateResources(): void {
-    const { capacity, rate, stockpile } = this.resourceGeneration;
-    
-    // Generate each resource type
-    Object.keys(rate).forEach(resourceType => {
-      const currentStockpile = stockpile[resourceType as keyof typeof stockpile];
-      const generationRate = rate[resourceType as keyof typeof rate];
-      const maxCapacity = capacity[resourceType as keyof typeof capacity];
-      
-      const roll = rollTwenty().total;
-      const fluctuation = (roll - 10) / 100;
-      const generated = generationRate * (1 + fluctuation);
+  private generateResources(type: string): number {
+    const currentStockpile = this.resourceGeneration.stockpile[type as keyof typeof this.resourceGeneration.stockpile];
+    const generationRate = this.resourceGeneration.rate[type as keyof typeof this.resourceGeneration.rate];
+    const maxCapacity = this.resourceGeneration.capacity[type as keyof typeof this.resourceGeneration.capacity];
 
-      let newAmount = currentStockpile + generated;
-      if (newAmount > maxCapacity) {
-        newAmount = maxCapacity;
-      } else if (newAmount < 0) {
-        newAmount = 0;
+    const roll = rollTwenty().total;
+    const fluctuation = (roll - 10) / 100;
+    const generated = generationRate * (1 + fluctuation);
+
+    let newAmount = currentStockpile + generated;
+    if (newAmount > maxCapacity) {
+      newAmount = maxCapacity;
+    } else if (newAmount < 0) {
+      newAmount = 0;
+    }
+
+    this.resourceGeneration.stockpile[type as keyof typeof this.resourceGeneration.stockpile] = newAmount;
+    
+    // Return amount actually generated (for production tracking)
+    return Math.max(0, newAmount - currentStockpile);
+  }
+
+  // Generate resources based on capacity and rates
+  refillResources(): Map<string, number> {
+    const generated = new Map<string, number>();
+    
+    switch (GameTime.season) {
+      case 1:
+        // Seeding season
+        // fish, livestock
+        generated.set("fish", this.generateResources("fish"));
+        generated.set("livestock", this.generateResources("livestock"));
+        break;
+      case 2:
+        // RainFall season
+        // wood, herbs,
+        generated.set("wood", this.generateResources("wood"));
+        generated.set("herbs", this.generateResources("herbs"));
+        break;
+      case 3:
+        // GreenTide season
+        // fruits
+        generated.set("fruits", this.generateResources("fruits"));
+        break;
+      case 4:
+        // HarvestMoon season
+        // grain, vegetables, 
+        generated.set("grain", this.generateResources("grain"));
+        generated.set("vegetables", this.generateResources("vegetables"));
+        break;
+      case 5:
+        // SunDry season
+        // silk
+        generated.set("silk", this.generateResources("silk"));
+        break;
+      case 6:
+        // Frostveil season
+        // gemstone
+        generated.set("gemstone", this.generateResources("gemstone"));
+        break;
+      case 7:
+        // LongDark season
+        // ore
+        generated.set("ore", this.generateResources("ore"));
+        break;
       }
 
-      stockpile[resourceType as keyof typeof stockpile] = newAmount;
-    });
+    return generated;
   }
 
   // Get available resources for artisan actions

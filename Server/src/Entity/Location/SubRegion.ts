@@ -1,9 +1,11 @@
 import type { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import type { Weather } from "../../InterFacesEnumsAndTypes/Weather";
-import { getLocationBySubRegion, locationRepository } from "./Repository/location";
-import { getRandomWeatherDeviant } from "./WeatherCard/getRandomWeatherDeviant";
-import { WeatherDeck, type WeatherVolatility } from "./WeatherCard/WeatherCard";
+import { createNews, type News } from "../News/News";
+import { getLocationBySubRegion } from "../Repository/location";
+import { getRandomWeatherDeviant } from "../Card/WeatherCard/getRandomWeatherDeviant";
+import { WeatherDeck, type WeatherVolatility } from "../Card/WeatherCard/WeatherCard";
 
 export class SubRegion {
   id: SubRegionEnum;
@@ -30,20 +32,42 @@ export class SubRegion {
     this.weatherInterpretation = weatherInterpretation;
   }
 
-  get regionName(): string {
-    return this.region.toString();
-  }
-
   getSpeedBonusFor(mode: "walk" | "horse" | "caravan"): number {
     return this.speedBonus[mode];
   }
 
-  handleDailyWeatherUpdate() {
+  handleDailyWeatherUpdate(): News[] {
     const card = this.drawWeatherCard();
+
+    let allNews = [];
+
     for (const location of getLocationBySubRegion(this.id)){
       const updateVal = card.value + getRandomWeatherDeviant();
       location.weatherScale += updateVal;
+
+      const news = createNews({
+        scope: {
+          kind: "locationScope",
+          location: location.id
+        },
+        tokens: [{
+          t: "text",
+          v: `${location.id} weather in ${this.id} is now ${location.getWeather()}`
+        }],
+        context: {
+          region: this.region,
+          subRegion: this.id,
+          location: location.id,
+          partyId: "",
+          characterIds: []
+        },
+        secretTier: TierEnum.common
+      })
+
+      allNews.push(news);
     }
+
+    return allNews;
   }
 
   private drawWeatherCard() {

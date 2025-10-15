@@ -1,3 +1,5 @@
+import { SubRegionEnum } from "../../../../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
 import type { Character } from "../../../../Character/Character";
 import { MiscItemId } from "../../../../Item/Item";
 import {
@@ -18,7 +20,7 @@ export function innRest(
   config: InnConfig,
   numberOfRooms: number,
   context: NewsContext,
-): NewsWithScope {
+): NewsWithScope[] {
   const totalCost = config.costPerRoom * numberOfRooms;
 
   const wallets = characters.map((char) => ({
@@ -27,9 +29,13 @@ export function innRest(
   }));
 
   const totalAvailable = wallets.reduce((sum, w) => sum + w.gold, 0);
+  const allNewsWithScope: NewsWithScope[] = [];
 
   if (totalAvailable < totalCost) {
-    return normalRest(characters, context);
+    for (const character of characters) {
+      allNewsWithScope.push(normalRest(character, context));
+    }
+    return allNewsWithScope;
   } else {
     let remaining = totalCost;
     for (const wallet of wallets) {
@@ -48,7 +54,24 @@ export function innRest(
     }
   }
 
-  applyRestBenefits(characters, 1.3);
+  for (const character of characters) {
+    applyRestBenefits(character, 1.3);
+    const news = createNews({
+      scope: { kind: "privateScope", characterId: character.id },
+      tokens: [
+        { t: "char", v: [character.intoNewsInterface(context.subRegion)] },
+        { t: "text", v: `has taken a rest in an inn.` },
+      ],
+      context: {
+        region: context.region,
+        subRegion: context.subRegion,
+        location: context.location,
+        partyId: character.partyID ?? '',
+        characterIds: [character.id]
+      },
+      secretTier: TierEnum.rare
+    });
+  }
 
   const news = createNews({
     scope: { kind: "private", characterId: characters.map((char) => char.id) },

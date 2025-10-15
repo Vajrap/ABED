@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { WeatherCard, WeatherDeck, type WeatherVolatility } from "../../../src/Entity/Location/WeatherCard/WeatherCard";
+import { WeatherCard, WeatherDeck, type WeatherVolatility } from "../../../src/Entity/Card/WeatherCard/WeatherCard";
 
 describe("WeatherCard", () => {
   it("should create a weather card with name and value", () => {
