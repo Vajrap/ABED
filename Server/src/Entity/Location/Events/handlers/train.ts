@@ -7,7 +7,7 @@ import type { ActionInput } from "../../../Character/Subclass/Action/CharacterAc
 import {
   createNews,
   type NewsContext,
-  type NewsWithScope,
+  type News,
 } from "../../../News/News";
 import type { LocationInns } from "../../Config/Inn";
 
@@ -16,25 +16,20 @@ export function handleTrainAction(
   type: ActionInput,
   context: NewsContext,
   config?: LocationInns,
-): NewsWithScope {
+): News {
   
-  return {
+  return createNews({
     scope: {
       kind: "worldScope",
     },
-    news: createNews({
-      scope: {
-        kind: "worldScope",
-      },
-      tokens: [],
-      context: {
-        region: RegionEnum.CentralPlain,
-        subRegion: SubRegionEnum.FyonarCapitalDistrict,
-        location: LocationsEnum.PlagueWaterCrossing,
-        partyId: "",
-        characterIds: [],
-      },
-      secretTier: TierEnum.rare
-    }),
-  };
+    tokens: [],
+    context: {
+      region: RegionEnum.CentralPlain,
+      subRegion: SubRegionEnum.FyonarCapitalDistrict,
+      location: LocationsEnum.PlagueWaterCrossing,
+      partyId: "",
+      characterIds: [],
+    },
+    secretTier: TierEnum.rare
+  });
 }

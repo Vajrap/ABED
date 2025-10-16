@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import { GameTime } from "./GameTime/GameTime";
 import type { DayOfWeek, TimeOfDay } from "../InterFacesEnumsAndTypes/Time";
 import {
-  type NewsEmittedFromLocationStructure,
+  type NewsDistribution,
   newsArrayToStructure,
 } from "../Entity/News/News";
 import { locationManager } from "../Entity/Location/Manager/LocationManager";
@@ -15,6 +15,7 @@ import {drawSubRegionsWeatherCard} from "../Event/subRegionWeather.ts";
 import { drawGlobalEventCard } from "../Event/drawGlobalEventCard.ts";
 import { drawRegionEventCard } from "../Event/drawRegionEventCard.ts";
 import { market } from "../Entity/Market/Market.ts";
+import { newsArchiveService } from "../Entity/News/NewsArchive";
 
 export async function runSchedule() {
   const now = new Date();
@@ -36,7 +37,7 @@ export async function runSchedule() {
 async function runGameLoop() {
   try {
     GameTime.advanceOnePhrase();
-    const mileStoneNews = handleGameMilestones();
+    const mileStoneNews = await handleGameMilestones();
     const news = await processEvents(
       GameTime.getCurrentGameDayOfWeek(),
       GameTime.getCurrentGamePhase(),
@@ -70,10 +71,10 @@ const nextScheduleTick = (now: Date) => {
   }
 };
 
-function handleGameMilestones(): NewsEmittedFromLocationStructure {
+async function handleGameMilestones(): Promise<NewsDistribution> {
   const { hour, dayOfSeason, season } = GameTime;
 
-  let allNews: NewsEmittedFromLocationStructure = {
+  let allNews: NewsDistribution = {
     worldScope: [],
     regionScope: new Map(),
     subRegionScope: new Map(),
@@ -126,6 +127,11 @@ function handleGameMilestones(): NewsEmittedFromLocationStructure {
   }
 
   if (hour === 1) {
+    // Save 
+    // await newsArchiveService.saveToDatabase();
+    // save things to database here
+    // News, Character, Party, Location, SubRegion, Region, Weather, Event Card, Game State, too much to think now
+
     // Check if global event card is completed
     if (gameState.activeGlobalEventCards?.completionCondition()) {
       // Call cleanup handler before marking as complete
@@ -137,6 +143,12 @@ function handleGameMilestones(): NewsEmittedFromLocationStructure {
       gameState.completedGlobalEventCards.push(gameState.activeGlobalEventCards);
       gameState.activeGlobalEventCards = undefined;
     }
+    
+    // News propagation and decay
+    newsArchiveService.dailySpread();
+    newsArchiveService.dailyDecay();
+    
+    // Save news to database
     
     // New day
     // Draw weather cards for all subregions update accordingly
@@ -151,12 +163,12 @@ function handleGameMilestones(): NewsEmittedFromLocationStructure {
 async function processEvents(
   day: DayOfWeek,
   phase: TimeOfDay,
-): Promise<NewsEmittedFromLocationStructure> {
-  const enc: NewsEmittedFromLocationStructure =
+): Promise<NewsDistribution> {
+  const enc: NewsDistribution =
     await locationManager.processEncounters(day, phase);
-  const act: NewsEmittedFromLocationStructure =
+  const act: NewsDistribution =
     await locationManager.processActions(day, phase);
-  const tra: NewsEmittedFromLocationStructure = await travelManager.allTravel(
+  const tra: NewsDistribution = await travelManager.allTravel(
     day,
     phase,
   );
@@ -164,6 +176,6 @@ async function processEvents(
   return mergeNewsStructures(enc, act, tra);
 }
 
-async function sendPartyData(news: NewsEmittedFromLocationStructure) {
+async function sendPartyData(news: NewsDistribution) {
   postman.deliver(news);
 }

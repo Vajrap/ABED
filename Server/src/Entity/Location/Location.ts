@@ -27,9 +27,10 @@ import {
 import type {
   News,
   NewsContext,
-  NewsEmittedFromLocationStructure,
-  NewsWithScope,
+  NewsDistribution,
 } from "../News/News";
+import { newsArrayToStructure } from "../News/News";
+import { mergeNewsStructures } from "../../Utils/mergeNewsStructure";
 import type { Party } from "../Party/Party";
 import type { SkillId } from "../Skill/enums";
 import type { LocationInns } from "./Config/Inn";
@@ -51,6 +52,7 @@ import Report from "../../Utils/Reporter";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import { subregionRepository } from "../Repository/subregion";
 import type { ResourceType } from "../Market/types";
+import type { L10N } from "../../InterFacesEnumsAndTypes/L10N";
 
 export type UserInputAction = {
   type: ActionInput;
@@ -72,7 +74,7 @@ type RandomEventUnits = {
   best: RandomEventSubUnit;
 };
 
-type RandomEventHandler = (characters: Character[]) => NewsWithScope;
+type RandomEventHandler = (characters: Character[]) => News | null;
 export type RandomEventSubUnit = RandomEventHandler[];
 
 const defaultRandomEvents: RandomEvents = {
@@ -116,6 +118,7 @@ const defaultRandomEvents: RandomEvents = {
 
 export class Location {
   id: LocationsEnum;
+  name: L10N;
   subRegion: SubRegionEnum;
   region: RegionEnum;
   parties: Party[] = [];
@@ -146,6 +149,7 @@ export class Location {
 
   constructor(
     id: LocationsEnum,
+    name: L10N,
     subRegion: SubRegion,
     connectedLocations: { location: Location; distance: number }[],
     actions: ActionInput[],
@@ -156,6 +160,7 @@ export class Location {
     resourceGeneration?: ResourceGenerationConfig,
   ) {
     this.id = id;
+    this.name = name;
     this.subRegion = subRegion.id;
     this.region = subRegion.region;
     this.connectedLocations = connectedLocations;
@@ -240,7 +245,7 @@ export class Location {
     this.parties = this.parties.filter((p) => p !== party);
   }
 
-  async processEncounters(): Promise<NewsEmittedFromLocationStructure> {
+  async processEncounters(): Promise<NewsDistribution> {
     const result = createEmptyNewsStructure();
 
     const candidates = getEncounterCandidates(this.parties);
@@ -260,8 +265,8 @@ export class Location {
   async processActions(
     day: DayOfWeek,
     phase: TimeOfDay,
-  ): Promise<NewsEmittedFromLocationStructure> {
-    const results: NewsEmittedFromLocationStructure =
+  ): Promise<NewsDistribution> {
+    const results: NewsDistribution =
       createEmptyNewsStructure();
     if (this.parties.length === 0) return results;
 
@@ -280,8 +285,13 @@ export class Location {
           context,
           this.innType,
         );
-        if (result && result.scope.kind != "none")
-          addToPartyScope(results, party.partyID, result.news);
+        if (result) {
+          for (const news of result) {
+            if (news.scope.kind !== "none") {
+              addToPartyScope(results, party.partyID, news);
+            }
+          }
+        }
         continue;
       }
 
@@ -610,7 +620,7 @@ function resolveEncounters(pairs: [Party, Party][]): News[] {
   return news;
 }
 
-function pushNewsToScope(result: NewsEmittedFromLocationStructure, news: News) {
+function pushNewsToScope(result: NewsDistribution, news: News) {
   switch (news.scope.kind) {
     case "worldScope":
       result.worldScope.push(news);
@@ -636,7 +646,7 @@ function pushNewsToScope(result: NewsEmittedFromLocationStructure, news: News) {
   }
 }
 
-function createEmptyNewsStructure(): NewsEmittedFromLocationStructure {
+function createEmptyNewsStructure(): NewsDistribution {
   return {
     worldScope: [],
     regionScope: new Map(),
@@ -671,7 +681,7 @@ function processGroupResting(
     | ActionInput.HouseRest,
   context: NewsContext,
   innType: LocationInns,
-): NewsWithScope | null {
+): News[] | null {
   const characters = party.characters.filter((c) => c !== "none");
   return handleRestAction(
     characters,
@@ -684,10 +694,10 @@ function processGroupResting(
 function processCharacterGroups(
   groups: CharacterGroups,
   context: NewsContext,
-  news: NewsEmittedFromLocationStructure,
+  news: NewsDistribution,
   events: RandomEvents,
-): NewsEmittedFromLocationStructure {
-  let allNews: NewsWithScope[] = [];
+): NewsDistribution {
+  let allNews: News[] = [];
   // Solo Artisan
   for (const { character, actionInput } of groups.artisanActions) {
     const results = resolveGroupRandomEvent([character], events.artisan, () =>
@@ -709,12 +719,12 @@ function processCharacterGroups(
   // Grouping just like the same as RE, worst bad natural good best, each with multiple possible events, and we randomly pick.
   // These resolve functions might need to receive the location or at least set of possible events from location itself
   if (groups.strolling.length > 0) {
-    const result: NewsWithScope[] = resolveStrollingAction();
+    const result: News[] = resolveStrollingAction();
     allNews.push(...result);
   }
 
   if (groups.tavern.length > 0) {
-    const result: NewsWithScope[] = resolveTavernAction();
+    const result: News[] = resolveTavernAction();
     allNews.push(...result);
   }
 
@@ -754,7 +764,7 @@ function processCharacterGroups(
 
   groups.crafting.forEach((c) => {
     const result = handleCraftAction(c, context);
-    allNews.push(...result);
+    if (result) allNews.push(...result);
   });
 
   for (const { character, skillId } of groups.learnSkill) {
@@ -764,27 +774,17 @@ function processCharacterGroups(
     allNews.push(...result);
   }
 
-  for (const n of allNews) {
-    addNewsWithScopeToNewsEmittedFromLocationStruct({
-      nws: n,
-      nefls: news,
-      location: context.location,
-      subRegion: context.subRegion,
-      region: context.region,
-      characterIds: n.news.context.characterIds,
-      partyId: n.news.context.partyId,
-    });
-  }
-
-  return news;
+  // Convert News[] to NewsDistribution and merge
+  const newsStruct = newsArrayToStructure(allNews);
+  return mergeNewsStructures(news, newsStruct);
 }
 
 function resolveGroupRandomEvent(
   characters: Character[],
   eventSource: RandomEventUnits,
-  fallback: () => NewsWithScope | NewsWithScope[] | null,
-): NewsWithScope[] {
-  let results: NewsWithScope[] = [];
+  fallback: () => News | News[] | null,
+): News[] {
+  let results: News[] = [];
   const luckAvg = Math.floor(
     characters.reduce(
       (sum, c) => sum + statMod(c.attribute.getTotal("luck")),
@@ -816,34 +816,34 @@ function resolveGroupRandomEvent(
 }
 
 function addNewsWithScopeToNewsEmittedFromLocationStruct(data: {
-  nws: NewsWithScope;
-  nefls: NewsEmittedFromLocationStructure;
+  nws: News;
+  nefls: NewsDistribution;
   location: LocationsEnum;
   subRegion: SubRegionEnum;
   region: RegionEnum;
   characterIds: string[];
   partyId: string;
-}): NewsEmittedFromLocationStructure {
+}): NewsDistribution {
   switch (data.nws.scope.kind) {
     case "privateScope":
       for (const characterId of data.characterIds) {
-        addToPrivateScope(data.nefls, characterId, data.nws.news);
+        addToPrivateScope(data.nefls, characterId, data.nws);
       }
       break;
     case "partyScope":
-      addToPartyScope(data.nefls, data.partyId, data.nws.news);
+      addToPartyScope(data.nefls, data.partyId, data.nws);
       break;
     case "locationScope":
-      addToLocationScope(data.nefls, data.location, data.nws.news);
+      addToLocationScope(data.nefls, data.location, data.nws);
       break;
     case "subRegionScope":
-      addToSubRegionScope(data.nefls, data.subRegion, data.nws.news);
+      addToSubRegionScope(data.nefls, data.subRegion, data.nws);
       break;
     case "regionScope":
-      addToRegionScope(data.nefls, data.region, data.nws.news);
+      addToRegionScope(data.nefls, data.region, data.nws);
       break;
     case "worldScope":
-      addToWorldScope(data.nefls, data.nws.news);
+      addToWorldScope(data.nefls, data.nws);
       break;
   }
   return data.nefls;

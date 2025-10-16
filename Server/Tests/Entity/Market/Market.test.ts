@@ -113,7 +113,7 @@ describe("Market", () => {
         cost: new ItemCost({ baseCost: 100 })
       });
 
-      market.setEventModifier("ironSword" as any, 1.5);
+      market.setEventModifier("ironSword" as any, 1.5, "event1");
 
       const price = market.getPrice(item, LocationsEnum.FyonarCity);
       
@@ -130,7 +130,7 @@ describe("Market", () => {
       });
 
       market.yearlyModifiers.set("ore", 1.2);
-      market.setEventModifier("ironSword" as any, 1.5);
+      market.setEventModifier("ironSword" as any, 1.5, "event1");
 
       const price = market.getPrice(item, LocationsEnum.FyonarCity);
       
@@ -161,7 +161,7 @@ describe("Market", () => {
     });
 
     it("should apply event modifier", () => {
-      market.setEventModifier("ore", 1.5);
+      market.setEventModifier("ore", 1.5, "event1");
 
       const price = market.getResourcePrice("ore", LocationsEnum.FyonarCity, 100);
       
@@ -193,35 +193,35 @@ describe("Market", () => {
 
   describe("setEventModifier()", () => {
     it("should set modifier for resource", () => {
-      market.setEventModifier("grain", 1.5);
-      expect(market.eventModifiers.get("grain")).toBe(1.5);
+      market.setEventModifier("grain", 1.5, "event1");
+      expect(market.getEventModifier("grain")).toBe(1.5);
     });
 
     it("should set modifier for item", () => {
-      market.setEventModifier("ironSword" as any, 2.0);
-      expect(market.eventModifiers.get("ironSword" as any)).toBe(2.0);
+      market.setEventModifier("ironSword" as any, 2.0, "event1");
+      expect(market.getEventModifier("ironSword" as any)).toBe(2.0);
     });
 
     it("should overwrite existing modifier", () => {
-      market.setEventModifier("grain", 1.5);
-      market.setEventModifier("grain", 2.0);
+      market.setEventModifier("grain", 1.5, "event1");
+      market.setEventModifier("grain", 2.0, "event1");
       
-      expect(market.eventModifiers.get("grain")).toBe(2.0);
+      expect(market.getEventModifier("grain")).toBe(2.0);
     });
   });
 
   describe("clearEventModifier()", () => {
     it("should remove event modifier", () => {
-      market.setEventModifier("grain", 1.5);
+      market.setEventModifier("grain", 1.5, "event1");
       expect(market.eventModifiers.has("grain")).toBe(true);
       
-      market.clearEventModifier("grain");
+      market.clearEventModifier("grain", "event1");
       expect(market.eventModifiers.has("grain")).toBe(false);
     });
 
     it("should handle clearing non-existent modifier", () => {
       expect(() => {
-        market.clearEventModifier("ore");
+        market.clearEventModifier("ore", "event1");
       }).not.toThrow();
     });
   });
@@ -399,14 +399,14 @@ describe("Market", () => {
       const basePrice = market.getPrice(ironSword, LocationsEnum.FyonarCity);
 
       // Kingdom March event increases ore prices by 30%
-      market.setEventModifier("ore", 1.3);
+      market.setEventModifier("ore", 1.3, "event1");
 
       const warPrice = market.getPrice(ironSword, LocationsEnum.FyonarCity);
 
       expect(warPrice).toBeCloseTo(basePrice * 1.3, 1);
 
       // Clear event
-      market.clearEventModifier("ore");
+      market.clearEventModifier("ore", "event1");
 
       const peacePrice = market.getPrice(ironSword, LocationsEnum.FyonarCity);
 
@@ -495,8 +495,8 @@ describe("Market", () => {
 
       const oreModifier = market.yearlyModifiers.get("ore");
       
-      // Low production should result in clamped modifier
-      expect(oreModifier).toBe(0.6); // Clamped
+      // Low production (30%) should result in HIGH prices (clamped at 1.6)
+      expect(oreModifier).toBe(1.6); // Clamped max
 
       // Reset for new year
       market.resourceTracker.resetYearlyTracking();

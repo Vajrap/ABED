@@ -1,16 +1,17 @@
+import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
 import type { Character } from "../../../../Character/Character";
 import { UsableId } from "../../../../Item/Item";
 import {
   createNews,
+  type News,
   type NewsContext,
-  type NewsWithScope,
 } from "../../../../News/News";
 import { applyRestBenefits } from "./applyRestBenefits";
 
 export function campingRest(
   characters: Character[],
   context: NewsContext,
-): NewsWithScope {
+): News | null {
   let willUse = false;
   // Decide first if they want to use camp kit
   const charWithUsedKit = characters.filter(
@@ -44,9 +45,12 @@ export function campingRest(
     willUse = false;
   }
 
-  applyRestBenefits(characters, willUse ? 1.3 : 1);
-  const news = createNews({
-    scope: { kind: "private", characterId: characters.map((char) => char.id) },
+  for (const character of characters) {
+    applyRestBenefits(character, willUse ? 1.3 : 1);
+  }
+
+  return createNews({
+    scope: { kind: "partyScope", partyId: context.partyId },
     tokens: [
       {
         t: "char",
@@ -55,13 +59,6 @@ export function campingRest(
       { t: "text", v: `has taken a rest` },
     ],
     context,
+    secretTier: TierEnum.common
   });
-
-  return {
-    scope: {
-      kind: "party",
-      partyId: context.partyId ? context.partyId : "none",
-    },
-    news,
-  };
 }

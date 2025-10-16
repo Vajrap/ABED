@@ -5,8 +5,8 @@ import { Weather } from "../../../src/InterFacesEnumsAndTypes/Weather";
 import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
 import { SubRegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/SubRegion";
 import { RegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Region";
-import { subregionRepository } from "../../../src/Entity/Location/Repository/subregion";
-import { locationRepository } from "../../../src/Entity/Location/Repository/location";
+import { subregionRepository } from "../../../src/Entity/Repository/subregion";
+import { locationRepository } from "../../../src/Entity/Repository/location";
 
 describe("Location - getWeather()", () => {
   beforeEach(() => {

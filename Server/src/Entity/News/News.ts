@@ -5,6 +5,9 @@ import { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import type { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
+import { NewsSignificance, NewsPropagation } from "../../InterFacesEnumsAndTypes/NewsEnums";
+import type { NewsSpreadConfig } from "./NewsSpreadConfig";
+import type { L10N } from "../../InterFacesEnumsAndTypes/L10N";
 
 // SCOPE
 export type NewsScope =
@@ -63,37 +66,111 @@ enum NewsTag {
 */
 export interface News {
   id: string;
-  ts: GameTimeInterface; // epoch ms
+  ts: GameTimeInterface;
   scope: NewsScope;
-  tags?: NewsTag[]; // "craft","legendary","combat"
-  tokens: NewsToken[]; // rich, UI-resolvable content
+  tags?: NewsTag[];
+  
+  // NEW: Simple L10N content with markup
+  content: L10N;  // Replaces tokens array
+  
+  // DEPRECATED: Old token system (for migration)
+  tokens?: NewsToken[];
+  
   context: NewsContext;
-  secretTier: TierEnum;
+  
+  // Dual-axis system
+  significance: NewsSignificance;
+  propagation: NewsPropagation;
+  spreadConfig?: NewsSpreadConfig;
+  
+  // DEPRECATED
+  secretTier?: TierEnum;
 }
 
 export function createNews(data: {
   scope: NewsScope;
-  tokens: NewsToken[];
+  content: L10N;  // NEW: Required L10N content
+  tokens?: NewsToken[];  // DEPRECATED: Optional for migration
   origin?: {
     location?: LocationsEnum;
     partyId?: string;
     system?: "craft" | "combat" | "quest" | string;
   };
   context: NewsContext;
-  secretTier: TierEnum;
+  
+  // Dual-axis system
+  significance?: NewsSignificance;
+  propagation?: NewsPropagation;
+  spreadConfig?: NewsSpreadConfig;
+  
+  
   tags?: NewsTag[];
 }): News {
   const id = randomUUID();
-  const ts = GameTime.getCurrentGameDateTime()
+  const ts = GameTime.getCurrentGameDateTime();
+  
+  // Default significance based on scope if not provided
+  const defaultSignificance = data.significance ?? inferSignificanceFromScope(data.scope);
+  
+  // Default propagation based on scope if not provided
+  const defaultPropagation = data.propagation ?? inferPropagationFromScope(data.scope);
+  
   return {
     id,
     ts,
     scope: data.scope,
     tags: data.tags,
-    tokens: data.tokens,
+    content: data.content,
+    tokens: data.tokens,  // Optional, for backwards compat
     context: data.context,
-    secretTier: data.secretTier,
+    significance: defaultSignificance,
+    propagation: defaultPropagation,
+    spreadConfig: data.spreadConfig,
   };
+}
+
+/**
+ * Infer reasonable default significance from scope
+ */
+function inferSignificanceFromScope(scope: NewsScope): NewsSignificance {
+  switch (scope.kind) {
+    case "worldScope":
+      return NewsSignificance.MAJOR;
+    case "regionScope":
+      return NewsSignificance.NOTABLE;
+    case "subRegionScope":
+      return NewsSignificance.MINOR;
+    case "locationScope":
+      return NewsSignificance.MINOR;
+    case "partyScope":
+      return NewsSignificance.TRIVIAL;
+    case "privateScope":
+      return NewsSignificance.TRIVIAL;
+    case "none":
+      return NewsSignificance.TRIVIAL;
+  }
+}
+
+/**
+ * Infer reasonable default propagation from scope
+ */
+function inferPropagationFromScope(scope: NewsScope): NewsPropagation {
+  switch (scope.kind) {
+    case "worldScope":
+      return NewsPropagation.GLOBAL;
+    case "regionScope":
+      return NewsPropagation.REGIONAL;
+    case "subRegionScope":
+      return NewsPropagation.LOCAL;
+    case "locationScope":
+      return NewsPropagation.LOCAL;
+    case "partyScope":
+      return NewsPropagation.PRIVATE;
+    case "privateScope":
+      return NewsPropagation.SECRET;
+    case "none":
+      return NewsPropagation.SECRET;
+  }
 }
 
 // These needs to think of in terms of public and private data, something should be hidden from other player, some information might be more public
@@ -111,7 +188,7 @@ type ItemInterface = {
   stats: {};
 };
 
-export type NewsEmittedFromLocationStructure = {
+export type NewsDistribution = {
   worldScope: News[];
   regionScope: Map<RegionEnum, News[]>;
   subRegionScope: Map<SubRegionEnum, News[]>;
@@ -120,13 +197,7 @@ export type NewsEmittedFromLocationStructure = {
   privateScope: Map<string, News[]>;
 };
 
-// each event should emit this, and the handler might be the one dealing with then, putting into the map
-export type NewsWithScope = {
-  scope: NewsScope;
-  news: News;
-};
-
-export function emptyNewsStruct(): NewsEmittedFromLocationStructure {
+export function emptyNewsDistribution(): NewsDistribution {
   return {
     worldScope: [],
     regionScope: new Map(),
@@ -142,7 +213,7 @@ export function emptyNewsStruct(): NewsEmittedFromLocationStructure {
  * 
  * This is the core mapping logic - News.scope tells us where it goes!
  */
-function mapNewsToStructure(structure: NewsEmittedFromLocationStructure, news: News): void {
+function mapNewsToStructure(structure: NewsDistribution, news: News): void {
   switch (news.scope.kind) {
     case "worldScope":
       structure.worldScope.push(news);
@@ -221,8 +292,8 @@ function mapNewsToStructure(structure: NewsEmittedFromLocationStructure, news: N
  * return newsArrayToStructure([news1, news2]);
  * ```
  */
-export function newsArrayToStructure(newsList: News[]): NewsEmittedFromLocationStructure {
-  const structure = emptyNewsStruct();
+export function newsArrayToStructure(newsList: News[]): NewsDistribution {
+  const structure = emptyNewsDistribution();
   for (const news of newsList) {
     mapNewsToStructure(structure, news);
   }
@@ -232,6 +303,6 @@ export function newsArrayToStructure(newsList: News[]): NewsEmittedFromLocationS
 /**
  * Convert single News to structure (convenience)
  */
-export function newsToStructure(news: News): NewsEmittedFromLocationStructure {
+export function newsToStructure(news: News): NewsDistribution {
   return newsArrayToStructure([news]);
 }

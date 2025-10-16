@@ -1,7 +1,7 @@
-import type { NewsWithScope } from "../../../../News/News";
+import type { News } from "../../../../News/News";
 
-export function resolveTavernAction(): NewsWithScope[] {
+export function resolveTavernAction(): News[] {
     // TODO
-    const news: NewsWithScope[] = [];
+    const news: News[] = [];
     return news;
 }

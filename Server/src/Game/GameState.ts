@@ -1,6 +1,6 @@
 import { globalEventCardDeck } from "../Entity/Card/GlobalEventCard/definitions";
 import type { GlobalEventCard } from "../Entity/Card/GlobalEventCard/GlobalEventCard";
-import type { News, NewsEmittedFromLocationStructure } from "../Entity/News/News";
+import type { News, NewsDistribution } from "../Entity/News/News";
 import { regionEventCardDeck } from "../Entity/Card/RegionEventCard/definitions";
 import type { RegionEventCard } from "../Entity/Card/RegionEventCard/RegionEventCard";
 
@@ -29,7 +29,7 @@ class GameState {
         this.globalEventScale = data?.globalEventScale ?? 0;
     }
 
-    drawGlobalCard(): NewsEmittedFromLocationStructure | undefined {
+    drawGlobalCard(): NewsDistribution | undefined {
         if (this.globalEventCardDeck.length === 0) {
             this.reshuffleGlobalEventCardDeck();
         }
@@ -39,7 +39,7 @@ class GameState {
         return card.onDraw?.();
     }
 
-    drawRegionCard(): NewsEmittedFromLocationStructure | null {
+    drawRegionCard(): NewsDistribution | null {
         if (this.regionEventCardDeck.length === 0) {
             this.reshuffleRegionEventCardDeck();
         }

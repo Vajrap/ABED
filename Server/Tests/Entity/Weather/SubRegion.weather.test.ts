@@ -5,7 +5,7 @@ import { RegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Region";
 import { Weather } from "../../../src/InterFacesEnumsAndTypes/Weather";
 import { Location } from "../../../src/Entity/Location/Location";
 import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
-import { locationRepository } from "../../../src/Entity/Location/Repository/location";
+import { locationRepository } from "../../../src/Entity/Repository/location";
 
 describe("SubRegion - Weather System", () => {
   describe("handleDailyWeatherUpdate", () => {

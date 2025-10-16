@@ -1,6 +1,6 @@
 import type {
   News,
-  NewsEmittedFromLocationStructure,
+  NewsDistribution,
 } from "../Entity/News/News";
 import type { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import type { RegionEnum } from "../InterFacesEnumsAndTypes/Enums/Region";
@@ -8,14 +8,14 @@ import type { SubRegionEnum } from "../InterFacesEnumsAndTypes/Enums/SubRegion";
 
 // Utility to add to a Map<K, V[]>
 export function addToWorldScope(
-  news: NewsEmittedFromLocationStructure,
+  news: NewsDistribution,
   item: News,
 ) {
   news.worldScope.push(item);
 }
 
 export function addToRegionScope(
-  news: NewsEmittedFromLocationStructure,
+  news: NewsDistribution,
   region: RegionEnum,
   item: News,
 ) {
@@ -28,7 +28,7 @@ export function addToRegionScope(
 }
 
 export function addToSubRegionScope(
-  news: NewsEmittedFromLocationStructure,
+  news: NewsDistribution,
   subRegion: SubRegionEnum,
   item: News,
 ) {
@@ -41,7 +41,7 @@ export function addToSubRegionScope(
 }
 
 export function addToLocationScope(
-  news: NewsEmittedFromLocationStructure,
+  news: NewsDistribution,
   location: LocationsEnum,
   item: News,
 ) {
@@ -54,7 +54,7 @@ export function addToLocationScope(
 }
 
 export function addToPartyScope(
-  news: NewsEmittedFromLocationStructure,
+  news: NewsDistribution,
   partyId: string,
   item: News,
 ) {
@@ -67,7 +67,7 @@ export function addToPartyScope(
 }
 
 export function addToPrivateScope(
-  news: NewsEmittedFromLocationStructure,
+  news: NewsDistribution,
   characterId: string,
   item: News,
 ) {

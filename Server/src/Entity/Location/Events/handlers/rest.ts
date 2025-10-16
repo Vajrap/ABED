@@ -1,6 +1,6 @@
 import type { Character } from "../../../Character/Character";
 import { ActionInput } from "../../../Character/Subclass/Action/CharacterAction";
-import { type NewsContext, type NewsWithScope } from "../../../News/News";
+import { type NewsContext, type News } from "../../../News/News";
 import { InnLevel, type LocationInns } from "../../Config/Inn";
 import { campingRest } from "./rests/campingRest";
 import { houseRest } from "./rests/houseRest";
@@ -16,16 +16,16 @@ export function handleRestAction(
     | ActionInput.HouseRest,
   context: NewsContext,
   config?: LocationInns,
-): NewsWithScope | null {
+): News[] | null {
   switch (type) {
     case ActionInput.Rest: {
-      return normalRest(characters, context);
+      return characters.map(character => normalRest(character, context));
     }
     case ActionInput.Inn: {
       const innConfig = config ?? fallBackInnConfig;
       const innType = getPreferredInnType(characters, innConfig);
       if (!innType) {
-        return normalRest(characters, context);
+        return characters.map(character => normalRest(character, context));
       }
       return innRest(
         characters,
@@ -35,7 +35,8 @@ export function handleRestAction(
       );
     }
     case ActionInput.Camping:
-      return campingRest(characters, context);
+      const campingNews = campingRest(characters, context);
+      return campingNews ? [campingNews] : null;
     case ActionInput.HouseRest:
       return houseRest(characters, context);
     default:

@@ -1,12 +1,13 @@
 import { describe, expect, it, beforeEach } from "bun:test";
-import { drawSubRegionsWeatherCard, subregionRepository } from "../../../src/Entity/Location/Repository/subregion";
+import { subregionRepository } from "../../../src/Entity/Repository/subregion";
+import { drawSubRegionsWeatherCard } from "../../../src/Event/subRegionWeather";
 import { SubRegion } from "../../../src/Entity/Location/SubRegion";
 import { SubRegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/SubRegion";
 import { RegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Region";
 import { Weather } from "../../../src/InterFacesEnumsAndTypes/Weather";
 import { Location } from "../../../src/Entity/Location/Location";
 import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
-import { locationRepository } from "../../../src/Entity/Location/Repository/location";
+import { locationRepository } from "../../../src/Entity/Repository/location";
 
 describe("drawSubRegionsWeatherCard", () => {
   beforeEach(() => {

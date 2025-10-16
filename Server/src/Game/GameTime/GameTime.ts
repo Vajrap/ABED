@@ -122,4 +122,19 @@ export class GameTime {
   static getWeekNumber(): number {
     return Math.floor(GameTime.dayOfWeek / GameTime.inGameDaysPerWeek);
   }
+  
+  /**
+   * Get total days since game epoch (year 0, season 1, day 1)
+   * Used for news archiving and propagation timing
+   */
+  static getDaysSinceEpoch(): number {
+    const daysPerYear = GameTime.inGameDaysPerSeason * GameTime.inGameSeasonsPerYear; // 336
+    return (
+      GameTime.year * daysPerYear +
+      (GameTime.season - 1) * GameTime.inGameDaysPerSeason +
+      GameTime.dayOfSeason
+    );
+    // Is this equal to the dayPassed?
+    // return GameTime.dayPassed
+  }
 }

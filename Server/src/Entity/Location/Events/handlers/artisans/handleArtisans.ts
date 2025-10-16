@@ -1,8 +1,8 @@
 import type { Character } from "../../../../Character/Character";
-import type { NewsContext, NewsWithScope } from "../../../../News/News";
+import type { NewsContext, News } from "../../../../News/News";
 
-export function handelArtisanAction(character: Character, context: NewsContext): NewsWithScope[] {
+export function handelArtisanAction(character: Character, context: NewsContext): News[] | null {
     // TODO
-    const news: NewsWithScope[] = [];
+    const news: News[] = [];
     return news;
 }

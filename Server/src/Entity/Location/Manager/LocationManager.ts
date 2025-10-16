@@ -5,7 +5,7 @@ import type {
   DayOfWeek,
   TimeOfDay,
 } from "../../../InterFacesEnumsAndTypes/Time";
-import type { NewsEmittedFromLocationStructure } from "../../News/News";
+import type { NewsDistribution } from "../../News/News";
 import type { Location } from "../Location";
 import type { Region } from "../Regions";
 import { locationRepository } from "../../Repository/location";
@@ -23,8 +23,8 @@ class LocationManager {
   async processEncounters(
     day: DayOfWeek,
     phase: TimeOfDay,
-  ): Promise<NewsEmittedFromLocationStructure> {
-    let news: NewsEmittedFromLocationStructure = {
+  ): Promise<NewsDistribution> {
+    let news: NewsDistribution = {
       worldScope: [],
       regionScope: new Map(),
       subRegionScope: new Map(),
@@ -32,7 +32,7 @@ class LocationManager {
       partyScope: new Map(),
       privateScope: new Map(),
     };
-    const results: NewsEmittedFromLocationStructure[] = [];
+    const results: NewsDistribution[] = [];
     for (const [_, location] of this.locations) {
       const result = await location.processEncounters();
       results.push(result);
@@ -46,8 +46,8 @@ class LocationManager {
   async processActions(
     day: DayOfWeek,
     phase: TimeOfDay,
-  ): Promise<NewsEmittedFromLocationStructure> {
-    let news: NewsEmittedFromLocationStructure = {
+  ): Promise<NewsDistribution> {
+    let news: NewsDistribution = {
       worldScope: [],
       regionScope: new Map(),
       subRegionScope: new Map(),
@@ -55,7 +55,7 @@ class LocationManager {
       partyScope: new Map(),
       privateScope: new Map(),
     };
-    const results: NewsEmittedFromLocationStructure[] = [];
+    const results: NewsDistribution[] = [];
     for (const [_, location] of this.locations) {
       const result = await location.processActions(day, phase);
       results.push(result);

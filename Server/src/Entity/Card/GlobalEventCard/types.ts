@@ -1,4 +1,4 @@
-import type { NewsEmittedFromLocationStructure } from "../../News/News";
+import type { NewsDistribution } from "../../News/News";
 
 export enum GlobalEventCardEnum {
   // Escalation Events
@@ -32,7 +32,7 @@ export enum GlobalEventCardEnum {
 }
 
 // Effect handler function - just do whatever you need
-export type EffectHandler = () => NewsEmittedFromLocationStructure;
+export type EffectHandler = () => NewsDistribution;
 
 // Cleanup handler - called when card ends (no news needed)
 export type CleanupHandler = () => void;

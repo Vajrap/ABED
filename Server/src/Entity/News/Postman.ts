@@ -1,5 +1,5 @@
 import { connectionManager } from "../Connection/connectionManager";
-import type { News, NewsEmittedFromLocationStructure } from "./News";
+import type { News, NewsDistribution } from "./News";
 import WebSocket from "bun";
 
 type NewsPayload =
@@ -10,7 +10,7 @@ type NewsPayload =
   | { type: "NEWS_PARTY"; data: News[] }
   | { type: "NEWS_PRIVATE"; data: News[] };
 
-function buildCache(news: NewsEmittedFromLocationStructure) {
+function buildCache(news: NewsDistribution) {
   const cache = {
     world: {
       type: "NEWS",
@@ -35,7 +35,7 @@ function buildCache(news: NewsEmittedFromLocationStructure) {
 }
 
 class Postman {
-  deliver(news: NewsEmittedFromLocationStructure) {
+  deliver(news: NewsDistribution) {
     const cache = buildCache(news);
 
     for (const cl of connectionManager.getConnections()) {

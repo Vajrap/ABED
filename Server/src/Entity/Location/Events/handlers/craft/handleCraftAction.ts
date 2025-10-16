@@ -1,9 +1,9 @@
 import type { Character } from "../../../../Character/Character";
-import type { NewsContext, NewsWithScope } from "../../../../News/News";
+import type { NewsContext, News } from "../../../../News/News";
 
-export function handleCraftAction(character: Character, context: NewsContext): NewsWithScope[] {
+export function handleCraftAction(character: Character, context: NewsContext): News[] | null {
     // TODO
-    const news: NewsWithScope[] = [];
+    const news: News[] = [];
     let isCrafted = false;
     const a = character.behavior.craftingPreference.craftingList
     if (a[1].bluePrintID !== 0) {

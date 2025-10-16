@@ -5,7 +5,7 @@ import { MiscItemId } from "../../../../Item/Item";
 import {
   createNews,
   type NewsContext,
-  type NewsWithScope,
+  type News,
 } from "../../../../News/News";
 import {
   type InnConfig,
@@ -20,7 +20,7 @@ export function innRest(
   config: InnConfig,
   numberOfRooms: number,
   context: NewsContext,
-): NewsWithScope[] {
+): News[] {
   const totalCost = config.costPerRoom * numberOfRooms;
 
   const wallets = characters.map((char) => ({
@@ -29,13 +29,13 @@ export function innRest(
   }));
 
   const totalAvailable = wallets.reduce((sum, w) => sum + w.gold, 0);
-  const allNewsWithScope: NewsWithScope[] = [];
+  const allNews: News[] = [];
 
   if (totalAvailable < totalCost) {
     for (const character of characters) {
-      allNewsWithScope.push(normalRest(character, context));
+      allNews.push(normalRest(character, context));
     }
-    return allNewsWithScope;
+    return allNews;
   } else {
     let remaining = totalCost;
     for (const wallet of wallets) {
@@ -71,30 +71,10 @@ export function innRest(
       },
       secretTier: TierEnum.rare
     });
+    allNews.push(news);
   }
 
-  const news = createNews({
-    scope: { kind: "private", characterId: characters.map((char) => char.id) },
-    tokens: [
-      {
-        t: "party",
-        label: `party of [${characters.map((char) => char.name).join(", ")}]`,
-      },
-      {
-        t: "text",
-        v: `rested at the inn and paid (${config.costPerRoom} gold per room)`,
-      },
-    ],
-    context,
-  });
-
-  return {
-    scope: {
-      kind: "private",
-      characterId: context.characterIds,
-    },
-    news,
-  };
+  return allNews;
 }
 
 export function getPreferredInnType(

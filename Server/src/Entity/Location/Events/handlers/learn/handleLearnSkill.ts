@@ -4,8 +4,8 @@ import { statMod } from "../../../../../Utils/statMod";
 import type { Character } from "../../../../Character/Character";
 import {
   createNews,
+  type News,
   type NewsContext,
-  type NewsWithScope,
 } from "../../../../News/News";
 import type { SkillId } from "../../../../Skill/enums";
 
@@ -33,8 +33,7 @@ export function handleLearnSkill(
   character: Character,
   skillId: SkillId,
   context: NewsContext,
-): NewsWithScope | null {
-  // TODO
+): News | null {
   const existingProgress = character.skillLearningProgress.get(skillId) || 0;
   const skillTier = skillRepository.get(skillId)?.tier;
   if (!skillTier) return null; //Need to report error, skill not found
@@ -57,34 +56,28 @@ export function handleLearnSkill(
     learned = true;
     character.skillLearningProgress.delete(skillId);
     character.skills.set(skillId, { id: skillId, level: 1, exp: 0 }); // Assuming new skill starts at level 1 with 0 exp
-    const news: NewsWithScope = {
+    const news = createNews({
       scope: {
         kind: "privateScope",
         characterId: character.id,
       },
-      news: createNews({
-        scope: {
-          kind: "privateScope",
-          characterId: character.id,
+      tokens: [
+        {
+          t: "char",
+          v: [character.intoNewsInterface(context.subRegion)],
         },
-        tokens: [
-          {
-            t: "char",
-            v: [character.intoNewsInterface(context.subRegion)],
-          },
-          {
-            t: "text",
-            v: `${learned ? "has learned" : "progressed towards learning"}`,
-          },
-          {
-            t: "skill",
-            id: skillId,
-          },
-        ],
-        context,
-        secretTier: TierEnum.epic,
-      }),
-    };
+        {
+          t: "text",
+          v: `${learned ? "has learned" : "progressed towards learning"}`,
+        },
+        {
+          t: "skill",
+          id: skillId,
+        },
+      ],
+      context,
+      secretTier: TierEnum.epic,
+    });
 
     return news;
   }

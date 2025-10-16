@@ -4,7 +4,7 @@ import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import type { TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 import type { Character } from "../Character/Character";
 import type { Location } from "../Location/Location";
-import { locationRepository } from "../Location/Repository/location";
+import { locationRepository } from "../Repository/location";
 import type { SkillId } from "./enums";
 import type { SkillLearningRequirement } from "./types";
 
@@ -48,6 +48,3 @@ export type TurnResult = {
   // Maybe we need to add some more context here, like damage, buff, debuff, etc
   context: any;
 }
-
-const a: Location = locationRepository.get(LocationsEnum.AncestorBarrows)!
-a.weatherScale

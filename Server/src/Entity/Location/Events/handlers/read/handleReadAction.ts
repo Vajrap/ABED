@@ -1,8 +1,8 @@
 import type { Character } from "../../../../Character/Character";
-import type { NewsWithScope } from "../../../../News/News";
+import type { News } from "../../../../News/News";
 
-export function handleReadAction(character: Character): NewsWithScope[] {
+export function handleReadAction(character: Character): News[] {
     // TODO
-    const news: NewsWithScope[] = [];
+    const news: News[] = [];
     return news;
 }

@@ -1,4 +1,4 @@
-import type { NewsEmittedFromLocationStructure } from "../../News/News";
+import type { NewsDistribution } from "../../News/News";
 import type { RegionEnum } from "../../../InterFacesEnumsAndTypes/Enums/Region";
 
 export enum RegionEventCardEnum {
@@ -30,7 +30,7 @@ export enum RegionEventCardEnum {
 }
 
 // Effect handler function - returns news or null
-export type RegionEffectHandler = () => NewsEmittedFromLocationStructure | null;
+export type RegionEffectHandler = () => NewsDistribution | null;
 
 export interface RegionEventCardConfig {
   id: RegionEventCardEnum;

@@ -1,11 +1,11 @@
 import type {
   News,
-  NewsEmittedFromLocationStructure,
+  NewsDistribution,
 } from "../Entity/News/News";
 
 export function mergeNewsStructures(
-  ...structures: NewsEmittedFromLocationStructure[]
-): NewsEmittedFromLocationStructure {
+  ...structures: NewsDistribution[]
+): NewsDistribution {
   const mergeMaps = (
     base: Map<any, News[]>,
     incoming: Map<any, News[]>,
@@ -23,7 +23,7 @@ export function mergeNewsStructures(
     return result;
   };
 
-  return structures.reduce<NewsEmittedFromLocationStructure>(
+  return structures.reduce<NewsDistribution>(
     (acc, curr) => ({
       worldScope: [...acc.worldScope, ...curr.worldScope],
       regionScope: mergeMaps(acc.regionScope, curr.regionScope),

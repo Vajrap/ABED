@@ -119,9 +119,9 @@ describe("ResourceProductionTracker", () => {
       const modifiers = tracker.calculateYearlyModifiers();
 
       // No production (0) with baseline > 0 means ratio = 0
-      // factor(0) = clamped to 0.6
-      expect(modifiers.get("ore")).toBe(0.6);
-      expect(modifiers.get("grain")).toBe(0.6);
+      // factor(0) = sqrt(0) = 0, clamped to MAX 1.6 (prices go UP when scarce!)
+      expect(modifiers.get("ore")).toBe(1.6);
+      expect(modifiers.get("grain")).toBe(1.6);
     });
 
     it("should calculate modifiers based on production vs baseline", () => {
@@ -455,8 +455,8 @@ describe("ResourceProductionTracker", () => {
       const modifiers = tracker.calculateYearlyModifiers();
       const oreModifier = modifiers.get("ore");
 
-      // ratio = 0.1, factor(0.1) = sqrt(0.1) ≈ 0.316, clamped to 0.6
-      expect(oreModifier).toBe(0.6);
+      // ratio = 0.1, factor(0.1) = sqrt(0.1) ≈ 0.316, clamped to MAX 1.6 (low prod = high price!)
+      expect(oreModifier).toBe(1.6);
     });
 
     it("should handle high production correctly", () => {
@@ -502,8 +502,8 @@ describe("ResourceProductionTracker", () => {
       const modifiers = tracker.calculateYearlyModifiers();
       const oreModifier = modifiers.get("ore");
 
-      // ratio = 3.0, factor(3.0) = sqrt(3.0) ≈ 1.732, clamped to 1.6
-      expect(oreModifier).toBe(1.6);
+      // ratio = 3.0, factor(3.0) = sqrt(3.0) ≈ 1.732, clamped to MIN 0.6 (high prod = low price!)
+      expect(oreModifier).toBe(0.6);
     });
   });
 

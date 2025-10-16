@@ -3,7 +3,7 @@ import {
   createNews, 
   newsToStructure, 
   newsArrayToStructure,
-  emptyNewsStruct 
+  emptyNewsDistribution 
 } from "../../../src/Entity/News/News";
 import { TierEnum } from "../../../src/InterFacesEnumsAndTypes/Tiers";
 import { RegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Region";

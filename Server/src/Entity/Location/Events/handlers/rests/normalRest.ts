@@ -3,16 +3,16 @@ import type { Character } from "../../../../Character/Character";
 import {
   createNews,
   type NewsContext,
-  type NewsWithScope,
+  type News,
 } from "../../../../News/News";
 import { applyRestBenefits } from "./applyRestBenefits";
 
 export function normalRest(
   character: Character,
   context: NewsContext,
-): NewsWithScope {
+): News {
   applyRestBenefits(character, 1);
-  const news = createNews({
+  return createNews({
     scope: { kind: "privateScope", characterId: character.id },
     tokens: [
       {
@@ -24,11 +24,4 @@ export function normalRest(
     context,
     secretTier: TierEnum.rare,
   });
-  return {
-    scope: {
-      kind: "privateScope",
-      characterId: character.id,
-    },
-    news: news,
-  };
 }

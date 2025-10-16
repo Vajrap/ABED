@@ -1,14 +1,13 @@
 import type { RemoveLocationError } from "../../../Common/Text/TextEnum";
 import { ActionInput } from "../../Entity/Character/Subclass/Action/CharacterAction";
-import type { Region } from "../../Entity/Location/Regions";
-import { locationRepository } from "../../Entity/Location/Repository/location";
-import { regionRepository } from "../../Entity/Location/Repository/region";
-import { subregionRepository } from "../../Entity/Location/Repository/subregion";
-import type { SubRegion } from "../../Entity/Location/SubRegion";
+import { locationRepository } from "../../Entity/Repository/location";
+import { regionRepository } from "../../Entity/Repository/region";
+import { subregionRepository } from "../../Entity/Repository/subregion";
 import {
-  emptyNewsStruct,
-  type NewsEmittedFromLocationStructure,
-  type NewsWithScope,
+  createNews,
+  emptyNewsDistribution,
+  newsArrayToStructure,
+  type NewsDistribution,
 } from "../../Entity/News/News";
 import type { Party } from "../../Entity/Party/Party";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
@@ -19,6 +18,9 @@ import Report from "../../Utils/Reporter";
 import { statMod } from "../../Utils/statMod";
 import { TravelingParty } from "./TravelingParty";
 import { TravelMethodEnum } from "./TravelMethod";
+import { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
+import { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import { L10NWithEntities } from "../../InterFacesEnumsAndTypes/L10N";
 
 class TravelManager {
   travelingParties: Map<string, TravelingParty> = new Map();
@@ -127,9 +129,9 @@ class TravelManager {
   async allTravel(
     day: DayOfWeek,
     phase: TimeOfDay,
-  ): Promise<NewsEmittedFromLocationStructure> {
+  ): Promise<NewsDistribution> {
     let travelingParties = [];
-    const newsWithScope = emptyNewsStruct();
+    const newsWithScope = emptyNewsDistribution();
     for (const [partyId, travelingParty] of this.travelingParties) {
       if (
         travelingParty.party.actionSequence[day][phase] === ActionInput.Travel
@@ -156,7 +158,7 @@ class TravelManager {
     return newsWithScope;
   }
 
-  travel(party: TravelingParty): NewsEmittedFromLocationStructure | null {
+  travel(party: TravelingParty): NewsDistribution | null {
     // Early return if the party has no path or already arrived at the last location in the path. Which shouldn't happen.
     if (
       party.path.length === 0 ||
@@ -174,24 +176,14 @@ class TravelManager {
     const randomEvent = location.getRandomEventFor("travel", randomRoll);
 
     let isEventHappen = false;
-    let travelNews = emptyNewsStruct();
+    let travelNews = emptyNewsDistribution();
 
     // Get Random Event Result
     if (randomEvent) {
       const result = randomEvent(party.party.getCharacters());
-      if (result.scope.kind === "worldScope") {
-        travelNews.worldScope.push(result.news);
-      } else if (result.scope.kind === "regionScope") {
-        travelNews.regionScope.set(result.scope.region, [result.news]);
-      } else if (result.scope.kind === "subRegionScope") {
-        travelNews.subRegionScope.set(result.scope.subRegion, [result.news]);
-      } else if (result.scope.kind === "locationScope") {
-        travelNews.locationScope.set(result.scope.location, [result.news]);
-      } else if (result.scope.kind === "partyScope") {
-        travelNews.partyScope.set(result.scope.partyId, [result.news]);
-      } else if (result.scope.kind === "privateScope") {
-        travelNews.privateScope.set(result.scope.characterId, [result.news]);
-      }
+      if (!result) return null;
+      travelNews = newsArrayToStructure([result]);
+
       isEventHappen = true;
     }
 
@@ -201,10 +193,78 @@ class TravelManager {
     // Deal with the arrival
     const handleResult = this.handlePartyArrival(party);
     if (handleResult.reachNextLocation) {
-      // TODO: Add news of reaching new location here
+      const leader = party.party.leader;
+      const locId = party.currentLocation;
+      let locName = locationRepository.get(locId)?.name;
+      if (!locName) {
+        Report.error("Location name not found in repository")
+        locName = {
+          en: 'Undefined',
+          th: 'ไม่ระบุ'
+        }
+      }
+
+      const news = createNews({
+        scope: {
+          kind: "partyScope",
+          partyId: party.party.partyID
+        },
+        content: L10NWithEntities(
+          {
+            en: `[char:${leader.id}]${leader.name}[/char]'s party has reached [loc:${locId}]${locName.en}[/loc]`,
+            th: `ปาร์ตี้ของ [char:${leader.id}]${leader.name}[/char] เดินทางมาถึง [loc:${locId}]${locName.th}[/loc]`
+          },
+          {
+            characters: [leader],
+            locations: [locId]
+          }
+        ),
+        context: {
+          region: RegionEnum.CentralPlain,
+          subRegion: SubRegionEnum.FyonarCapitalDistrict,
+          location: party.currentLocation,
+          partyId: party.party.partyID,
+          characterIds: party.party.characters.map(character => character !== "none" ? character.id : "")
+        }
+      });
+      travelNews = mergeNewsStructures(travelNews, newsArrayToStructure([news]));
     }
     if (handleResult.atDestination) {
-      // TODO: Add news of reaching destination here
+      const leader = party.party.leader;
+      const locId = party.currentLocation;
+      let locName = locationRepository.get(locId)?.name;
+      if (!locName) {
+        Report.error("Location name not found in repository")
+        locName = {
+          en: 'Undefined',
+          th: 'ไม่ระบุ'
+        }
+      }
+      
+      const news = createNews({
+        scope: {
+          kind: "partyScope",
+          partyId: party.party.partyID
+        },
+        content: L10NWithEntities(
+          {
+            en: `[char:${leader.id}]${leader.name}[/char]'s party has arrived at [loc:${locId}]${locName.en}[/loc]!`,
+            th: `ปาร์ตี้ของ [char:${leader.id}]${leader.name}[/char] มาถึง [loc:${locId}]${locName.th}[/loc] แล้ว!`
+          },
+          {
+            characters: [leader],
+            locations: [locId]
+          }
+        ),
+        context: {
+          region: RegionEnum.CentralPlain,
+          subRegion: SubRegionEnum.FyonarCapitalDistrict,
+          location: party.currentLocation,
+          partyId: party.party.partyID,
+          characterIds: party.party.characters.map(character => character !== "none" ? character.id : "")
+        }
+      });
+      travelNews = mergeNewsStructures(travelNews, newsArrayToStructure([news]));
     }
 
     // Decrease mood and energy after travelling

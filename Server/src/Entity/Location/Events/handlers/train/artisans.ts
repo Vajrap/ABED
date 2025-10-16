@@ -6,7 +6,7 @@ import type { Character } from "../../../../Character/Character";
 import {
   createNews,
   type NewsContext,
-  type NewsWithScope,
+  type News,
 } from "../../../../News/News";
 import { getExpNeededForStatus } from "./getExpNeeded";
 import { gainStatTracker } from "./statTracker";
@@ -15,8 +15,8 @@ export function handleTrainArtisans(
   characters: Character[],
   target: ArtisanKey,
   context: NewsContext,
-): NewsWithScope[] {
-  let results: NewsWithScope[] = [];
+): News[] {
+  let results: News[] = [];
   for (const character of characters) {
     let stat = character.artisans.getStat(target);
 
@@ -38,34 +38,28 @@ export function handleTrainArtisans(
 
       gainStatTracker(character, statTrackGain);
     }
-    const news: NewsWithScope = {
+    const news = createNews({
       scope: {
         kind: "privateScope",
         characterId: character.id,
       },
-      news: createNews({
-        scope: {
-          kind: "privateScope",
-          characterId: character.id,
+      tokens: [
+        {
+          t: "char",
+          v: [
+            {
+              name: character.name,
+              title: character.title.string(),
+              fame: character.fame.getString(context.subRegion),
+              portrait: character.portrait ? character.portrait : "",
+              level: character.level,
+            },
+          ],
         },
-        tokens: [
-          {
-            t: "char",
-            v: [
-              {
-                name: character.name,
-                title: character.title.string(),
-                fame: character.fame.getString(context.subRegion),
-                portrait: character.portrait ? character.portrait : "",
-                level: character.level,
-              },
-            ],
-          },
-        ],
-        context,
-        secretTier: TierEnum.rare
-      }),
-    };
+      ],
+      context,
+      secretTier: TierEnum.rare
+    });
     results.push(news);
   }
   return results;

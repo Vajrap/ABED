@@ -5,7 +5,7 @@ import type { Character } from "../../../../Character/Character";
 import {
   createNews,
   type NewsContext,
-  type NewsWithScope,
+  type News,
 } from "../../../../News/News";
 import type { SkillId } from "../../../../Skill/enums";
 import { getExpNeededForSkill } from "./getExpNeeded";
@@ -34,8 +34,8 @@ export function handleTrainSkill(
   characters: Character[],
   target: SkillId,
   context: NewsContext,
-): NewsWithScope[] {
-  let results: NewsWithScope[] = [];
+): News[] {
+  let results: News[] = [];
   for (const character of characters) {
     let skill = character.skills.get(target);
     if (!skill) continue;
@@ -62,33 +62,28 @@ export function handleTrainSkill(
       gainStatTracker(character, statTrackGain);
     }
 
-    const news: NewsWithScope = {
+    const news = createNews({
       scope: {
-        kind: "private",
-        characterId: [character.id],
+        kind: "privateScope",
+        characterId: character.id,
       },
-      news: createNews({
-        scope: {
-          kind: "private",
-          characterId: [character.id],
+      tokens: [
+        {
+          t: "char",
+          v: [
+            {
+              name: character.name,
+              title: character.title.string(),
+              fame: character.fame.getString(context.subRegion),
+              portrait: character.portrait ? character.portrait : "",
+              level: character.level,
+            },
+          ],
         },
-        tokens: [
-          {
-            t: "char",
-            v: [
-              {
-                name: character.name,
-                title: character.title.string(),
-                fame: character.fame.getString(context.subRegion),
-                portrait: character.portrait ? character.portrait : "",
-                level: character.level,
-              },
-            ],
-          },
-        ],
-        context,
-      }),
-    };
+      ],
+      context,
+      secretTier: TierEnum.common
+    });
     results.push(news);
   }
   return results;
