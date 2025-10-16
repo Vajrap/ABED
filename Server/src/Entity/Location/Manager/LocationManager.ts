@@ -12,6 +12,8 @@ import { locationRepository } from "../../Repository/location";
 import { regionRepository } from "../../Repository/region";
 import { subregionRepository } from "../../Repository/subregion";
 import type { SubRegion } from "../SubRegion";
+import { market } from "../../Market/Market";
+import { mergeNewsStructures } from "../../../Utils/mergeNewsStructure";
 
 class LocationManager {
   regions: Map<RegionEnum, Region> = regionRepository;
@@ -22,7 +24,7 @@ class LocationManager {
     day: DayOfWeek,
     phase: TimeOfDay,
   ): Promise<NewsEmittedFromLocationStructure> {
-    const news: NewsEmittedFromLocationStructure = {
+    let news: NewsEmittedFromLocationStructure = {
       worldScope: [],
       regionScope: new Map(),
       subRegionScope: new Map(),
@@ -33,62 +35,11 @@ class LocationManager {
     const results: NewsEmittedFromLocationStructure[] = [];
     for (const [_, location] of this.locations) {
       const result = await location.processEncounters();
+      results.push(result);
     }
     for (const res of results) {
-      // Private
-      res.privateScope.forEach((values, key) => {
-        const exist = news.privateScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.privateScope.set(key, values);
-        }
-      });
-
-      // Party
-      res.partyScope.forEach((values, key) => {
-        const exist = news.partyScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.partyScope.set(key, values);
-        }
-      });
-
-      // Location
-      res.locationScope.forEach((values, key) => {
-        const exist = news.locationScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.locationScope.set(key, values);
-        }
-      });
-
-      // SubRegion
-      res.subRegionScope.forEach((values, key) => {
-        const exist = news.subRegionScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.subRegionScope.set(key, values);
-        }
-      });
-
-      // Region
-      res.regionScope.forEach((values, key) => {
-        const exist = news.regionScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.regionScope.set(key, values);
-        }
-      });
-
-      // World
-      news.worldScope.push(...res.worldScope);
+      news = mergeNewsStructures(news, res);
     }
-    // return news;
     return news;
   }
 
@@ -96,7 +47,7 @@ class LocationManager {
     day: DayOfWeek,
     phase: TimeOfDay,
   ): Promise<NewsEmittedFromLocationStructure> {
-    const news: NewsEmittedFromLocationStructure = {
+    let news: NewsEmittedFromLocationStructure = {
       worldScope: [],
       regionScope: new Map(),
       subRegionScope: new Map(),
@@ -107,62 +58,11 @@ class LocationManager {
     const results: NewsEmittedFromLocationStructure[] = [];
     for (const [_, location] of this.locations) {
       const result = await location.processActions(day, phase);
+      results.push(result);
     }
     for (const res of results) {
-      // Private
-      res.privateScope.forEach((values, key) => {
-        const exist = news.privateScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.privateScope.set(key, values);
-        }
-      });
-
-      // Party
-      res.partyScope.forEach((values, key) => {
-        const exist = news.partyScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.partyScope.set(key, values);
-        }
-      });
-
-      // Location
-      res.locationScope.forEach((values, key) => {
-        const exist = news.locationScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.locationScope.set(key, values);
-        }
-      });
-
-      // SubRegion
-      res.subRegionScope.forEach((values, key) => {
-        const exist = news.subRegionScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.subRegionScope.set(key, values);
-        }
-      });
-
-      // Region
-      res.regionScope.forEach((values, key) => {
-        const exist = news.regionScope.get(key);
-        if (exist) {
-          exist.push(...values);
-        } else {
-          news.regionScope.set(key, values);
-        }
-      });
-
-      // World
-      news.worldScope.push(...res.worldScope);
+      news = mergeNewsStructures(news, res);
     }
-    // return news;
     return news;
   }
 
@@ -171,7 +71,7 @@ class LocationManager {
    */
   refillResources() {
     // Import market here to avoid circular dependencies
-    const { market } = require("../../Market/Market");
+    // const { market } = require("../../Market/Market");
     
     for (const [_, location] of this.locations) {
       const generated = location.refillResources();

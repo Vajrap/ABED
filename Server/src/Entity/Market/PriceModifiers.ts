@@ -40,6 +40,10 @@ export function factor(ratio: number): number {
  * 
  * This is the "sticky" modifier that has huge impact on prices.
  * Compares actual global production to expected baseline.
+ * 
+ * IMPORTANT: Inverts the ratio so that:
+ * - Low production (shortage) → HIGH prices
+ * - High production (surplus) → LOW prices
  */
 export function calculateYearlyBaseModifier(
   resourceType: ResourceType,
@@ -49,7 +53,13 @@ export function calculateYearlyBaseModifier(
   if (globalBaseline === 0) return 1.0;
   
   const ratio = globalProduction / globalBaseline;
-  return factor(ratio);
+  
+  // INVERT ratio for shortage/surplus logic
+  // Low production (0.5) → inverted (2.0) → factor (1.414) → HIGH prices
+  // High production (2.0) → inverted (0.5) → factor (0.707) → LOW prices
+  const invertedRatio = ratio > 0 ? 1 / ratio : 10;
+  
+  return factor(invertedRatio);
 }
 
 /**
@@ -119,6 +129,10 @@ export function sumStorageInSubRegion(
  * 
  * Considers months remaining until next production to determine
  * if current storage is adequate.
+ * 
+ * IMPORTANT: For shortages, we INVERT the factor:
+ * - Low storage (ratio < 1) → HIGH factor → HIGH prices
+ * - High storage (ratio > 1) → LOW factor → LOW prices
  */
 export function calculateLocalShortageFactor(
   location: LocationsEnum,
@@ -146,9 +160,14 @@ export function calculateLocalShortageFactor(
   const localRatio = (localStorage / monthsRemaining) / localBaseline;
   const subRegionRatio = (subRegionStorage / monthsRemaining) / subRegionBaseline;
   
-  // Apply factor smoothing to each ratio
-  const localFactor = factor(localRatio);
-  const subRegionFactor = factor(subRegionRatio);
+  // INVERT ratios for shortage logic, then apply factor smoothing
+  // Inverting: low storage (ratio 0.5) becomes (2.0) → high prices
+  //            high storage (ratio 2.0) becomes (0.5) → low prices
+  const invertedLocalRatio = localRatio > 0 ? 1 / localRatio : 10;
+  const invertedSubRegionRatio = subRegionRatio > 0 ? 1 / subRegionRatio : 10;
+  
+  const localFactor = factor(invertedLocalRatio);
+  const subRegionFactor = factor(invertedSubRegionRatio);
   
   // Weighted blend
   return (localFactor * localWeight) + (subRegionFactor * subRegionWeight);

@@ -136,3 +136,102 @@ export function emptyNewsStruct(): NewsEmittedFromLocationStructure {
     privateScope: new Map(),
   };
 }
+
+/**
+ * Map a single News item to the correct scope in the structure
+ * 
+ * This is the core mapping logic - News.scope tells us where it goes!
+ */
+function mapNewsToStructure(structure: NewsEmittedFromLocationStructure, news: News): void {
+  switch (news.scope.kind) {
+    case "worldScope":
+      structure.worldScope.push(news);
+      break;
+      
+    case "regionScope": {
+      const region = news.scope.region;
+      if (!structure.regionScope.has(region)) {
+        structure.regionScope.set(region, []);
+      }
+      structure.regionScope.get(region)!.push(news);
+      break;
+    }
+      
+    case "subRegionScope": {
+      const subRegion = news.scope.subRegion;
+      if (!structure.subRegionScope.has(subRegion)) {
+        structure.subRegionScope.set(subRegion, []);
+      }
+      structure.subRegionScope.get(subRegion)!.push(news);
+      break;
+    }
+      
+    case "locationScope": {
+      const location = news.scope.location;
+      if (!structure.locationScope.has(location)) {
+        structure.locationScope.set(location, []);
+      }
+      structure.locationScope.get(location)!.push(news);
+      break;
+    }
+      
+    case "partyScope": {
+      const partyId = news.scope.partyId;
+      if (!structure.partyScope.has(partyId)) {
+        structure.partyScope.set(partyId, []);
+      }
+      structure.partyScope.get(partyId)!.push(news);
+      break;
+    }
+      
+    case "privateScope": {
+      const characterId = news.scope.characterId;
+      if (!structure.privateScope.has(characterId)) {
+        structure.privateScope.set(characterId, []);
+      }
+      structure.privateScope.get(characterId)!.push(news);
+      break;
+    }
+      
+    case "none":
+      // Ignore news with no scope
+      break;
+  }
+}
+
+/**
+ * Convert News array to NewsEmittedFromLocationStructure
+ * 
+ * This is the main helper - use this everywhere!
+ * 
+ * BEFORE:
+ * ```typescript
+ * return {
+ *   worldScope: [news1],
+ *   regionScope: new Map([[region, [news2]]]),
+ *   subRegionScope: new Map(),
+ *   locationScope: new Map(),
+ *   partyScope: new Map(),
+ *   privateScope: new Map(),
+ * };
+ * ```
+ * 
+ * AFTER:
+ * ```typescript
+ * return newsArrayToStructure([news1, news2]);
+ * ```
+ */
+export function newsArrayToStructure(newsList: News[]): NewsEmittedFromLocationStructure {
+  const structure = emptyNewsStruct();
+  for (const news of newsList) {
+    mapNewsToStructure(structure, news);
+  }
+  return structure;
+}
+
+/**
+ * Convert single News to structure (convenience)
+ */
+export function newsToStructure(news: News): NewsEmittedFromLocationStructure {
+  return newsArrayToStructure([news]);
+}

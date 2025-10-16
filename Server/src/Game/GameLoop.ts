@@ -3,6 +3,7 @@ import { GameTime } from "./GameTime/GameTime";
 import type { DayOfWeek, TimeOfDay } from "../InterFacesEnumsAndTypes/Time";
 import {
   type NewsEmittedFromLocationStructure,
+  newsArrayToStructure,
 } from "../Entity/News/News";
 import { locationManager } from "../Entity/Location/Manager/LocationManager";
 import { travelManager } from "./TravelManager";
@@ -10,9 +11,9 @@ import Report from "../Utils/Reporter";
 import { postman } from "../Entity/News/Postman";
 import { mergeNewsStructures } from "../Utils/mergeNewsStructure";
 import { gameState } from "./GameState";
-import { addToSubRegionScope } from "../Utils/addNewsToScope";
 import {drawSubRegionsWeatherCard} from "../Event/subRegionWeather.ts";
 import { drawGlobalEventCard } from "../Event/drawGlobalEventCard.ts";
+import { drawRegionEventCard } from "../Event/drawRegionEventCard.ts";
 import { market } from "../Entity/Market/Market.ts";
 
 export async function runSchedule() {
@@ -28,7 +29,6 @@ export async function runSchedule() {
 
   setTimeout(async () => {
     await runGameLoop();
-    // TODO: Can be repetitive,
     await runSchedule();
   }, delay);
 }
@@ -70,9 +70,8 @@ const nextScheduleTick = (now: Date) => {
   }
 };
 
-// TODO:: Mile stone consist of more than just Dating, it might have some events declaration, see example
 function handleGameMilestones(): NewsEmittedFromLocationStructure {
-  const { hour, dayOfWeek, dayOfSeason, season } = GameTime;
+  const { hour, dayOfSeason, season } = GameTime;
 
   let allNews: NewsEmittedFromLocationStructure = {
     worldScope: [],
@@ -119,38 +118,31 @@ function handleGameMilestones(): NewsEmittedFromLocationStructure {
   if ((dayOfSeason === 1 || dayOfSeason === 25) && hour === 1) {
     // New Month
     // Draw Region Event Card, Trigger event effect and update global event scale
-    /*
-      const card = drawRegionEventCard();
-      const result: NewsEmittedFromLocationStructure = card.effect(state);
-      allNews = mergeNewsStructures(allNews, result);
-    */
-  }
-
-  if (dayOfWeek === 1 && hour === 1) {
-    // Check if global event card is completed
-    if (gameState.activeGlobalEventCards?.completionCondition()) {
-      gameState.lastGlobalEventCardCompleted = true;
+    const regionCardNews = drawRegionEventCard();
+    
+    if (regionCardNews) {
+      allNews = mergeNewsStructures(allNews, regionCardNews);
     }
-    // New Week
-    // Draw Subregion Event Card
-    /*
-      const card = drawSubregionEventCard();
-      const result: NewsEmittedFromLocationStructure = card.effect(state);
-      allNews = mergeNewsStructures(allNews, result);
-    */
-    // Some events target a random location in that subregion
-    // If an event requires a ‘Location Specialty’, draw from that pile
-    // If a location lacks specialty events, proceed with no extra effect
   }
 
   if (hour === 1) {
+    // Check if global event card is completed
+    if (gameState.activeGlobalEventCards?.completionCondition()) {
+      // Call cleanup handler before marking as complete
+      if (gameState.activeGlobalEventCards.onEnd) {
+        gameState.activeGlobalEventCards.onEnd();
+        Report.info(`Global event "${gameState.activeGlobalEventCards.name}" ended, cleanup executed`);
+      }
+      gameState.lastGlobalEventCardCompleted = true;
+      gameState.completedGlobalEventCards.push(gameState.activeGlobalEventCards);
+      gameState.activeGlobalEventCards = undefined;
+    }
+    
     // New day
     // Draw weather cards for all subregions update accordingly
     const weatherNews = drawSubRegionsWeatherCard();
-
-    for (const wn of weatherNews) {
-      addToSubRegionScope(allNews, wn.context.subRegion, wn);
-    }
+    const weatherStruct = newsArrayToStructure(weatherNews);
+    allNews = mergeNewsStructures(allNews, weatherStruct);
   }
 
   return allNews;

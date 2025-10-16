@@ -34,6 +34,9 @@ export enum GlobalEventCardEnum {
 // Effect handler function - just do whatever you need
 export type EffectHandler = () => NewsEmittedFromLocationStructure;
 
+// Cleanup handler - called when card ends (no news needed)
+export type CleanupHandler = () => void;
+
 // Escalation threshold - triggers when scale crosses into this range
 export interface EscalationThreshold {
   minScale: number;
@@ -87,18 +90,24 @@ export function makeClimaxEvent(config: Partial<ClimaxEvent>): ClimaxEvent {
 
 export interface GlobalEventCardConfig {
   id: GlobalEventCardEnum;
+  name: string;
+  description: string;
   startingScale?: number;
   onDraw?: EffectHandler | undefined;
+  onEnd?: CleanupHandler | undefined; // Called when card completes - cleanup effects
   escalationTrack?: EscalationThreshold[];
   climaxEvent?: ClimaxEvent;
   completionCondition?: () => boolean;
 }
 
-function makeGlobalEventCardConfig(config: Partial<GlobalEventCardConfig>): GlobalEventCardConfig {
+export function makeGlobalEventCardConfig(config: Partial<GlobalEventCardConfig> & { id: GlobalEventCardEnum }): GlobalEventCardConfig {
     return {
-        id: config.id ?? GlobalEventCardEnum.BoringYear,
+        id: config.id,
+        name: config.name ?? "Unknown Event",
+        description: config.description ?? "",
         startingScale: config.startingScale ?? 250,
         onDraw: config.onDraw ?? undefined,
+        onEnd: config.onEnd ?? undefined,
         escalationTrack: config.escalationTrack ?? [],
         climaxEvent: config.climaxEvent ?? makeClimaxEvent({}),
         completionCondition: config.completionCondition ?? (() => true),

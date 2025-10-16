@@ -21,8 +21,10 @@ export class Market {
   // Cached modifiers (recalculated yearly)
   yearlyModifiers: Map<ResourceType, number> = new Map();
   
-  // Event-based price overrides (from global events, etc.)
-  eventModifiers: Map<Tradeable, number> = new Map();
+  // Event-based price modifiers (stacking system)
+  // Outer map: tradeable -> Inner map: eventId -> modifier
+  // Multiple events can affect the same resource, and they multiply together
+  eventModifiers: Map<Tradeable, Map<string, number>> = new Map();
   
   // Transaction history for market analysis
   transactionHistory: TransactionHistory = new Map();
@@ -73,14 +75,26 @@ export class Market {
       );
     }
     
-    // Apply event modifier if any
-    // Check both item-specific and resource-based event modifiers
-    const itemEventMod = this.eventModifiers.get(item.id as Tradeable) ?? 1.0;
-    const resourceEventMod = item.primaryResource 
-      ? (this.eventModifiers.get(item.primaryResource) ?? 1.0)
-      : 1.0;
+    // Apply event modifiers (multiply all active modifiers)
+    let eventMod = 1.0;
     
-    const eventMod = itemEventMod * resourceEventMod;
+    // Check item-specific modifiers
+    const itemModifiers = this.eventModifiers.get(item.id as Tradeable);
+    if (itemModifiers) {
+      for (const modifier of itemModifiers.values()) {
+        eventMod *= modifier;
+      }
+    }
+    
+    // Check resource-based modifiers
+    if (item.primaryResource) {
+      const resourceModifiers = this.eventModifiers.get(item.primaryResource);
+      if (resourceModifiers) {
+        for (const modifier of resourceModifiers.values()) {
+          eventMod *= modifier;
+        }
+      }
+    }
     
     return basePrice * yearlyMod * localMod * eventMod;
   }
@@ -108,7 +122,14 @@ export class Market {
       subRegionBaseline
     );
     
-    const eventMod = this.eventModifiers.get(resource) ?? 1.0;
+    // Apply all event modifiers (multiply them together)
+    let eventMod = 1.0;
+    const resourceModifiers = this.eventModifiers.get(resource);
+    if (resourceModifiers) {
+      for (const modifier of resourceModifiers.values()) {
+        eventMod *= modifier;
+      }
+    }
     
     return basePrice * yearlyMod * localMod * eventMod;
   }
@@ -134,20 +155,77 @@ export class Market {
   }
   
   /**
-   * Set event-based price modifier
+   * Set event-based price modifier (stacking system)
    * 
-   * Used by global event cards to affect prices
-   * Example: Great Famine increases grain prices by 50%
+   * Multiple events can affect the same resource, and they multiply together.
+   * Each event must provide a unique eventId for proper cleanup.
+   * 
+   * Example:
+   * - Global Event "Famine": setEventModifier("grain", 2.0, "GreatFamine")
+   * - Region Event "Drought": setEventModifier("grain", 1.3, "Drought_CentralPlain")
+   * - Final modifier: 2.0 × 1.3 = 2.6
+   * 
+   * @param tradeable - The resource or item to modify
+   * @param modifier - The price multiplier (1.0 = no change, 2.0 = double, 0.5 = half)
+   * @param eventId - Unique identifier for this event (used for cleanup)
    */
-  setEventModifier(tradeable: Tradeable, modifier: number): void {
-    this.eventModifiers.set(tradeable, modifier);
+  setEventModifier(tradeable: Tradeable, modifier: number, eventId: string): void {
+    if (!this.eventModifiers.has(tradeable)) {
+      this.eventModifiers.set(tradeable, new Map());
+    }
+    
+    const modifiers = this.eventModifiers.get(tradeable)!;
+    modifiers.set(eventId, modifier);
   }
   
   /**
-   * Clear event modifier
+   * Clear a specific event's modifier
+   * 
+   * Only removes the modifier for the specified event, leaving others intact.
+   * 
+   * @param tradeable - The resource or item
+   * @param eventId - The event identifier to remove
    */
-  clearEventModifier(tradeable: Tradeable): void {
-    this.eventModifiers.delete(tradeable);
+  clearEventModifier(tradeable: Tradeable, eventId: string): void {
+    const modifiers = this.eventModifiers.get(tradeable);
+    if (modifiers) {
+      modifiers.delete(eventId);
+      
+      // Clean up empty map
+      if (modifiers.size === 0) {
+        this.eventModifiers.delete(tradeable);
+      }
+    }
+  }
+  
+  /**
+   * Get the combined event modifier for a tradeable
+   * 
+   * Multiplies all active event modifiers together.
+   * 
+   * @param tradeable - The resource or item
+   * @returns Combined modifier (1.0 if no modifiers active)
+   */
+  getEventModifier(tradeable: Tradeable): number {
+    const modifiers = this.eventModifiers.get(tradeable);
+    if (!modifiers || modifiers.size === 0) {
+      return 1.0;
+    }
+    
+    let combined = 1.0;
+    for (const modifier of modifiers.values()) {
+      combined *= modifier;
+    }
+    return combined;
+  }
+  
+  /**
+   * Get all active event modifiers for a tradeable
+   * 
+   * Returns a map of eventId -> modifier for debugging/display
+   */
+  getEventModifiers(tradeable: Tradeable): Map<string, number> {
+    return this.eventModifiers.get(tradeable) ?? new Map();
   }
   
   /**

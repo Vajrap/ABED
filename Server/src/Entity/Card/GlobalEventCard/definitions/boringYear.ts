@@ -1,12 +1,13 @@
-import { type GlobalEventCard } from "../GlobalEventCard";
+import { GlobalEventCard } from "../GlobalEventCard";
 import { GlobalEventCardEnum } from "../types";
 
-export const boringYear: GlobalEventCard = {
+export const boringYear = new GlobalEventCard({
     id: GlobalEventCardEnum.BoringYear,
+    name: "A Boring Year",
+    description: "Nothing particularly interesting happens this year. The world continues as usual.",
     escalationTrack: [],
     startingScale: 250,
     onDraw: undefined,
-    completionCondition: function (): boolean {
-        return true
-    }
-}
+    onEnd: undefined,
+    completionCondition: () => true
+});

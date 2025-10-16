@@ -50,6 +50,7 @@ import { Weather } from "../../InterFacesEnumsAndTypes/Weather";
 import Report from "../../Utils/Reporter";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import { subregionRepository } from "../Repository/subregion";
+import type { ResourceType } from "../Market/types";
 
 export type UserInputAction = {
   type: ActionInput;
@@ -246,7 +247,8 @@ export class Location {
     if (candidates.length < 2) return result;
 
     const encounterPairs = pairEncounterCandidates(candidates);
-    const newsList = generateEncounterNews(encounterPairs);
+    // All Pairs might not end up well, some might fight so the generateNews Function might not be a good name
+    const newsList = resolveEncounters(encounterPairs);
 
     for (const n of newsList) {
       pushNewsToScope(result, n);
@@ -391,8 +393,8 @@ export class Location {
   }
 
   // Generate resources based on capacity and rates
-  refillResources(): Map<string, number> {
-    const generated = new Map<string, number>();
+  refillResources(): Map<ResourceType, number> {
+    const generated = new Map<ResourceType, number>();
     
     switch (GameTime.season) {
       case 1:
@@ -598,7 +600,7 @@ function pairEncounterCandidates(candidates: Party[]): [Party, Party][] {
   return pairs;
 }
 
-function generateEncounterNews(pairs: [Party, Party][]): News[] {
+function resolveEncounters(pairs: [Party, Party][]): News[] {
   const news: News[] = [];
   for (const [a, b] of pairs) {
     // Placeholder - replace with actual logic

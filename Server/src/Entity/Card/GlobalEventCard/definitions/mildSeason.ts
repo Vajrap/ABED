@@ -1,45 +1,93 @@
-// import { GlobalEventCardEnum, type GlobalEventCardConfig } from "../GlobalEventCard";
+import { GlobalEventCard } from "../GlobalEventCard";
+import { GlobalEventCardEnum } from "../types";
+import { locationRepository } from "../../../Repository/location";
+import { createNews, newsToStructure } from "../../../News/News";
+import { TierEnum } from "../../../../InterFacesEnumsAndTypes/Tiers";
 
-// /**
-//  * Mild Season - Simple beneficial minor event
-//  * 
-//  * From doc: "All crop RGC +5% this year"
-//  * 
-//  * This is the simplest type of event - just one effect for the year.
-//  */
-// export const MildSeasonCard: GlobalEventCardConfig = {
-//   id: GlobalEventCardEnum.MildSeason,
-//   name: "Mild Season",
-//   description: "Pleasant weather favors the crops this year",
+/**
+ * Mild Season - Simple beneficial minor event
+ * 
+ * From doc: "All crop RGC +5% this year"
+ * 
+ * Effect: Increases crop (grain, vegetables, fruits) capacity by 5% globally
+ * Duration: Until card completes (end of year)
+ * Cleanup: Restores original capacities
+ */
+
+// Store original capacities for restoration
+const originalCapacities = new Map<string, { grain: number; vegetables: number; fruits: number }>();
+
+export const mildSeason = new GlobalEventCard({
+  id: GlobalEventCardEnum.MildSeason,
+  name: "Mild Season",
+  description: "Pleasant weather favors the crops this year. Farmers enjoy a 5% boost to crop yields.",
   
-//   startingScale: 0,
-//   startingScale: 100,
+  startingScale: 100,
   
-//   onDraw: () => {
-//     // TODO: Apply crop bonus globally
-//     // - Increase grain, vegetables, fruits RGC by 5%
-//     // - Add news: "Farmers shrug and say, 'Not the best, not the worst. A decent season.'"
+  onDraw: () => {
+    // Apply 5% boost to all crop capacities globally
+    for (const location of locationRepository.values()) {
+      // Store original values for cleanup
+      originalCapacities.set(location.id, {
+        grain: location.resourceGeneration.capacity.grain,
+        vegetables: location.resourceGeneration.capacity.vegetables,
+        fruits: location.resourceGeneration.capacity.fruits,
+      });
+      
+      // Apply 5% boost
+      location.resourceGeneration.capacity.grain = Math.floor(
+        location.resourceGeneration.capacity.grain * 1.05
+      );
+      location.resourceGeneration.capacity.vegetables = Math.floor(
+        location.resourceGeneration.capacity.vegetables * 1.05
+      );
+      location.resourceGeneration.capacity.fruits = Math.floor(
+        location.resourceGeneration.capacity.fruits * 1.05
+      );
+    }
     
-//     console.log("Mild Season: All crops +5%");
-//   },
+    // Generate news
+    const news = createNews({
+      scope: {
+        kind: "worldScope",
+      },
+      tokens: [{
+        t: "text",
+        v: "Pleasant weather graces the lands this year. Farmers shrug and say, 'Not the best, not the worst. A decent season.'"
+      }],
+      context: {
+        region: undefined as any,
+        subRegion: undefined as any,
+        location: undefined as any,
+        partyId: "",
+        characterIds: []
+      },
+      secretTier: TierEnum.common
+    });
+    
+    // Auto-map news to structure based on scope
+    return newsToStructure(news);
+  },
   
-//   escalationTrack: [
-//     {
-//       minScale: 0,
-//       maxScale: 100,
-//       narrative: "The weather remains pleasantly mild throughout the year.",
-//       effects: [
-//         () => {
-//           // Ongoing effect (if needed) - maintains the +5% bonus
-//         }
-//       ]
-//     }
-//   ],
+  onEnd: () => {
+    // Restore original capacities
+    for (const location of locationRepository.values()) {
+      const original = originalCapacities.get(location.id);
+      if (original) {
+        location.resourceGeneration.capacity.grain = original.grain;
+        location.resourceGeneration.capacity.vegetables = original.vegetables;
+        location.resourceGeneration.capacity.fruits = original.fruits;
+      }
+    }
+    
+    // Clear stored values
+    originalCapacities.clear();
+  },
   
-//   // No climax - just naturally completes at year end
-//   completionCondition: (scale: number) => {
-//     // Card completes at end of year (checked by game loop)
-//     return scale >= 100;
-//   }
-// };
+  // Card completes at end of year (checked daily)
+  completionCondition: () => {
+    // Will be completed by GameLoop when year ends
+    return true;
+  }
+});
 
