@@ -46,7 +46,7 @@ function swapPart<K extends PartKind>(
   if (prevCombo) prevCombo.deactivate(char);
 
   // 2) turn OFF the old part if it exists
-  if (currentId) repoGet(currentId)?.deactive(char);
+  if (currentId) repoGet(currentId)?.deactivate(char);
 
   // 3) write new id
   setCurrent(nextId);

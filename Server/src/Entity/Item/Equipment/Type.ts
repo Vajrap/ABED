@@ -7,6 +7,9 @@ import type {
 import type { BuffsAndDebuffsEnum } from "../../BuffsAndDebuffs/enum";
 import type { TraitEnum } from "../../Trait.ts/enum";
 
+/**
+ * Equipment modifier type - defines stat bonuses and effects from equipment
+ */
 export type EquipmentModifier = {
   attributes?: Partial<Record<AttributeKey, number>>;
   proficiencies?: Partial<Record<ProficiencyKey, number>>;

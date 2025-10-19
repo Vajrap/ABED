@@ -1,15 +1,27 @@
+import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import {
   CharacterEquipmentSlot,
   EquipmentSlot,
 } from "../../../InterFacesEnumsAndTypes/Enums";
-import { Item, type ItemId } from "../Item";
-import type { EquipmentModifier } from "./Type";
+import { Item } from "../Item";
+import type { EquipmentId } from "./repository";
+import { type EquipmentModifier } from "./type";
+import type { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
+import type { ItemCost } from "../Subclass/ItemCost";
 
+/**
+ * Base Equipment class
+ * All equipment items (weapons, armor) extend from this
+ */
 export class Equipment extends Item {
+  // Override to narrow type from ItemId to EquipmentId
+  declare id: EquipmentId;
+  
   slot: EquipmentSlot;
   modifier: EquipmentModifier;
+  
   constructor(
-    data: Partial<Item>,
+    data: Item,
     slot: EquipmentSlot,
     modifier: EquipmentModifier,
   ) {
@@ -19,8 +31,9 @@ export class Equipment extends Item {
   }
 }
 
-export const equipmentRepo: Map<ItemId, Equipment> = new Map();
-
+/**
+ * Check if equipment slot is compatible with character equipment slot
+ */
 export function isCompatible(
   equipSlot: EquipmentSlot,
   target: CharacterEquipmentSlot,

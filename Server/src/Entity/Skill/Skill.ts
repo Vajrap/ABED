@@ -1,50 +1,55 @@
-import type { CharacterInterface } from "../../InterFacesEnumsAndTypes/CharacterInterface";
-import { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
+import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
-import type { TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 import type { Character } from "../Character/Character";
 import type { Location } from "../Location/Location";
-import { locationRepository } from "../Repository/location";
 import type { SkillId } from "./enums";
-import type { SkillLearningRequirement } from "./types";
+import type {
+  SkillConsume,
+  SkillLearningRequirement,
+  SkillProduce,
+  TurnResult,
+} from "./types";
+import type { ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
 
-/*
-Skill Execution Context
-- Location
-- Weather, is it in Location?
-- Time of day
-*/
 export class Skill {
   id: SkillId;
-  name: string;
+  name: L10N;
   tier: TierEnum;
-  description: string;
+  description: L10N;
   requirement: SkillLearningRequirement;
-  exec: (user: Character, target: Character, location: Location, timeOfDay: TimeOfDay) => TurnResult;
+  equipmentNeeded: ProficiencyKey[];
+  consume: SkillConsume;
+  produce: SkillProduce;
+  exec: (
+    user: Character,
+    target: Character,
+    skillLevel: number,
+    location: Location,
+  ) => TurnResult;
   constructor(data: {
     id: SkillId;
-    name: string;
+    name: L10N;
     tier: TierEnum;
-    description: string;
+    description: L10N;
     requirement: SkillLearningRequirement;
-    exec: (user: Character, target: Character) => TurnResult;
+    equipmentNeeded: ProficiencyKey[];
+    consume: SkillConsume;
+    produce: SkillProduce;
+    exec: (
+      user: Character,
+      target: Character,
+      skillLevel: number,
+      location: Location,
+    ) => TurnResult;
   }) {
     this.id = data.id;
     this.name = data.name;
     this.tier = data.tier;
     this.description = data.description;
     this.requirement = data.requirement;
+    this.equipmentNeeded = data.equipmentNeeded;
+    this.consume = data.consume;
+    this.produce = data.produce;
     this.exec = data.exec;
   }
-}
-
-export type TurnResult = {
-  // This would be added to battle report
-  // it should also tell FE how to render the battle scene UI
-  // So, Who, do what (to whom)
-  who: CharacterInterface;
-  do: string;
-  to: CharacterInterface;
-  // Maybe we need to add some more context here, like damage, buff, debuff, etc
-  context: any;
 }

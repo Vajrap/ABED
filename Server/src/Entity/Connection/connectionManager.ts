@@ -42,17 +42,17 @@ class ConnectionManager {
 
   private isMatch(scope: NewsScope, context: ClientContext): boolean {
     switch (scope.kind) {
-      case "world":
+      case "worldScope":
         return true;
-      case "region":
+      case "regionScope":
         return context.regionId === scope.region;
-      case "subRegion":
+      case "subRegionScope":
         return context.subRegionId === scope.subRegion;
-      case "location":
+      case "locationScope":
         return context.locationId === scope.location;
-      case "party":
+      case "partyScope":
         return context.partyId === scope.partyId;
-      case "private":
+      case "privateScope":
         return context.characterId === scope.characterId;
       default:
         return false;

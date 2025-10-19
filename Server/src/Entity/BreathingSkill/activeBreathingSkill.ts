@@ -23,6 +23,10 @@ export function deactiveBreathingSkill(
 // From the looks of it, this means when character 'train' the internal skill, or when it level goes up, we need to deactive it first, to make sure the passive stats given won't be wrong
 const testInt = new BreathingSkill({
   id: BreathingSkillId.test,
+  name: {
+    en: "Test Internal",
+    th: "ทดสอบภายใน"
+  },
   type: ELEMENT_KEYS[0],
   tier: TierEnum.common,
   activateEffect: {

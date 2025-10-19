@@ -1,9 +1,9 @@
-import type { Range } from "../../../../InterFacesEnumsAndTypes/Types";
+import type { Range } from "src/InterFacesEnumsAndTypes/Types.ts";
 
 export class DeckCondition {
   selectedCondition: "NONE" | "SELF" | "TEAMMATE" | "ENEMY" | "PARTY_SIZE";
   self: VitalCondition | undefined;
-  teammate: { position: number[]; vital: VitalCondition } | undefined; //If any team mate within position met the condition
+  teammate: { position: number[]; vital: VitalCondition } | undefined; //If any teammate within position met the condition
   enemy: VitalCondition | undefined; //If 'any' enemy met the condition
   partySize: "SMALLER" | "LARGER" | undefined;
   constructor(data: {

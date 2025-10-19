@@ -5,9 +5,9 @@ import {
   type ArtisanKey,
   type AttributeKey,
   type ProficiencyKey,
-} from "../../../../InterFacesEnumsAndTypes/Enums";
-import { rollTwenty } from "../../../../Utils/Dice";
-import { statMod } from "../../../../Utils/statMod";
+} from "src/InterFacesEnumsAndTypes/Enums.ts";
+import { rollTwenty } from "src/Utils/Dice.ts";
+import { statMod } from "src/Utils/statMod.ts";
 import type { Character } from "../../Character";
 import { addBaseVitals } from "../Vitals/addBaseVitals";
 import type { StatBlock } from "./CharacterStatArchetype";
@@ -108,7 +108,7 @@ function levelUp(character: Character): Character {
   }
 
   addBaseVitals(character);
-  
+
   return character;
 }
 

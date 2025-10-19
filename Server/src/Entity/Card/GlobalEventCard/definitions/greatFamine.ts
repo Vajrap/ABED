@@ -2,7 +2,7 @@ import { GlobalEventCard } from "../GlobalEventCard";
 import { GlobalEventCardEnum } from "../types";
 import { market } from "../../../Market/Market";
 import { createNews, newsToStructure } from "../../../News/News";
-import { TierEnum } from "../../../../InterFacesEnumsAndTypes/Tiers";
+import { NewsSignificance } from "../../../../InterFacesEnumsAndTypes/NewsEnums";
 
 /**
  * Great Famine - Major food shortage event
@@ -18,8 +18,14 @@ import { TierEnum } from "../../../../InterFacesEnumsAndTypes/Tiers";
 
 export const greatFamine = new GlobalEventCard({
   id: GlobalEventCardEnum.GreatFamine,
-  name: "The Great Famine",
-  description: "A catastrophic famine sweeps across the lands. Food becomes scarce and expensive.",
+  name: {
+    en: "The Great Famine",
+    th: "การกันแคล้นคลาดครั้งใหญ่"
+  },
+  description: {
+    en: "A catastrophic famine sweeps across the lands. Food becomes scarce and expensive.",
+    th: "ความอดอยากครั้งใหญ่แผ่คลุมไปทั่วดินแดน อาหารขาดแคลนและราคาแพง"
+  },
   
   startingScale: 150,
   
@@ -37,10 +43,10 @@ export const greatFamine = new GlobalEventCard({
       scope: {
         kind: "worldScope",
       },
-      tokens: [{
-        t: "text",
-        v: "A great famine strikes the world! Crops fail across all regions. Food prices soar as desperate people scramble for sustenance. Starvation threatens many settlements."
-      }],
+      content: {
+        en: "A great famine strikes the world! Crops fail across all regions. Food prices soar as desperate people scramble for sustenance. Starvation threatens many settlements.",
+        th: "ความอดอยากครั้งใหญ่โจมตีโลก! พืชผลล้มเหลวในทุกภูมิภาค ราคาอาหารพุ่งสูงขึ้นขณะที่ผู้คนต่อสู้เพื่อหาอาหาร ความอดอยากคุกคามหลายชุมชน"
+      },
       context: {
         region: undefined as any,
         subRegion: undefined as any,
@@ -48,7 +54,7 @@ export const greatFamine = new GlobalEventCard({
         partyId: "",
         characterIds: []
       },
-      secretTier: TierEnum.rare
+      significance: NewsSignificance.MOMENTOUS
     });
     
     // Auto-map news to structure based on scope

@@ -567,12 +567,12 @@ describe("Character", () => {
     });
 
     it("should initialize with default abGuage", () => {
-      expect(character.abGuage).toBe(0);
+      expect(character.abGauge).toBe(0);
     });
 
     it("should have proper informations object", () => {
-      expect(character.informations).toEqual({});
-      expect(typeof character.informations).toBe("object");
+      expect(character.information).toEqual({});
+      expect(typeof character.information).toBe("object");
     });
 
     it("should allow activeBreathingSkill to be null", () => {

@@ -1,68 +1,92 @@
+import type { DamageType } from "../../../../InterFacesEnumsAndTypes/DamageTypes";
 import {
   DiceEnum,
   EquipmentSlot,
   type AttributeKey,
+  type ProficiencyKey,
 } from "../../../../InterFacesEnumsAndTypes/Enums";
 import type { Item } from "../../Item";
 import { Equipment } from "../Equipment";
-import type { EquipmentModifier } from "../Type";
+import type { EquipmentModifier } from "../type";
+import type { WeaponId } from "./type";
 
-export class Weapon extends Equipment {
-  weaponData: WeaponData;
+/**
+ * Weapon positioning/range types
+ */
+export enum WeaponPosition {
+  Melee = "Melee",
+  Ranged = "Ranged",
+  Versatile = "Versatile", // Can be used in both melee and ranged
+}
+
+/**
+ * Generic WeaponData type
+ * T = ProficiencyKey (weapon type like "sword", "axe", etc.)
+ * P = WeaponPosition (Melee/Ranged/Versatile)
+ *
+ * By using generics, each specific weapon class can narrow both properties!
+ */
+export type WeaponData<
+  T extends ProficiencyKey = ProficiencyKey,
+  P extends WeaponPosition = WeaponPosition,
+> = {
+  weaponType: T;
+  preferredPosition: P;
+  handle: 1 | 2;
+  damage: DamageData;
+};
+
+type DamageData = {
+  physicalDamageDice: {
+    face: number;
+    dice: number;
+  };
+  magicalDamageDice: {
+    dice: number;
+    face: number;
+  };
+  physicalDamageType: DamageType;
+  magicalDamageType: DamageType;
+  physicalDamageStat: AttributeKey[];
+  magicalDamageStat: AttributeKey[];
+  physicalHitStat: AttributeKey[];
+  magicalHitStat: AttributeKey[];
+  physicalCritStat: AttributeKey[];
+  magicalCritStat: AttributeKey[];
+};
+
+/**
+ * Base Weapon class with generics for type narrowing
+ * T = ProficiencyKey (weapon type)
+ * P = WeaponPosition
+ *
+ * Each specific weapon class (Sword, Axe, etc.) will narrow these types
+ */
+export class Weapon<
+  T extends ProficiencyKey = ProficiencyKey,
+  P extends WeaponPosition = WeaponPosition,
+> extends Equipment {
+  // Override to narrow type from EquipmentId to WeaponId
+  declare id: WeaponId;
+  weaponData: WeaponData<T, P>;
+
   constructor(
-    data: Partial<Item>,
+    data: Item,
     modifier: EquipmentModifier,
-    weaponData: WeaponData,
+    weaponData: WeaponData<T, P>,
   ) {
     super(data, EquipmentSlot.weapon, modifier);
     this.weaponData = weaponData;
   }
-}
 
-type WeaponData = {
-  handle: 1 | 2;
-  requirement: any; // should be used to compare with character stat base if surpassed the threshold => 100% usability, else will get least damage and accuracy but wearable
-  physical: DamageData;
-  magical: DamageData;
-};
+  /**
+   * Convenience getters for locked weapon properties
+   */
+  get weaponType(): T {
+    return this.weaponData.weaponType;
+  }
 
-type DamageData = {
-  dice: DiceEnum;
-  damageType: DamageType;
-  damageStat: AttributeKey;
-  hitStat: AttributeKey;
-  critStat: AttributeKey;
-};
-
-enum DamageType {
-  // Physical
-  slash = "slash",
-  blunt = "blunt",
-  pierce = "pierce",
-  // Elemental - Magical
-  order = "order",
-  chaos = "chaos",
-  fire = "fire",
-  earth = "earth",
-  water = "water",
-  air = "air",
-  // 2nd tier
-  ice = "ice",
-  spirit = "spirit",
-  lightning = "lightning",
-  demonic = "demonic",
-  metal = "metal",
-  angelic = "angelic",
-  // 3rd tier
-  nature = "nature",
-  life = "life",
-  dark = "dark",
-  necrotic = "necrotic",
-  poison = "poison",
-  holy = "holy",
-  // all elements
-  arcane = "arcane",
-
-  // ???
-  resource = "resource",
+  get preferredPosition(): P {
+    return this.weaponData.preferredPosition;
+  }
 }

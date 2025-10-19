@@ -90,7 +90,6 @@ export interface News {
 export function createNews(data: {
   scope: NewsScope;
   content: L10N;  // NEW: Required L10N content
-  tokens?: NewsToken[];  // DEPRECATED: Optional for migration
   origin?: {
     location?: LocationsEnum;
     partyId?: string;
@@ -121,7 +120,6 @@ export function createNews(data: {
     scope: data.scope,
     tags: data.tags,
     content: data.content,
-    tokens: data.tokens,  // Optional, for backwards compat
     context: data.context,
     significance: defaultSignificance,
     propagation: defaultPropagation,

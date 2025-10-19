@@ -1,17 +1,18 @@
 import { type EscalationThreshold, type ClimaxEvent, type EffectHandler, type CleanupHandler, makeClimaxEvent, GlobalEventCardEnum, type GlobalEventCardConfig } from "./types";
+import type { L10N } from "src/InterFacesEnumsAndTypes/L10N.ts";
 
 
 export class GlobalEventCard {
   id: GlobalEventCardEnum;
-  name: string;
-  description: string;
+  name: L10N;
+  description: L10N;
   startingScale: number;
   onDraw: EffectHandler | undefined;
   onEnd: CleanupHandler | undefined;
   escalationTrack: EscalationThreshold[];
   climaxEvent?: ClimaxEvent;
   completionCondition: () => boolean;
-  
+
   constructor(config: GlobalEventCardConfig) {
     this.id = config.id;
     this.name = config.name;
@@ -21,9 +22,9 @@ export class GlobalEventCard {
     this.onEnd = config.onEnd ?? undefined;
     this.escalationTrack = config.escalationTrack ?? [];
     this.climaxEvent = config.climaxEvent ?? makeClimaxEvent({});
-    
-    this.completionCondition = config.completionCondition ?? 
+
+    this.completionCondition = config.completionCondition ??
       (() => true);
   }
- 
+
 }

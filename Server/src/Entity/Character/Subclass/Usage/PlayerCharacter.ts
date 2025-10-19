@@ -1,4 +1,4 @@
-import type { CharacterType } from "../../../../InterFacesEnumsAndTypes/Enums";
+import type { CharacterType } from "src/InterFacesEnumsAndTypes/Enums.ts";
 import { Character } from "../../Character";
 import type { CharacterActionSequence } from "../Action/CharacterAction";
 import type { CharacterAlignment } from "../Alignment/CharacterAlignment";
@@ -10,6 +10,7 @@ import type { CharacterBattleStats } from "../Stats/CharacterBattleStats";
 import type { CharacterElements } from "../Stats/CharacterElements";
 import type { CharacterProficiencies } from "../Stats/CharacterProficiencies";
 import type { CharacterVitals } from "../Vitals/CharacterVitals";
+import type {L10N} from "src/InterFacesEnumsAndTypes/L10N.ts";
 
 export class PlayerCharacter extends Character {
     userId: string
@@ -17,7 +18,7 @@ export class PlayerCharacter extends Character {
         userId: string,
         data: {
         id: string;
-        name: string;
+        name: L10N;
         type: CharacterType;
         gender?: "MALE" | "FEMALE" | "NONE";
         level: number;

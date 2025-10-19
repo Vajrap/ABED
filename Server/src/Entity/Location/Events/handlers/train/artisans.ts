@@ -1,7 +1,6 @@
-import type { ArtisanKey } from "../../../../../InterFacesEnumsAndTypes/Enums";
-import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
-import { rollTwenty } from "../../../../../Utils/Dice";
-import { statMod } from "../../../../../Utils/statMod";
+import type { ArtisanKey } from "src/InterFacesEnumsAndTypes/Enums.ts";
+import { rollTwenty } from "src/Utils/Dice.ts";
+import { statMod } from "src/Utils/statMod.ts";
 import type { Character } from "../../../../Character/Character";
 import {
   createNews,
@@ -38,27 +37,24 @@ export function handleTrainArtisans(
 
       gainStatTracker(character, statTrackGain);
     }
+
+      // {
+      //     en: `[char:${character.id}]${character.name}[/char] has taken a rest`,
+      //         th: `[char:${character.id}]${character.name}[/char] พักผ่อน`
+      // },
+      // {
+      //     characters: [character]  // ← Auto-generates tooltip!
+      // }
     const news = createNews({
-      scope: {
-        kind: "privateScope",
-        characterId: character.id,
-      },
-      tokens: [
-        {
-          t: "char",
-          v: [
-            {
-              name: character.name,
-              title: character.title.string(),
-              fame: character.fame.getString(context.subRegion),
-              portrait: character.portrait ? character.portrait : "",
-              level: character.level,
-            },
-          ],
+        content: {
+            en: `[char:${character.id}]${character.name.en} has trained in ${target}`,
+            th: `[char:${character.id}]${character.name.th} ได้ฝึกฝน ${target}`,
         },
-      ],
-      context,
-      secretTier: TierEnum.rare
+        scope: {
+            kind: "privateScope",
+            characterId: character.id,
+        },
+      context
     });
     results.push(news);
   }

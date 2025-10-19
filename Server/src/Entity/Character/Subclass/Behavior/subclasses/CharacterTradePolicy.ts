@@ -2,29 +2,29 @@
 // 1) CharacterTradePolicy (personal, consent-driven)
 // =================================================
 
-import type { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
+import type { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers.ts";
 import type { ItemId } from "../../../../Item/Item";
 
 /*
 		Trade System Flags:
 		This system determines how a party engages in trade, including buying and selling behavior.
 
-		: tradeEngagement - Determines if the party will engage in trade.
+		TradeEngagement - Determines if the party will engage in trade.
 			- "trade": The party participates in trade.
 			- "noTrade": The party does not engage in trade.
 
 		-------------------
 		SELLING CONFIGURATION
 		-------------------
-		: selling.strategy - Defines how the party sells items.
+		Selling.strategy - Defines how the party sells items.
 			- "sellSome": The party sells items if they meet stock and rarity criteria.
 			- "sellNone": The party does not sell items.
 			- "sellAtMarkUp": The party sells items if their price exceeds a certain threshold (based on market price)
 			while also meeting stock and rarity criteria.
 
-		: selling.markupPercentage - The percentage above the base price at which items will be sold (only applies to "sellAtMarkUp").
-		: selling.rarityThreshold - The **maximum** rarity of an item that can be sold.
-		: selling.itemList - List of items the party is willing to sell.
+		Selling.markupPercentage - The percentage above the base price at which items will be sold (only applies to "sellAtMarkUp").
+		Selling.rarityThreshold - The **maximum** rarity of an item that can be sold.
+		Selling.itemList - List of items the party is willing to sell.
 			- Each entry contains:
 				- `itemName: string` → Name of the item.
 				- `stockThreshold: number` → Minimum stock required before selling.
@@ -34,15 +34,15 @@ import type { ItemId } from "../../../../Item/Item";
 		-------------------
 		BUYING CONFIGURATION
 		-------------------
-		: buying.strategy - Defines how the party buys items.
+		Buying.strategy - Defines how the party buys items.
 			- "buySome": The party buys items if they meet stock and rarity criteria.
 			- "buyNone": The party does not buy items.
 			- "buyAtDiscount": The party buys items if their price drops below a certain threshold (based on market price)
 			while also meeting stock and rarity criteria.
 
-		: buying.discountPercentage - The percentage below the base price at which items will be purchased (only applies to "buyAtDiscount").
-		: buying.rarityThreshold - The **minimum** rarity of an item that can be purchased.
-		: buying.itemList - List of items the party is willing to buy.
+		Buying.discountPercentage - The percentage below the base price at which items will be purchased (only applies to "buyAtDiscount").
+		Buying.rarityThreshold - The **minimum** rarity of an item that can be purchased.
+		Buying.itemList - List of items the party is willing to buy.
 			- Each entry contains:
 				- `itemName: string` → Name of the item.
 				- `stockThreshold: number` → Maximum stock the party wants to keep.

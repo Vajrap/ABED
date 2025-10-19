@@ -1,11 +1,14 @@
+import type { CharacterInterface } from "src/InterFacesEnumsAndTypes/CharacterInterface";
 import type {
   ArtisanKey,
   AttributeKey,
   ElementKey,
+  ElementResourceKey,
   ProficiencyKey,
 } from "../../InterFacesEnumsAndTypes/Enums";
 import type { TraitEnum } from "../Trait.ts/enum";
 import type { SkillId } from "./enums";
+import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
 export type SkillLearningRequirement = Partial<{
   reqCharacterLevel: number;
@@ -20,3 +23,39 @@ export type SkillLearningRequirement = Partial<{
 export type SkillLearnResult =
   | { success: true; learned: boolean; progress?: number }
   | { success: false; reason: "already_known" | "missing_requirements" };
+
+export type SkillConsume = {
+  hp: number;
+  mp: number;
+  sp: number;
+  elements: ElementConsume[];
+};
+
+export type SkillProduce = {
+  hp: number;
+  mp: number;
+  sp: number;
+  elements: ElementProduce[];
+};
+
+export type ElementConsume = {
+  element: ElementResourceKey;
+  value: number;
+};
+
+export type ElementProduce = {
+  element: ElementResourceKey;
+  min: number;
+  max: number;
+};
+
+export type TurnResult = {
+  content: L10N;
+  actor: ActorEffectPair;
+  targets: ActorEffectPair[];
+};
+
+export type ActorEffectPair = {
+  actorId: string;
+  effect: string;
+};

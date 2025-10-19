@@ -1,4 +1,4 @@
-import { clamp } from "../../../../Utils/clamp";
+import { clamp } from "src/Utils/clamp.ts";
 
 class Vital {
   base: number;

@@ -44,22 +44,22 @@ export class CharacterService {
     try {
       // 1. Create the Character entity
       const character = this.createCharacter(userId, characterData);
-      
+
       // 2. Create party for the character
       const party = PartyService.createParty(character, LocationsEnum.None);
       character.partyID = party.partyID;
-      
+
       // 3. Manager are for easy access to characters and parties
       characterManager.addCharacter(character);
       partyManager.addParty(party);
-      
+
       // 4. Save to database
       const insertCharacter = this.characterToInsertCharacter(character);
       await this.saveCharacterToDatabase(insertCharacter);
-      
+
       const insertParty = PartyService.partyToInsertParty(party);
       await PartyService.savePartyToDatabase(insertParty);
-      
+
       // 5. Return success, no need for character data, FE will fetch it later
       return {
         success: true,
@@ -80,7 +80,7 @@ export class CharacterService {
       id: character.id,
       userId: character.userId!,
       partyID: character.partyID,
-      
+
       // Basic info
       name: character.name,
       gender: character.gender,
@@ -89,7 +89,7 @@ export class CharacterService {
       level: character.level,
       portrait: character.portrait,
       background: character.background,
-      
+
       // Character systems - serialize to JSON
       alignment: character.alignment as any,
       artisans: character.artisans as any,
@@ -105,8 +105,8 @@ export class CharacterService {
       possibleEpithets: character.possibleEpithets as any,
       possibleRoles: character.possibleRoles as any,
       actionSequence: character.actionSequence as any,
-      informations: character.informations as any,
-      
+      informations: character.information as any,
+
       // Skills
       skills: character.skills as any,
       activeSkills: character.activeSkills as any,
@@ -117,26 +117,26 @@ export class CharacterService {
       activeBreathingSkill: character.activeBreathingSkill as any,
       breathingSkillsLearningProgress: character.breathingSkillsLearningProgress as any,
       planarAptitude: character.planarAptitude as any,
-      
+
       // Social
       relations: character.relations as any,
       traits: character.traits as any,
-      
+
       // Inventory
       inventorySize: character.inventorySize as any,
       inventory: character.inventory as any,
       equipments: character.equipments as any,
-      
+
       // State
       statTracker: character.statTracker,
-      abGuage: character.abGuage,
-      
+      abGuage: character.abGauge,
+
       // Audit
       createdBy: "system",
       updatedBy: "system",
     };
   }
-  
+
   static createCharacter(
     userId: string,
     characterData: CharacterCreationData
@@ -160,7 +160,7 @@ export class CharacterService {
     if (!raceDef || !classDef || !backgroundDef) {
       throw new Error("Invalid race, class, or background definition");
     }
-    
+
     // Create character data (matching Character entity structure)
     const newCharacter = new Character({
       // random uuid as string
@@ -171,14 +171,14 @@ export class CharacterService {
       level: 1,
       portrait: characterData.portrait,
       background: characterData.background,
-      
+
       alignment: new CharacterAlignment({}),
 
       // Character systems
       artisans: new CharacterArtisans(),
       attribute: new CharacterAttributes(),
       proficiencies: new CharacterProficiencies(),
-      
+
       battleStats: new CharacterBattleStats(),
       elements: new CharacterElements(),
       needs: new CharacterNeeds(),
@@ -231,7 +231,7 @@ export class CharacterService {
 
     return newCharacter;
   }
-  
+
   static async saveCharacterToDatabase(character: InsertCharacter): Promise<{ character: InsertCharacter; id: string }> {
     let savedCharacter;
     try {

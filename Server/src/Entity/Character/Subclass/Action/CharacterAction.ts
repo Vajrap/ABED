@@ -2,8 +2,8 @@ import type {
   ArtisanKey,
   AttributeKey,
   ProficiencyKey,
-} from "../../../../InterFacesEnumsAndTypes/Enums";
-import { DayOfWeek, TimeOfDay } from "../../../../InterFacesEnumsAndTypes/Time";
+} from "src/InterFacesEnumsAndTypes/Enums.ts";
+import { DayOfWeek, TimeOfDay } from "src/InterFacesEnumsAndTypes/Time.ts";
 import type { BookId, ItemId } from "../../../Item/Item";
 import type { SkillId } from "../../../Skill/enums";
 

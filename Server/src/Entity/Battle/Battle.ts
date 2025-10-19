@@ -2,9 +2,12 @@ import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location
 import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 import { statMod } from "../../Utils/statMod";
 import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
+import { buffsAndDebuffsRepository } from "../BuffsAndDebuffs/repository";
 import type { Character } from "../Character/Character";
 import type { Location } from "../Location/Location";
 import type { Party } from "../Party/Party";
+import { BattleReport } from "./BattleReport";
+import { battleTypeConfig, type BattleType } from "./types";
 
 export class Battle {
   id: string;
@@ -27,7 +30,12 @@ export class Battle {
     this.isOngoing = true;
     this.partyA = partyA;
     this.partyB = partyB;
-    this.battleReport = new BattleReport(partyA, partyB, location.id, gameTime);
+    this.battleReport = new BattleReport(
+      partyA,
+      partyB,
+      location.id,
+      battleType,
+    );
     this.location = location;
     this.gameTime = gameTime;
     this.battleType = battleType;
@@ -59,7 +67,7 @@ export class Battle {
           continue;
         }
 
-        if (updateAbGuage(actor)) {
+        if (updateAbGaugeAndDecideTurnTaking(actor)) {
           turnCount++;
           // resolveBuffAndDebuff
           const buffResolveResult = resolveBuffAndDebuff(actor);
@@ -71,7 +79,7 @@ export class Battle {
             this.allParticipants.push(
               this.allParticipants.shift() as Character,
             );
-          } else if (buffResolveResult.ableToTakesTurn === false) {
+          } else {
             // let reason = buffResolveResult.reason;
             // Update battle report, maybe just
             // result = {character, can't take turn, because of} and this.battleReport.results.push(result)
@@ -280,32 +288,19 @@ enum BattleStatus {
   DRAW_END = "DRAW_END",
 }
 
-function updateAbGuage(actor: Character): boolean {
+function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
   let abGaugeIncrement = Math.max(
     statMod(actor.attribute.getStat("agility").total),
     1,
   );
-  // let abGaugeIncrement = Math.max(actor.attribute.agility(), 10);
-  const hasteBuff = actor.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.haste);
-  const slowBuff = actor.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.slow);
-  const timeWarpBuff = actor.buffsAndDebuffs.entry.get(
-    BuffsAndDebuffsEnum.timeWarp,
-  );
-  if (hasteBuff && (hasteBuff.value || hasteBuff.permValue)) {
-    abGaugeIncrement *= Math.pow(2, hasteBuff.value + hasteBuff.permValue);
-  }
-  if (slowBuff && (slowBuff.value || slowBuff.permValue)) {
-    abGaugeIncrement /= Math.pow(2, slowBuff.value + slowBuff.permValue);
-  }
-  if (timeWarpBuff && (timeWarpBuff.value || timeWarpBuff.permValue)) {
-    abGaugeIncrement += 25 * (timeWarpBuff.value + timeWarpBuff.permValue);
-  }
-  actor.abGuage += abGaugeIncrement;
 
-  if (actor.abGuage >= 20) {
-    actor.abGuage = 0;
+  actor.abGauge += abGaugeIncrement;
+
+  if (actor.abGauge >= 10) {
+    actor.abGauge = 0;
     return true;
   }
+
   return false;
 }
 
@@ -320,71 +315,39 @@ const unresolved = {
 
 function resolveBuffAndDebuff(actor: Character): {
   ableToTakesTurn: boolean;
-  reason?: BuffsAndDebuffsEnum;
+  reason: BuffsAndDebuffsEnum | undefined;
 } {
+  let ableToTakesTurn = true;
+  let reason;
+
+  for (const [buffsOrDebuffs, entry] of actor.buffsAndDebuffs.entry) {
+    // Safe guard, no 0 buffs resolve
+    if (entry.value === 0 && entry.permValue === 0) {
+      return { ableToTakesTurn, reason };
+    }
+
+    if (
+      !buffsAndDebuffsRepository[buffsOrDebuffs].resolver(actor) &&
+      ableToTakesTurn
+    ) {
+      ableToTakesTurn = false;
+      reason = buffsOrDebuffs;
+    }
+  }
+
   return {
-    ableToTakesTurn: true,
+    ableToTakesTurn,
+    reason,
   };
 }
 
 function startActorTurn(actor: Character): void {
   // TODO
+  actor.replenishResource();
 }
 
-export class BattleReport {
-  constructor(
-    partyA: Party,
-    partyB: Party,
-    location: LocationsEnum,
-    gameTime: GameTimeInterface,
-  ) {}
-}
-
-export enum BattleType {
-  Normal = "Normal",
-  Training = "Training",
-  Arena = "Arena",
-  Scripted = "Scripted",
-  NoReward = "NoReward",
-}
-
-export const battleTypeConfig: Record<
-  BattleType,
-  {
-    allowXP: boolean;
-    allowLoot: boolean;
-    resetHealth: boolean;
-    allowDeath: boolean;
+function activePassiveSkillEffect(actor: Character) {
+  for (const charSkill of actor.activeSkills) {
+    const skillObj = charSkill.id;
   }
-> = {
-  [BattleType.Normal]: {
-    allowXP: true,
-    allowLoot: true,
-    resetHealth: false,
-    allowDeath: true,
-  },
-  [BattleType.Training]: {
-    allowXP: true,
-    allowLoot: false,
-    resetHealth: true,
-    allowDeath: false,
-  },
-  [BattleType.Arena]: {
-    allowXP: true,
-    allowLoot: true,
-    resetHealth: false,
-    allowDeath: false,
-  },
-  [BattleType.Scripted]: {
-    allowXP: true,
-    allowLoot: true,
-    resetHealth: false,
-    allowDeath: true,
-  },
-  [BattleType.NoReward]: {
-    allowXP: false,
-    allowLoot: false,
-    resetHealth: false,
-    allowDeath: false,
-  },
-};
+}

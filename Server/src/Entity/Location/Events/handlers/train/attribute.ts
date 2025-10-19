@@ -1,7 +1,7 @@
-import type { AttributeKey } from "../../../../../InterFacesEnumsAndTypes/Enums";
-import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
-import { rollTwenty } from "../../../../../Utils/Dice";
-import { statMod } from "../../../../../Utils/statMod";
+import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums.ts";
+import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers.ts";
+import { rollTwenty } from "src/Utils/Dice.ts";
+import { statMod } from "src/Utils/statMod.ts";
 import type { Character } from "../../../../Character/Character";
 import {
   createNews,
@@ -43,22 +43,11 @@ export function handleTrainAttribute(
         kind: "partyScope",
         partyId: context.partyId,
       },
-      tokens: [
-        {
-          t: "char",
-          v: [
-            {
-              name: character.name,
-              title: character.title.string(),
-              fame: character.fame.getString(context.subRegion),
-              portrait: character.portrait ? character.portrait : "",
-              level: character.level,
-            },
-          ],
+        content: {
+            en: "",
+            th: "",
         },
-      ],
       context,
-      secretTier: TierEnum.common
     });
     results.push(news);
   }

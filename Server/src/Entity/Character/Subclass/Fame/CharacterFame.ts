@@ -1,4 +1,5 @@
-import type { SubRegionEnum } from "../../../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import type { SubRegionEnum } from "src/InterFacesEnumsAndTypes/Enums/SubRegion.ts";
+import type {L10N} from "src/InterFacesEnumsAndTypes/L10N.ts";
 
 export class CharacterFame {
   private fameMap: Map<SubRegionEnum, number>;
@@ -13,35 +14,23 @@ export class CharacterFame {
     return this.fameMap.get(subRegion) ?? 0;
   }
 
-  getString(subRegion: SubRegionEnum): string {
-    return toFameString(this.get(subRegion));
-  }
-
   set(region: SubRegionEnum, value: number) {
     this.fameMap.set(region, Math.max(0, value));
   }
 
   add(region: SubRegionEnum, delta: number) {
-    this.set(region, this.get(region) + delta);
-  }
-
-  toJSON() {
-    return Object.fromEntries(this.fameMap);
-  }
-
-  static fromJSON(data: Record<SubRegionEnum, number>) {
-    return new CharacterFame(data);
+      this.set(region, this.get(region) + delta);
   }
 }
 
 // Fame string
-function toFameString(value: number): string {
-  if (value >= 12000) return "Legendary";
-  if (value >= 6000) return "Heroic";
-  if (value >= 2500) return "Famous";
-  if (value >= 1000) return "Renowned";
-  if (value >= 400) return "Recognized";
-  if (value >= 150) return "Familiar";
-  if (value >= 50) return "Known";
-  return "No Name";
-}
+// function toFameString(value: number): L10N {
+//   if (value >= 12000) return {en: "Legendary", th: "ตำนาน"};
+//   if (value >= 6000) return {en: "Heroic", th: "วีรบุรุษ"};
+//   if (value >= 2500) return {en: "Famous", th: "นับหน้าถือตา"};
+//   if (value >= 1000) return {en: "Renowned", th: "โด่งดังไปทั่ว"};
+//   if (value >= 400) return {en: "Recognized", th: "คนมีชื่อเสียง"};
+//   if (value >= 150) return {en: "Familiar", th: "เริ่มมีชื่อเสียง"};
+//   if (value >= 50) return {en: "Known", th: "คนคุ้นหน้า"};
+//   return {en: "No name", th: "ไม่มีคนรู้จัก"};
+// }

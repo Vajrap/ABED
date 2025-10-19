@@ -13,7 +13,6 @@ import { CharacterElements } from "./Subclass/Stats/CharacterElements";
 import { CharacterNeeds } from "./Subclass/Needs/CharacterNeeds";
 import { CharacterVitals } from "./Subclass/Vitals/CharacterVitals";
 import { CharacterFame } from "./Subclass/Fame/CharacterFame";
-import type { ItemId } from "../Item/Item";
 import { CharacterPlanarAptitude } from "./Subclass/PlanarAptitude/CharacterPlanarAptitude";
 import type { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import type { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
@@ -29,17 +28,42 @@ import {
   type CharacterActionSequence,
 } from "./Subclass/Action/CharacterAction";
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
-import type { CharNewsInterface } from "../News/News";
-import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
+import type { News } from "../News/News";
 import type { CharacterRoleEnum } from "./Subclass/Title/Role/enum";
 import type { CharacterEpithetEnum } from "./Subclass/Title/Epithet/enum";
+import type { L10N } from "../../InterFacesEnumsAndTypes/L10N.ts";
+import { roll } from "src/Utils/Dice.ts";
+import { statMod } from "src/Utils/statMod.ts";
+import type { Weapon } from "../Item/Equipment/Weapon/Weapon.ts";
+import type { ItemId } from "../Item/type.ts";
+import {
+  BareHandId,
+  getEquipment,
+  getWeaponFromRepository,
+  type BodyId,
+  type EarId,
+  type Equipment,
+  type EquipmentId,
+  type FootId,
+  type HandId,
+  type HeadWearId,
+  type LegId,
+  type NeckId,
+  type RingId,
+  type UtilId,
+  type WeaponId,
+} from "../Item/index.ts";
+import Report from "src/Utils/Reporter.ts";
+import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
+import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes.ts";
+import type { Location } from "../Location/Location.ts";
 
 export class Character {
   id: string = "";
   userId: string | null = null;
   partyID: string | null = null;
 
-  name: string = "";
+  name: L10N;
   gender: "MALE" | "FEMALE" | "NONE" = "NONE";
   race: string = "";
   type: CharacterType = CharacterType.humanoid;
@@ -64,7 +88,7 @@ export class Character {
   possibleEpithets: CharacterEpithetEnum[] = [];
   possibleRoles: CharacterRoleEnum[] = [];
   actionSequence: CharacterActionSequence = defaultActionSequence();
-  informations: Record<string, number> = {};
+  information: Record<string, number> = {};
   // Skills
   // TODO: write condition, might be config setting
   skills: Map<SkillId, CharacterSkillObject> = new Map();
@@ -82,19 +106,68 @@ export class Character {
 
   relations: Map<string, { value: number; status: RelationStatusEnum }> =
     new Map();
-  traits: TraitEnum[] = [];
+  traits: Map<TraitEnum, number> = new Map();
 
   inventorySize: { base: number; bonus: number } = { base: 20, bonus: 0 };
   inventory: Map<ItemId, number> = new Map();
-  equipments: Map<CharacterEquipmentSlot, ItemId> = new Map();
+  equipments: {
+    // TODO
+    headWear: EquipmentId | null;
+    body: EquipmentId | null;
+    leg: EquipmentId | null;
+    hand: EquipmentId | null;
+    foot: EquipmentId | null;
+    util: EquipmentId | null;
+    ringL: EquipmentId | null;
+    ringR: EquipmentId | null;
+    earL: EquipmentId | null;
+    earR: EquipmentId | null;
+    neck: EquipmentId | null;
+    rightHand: EquipmentId | null;
+    leftHand: EquipmentId | null;
+  } = {
+    headWear: null,
+    body: null,
+    leg: null,
+    hand: null,
+    foot: null,
+    util: null,
+    ringL: null,
+    ringR: null,
+    earL: null,
+    earR: null,
+    neck: null,
+    rightHand: null,
+    leftHand: null,
+  };
 
   buffsAndDebuffs: CharacterBuffsAndDebuffs = { entry: new Map() };
 
   statTracker: number;
-  abGuage = 0;
+  abGauge = 0;
 
-  news: string[] = [];
-  unseenNews: string[] = [];
+  news: News[] = [];
+  unseenNews: News[] = [];
+
+  isPlayer: boolean = false;
+
+  resources: {
+    order: number;
+    chaos: number;
+    earth: number;
+    water: number;
+    wind: number;
+    fire: number;
+    none: number;
+  } = {
+    order: 0,
+    chaos: 0,
+    earth: 0,
+    water: 0,
+    wind: 0,
+    fire: 0,
+    none: 0,
+  };
 
   createdAt: Date;
   updatedAt: Date;
@@ -103,7 +176,7 @@ export class Character {
 
   constructor(data: {
     id: string;
-    name: string;
+    name: L10N;
     type: CharacterType;
     gender?: "MALE" | "FEMALE" | "NONE";
     level: number;
@@ -160,22 +233,12 @@ export class Character {
           // If not permanent, it means we should just remove it
           this.buffsAndDebuffs.entry.delete(key);
         } else {
-          // If has permanent, only remove the kinetic value
+          // If permanent, only remove the kinetic value
           value.value = 0;
         }
       }
     }
     return this;
-  }
-
-  intoNewsInterface(subRegion: SubRegionEnum): CharNewsInterface {
-    return {
-      name: this.name,
-      title: this.title.string(),
-      fame: this.fame.getString(subRegion),
-      portrait: this.portrait ?? "",
-      level: this.level,
-    };
   }
 
   addItemToInventory(item: ItemId, quantity: number) {
@@ -199,6 +262,170 @@ export class Character {
       this.possibleRoles.push(role);
     }
   }
+
+  replenishResource() {
+    this.replenishSpAndMp();
+    this.replenishElement();
+  }
+
+  // Conceptually talking, we'll get equal to control/endurance stat mod replenish if wearing medium armor
+  private replenishSpAndMp() {
+    const staminaDice = roll(1).d(3).total;
+    const manaDice = roll(1).d(3).total;
+    const controlMod = statMod(this.attribute.getTotal("control"));
+    const enduranceMod = statMod(this.attribute.getTotal("endurance"));
+
+    // TODO:
+    // const armorPenaltyMap: Record<ArmorType, number> = {
+    //   [ArmorType.cloth]: 0,
+    //   [ArmorType.light]: 1,
+    //   [ArmorType.medium]: 2,
+    //   [ArmorType.heavy]: 3,
+    // };
+
+    let armorpenalty = 0;
+    // if (
+    //   this.equipments.armor !== undefined &&
+    //   this.equipments.armor.armorType !== null
+    // ) {
+    //   armorpenalty = armorPenaltyMap[this.equipments.armor?.armorType];
+    // }
+
+    this.vitals.incSp(staminaDice - armorpenalty + enduranceMod);
+    this.vitals.incMp(manaDice - armorpenalty + controlMod);
+  }
+
+  private replenishElement() {
+    const coreElement = [
+      "wind",
+      "water",
+      "fire",
+      "earth",
+      "order",
+      "chaos",
+    ] as const;
+    for (const element of coreElement) {
+      const bonus = this.elements.getTotal(element);
+      if (bonus != 0) {
+        this.resources[element] += bonus;
+      }
+    }
+  }
+
+  getWeapon(expectedShield: boolean = false): Weapon {
+    const rWeaponId = this.equipments.rightHand as WeaponId;
+    const lWeaponId = this.equipments.leftHand as WeaponId;
+    // Right hand first
+    if (rWeaponId) {
+      const weapon = getWeaponFromRepository(rWeaponId);
+      if (weapon) {
+        if (expectedShield && weapon.weaponType === "shield") return weapon;
+        if (!expectedShield && weapon.weaponType !== "shield") return weapon;
+      }
+    }
+
+    // If right hand yields no result
+    if (lWeaponId) {
+      const weapon = getWeaponFromRepository(lWeaponId);
+      if (weapon) {
+        if (expectedShield && weapon.weaponType === "shield") return weapon;
+        if (!expectedShield && weapon.weaponType !== "shield") return weapon;
+      }
+    }
+
+    // When both hands yields no result
+    return bareHand;
+  }
+
+  receiveDamage(
+    damageOutput: {
+      damage: number;
+      hit: number;
+      crit: number /* consider: isNat20?: boolean */;
+    },
+    damageType: DamageType,
+    location: Location,
+    critModifier: number = 1.5,
+  ): {
+    actualDamage: number;
+    damageType: DamageType;
+    isHit: boolean;
+    isCrit: boolean;
+  } {
+    // --- HIT / DODGE ---
+    // If you mean "nat 20 can't be dodged", you need a raw die or a boolean flag.
+    // Here we treat 20+ as "auto-hit" only if that's your rule; adjust as needed.
+    const dodgeChance =
+      this.battleStats.getTotal("dodge") +
+      statMod(this.attribute.getTotal("agility"));
+
+    // Attacker’s 'hit' already includes their bonuses
+    const autoHit = damageOutput.crit >= 20; // ideally: damageOutput.isNat20 === true
+    if (!autoHit && dodgeChance >= damageOutput.hit) {
+      return {
+        actualDamage: 0,
+        damageType,
+        isHit: false,
+        isCrit: false,
+      };
+    }
+
+    // --- MITIGATION ---
+    const isPhysical =
+      damageType === DamageType.pierce ||
+      damageType === DamageType.slash ||
+      damageType === DamageType.blunt;
+
+    const mitigation = isPhysical
+      ? this.battleStats.getTotal("pDEF") +
+        statMod(this.attribute.getTotal("endurance"))
+      : this.battleStats.getTotal("mDEF") +
+        statMod(this.attribute.getTotal("planar"));
+
+    let damage = Math.max(damageOutput.damage - Math.max(mitigation, 0), 0);
+
+    // --- CRIT CHECK ---
+    // Keep stat usage consistent: use statMod(endurance) if dodge used statMod(agility)
+    const critDefense = statMod(this.attribute.getTotal("endurance"));
+    let isCrit = false;
+    if (damageOutput.crit - critDefense >= 20) {
+      damage *= critModifier;
+      isCrit = true;
+    }
+
+    // TODO
+    // --- BUFFS/DEBUFFS/TRAITS (future hooks) ---
+    // Example pattern:
+    // damage = this.applyElementalInteractions(damage, damageType);
+    // damage = this.applyShieldsAndAbsorbs(damage);
+
+    // --- ROUND & APPLY ---
+    const finalDamage = Math.max(Math.floor(damage), 0);
+    this.vitals.decHp(finalDamage);
+
+    return {
+      actualDamage: finalDamage,
+      damageType,
+      isHit: true,
+      isCrit,
+    };
+  }
+
+  //MARK: RECEIVE HEAL
+  // receiveHeal({ healing }: { actor: Character; healing: number }) {
+  //   if (this.isDead === true) {
+  //     return this.hpUp(healing);
+  //   }
+  //   this.currentHP = Math.min(
+  //     this.currentHP + healing || this.maxHP(),
+  //     this.maxHP(),
+  //   );
+
+  //   console.log(
+  //     `${this.name} healed for ${healing}: ${this.currentHP}/${this.maxHP()}`,
+  //   );
+  //   return this.hpUp(healing);
+  // }
 }
 
 export type CharacterSkillObject = {

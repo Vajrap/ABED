@@ -2,7 +2,7 @@ import { GlobalEventCard } from "../GlobalEventCard";
 import { GlobalEventCardEnum } from "../types";
 import { locationRepository } from "../../../Repository/location";
 import { createNews, newsToStructure } from "../../../News/News";
-import { TierEnum } from "../../../../InterFacesEnumsAndTypes/Tiers";
+import { NewsSignificance } from "../../../../InterFacesEnumsAndTypes/NewsEnums";
 
 /**
  * Mild Season - Simple beneficial minor event
@@ -19,8 +19,14 @@ const originalCapacities = new Map<string, { grain: number; vegetables: number; 
 
 export const mildSeason = new GlobalEventCard({
   id: GlobalEventCardEnum.MildSeason,
-  name: "Mild Season",
-  description: "Pleasant weather favors the crops this year. Farmers enjoy a 5% boost to crop yields.",
+  name: {
+    en: "Mild Season",
+    th: "ฤดูกาลที่เหมาะสม"
+  },
+  description: {
+    en: "Pleasant weather favors the crops this year. Farmers enjoy a 5% boost to crop yields.",
+    th: "สภาพอากาศที่ดีช่วยให้พืชผลเจริญเติบโต เกษตรกรได้รับผลผลิตเพิ่มขึ้น 5%"
+  },
   
   startingScale: 100,
   
@@ -51,10 +57,10 @@ export const mildSeason = new GlobalEventCard({
       scope: {
         kind: "worldScope",
       },
-      tokens: [{
-        t: "text",
-        v: "Pleasant weather graces the lands this year. Farmers shrug and say, 'Not the best, not the worst. A decent season.'"
-      }],
+      content: {
+        en: "Pleasant weather graces the lands this year. Farmers shrug and say, 'Not the best, not the worst. A decent season.'",
+        th: "สภาพอากาศที่ดีงามตลอดปี เกษตรกรกล่าวว่า 'ไม่ดีที่สุดแต่ก็ไม่แย่ที่สุด ฤดูกาลที่พอใช้ได้'"
+      },
       context: {
         region: undefined as any,
         subRegion: undefined as any,
@@ -62,7 +68,7 @@ export const mildSeason = new GlobalEventCard({
         partyId: "",
         characterIds: []
       },
-      secretTier: TierEnum.common
+      significance: NewsSignificance.NOTABLE
     });
     
     // Auto-map news to structure based on scope

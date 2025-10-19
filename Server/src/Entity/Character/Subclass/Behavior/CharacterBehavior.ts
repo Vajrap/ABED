@@ -7,7 +7,7 @@ export class CharacterBehavior {
   tradePolicy: CharacterTradePolicy;
   craftingPreference: CharacterCraftingPreference;
 
-  // During the game, many events may happened, the risk taking behavior of the party will be used as a modifier factor to determine the outcome of the event.
+  // During the game, many events may happen, the risk taking behavior of the party will be used as a modifier factor to determine the outcome of the event.
   riskTaking: "bold" | "measured" | "careful";
 
   // Travel Pace affected the speed of the party when traveling on the map.
@@ -30,22 +30,5 @@ export class CharacterBehavior {
     this.eventResponse = init?.eventResponse ?? "measured";
     this.preferredInnType = init?.preferredInnType ?? InnLevel.Comfortable;
     this.useCampSupplies = init?.useCampSupplies ?? false;
-  }
-
-  toJSON() {
-    return {
-      tradePolicy: this.tradePolicy,
-      battlePolicy: this.battlePolicy,
-      craftingPreference: this.craftingPreference,
-      riskTaking: this.riskTaking,
-      travelPace: this.travelPace,
-      eventResponse: this.eventResponse,
-      preferredInnType: this.preferredInnType,
-      useCampSupplies: this.useCampSupplies,
-    };
-  }
-
-  static fromJSON(data: Partial<CharacterBehavior>) {
-    return new CharacterBehavior(data);
   }
 }

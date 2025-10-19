@@ -9,6 +9,11 @@
     "allowJs": true,
     "types": ["bun-types"],
 
+    // Path resolution
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"]
+    },
 
     // Bundler mode
     "moduleResolution": "bundler",

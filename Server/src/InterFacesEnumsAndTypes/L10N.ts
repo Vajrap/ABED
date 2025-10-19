@@ -1,13 +1,14 @@
 import type { TierEnum } from "./Tiers";
 import type { LocationsEnum } from "./Enums/Location";
+import type {Character} from "src/Entity/Character/Character.ts";
 
 /**
  * L10N - Localization Type with Markup Support
- * 
+ *
  * Combines:
  * 1. Localized text (en, th) with BBCode-style markup
  * 2. Optional tooltip data for entities referenced in markup
- * 
+ *
  * Markup syntax:
  * - [char:id]Name[/char]
  * - [loc:id]Location[/loc]
@@ -16,7 +17,7 @@ import type { LocationsEnum } from "./Enums/Location";
  * - [party:id]Party[/party]
  * - [color:red]Text[/color]
  * - [b]Bold[/b], [i]Italic[/i]
- * 
+ *
  * Example:
  * ```
  * L10N({
@@ -33,7 +34,7 @@ import type { LocationsEnum } from "./Enums/Location";
 export interface CharacterTooltipData {
   name: { en: string; th: string };
   level: number;
-  title: string;
+  title: { en: string; th: string };
   lastSeenLocation?: LocationsEnum;
   portraitUrl?: string;
 }
@@ -97,10 +98,10 @@ export function L10N(data: {
 
 /**
  * L10NWithEntities - Auto-build tooltip data from entities
- * 
+ *
  * Pass the actual entities and this function will automatically
  * extract tooltip data from them.
- * 
+ *
  * @example
  * L10NWithEntities(
  *   {
@@ -113,7 +114,7 @@ export function L10N(data: {
 export function L10NWithEntities(
   text: { en: string; th: string },
   context: {
-    characters?: Array<any>;      // Character objects
+    characters?: Array<Character>;      // Character objects
     locations?: LocationsEnum[];  // Location IDs to look up
     items?: Array<any>;           // Item objects
     skills?: Array<any>;          // Skill objects
@@ -121,36 +122,39 @@ export function L10NWithEntities(
   }
 ): L10N {
   const entities: L10N["entities"] = {};
-  
+
   // Auto-build character tooltip data
   if (context.characters && context.characters.length > 0) {
     entities.chars = {};
     for (const char of context.characters) {
-      if (!char || char === "none") continue;
-      
+      if (!char) continue;
+
       entities.chars[char.id] = {
-        name: { 
-          en: char.name,
-          th: char.nameThai || char.name  // Fallback to en if no Thai name
+        name: {
+          en: char.name.en,
+          th: char.name.th,
         },
         level: char.level,
-        title: typeof char.title === 'string' ? char.title : char.title?.string?.() || "",
-        lastSeenLocation: char.location || char.currentLocation,
-        portraitUrl: char.portrait,
+        title: {
+            en: char.title.string().en,
+            th: char.title.string().th
+        },
+        lastSeenLocation: context.locations ? context.locations.length >= 1 ? context.locations[0] : undefined : undefined,
+        portraitUrl: char.portrait ?? undefined,
       };
     }
   }
-  
+
   // Auto-build location tooltip data
   if (context.locations && context.locations.length > 0) {
     entities.locs = {};
     // Import locationRepository dynamically to avoid circular deps
     const { locationRepository } = require("../Entity/Repository/location");
-    
+
     for (const locId of context.locations) {
       const loc = locationRepository.get(locId);
       if (!loc) continue;
-      
+
       entities.locs[locId] = {
         name: {
           en: loc.name || locId,
@@ -165,13 +169,13 @@ export function L10NWithEntities(
       };
     }
   }
-  
+
   // Auto-build item tooltip data
   if (context.items && context.items.length > 0) {
     entities.items = {};
     for (const item of context.items) {
       if (!item) continue;
-      
+
       entities.items[item.id] = {
         name: {
           en: item.name,
@@ -187,13 +191,13 @@ export function L10NWithEntities(
       };
     }
   }
-  
+
   // Auto-build skill tooltip data
   if (context.skills && context.skills.length > 0) {
     entities.skills = {};
     for (const skill of context.skills) {
       if (!skill) continue;
-      
+
       entities.skills[skill.id] = {
         name: {
           en: skill.name,
@@ -209,15 +213,15 @@ export function L10NWithEntities(
       };
     }
   }
-  
+
   // Auto-build party tooltip data
   if (context.parties && context.parties.length > 0) {
     entities.parties = {};
     for (const party of context.parties) {
       if (!party) continue;
-      
+
       const members = party.characters?.filter((c: any) => c !== "none") || [];
-      
+
       entities.parties[party.partyID || party.id] = {
         name: {
           en: party.name || `${party.leader?.name || "Unknown"}'s Party`,
@@ -231,7 +235,7 @@ export function L10NWithEntities(
       };
     }
   }
-  
+
   return {
     en: text.en,
     th: text.th,
@@ -331,21 +335,21 @@ export const markup = {
  */
 export function validateMarkup(text: string): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   // Check for unclosed tags
   const openTags = text.match(/\[(\w+):/g) || [];
   const closeTags = text.match(/\[\/(\w+)\]/g) || [];
-  
+
   if (openTags.length !== closeTags.length) {
     errors.push(`Mismatched tags: ${openTags.length} open, ${closeTags.length} close`);
   }
-  
+
   // Check for malformed tags
   const malformed = text.match(/\[[^\]]*$/);
   if (malformed) {
     errors.push("Unclosed bracket detected");
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -370,15 +374,15 @@ export function extractEntityIds(text: string): {
     locs: [] as string[],
     parties: [] as string[],
   };
-  
+
   const regex = /\[(\w+):(\w+)\]/g;
   let match;
-  
+
   while ((match = regex.exec(text)) !== null) {
     const tag = match[1];
     const id = match[2];
     if (!tag || !id) continue;
-    
+
     switch (tag) {
       case "char":
         result.chars.push(id);
@@ -397,7 +401,7 @@ export function extractEntityIds(text: string): {
         break;
     }
   }
-  
+
   return result;
 }
 

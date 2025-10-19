@@ -5,7 +5,7 @@ import { CharacterType, CharacterAlignmentEnum } from "../InterFacesEnumsAndType
 // Helper function to extract essential UI values from StatBlock objects
 function extractStatValues(stats: Record<string, any>): Record<string, any> {
   const result: Record<string, any> = {};
-  
+
   for (const [key, value] of Object.entries(stats)) {
     if (value && typeof value === 'object' && 'total' in value) {
       // StatBlock structure: { base, bonus, battle, exp, total }
@@ -28,19 +28,19 @@ function extractStatValues(stats: Record<string, any>): Record<string, any> {
       result[key] = value;
     }
   }
-  
+
   return result;
 }
 
 // Helper function to extract essential UI values from Map-like objects
 function extractMapValues(mapData: any): Record<string, any> {
   if (!mapData) return {};
-  
+
   // If it's already a plain object, return as is
   if (typeof mapData === 'object' && !Array.isArray(mapData) && !mapData.constructor || mapData.constructor === Object) {
     return mapData;
   }
-  
+
   // If it's a Map-like structure, convert to object
   if (mapData instanceof Map) {
     const result: Record<string, any> = {};
@@ -49,7 +49,7 @@ function extractMapValues(mapData: any): Record<string, any> {
     }
     return result;
   }
-  
+
   return mapData;
 }
 
@@ -65,7 +65,7 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
     portrait: character.portrait || "",
     background: character.background || "",
     alignment: character.alignment.alignment(),
-    
+
     // Extract essential UI values from complex objects
     artisans: extractStatValues(character.artisans || {}) as any,
     attributes: extractStatValues(character.attribute || {}) as any, // Note: database uses 'attribute' not 'attributes'
@@ -81,7 +81,7 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
       craftingPreference: character.behavior.craftingPreference,
       riskTaking: character.behavior.riskTaking,
       travelPace: character.behavior.travelPace,
-      
+
       eventResponse: character.behavior.eventResponse,
       preferredInnType: character.behavior.preferredInnType,
       useCampSupplies: character.behavior.useCampSupplies,
@@ -90,7 +90,7 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
     possibleEpithets: character.possibleEpithets || [] as any,
     possibleRoles: character.possibleRoles || [] as any,
     actionSequence: character.actionSequence || {} as any,
-    informations: character.informations || {} as any,
+    informations: character.information || {} as any,
     skills: extractMapValues(character.skills || {}) as any,
     activeSkills: extractMapValues(character.activeSkills || {}) as any,
     conditionalSkills: extractMapValues(character.conditionalSkills || {}) as any,

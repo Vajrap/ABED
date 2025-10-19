@@ -1,3 +1,4 @@
+import type { L10N } from "../../../InterFacesEnumsAndTypes/L10N";
 import type { NewsDistribution } from "../../News/News";
 
 export enum GlobalEventCardEnum {
@@ -90,8 +91,8 @@ export function makeClimaxEvent(config: Partial<ClimaxEvent>): ClimaxEvent {
 
 export interface GlobalEventCardConfig {
   id: GlobalEventCardEnum;
-  name: string;
-  description: string;
+  name: L10N;
+  description: L10N;
   startingScale?: number;
   onDraw?: EffectHandler | undefined;
   onEnd?: CleanupHandler | undefined; // Called when card completes - cleanup effects
@@ -103,8 +104,14 @@ export interface GlobalEventCardConfig {
 export function makeGlobalEventCardConfig(config: Partial<GlobalEventCardConfig> & { id: GlobalEventCardEnum }): GlobalEventCardConfig {
     return {
         id: config.id,
-        name: config.name ?? "Unknown Event",
-        description: config.description ?? "",
+        name: config.name ?? {
+          en: "Unknown Event",
+          th: "ไม่ระบุเหตุการณ์"
+        },
+        description: config.description ?? {
+          en: "Unknown Event",
+          th: "ไม่ระบุเหตุการณ์"
+        },
         startingScale: config.startingScale ?? 250,
         onDraw: config.onDraw ?? undefined,
         onEnd: config.onEnd ?? undefined,

@@ -128,6 +128,17 @@ export const EXPANDED_ELEMENT_KEYS = [
   // T2 and T3 elements will be added here, use later
 ] as const;
 
+export const ELEMENT_RESOURCE_KEYS = [
+  "order",
+  "chaos",
+  "fire",
+  "water",
+  "earth",
+  "wind",
+  "none",
+] as const;
+export type ElementResourceKey = (typeof ELEMENT_RESOURCE_KEYS)[number];
+
 export type ExpandedElementKey = (typeof EXPANDED_ELEMENT_KEYS)[number];
 
 export const PROFICIENCY_KEYS = [

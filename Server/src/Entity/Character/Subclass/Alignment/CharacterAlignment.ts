@@ -3,7 +3,7 @@ import {
   CharacterAlignmentEnum,
   EvilAlignmentMap,
   GoodAlignmentMap,
-} from "../../../../InterFacesEnumsAndTypes/Enums";
+} from "src/InterFacesEnumsAndTypes/Enums.ts";
 
 export class CharacterAlignment {
   good: number = 0;
@@ -29,14 +29,6 @@ export class CharacterAlignment {
         return EvilAlignmentMap[turnMax(this.evil)];
       }
     }
-  }
-
-  toJSON() {
-    return { good: this.good, evil: this.evil };
-  }
-
-  static fromJSON(data: { good?: number; evil?: number }) {
-    return new CharacterAlignment(data);
   }
 }
 

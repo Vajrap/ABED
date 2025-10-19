@@ -1,23 +1,28 @@
 import type { CharacterEquipmentSlot } from "../../../InterFacesEnumsAndTypes/Enums";
 import type { Character } from "../../Character/Character";
-import type { ItemId } from "../Item";
+import type { EquipmentId } from "./repository";
 import type { Equipment } from "./Equipment";
-import { getEquipmentOrThrow } from "./getOrThrow";
+import { getEquipment } from "./repository";
 import { modifyBonusStats, modifyVitals } from "./modifiers";
+import Report from "src/Utils/Reporter";
 
 export function remove(
   character: Character,
-  equipmentId: ItemId,
+  equipmentId: EquipmentId,
   slot: CharacterEquipmentSlot,
-) {
+): boolean {
   // 1. check if item were really equipped
-  const equipment = getEquipmentOrThrow(equipmentId);
-  const equippedId = character.equipments.get(slot);
+  const equippedId = character.equipments[slot];
   if (!equippedId) {
-    throw new Error();
+    Report.error(`Character ${character.id} try to remove ${equipmentId} from ${slot} but it's not equipped`);
+    return false;
   }
   // 2. get item from repo
-  const equipped = getEquipmentOrThrow(equippedId);
+  const equipped = getEquipment(equippedId);
+  if (!equipped) {
+    Report.error(`Equipment ${equippedId} not found`);
+    return false;
+  }
 
   // 3. remove values
   modifyBonusStats(character, equipped, "REMOVE");
@@ -28,7 +33,9 @@ export function remove(
   // 4. move item to inventory
   const inv = character.inventory.get(equippedId) ?? 0;
   character.inventory.set(equippedId, inv + 1);
-  character.equipments.delete(slot);
+  character.equipments[slot] = null;
+
+  return true;
 }
 
 function modifyBuffsAndDebuffs(character: Character, equipped: Equipment) {

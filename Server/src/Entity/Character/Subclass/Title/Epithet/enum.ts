@@ -1,7 +1,7 @@
 export enum CharacterEpithetEnum {
   Testing = "Testing",
   TestingCombo = "TestTingCombo",
-  Retainor = "Retainor",
+  Retainer = "Retainer",
   Peasant = "Peasant",
   Merchant = "Merchant",
   Scholar = "Scholar",

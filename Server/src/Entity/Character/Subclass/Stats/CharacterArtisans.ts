@@ -1,7 +1,7 @@
 import {
   ARTISAN_KEYS,
   type ArtisanKey,
-} from "../../../../InterFacesEnumsAndTypes/Enums";
+} from "src/InterFacesEnumsAndTypes/Enums.ts";
 import { CharacterStatArchetype, StatBlock } from "./CharacterStatArchetype";
 
 export class CharacterArtisans extends CharacterStatArchetype<ArtisanKey> {
@@ -9,7 +9,4 @@ export class CharacterArtisans extends CharacterStatArchetype<ArtisanKey> {
     super(ARTISAN_KEYS, initial);
   }
 
-  static fromJSON(data: any): CharacterArtisans {
-    return new CharacterArtisans(data);
-  }
 }

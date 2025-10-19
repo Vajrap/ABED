@@ -2,7 +2,7 @@ import { RegionEventCard } from "../RegionEventCard";
 import { RegionEventCardEnum } from "../types";
 import { RegionEnum } from "../../../../InterFacesEnumsAndTypes/Enums/Region";
 import { createNews, newsArrayToStructure } from "../../../News/News";
-import { TierEnum } from "../../../../InterFacesEnumsAndTypes/Tiers";
+import { L10N } from "../../../../InterFacesEnumsAndTypes/L10N";
 import { market } from "../../../Market/Market";
 
 /**
@@ -16,15 +16,39 @@ import { market } from "../../../Market/Market";
  * - Proper eventId prevents conflicts
  */
 
+const description = {
+  en: "War drives up demand for weapons and armor. Ore and wood prices spike.",
+  th: "สงครามทำให้ความต้องการอาวุธและเกราะเพิ่มสูงขึ้น ราคาแร่และไม้พุ่งสูงขึ้น"
+};
+
+const worldNewsContent = {
+  en: "War in the north drives demand for weapons! Blacksmiths and fletchers struggle to keep up with orders.",
+  th: "สงครามทางเหนือทำให้ความต้องการอาวุธเพิ่มสูงขึ้น! ช่างตีเหล็กและช่างทำธนูพยายามทำงานตามคำสั่งซื้อที่ท่วมท้น"
+};
+
+const northernNewsContent = {
+  en: "The Northern Reach mobilizes for war. Weapon prices soar as armies prepare for conflict.",
+  th: "ดินแดนเหนือระดมกำลังเพื่อสงคราม ราคาอาวุธพุ่งสูงขึ้นขณะที่กองทัพเตรียมพร้อมสำหรับการสู้รบ"
+};
+
+const borealNewsContent = {
+  en: "Boreal Frost's warriors march southward. Every blacksmith in the frozen lands works day and night.",
+  th: "นักรบแห่งป่าน้ำแข็งเหนือจัดเดินทัพลงใต้ ช่างตีเหล็กทุกคนในดินแดนเยือกแข็งทำงานทั้งกลางวันและกลางคืน"
+};
+
 export const warDemand = new RegionEventCard({
-  id: RegionEventCardEnum.RegionalConflict,
+  id: RegionEventCardEnum.RegionalConflict,  // Using existing enum value
+  name: {
+    en: "War Demand",
+    th: "ความต้องการในยามสงคราม"
+  },
   globalEventScale: 30,
   targetRegions: [RegionEnum.NorthernReach, RegionEnum.BorealFrost],
-  description: "War drives up demand for weapons and armor. Ore and wood prices spike.",
+  description,
   onDraw: () => {
     // Use unique eventId for this specific region event
     // Format: EventType_Region1_Region2
-    const eventId = `${RegionEventCardEnum.RegionalConflict}_${RegionEnum.NorthernReach}_${RegionEnum.BorealFrost}`;
+    const eventId = `WarDemand_${RegionEnum.NorthernReach}_${RegionEnum.BorealFrost}`;
     
     // Increase weapon/armor material prices
     market.setEventModifier("ore", 1.5, eventId);
@@ -34,18 +58,14 @@ export const warDemand = new RegionEventCard({
       scope: {
         kind: "worldScope",
       },
-      tokens: [{
-        t: "text",
-        v: "War in the north drives demand for weapons! Blacksmiths and fletchers struggle to keep up with orders."
-      }],
+      content: L10N(worldNewsContent),
       context: {
         region: undefined as any,
         subRegion: undefined as any,
         location: undefined as any,
         partyId: "",
         characterIds: []
-      },
-      secretTier: TierEnum.uncommon
+      }
     });
 
     const newsNorthern = createNews({
@@ -53,18 +73,14 @@ export const warDemand = new RegionEventCard({
         kind: "regionScope",
         region: RegionEnum.NorthernReach
       },
-      tokens: [{
-        t: "text",
-        v: "The Northern Reach mobilizes for war. Weapon prices soar as armies prepare for conflict."
-      }],
+      content: L10N(northernNewsContent),
       context: {
         region: RegionEnum.NorthernReach,
         subRegion: undefined as any,
         location: undefined as any,
         partyId: "",
         characterIds: []
-      },
-      secretTier: TierEnum.uncommon
+      }
     });
 
     const newsBoreal = createNews({
@@ -72,21 +88,16 @@ export const warDemand = new RegionEventCard({
         kind: "regionScope",
         region: RegionEnum.BorealFrost
       },
-      tokens: [{
-        t: "text",
-        v: "Boreal Frost's warriors march southward. Every blacksmith in the frozen lands works day and night."
-      }],
+      content: L10N(borealNewsContent),
       context: {
         region: RegionEnum.BorealFrost,
         subRegion: undefined as any,
         location: undefined as any,
         partyId: "",
         characterIds: []
-      },
-      secretTier: TierEnum.uncommon
+      }
     });
 
-    // Auto-map all news items to their scopes
     return newsArrayToStructure([worldNews, newsNorthern, newsBoreal]);
   },
   
