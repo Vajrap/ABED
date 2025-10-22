@@ -1,12 +1,12 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@jest/globals";
 import { roll, rollTwenty } from "../../src/Utils/Dice";
 
-const SEEDS = [0, 1, 42, 1337] as const;
+const SEEDS = [0, 1, 42, 1337];
 
-type TestDice = {
+interface TestDice {
   amount: number;
   face: number;
-};
+}
 
 const testCases = [
   { amount: 1, face: 6 },

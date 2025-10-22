@@ -107,6 +107,7 @@ export class WeatherDeck {
       this.drawn = deck.draws;
     } else {
       this.cards = createCardDeck(volaticity);
+      this.reshuffle();
       this.drawn = [];
     }
   }
@@ -122,14 +123,14 @@ export class WeatherDeck {
 
   reshuffle(): void {
     // Fisher-Yates shuffle algorithm for random order
-    const shuffled = [...this.drawn];
-    for (let i = shuffled.length - 1; i > 0; i--) {
+    const allCards = [...this.cards, ...this.drawn];
+    for (let i = allCards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      const temp = shuffled[i];
-      shuffled[i] = shuffled[j]!;
-      shuffled[j] = temp!;
+      const temp = allCards[i];
+      allCards[i] = allCards[j]!;
+      allCards[j] = temp!;
     }
-    this.cards = shuffled;
+    this.cards = allCards;
     this.drawn = [];
   }
 }

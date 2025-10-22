@@ -6,6 +6,8 @@ import { getEquipment } from "./repository";
 import { modifyBonusStats, modifyVitals } from "./modifiers";
 import { remove } from "./remove";
 import Report from "src/Utils/Reporter";
+import { BodyId, EarId, FootId, HandId, HeadWearId, LegId, NeckId, RingId, UtilId } from "./Armor";
+import { WeaponId } from "./Weapon";
 
 export function equip(
   character: Character,
@@ -45,7 +47,8 @@ export function equip(
   } else {
     character.inventory.set(equipmentId, inv);
   }
-  character.equipments[slot] = equipmentId;
+
+  putIntoSlot(character, equipmentId, slot);
 
   // 5. add values
   modifyBonusStats(character, equipment, "EQUIP");
@@ -80,5 +83,49 @@ function modifyTraits(character: Character, equipment: Equipment) {
       count++;
       character.traits.set(trait, count);
     }
+  }
+}
+
+function putIntoSlot(character: Character, equipmentId: EquipmentId, slot: CharacterEquipmentSlot) {
+  switch (slot) {
+    case CharacterEquipmentSlot.headWear:
+      character.equipments.headWear = equipmentId as HeadWearId;
+      break;
+    case CharacterEquipmentSlot.body:
+      character.equipments.body = equipmentId as BodyId;
+      break;
+    case CharacterEquipmentSlot.leg:
+      character.equipments.leg = equipmentId as LegId;
+      break;
+    case CharacterEquipmentSlot.hand:
+      character.equipments.hand = equipmentId as HandId;
+      break;
+    case CharacterEquipmentSlot.foot:
+      character.equipments.foot = equipmentId as FootId
+      break;
+    case CharacterEquipmentSlot.util:
+      character.equipments.util = equipmentId as UtilId
+      break;
+    case CharacterEquipmentSlot.ringL:
+      character.equipments.ringL = equipmentId as RingId
+      break;
+    case CharacterEquipmentSlot.ringR:
+      character.equipments.ringR = equipmentId as RingId
+      break;
+    case CharacterEquipmentSlot.earL:
+      character.equipments.earL = equipmentId as EarId
+      break;
+    case CharacterEquipmentSlot.earR:
+      character.equipments.earR = equipmentId as EarId
+      break;
+    case CharacterEquipmentSlot.neck:
+      character.equipments.neck = equipmentId as NeckId
+      break;
+    case CharacterEquipmentSlot.rightHand:
+      character.equipments.rightHand = equipmentId as WeaponId;
+      break;
+    case CharacterEquipmentSlot.leftHand:
+      character.equipments.leftHand = equipmentId as WeaponId;
+      break;
   }
 }

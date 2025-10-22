@@ -6,7 +6,7 @@ import type {
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import { calculateYearlyBaseModifier } from "./PriceModifiers";
-import { locationRepository } from "../Repository/location";
+import { locationRepository } from "../Location/Location/repository";
 
 /**
  * Tracks resource production across the year at multiple scopes
@@ -130,7 +130,7 @@ export class ResourceProductionTracker {
     ];
     
     // Calculate baselines from location capacities
-    for (const loc of locationRepository.values()) {
+    for (const loc of Object.values(locationRepository)) {
       const locationBaselines = new Map<ResourceType, number>();
       
       for (const resource of resources) {

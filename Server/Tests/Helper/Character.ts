@@ -16,6 +16,7 @@ import {
   type BattleStatKey,
   type ElementKey,
 } from "../../src/InterFacesEnumsAndTypes/Enums";
+import { L10N } from "../../src/InterFacesEnumsAndTypes/L10N";
 import {
   defaultActionSequence,
   type CharacterActionSequence,
@@ -65,7 +66,7 @@ export class CharacterFactory {
   private makeDefault(): Character {
     return new Character({
       id: "Test",
-      name: "Test",
+      name: { en: "Test", th: "ทดสอบ" },
       type: CharacterType.humanoid,
       gender: "NONE",
       level: 1,
@@ -88,7 +89,7 @@ export class CharacterFactory {
       throw new Error("CharacterFactory already used. Create a new factory.");
   }
 
-  withName(name: string) {
+  withName(name: L10N) {
     this.assertUnused();
     this.characterDraft.name = name;
     return this;

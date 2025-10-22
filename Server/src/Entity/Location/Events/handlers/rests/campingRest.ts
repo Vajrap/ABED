@@ -1,6 +1,6 @@
-import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
+import { NewsPropagation, NewsSignificance } from "src/InterFacesEnumsAndTypes/NewsEnums";
 import type { Character } from "../../../../Character/Character";
-import { UsableId } from "../../../../Item/Item";
+import { UsableId } from "../../../../Item/Consumable/index";
 import {
   createNews,
   type News,
@@ -51,14 +51,12 @@ export function campingRest(
 
   return createNews({
     scope: { kind: "partyScope", partyId: context.partyId },
-    tokens: [
-      {
-        t: "char",
-        v: characters.map((char) => char.intoNewsInterface(context.subRegion)),
-      },
-      { t: "text", v: `has taken a rest` },
-    ],
+    content: {
+      en: `[char:${characters[0]?.id}]${characters[0]?.name}[/char] has taken a rest`,
+      th: `[char:${characters[0]?.id}]${characters[0]?.name}[/char] ได้พักผ่อน`
+    },
     context,
-    secretTier: TierEnum.common
+    significance: NewsSignificance.TRIVIAL,
+    propagation: NewsPropagation.LOCAL
   });
 }

@@ -11,7 +11,7 @@ import Report from "../Utils/Reporter";
 import { postman } from "../Entity/News/Postman";
 import { mergeNewsStructures } from "../Utils/mergeNewsStructure";
 import { gameState } from "./GameState";
-import {drawSubRegionsWeatherCard} from "../Event/subRegionWeather.ts";
+import { drawSubRegionsWeatherCard } from "../Event/subRegionWeather.ts";
 import { drawGlobalEventCard } from "../Event/drawGlobalEventCard.ts";
 import { drawRegionEventCard } from "../Event/drawRegionEventCard.ts";
 import { market } from "../Entity/Market/Market.ts";
@@ -36,8 +36,20 @@ export async function runSchedule() {
 
 async function runGameLoop() {
   try {
+    console.log("\n=== GAME LOOP START ===");
+    console.log(
+      `Current Game Time: Year ${GameTime.year}, Season ${GameTime.season}, Day ${GameTime.dayOfSeason}, Hour ${GameTime.hour}`,
+    );
+
     GameTime.advanceOnePhrase();
+    console.log(
+      `Advanced to: Year ${GameTime.year}, Season ${GameTime.season}, Day ${GameTime.dayOfSeason}, Hour ${GameTime.hour}`,
+    );
+
+    console.log("\n--- Processing Milestones ---");
     const mileStoneNews = await handleGameMilestones();
+
+    console.log("\n--- Processing Events ---");
     const news = await processEvents(
       GameTime.getCurrentGameDayOfWeek(),
       GameTime.getCurrentGamePhase(),
@@ -45,16 +57,21 @@ async function runGameLoop() {
 
     const allNews = mergeNewsStructures(news, mileStoneNews);
 
+    // TODO: Archivers should record the news here
+
     await sendPartyData(allNews);
     console.log("Game loop executed successfully.");
+    console.log("=== GAME LOOP END ===\n");
   } catch (error) {
     console.error("Error during game loop:", error);
   }
 }
 
 const nextScheduleTick = (now: Date) => {
-  config();
-  const isTestMode = process.env.TEST_MODE === "true";
+  // config();
+  // const isTestMode = process.env.TEST_MODE === "true";
+
+  const isTestMode = true;
 
   if (isTestMode) {
     return new Date(now.getTime() + 10_000);
@@ -92,7 +109,7 @@ async function handleGameMilestones(): Promise<NewsDistribution> {
       const news = drawGlobalEventCard();
 
       if (news) {
-        mergeNewsStructures(allNews, news)
+        mergeNewsStructures(allNews, news);
       }
 
       gameState.lastGlobalEventCardCompleted = false;
@@ -103,14 +120,11 @@ async function handleGameMilestones(): Promise<NewsDistribution> {
     market.resourceTracker.resetYearlyTracking();
   }
 
-  if (
-    dayOfSeason === 1 &&
-    hour === 1
-  ) {
+  if (dayOfSeason === 1 && hour === 1) {
     // New season
     // - Refill resources based on the refilling table if it's the right season
     locationManager.refillResources();
-    
+
     // Adjust seasonal prices (local shortage factors recalculated on-demand)
     market.adjustSeasonalPrices();
   }
@@ -120,41 +134,53 @@ async function handleGameMilestones(): Promise<NewsDistribution> {
     // New Month
     // Draw Region Event Card, Trigger event effect and update global event scale
     const regionCardNews = drawRegionEventCard();
-    
+
     if (regionCardNews) {
       allNews = mergeNewsStructures(allNews, regionCardNews);
     }
   }
 
   if (hour === 1) {
-    // Save 
+    console.log("  New day milestone triggered");
+
+    // Save
     // await newsArchiveService.saveToDatabase();
     // save things to database here
     // News, Character, Party, Location, SubRegion, Region, Weather, Event Card, Game State, too much to think now
 
     // Check if global event card is completed
     if (gameState.activeGlobalEventCards?.completionCondition()) {
+      console.log("  Global event card completed");
       // Call cleanup handler before marking as complete
       if (gameState.activeGlobalEventCards.onEnd) {
         gameState.activeGlobalEventCards.onEnd();
-        Report.info(`Global event "${gameState.activeGlobalEventCards.name}" ended, cleanup executed`);
+        Report.info(
+          `Global event "${gameState.activeGlobalEventCards.name}" ended, cleanup executed`,
+        );
       }
       gameState.lastGlobalEventCardCompleted = true;
-      gameState.completedGlobalEventCards.push(gameState.activeGlobalEventCards);
+      gameState.completedGlobalEventCards.push(
+        gameState.activeGlobalEventCards,
+      );
       gameState.activeGlobalEventCards = undefined;
     }
-    
+
     // News propagation and decay
+    console.log("  Processing news spread and decay");
     newsArchiveService.dailySpread();
     newsArchiveService.dailyDecay();
-    
+
     // Save news to database
-    
+
     // New day
     // Draw weather cards for all subregions update accordingly
+    console.log("  Drawing weather cards for all subregions");
     const weatherNews = drawSubRegionsWeatherCard();
     const weatherStruct = newsArrayToStructure(weatherNews);
     allNews = mergeNewsStructures(allNews, weatherStruct);
+    console.log(`  Weather news merged into milestone news`);
+  } else {
+    console.log(`  Not a new day (hour=${hour}), skipping weather cards`);
   }
 
   return allNews;
@@ -164,16 +190,26 @@ async function processEvents(
   day: DayOfWeek,
   phase: TimeOfDay,
 ): Promise<NewsDistribution> {
-  const enc: NewsDistribution =
-    await locationManager.processEncounters(day, phase);
-  const act: NewsDistribution =
-    await locationManager.processActions(day, phase);
-  const tra: NewsDistribution = await travelManager.allTravel(
+  console.log(`  Processing events for day=${day}, phase=${phase}`);
+
+  console.log("  Processing encounters...");
+  const enc: NewsDistribution = await locationManager.processEncounters(
     day,
     phase,
   );
 
-  return mergeNewsStructures(enc, act, tra);
+  console.log("  Processing actions...");
+  const act: NewsDistribution = await locationManager.processActions(
+    day,
+    phase,
+  );
+
+  console.log("  Processing travel...");
+  const tra: NewsDistribution = await travelManager.allTravel(day, phase);
+
+  const merged = mergeNewsStructures(enc, act, tra);
+
+  return merged;
 }
 
 async function sendPartyData(news: NewsDistribution) {

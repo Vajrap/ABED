@@ -1,5 +1,5 @@
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
-import { locationRepository } from "../Repository/location";
+import { locationRepository } from "./Location/repository";
 import Report from "../../Utils/Reporter";
 
 /**
@@ -23,7 +23,7 @@ export class LocationGraph {
   buildFromLocations(): void {
     this.connections.clear();
     
-    for (const location of locationRepository.values()) {
+    for (const location of Object.values(locationRepository)) {
       if (!location.connectedLocations || location.connectedLocations.length === 0) continue;
       
       // Initialize set for this location

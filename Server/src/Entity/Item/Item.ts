@@ -39,12 +39,12 @@ export class Item {
     primaryResource?: ResourceType;
   }) {
     this.id = data.id;
-    this.name = data.name ?? "";
-    this.description = data.description ?? "";
+    this.name = data.name ?? { en: "", th: "" };
+    this.description = data.description ?? { en: "", th: "" };
     this.image = data.image ?? "";
     this.weight = data.weight ?? 0;
     this.tier = data.tier ?? TierEnum.common;
-    this.cost = data.cost ?? new ItemCost({})
+    this.cost = data.cost ?? new ItemCost({});
     this.isCraftable = data.isCraftable ?? false;
     this.primaryResource = data.primaryResource;
   }

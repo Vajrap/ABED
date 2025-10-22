@@ -1,18 +1,18 @@
 import Report from "../Utils/Reporter";
 import { characterManager } from "./CharacterManager";
 import { runSchedule } from "./GameLoop";
-import type { GameState } from "./GameState";
+import { gameState, type GameState } from "./GameState";
 
 export class Game {
   //db=db;
   characterManager = characterManager;
-  gameState: GameState = {
-    globalEventOccurred: false,
-  };
+  gameState: GameState = gameState;
 
   async start() {
     try {
       // initial DB, postgres,
+      // Change Game State here
+
       await this.initialize();
       // load things from DB into manager and repository
       // manager is like... pool of things? characterManager hold all characters, locationManager hold all locations etc
@@ -24,7 +24,7 @@ export class Game {
   }
 
   private async initialize() {
-    await runSchedule(this.gameState);
+    await runSchedule();
     Report.info(`Server is up and running at ${new Date().toLocaleString()}`);
   }
 

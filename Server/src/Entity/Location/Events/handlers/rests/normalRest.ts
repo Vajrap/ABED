@@ -1,3 +1,4 @@
+import { NewsPropagation, NewsSignificance } from "src/InterFacesEnumsAndTypes/NewsEnums";
 import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
 import type { Character } from "../../../../Character/Character";
 import {
@@ -14,14 +15,12 @@ export function normalRest(
   applyRestBenefits(character, 1);
   return createNews({
     scope: { kind: "privateScope", characterId: character.id },
-    tokens: [
-      {
-        t: "char",
-        v: [character.intoNewsInterface(context.subRegion)],
-      },
-      { t: "text", v: `has taken a rest` },
-    ],
+    content: {
+      en: `[char:${character.id}]${character.name}[/char] has taken a rest`,
+      th: `[char:${character.id}]${character.name}[/char] ได้พักผ่อน`
+    },
     context,
-    secretTier: TierEnum.rare,
+    significance: NewsSignificance.TRIVIAL,
+    propagation: NewsPropagation.LOCAL
   });
 }

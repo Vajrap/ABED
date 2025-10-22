@@ -1,5 +1,6 @@
-import { expect, describe, it } from "bun:test";
-import { CharacterService, type CharacterCreationData } from "../../src/Services/CharacterService";
+import { expect, describe, it } from "@jest/globals";
+import { CharacterService } from "../../src/Services/CharacterService";
+import type { CharacterCreationData } from "../../src/Services/CharacterService";
 import { RACES } from "../../src/Game/CharacterCreation/Races";
 import { CLASSES } from "../../src/Game/CharacterCreation/Classes";
 import { BACKGROUNDS } from "../../src/Game/CharacterCreation/Backgrounds";

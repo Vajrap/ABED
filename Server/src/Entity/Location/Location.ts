@@ -7,7 +7,10 @@ import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location
 import type { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
-import type { ResourceGenerateCapacity, ResourceGenerationConfig } from "../../InterFacesEnumsAndTypes/Interfaces/Resource";
+import type {
+  ResourceGenerateCapacity,
+  ResourceGenerationConfig,
+} from "../../InterFacesEnumsAndTypes/Interfaces/Resource";
 import {
   addToLocationScope,
   addToPartyScope,
@@ -24,11 +27,7 @@ import {
   groupRest,
   specialActions,
 } from "../Character/Subclass/Action/CharacterAction";
-import type {
-  News,
-  NewsContext,
-  NewsDistribution,
-} from "../News/News";
+import type { News, NewsContext, NewsDistribution } from "../News/News";
 import { newsArrayToStructure } from "../News/News";
 import { mergeNewsStructures } from "../../Utils/mergeNewsStructure";
 import type { Party } from "../Party/Party";
@@ -50,9 +49,9 @@ import type { WeatherVolatility } from "../Card/WeatherCard/WeatherCard";
 import { Weather } from "../../InterFacesEnumsAndTypes/Weather";
 import Report from "../../Utils/Reporter";
 import { GameTime } from "../../Game/GameTime/GameTime";
-import { subregionRepository } from "../Repository/subregion";
 import type { ResourceType } from "../Market/types";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N";
+import { subregionRepository } from "./SubRegion/repository";
 
 export type UserInputAction = {
   type: ActionInput;
@@ -176,7 +175,8 @@ export class Location {
         };
     this.volatility = volatility;
     this.weatherScale = weatherScale ?? getStartingWeatherScale(volatility);
-    this.resourceGeneration = resourceGeneration ?? this.getDefaultResourceGeneration();
+    this.resourceGeneration =
+      resourceGeneration ?? this.getDefaultResourceGeneration();
   }
 
   getRandomEventFor(
@@ -252,7 +252,7 @@ export class Location {
     if (candidates.length < 2) return result;
 
     const encounterPairs = pairEncounterCandidates(candidates);
-    // All Pairs might not end up well, some might fight so the generateNews Function might not be a good name
+
     const newsList = resolveEncounters(encounterPairs);
 
     for (const n of newsList) {
@@ -266,8 +266,7 @@ export class Location {
     day: DayOfWeek,
     phase: TimeOfDay,
   ): Promise<NewsDistribution> {
-    const results: NewsDistribution =
-      createEmptyNewsStructure();
+    const results: NewsDistribution = createEmptyNewsStructure();
     if (this.parties.length === 0) return results;
 
     for (const party of this.parties) {
@@ -313,7 +312,6 @@ export class Location {
         // Organic/forestry resources
         wood: 0,
 
-
         // Foraging resources
         herbs: 0,
         silk: 0,
@@ -327,7 +325,7 @@ export class Location {
         fruits: 0,
 
         // Livestock resources
-        livestock: 0
+        livestock: 0,
       },
       rate: {
         // Mineral resources
@@ -337,7 +335,6 @@ export class Location {
         // Organic/forestry resources
         wood: 0,
 
-
         // Foraging resources
         herbs: 0,
         silk: 0,
@@ -351,7 +348,7 @@ export class Location {
         fruits: 0,
 
         // Livestock resources
-        livestock: 0
+        livestock: 0,
       },
       stockpile: {
         // Mineral resources
@@ -361,7 +358,6 @@ export class Location {
         // Organic/forestry resources
         wood: 0,
 
-
         // Foraging resources
         herbs: 0,
         silk: 0,
@@ -375,15 +371,24 @@ export class Location {
         fruits: 0,
 
         // Livestock resources
-        livestock: 0
-      }
+        livestock: 0,
+      },
     };
   }
 
   private generateResources(type: string): number {
-    const currentStockpile = this.resourceGeneration.stockpile[type as keyof typeof this.resourceGeneration.stockpile];
-    const generationRate = this.resourceGeneration.rate[type as keyof typeof this.resourceGeneration.rate];
-    const maxCapacity = this.resourceGeneration.capacity[type as keyof typeof this.resourceGeneration.capacity];
+    const currentStockpile =
+      this.resourceGeneration.stockpile[
+        type as keyof typeof this.resourceGeneration.stockpile
+      ];
+    const generationRate =
+      this.resourceGeneration.rate[
+        type as keyof typeof this.resourceGeneration.rate
+      ];
+    const maxCapacity =
+      this.resourceGeneration.capacity[
+        type as keyof typeof this.resourceGeneration.capacity
+      ];
 
     const roll = rollTwenty().total;
     const fluctuation = (roll - 10) / 100;
@@ -396,8 +401,10 @@ export class Location {
       newAmount = 0;
     }
 
-    this.resourceGeneration.stockpile[type as keyof typeof this.resourceGeneration.stockpile] = newAmount;
-    
+    this.resourceGeneration.stockpile[
+      type as keyof typeof this.resourceGeneration.stockpile
+    ] = newAmount;
+
     // Return amount actually generated (for production tracking)
     return Math.max(0, newAmount - currentStockpile);
   }
@@ -405,7 +412,7 @@ export class Location {
   // Generate resources based on capacity and rates
   refillResources(): Map<ResourceType, number> {
     const generated = new Map<ResourceType, number>();
-    
+
     switch (GameTime.season) {
       case 1:
         // Seeding season
@@ -426,7 +433,7 @@ export class Location {
         break;
       case 4:
         // HarvestMoon season
-        // grain, vegetables, 
+        // grain, vegetables,
         generated.set("grain", this.generateResources("grain"));
         generated.set("vegetables", this.generateResources("vegetables"));
         break;
@@ -445,7 +452,7 @@ export class Location {
         // ore
         generated.set("ore", this.generateResources("ore"));
         break;
-      }
+    }
 
     return generated;
   }
@@ -456,12 +463,8 @@ export class Location {
   }
 
   getWeather(): Weather {
-    const subRegion = subregionRepository.get(this.subRegion);
-    if (!subRegion) {
-      Report.error(`SubRegion ${this.subRegion} not found`);
-      return Weather.Clear;
-    }
-    const weather = subRegion.weatherInterpretation.get(this.weatherScale);
+    const subRegion = subregionRepository[this.subRegion];
+    const weather = subRegion.getWeather(this.weatherScale);
     if (!weather) {
       Report.error(`Weather ${this.weatherScale} not found`);
       return Weather.Clear;
@@ -610,6 +613,7 @@ function pairEncounterCandidates(candidates: Party[]): [Party, Party][] {
   return pairs;
 }
 
+// TODO:
 function resolveEncounters(pairs: [Party, Party][]): News[] {
   const news: News[] = [];
   for (const [a, b] of pairs) {
@@ -848,7 +852,6 @@ function addNewsWithScopeToNewsEmittedFromLocationStruct(data: {
   }
   return data.nefls;
 }
-
 
 function getStartingWeatherScale(volatility: WeatherVolatility): number {
   switch (volatility) {

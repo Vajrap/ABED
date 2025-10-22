@@ -37,10 +37,17 @@ import type { Weapon } from "../Item/Equipment/Weapon/Weapon.ts";
 import type { ItemId } from "../Item/type.ts";
 import {
   ArmorClass,
-  BodyId,
   getWeaponFromRepository,
-  type EquipmentId,
   type WeaponId,
+  BodyId,
+  LegId,
+  HandId,
+  HeadWearId,
+  FootId,
+  UtilId,
+  RingId,
+  EarId,
+  NeckId,
 } from "../Item/index.ts";
 import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes.ts";
@@ -101,19 +108,19 @@ export class Character {
   inventory: Map<ItemId, number> = new Map();
   equipments: {
     // TODO
-    headWear: EquipmentId | null;
+    headWear: HeadWearId | null;
     body: BodyId | null;
-    leg: EquipmentId | null;
-    hand: EquipmentId | null;
-    foot: EquipmentId | null;
-    util: EquipmentId | null;
-    ringL: EquipmentId | null;
-    ringR: EquipmentId | null;
-    earL: EquipmentId | null;
-    earR: EquipmentId | null;
-    neck: EquipmentId | null;
-    rightHand: EquipmentId | null;
-    leftHand: EquipmentId | null;
+    leg: LegId | null;
+    hand: HandId | null;
+    foot: FootId | null;
+    util: UtilId | null;
+    ringL: RingId | null;
+    ringR: RingId | null;
+    earL: EarId | null;
+    earR: EarId | null;
+    neck: NeckId | null;
+    rightHand: WeaponId | null;
+    leftHand: WeaponId | null;
   } = {
     headWear: null,
     body: null,

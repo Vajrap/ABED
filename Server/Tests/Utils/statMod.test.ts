@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "@jest/globals";
 import { statMod } from "../../src/Utils/statMod";
 
 const testCases = [
@@ -36,8 +36,8 @@ const testCases = [
 
 test.each(testCases)(
   "statMod should return expected value",
-  ({ input, expected }: { input: number; expected: number }) => {
-    const result = statMod(input);
-    expect(result).toBe(expected);
+  (testCase) => {
+    const result = statMod(testCase.input);
+    expect(result).toBe(testCase.expected);
   },
 );

@@ -1,7 +1,7 @@
+import { GoldId } from "src/Entity/Item";
 import { SubRegionEnum } from "../../../../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
 import type { Character } from "../../../../Character/Character";
-import { MiscItemId } from "../../../../Item/Item";
 import {
   createNews,
   type NewsContext,
@@ -14,6 +14,7 @@ import {
 } from "../../../Config/Inn";
 import { applyRestBenefits } from "./applyRestBenefits";
 import { normalRest } from "./normalRest";
+import { NewsPropagation, NewsSignificance } from "src/InterFacesEnumsAndTypes/NewsEnums";
 
 export function innRest(
   characters: Character[],
@@ -25,7 +26,7 @@ export function innRest(
 
   const wallets = characters.map((char) => ({
     char,
-    gold: char.inventory.get(MiscItemId.gold) ?? 0,
+    gold: char.inventory.get(GoldId.gold) ?? 0,
   }));
 
   const totalAvailable = wallets.reduce((sum, w) => sum + w.gold, 0);
@@ -43,14 +44,14 @@ export function innRest(
         wallet.gold,
         Math.ceil((wallet.gold / totalAvailable) * totalCost),
       );
-      wallet.char.inventory.set(MiscItemId.gold, wallet.gold - share);
+      wallet.char.inventory.set(GoldId.gold, wallet.gold - share);
       remaining -= share;
     }
 
     if (remaining > 0 && wallets.length > 0) {
       const first = wallets[0]!;
-      const goldLeft = first.char.inventory.get(MiscItemId.gold) ?? 0;
-      first.char.inventory.set(MiscItemId.gold, goldLeft - remaining);
+      const goldLeft = first.char.inventory.get(GoldId.gold) ?? 0;
+      first.char.inventory.set(GoldId.gold, goldLeft - remaining);
     }
   }
 
@@ -58,20 +59,15 @@ export function innRest(
     applyRestBenefits(character, 1.3);
     const news = createNews({
       scope: { kind: "privateScope", characterId: character.id },
-      tokens: [
-        { t: "char", v: [character.intoNewsInterface(context.subRegion)] },
-        { t: "text", v: `has taken a rest in an inn.` },
-      ],
-      context: {
-        region: context.region,
-        subRegion: context.subRegion,
-        location: context.location,
-        partyId: character.partyID ?? '',
-        characterIds: [character.id]
+      content: {
+        en: `[char:${character.id}]${character.name}[/char] has taken a rest in an inn.`,
+        th: `[char:${character.id}]${character.name}[/char] ได้พักผ่อนในโรงแรม`
       },
-      secretTier: TierEnum.rare
+      context,
+      significance: NewsSignificance.TRIVIAL,
+      propagation: NewsPropagation.LOCAL
     });
-    allNews.push(news);
+        allNews.push(news);
   }
 
   return allNews;
@@ -90,7 +86,7 @@ export function getPreferredInnType(
   let accumulateGold = 0;
   for (const character of characters) {
     count[character.behavior.preferredInnType] += 1;
-    const gold = character.inventory.get(MiscItemId.gold);
+    const gold = character.inventory.get(GoldId.gold);
     if (gold) accumulateGold += gold;
   }
 

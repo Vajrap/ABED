@@ -1,11 +1,10 @@
-import type { Item, ItemId } from "../Item/Item";
+import type { Item } from "../Item/Item";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { ResourceType } from "./types";
 import type { Tradeable, TransactionHistory, TransactionRecord } from "./types";
 import { ResourceProductionTracker } from "./ResourceProductionTracker";
 import { calculateLocalShortageFactor } from "./PriceModifiers";
-import { locationRepository } from "../Repository/location";
-
+import { locationRepository } from "../Location/Location/repository";
 /**
  * Central market system
  * 
@@ -62,7 +61,7 @@ export class Market {
         location, 
         item.primaryResource
       );
-      const loc = locationRepository.get(location);
+      const loc = locationRepository[location];
       const subRegionBaseline = loc 
         ? this.resourceTracker.getSubRegionBaseline(loc.subRegion, item.primaryResource)
         : 0;
@@ -110,7 +109,7 @@ export class Market {
     const yearlyMod = this.yearlyModifiers.get(resource) ?? 1.0;
     
     const localBaseline = this.resourceTracker.getLocationBaseline(location, resource);
-    const loc = locationRepository.get(location);
+    const loc = locationRepository[location];
     const subRegionBaseline = loc 
       ? this.resourceTracker.getSubRegionBaseline(loc.subRegion, resource)
       : 0;

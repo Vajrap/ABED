@@ -2,7 +2,7 @@ import type { ResourceType } from "./types";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import { GameTime } from "../../Game/GameTime/GameTime";
-import { locationRepository } from "../Repository/location";
+import { locationRepository } from "../Location/Location/repository";
 
 /**
  * Price modifier calculation utilities
@@ -111,7 +111,7 @@ export function sumStorageInSubRegion(
 ): number {
   let total = 0;
   
-  for (const location of locationRepository.values()) {
+  for (const location of Object.values(locationRepository)) {
     if (location.subRegion === subRegion) {
       total += location.resourceGeneration.stockpile[resourceType];
     }
@@ -140,7 +140,7 @@ export function calculateLocalShortageFactor(
   localBaseline: number,
   subRegionBaseline: number
 ): number {
-  const loc = locationRepository.get(location);
+  const loc = locationRepository[location];
   if (!loc) return 1.0;
   
   const localWeight = 0.75;

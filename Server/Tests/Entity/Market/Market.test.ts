@@ -3,9 +3,9 @@ import { Market } from "../../../src/Entity/Market/Market";
 import { Item } from "../../../src/Entity/Item/Item";
 import { ItemCost } from "../../../src/Entity/Item/Subclass/ItemCost";
 import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
+import { locationRepository } from "src/Entity/Location/Location/repository";
 import { SubRegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/SubRegion";
 import { RegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Region";
-import { locationRepository } from "../../../src/Entity/Repository/location";
 import { Location } from "../../../src/Entity/Location/Location";
 import { SubRegion } from "../../../src/Entity/Location/SubRegion";
 import { Weather } from "../../../src/InterFacesEnumsAndTypes/Weather";
@@ -27,13 +27,46 @@ describe("Market", () => {
       RegionEnum.CentralPlain,
       { walk: 0, horse: 0, caravan: 0 },
       "STABLE",
-      weatherInterpretation
+      weatherInterpretation,
     );
 
     const config: ResourceGenerationConfig = {
-      capacity: { ore: 1000, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 },
-      rate: { ore: 100, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 },
-      stockpile: { ore: 500, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 }
+      capacity: {
+        ore: 1000,
+        gemstone: 0,
+        wood: 0,
+        herbs: 0,
+        silk: 0,
+        fish: 0,
+        grain: 0,
+        vegetables: 0,
+        fruits: 0,
+        livestock: 0,
+      },
+      rate: {
+        ore: 100,
+        gemstone: 0,
+        wood: 0,
+        herbs: 0,
+        silk: 0,
+        fish: 0,
+        grain: 0,
+        vegetables: 0,
+        fruits: 0,
+        livestock: 0,
+      },
+      stockpile: {
+        ore: 500,
+        gemstone: 0,
+        wood: 0,
+        herbs: 0,
+        silk: 0,
+        fish: 0,
+        grain: 0,
+        vegetables: 0,
+        fruits: 0,
+        livestock: 0,
+      },
     };
 
     testLocation = new Location(
@@ -45,7 +78,7 @@ describe("Market", () => {
       undefined,
       undefined,
       undefined,
-      config
+      config,
     );
 
     locationRepository.set(LocationsEnum.FyonarCity, testLocation);
@@ -82,7 +115,7 @@ describe("Market", () => {
       const item = new Item({
         id: "testItem",
         name: "Test Item",
-        cost: new ItemCost({ baseCost: 100 })
+        cost: new ItemCost({ baseCost: 100 }),
       });
 
       const price = market.getPrice(item, LocationsEnum.FyonarCity);
@@ -94,14 +127,14 @@ describe("Market", () => {
         id: "ironSword",
         name: "Iron Sword",
         cost: new ItemCost({ baseCost: 100 }),
-        primaryResource: "ore"
+        primaryResource: "ore",
       });
 
       // Set yearly modifier
       market.yearlyModifiers.set("ore", 1.2);
 
       const price = market.getPrice(item, LocationsEnum.FyonarCity);
-      
+
       // Should be basePrice × yearlyMod × localMod
       expect(price).toBeGreaterThan(100); // At least base × 1.2
     });
@@ -110,13 +143,13 @@ describe("Market", () => {
       const item = new Item({
         id: "ironSword",
         name: "Iron Sword",
-        cost: new ItemCost({ baseCost: 100 })
+        cost: new ItemCost({ baseCost: 100 }),
       });
 
       market.setEventModifier("ironSword" as any, 1.5, "event1");
 
       const price = market.getPrice(item, LocationsEnum.FyonarCity);
-      
+
       // Should include event modifier
       expect(price).toBeGreaterThan(100);
     });
@@ -126,14 +159,14 @@ describe("Market", () => {
         id: "ironSword",
         name: "Iron Sword",
         cost: new ItemCost({ baseCost: 100 }),
-        primaryResource: "ore"
+        primaryResource: "ore",
       });
 
       market.yearlyModifiers.set("ore", 1.2);
       market.setEventModifier("ironSword" as any, 1.5, "event1");
 
       const price = market.getPrice(item, LocationsEnum.FyonarCity);
-      
+
       // Base × yearly × local × event
       // At minimum: 100 × 1.2 × ? × 1.5
       expect(price).toBeGreaterThan(100);
@@ -147,15 +180,23 @@ describe("Market", () => {
     });
 
     it("should use provided base price", () => {
-      const price = market.getResourcePrice("ore", LocationsEnum.FyonarCity, 50);
+      const price = market.getResourcePrice(
+        "ore",
+        LocationsEnum.FyonarCity,
+        50,
+      );
       expect(price).toBeGreaterThan(0);
     });
 
     it("should apply yearly modifier", () => {
       market.yearlyModifiers.set("ore", 2.0);
 
-      const price = market.getResourcePrice("ore", LocationsEnum.FyonarCity, 100);
-      
+      const price = market.getResourcePrice(
+        "ore",
+        LocationsEnum.FyonarCity,
+        100,
+      );
+
       // Should be at least 100 × 2.0 = 200
       expect(price).toBeGreaterThanOrEqual(200);
     });
@@ -163,8 +204,12 @@ describe("Market", () => {
     it("should apply event modifier", () => {
       market.setEventModifier("ore", 1.5, "event1");
 
-      const price = market.getResourcePrice("ore", LocationsEnum.FyonarCity, 100);
-      
+      const price = market.getResourcePrice(
+        "ore",
+        LocationsEnum.FyonarCity,
+        100,
+      );
+
       expect(price).toBeGreaterThan(100);
     });
   });
@@ -176,15 +221,15 @@ describe("Market", () => {
         LocationsEnum.FyonarCity,
         SubRegionEnum.GoldenPlains,
         "ore",
-        500
+        500,
       );
 
       const modifiersBefore = new Map(market.yearlyModifiers);
-      
+
       market.adjustYearlyPrices();
-      
+
       const modifiersAfter = market.yearlyModifiers;
-      
+
       // Should have recalculated
       expect(modifiersAfter).toBeDefined();
       expect(modifiersAfter.size).toBeGreaterThan(0);
@@ -205,7 +250,7 @@ describe("Market", () => {
     it("should overwrite existing modifier", () => {
       market.setEventModifier("grain", 1.5, "event1");
       market.setEventModifier("grain", 2.0, "event1");
-      
+
       expect(market.getEventModifier("grain")).toBe(2.0);
     });
   });
@@ -214,7 +259,7 @@ describe("Market", () => {
     it("should remove event modifier", () => {
       market.setEventModifier("grain", 1.5, "event1");
       expect(market.eventModifiers.has("grain")).toBe(true);
-      
+
       market.clearEventModifier("grain", "event1");
       expect(market.eventModifiers.has("grain")).toBe(false);
     });
@@ -232,12 +277,12 @@ describe("Market", () => {
         LocationsEnum.FyonarCity,
         "ironSword" as any,
         3,
-        true // buy
+        true, // buy
       );
 
       const record = market.getTransactionRecord(
         LocationsEnum.FyonarCity,
-        "ironSword" as any
+        "ironSword" as any,
       );
 
       expect(record.bought).toBe(3);
@@ -249,12 +294,12 @@ describe("Market", () => {
         LocationsEnum.FyonarCity,
         "ore",
         50,
-        false // sell
+        false, // sell
       );
 
       const record = market.getTransactionRecord(
         LocationsEnum.FyonarCity,
-        "ore"
+        "ore",
       );
 
       expect(record.bought).toBe(0);
@@ -266,7 +311,10 @@ describe("Market", () => {
       market.recordTransaction(LocationsEnum.FyonarCity, "ore", 15, true);
       market.recordTransaction(LocationsEnum.FyonarCity, "ore", 5, false);
 
-      const record = market.getTransactionRecord(LocationsEnum.FyonarCity, "ore");
+      const record = market.getTransactionRecord(
+        LocationsEnum.FyonarCity,
+        "ore",
+      );
 
       expect(record.bought).toBe(25);
       expect(record.sold).toBe(5);
@@ -276,8 +324,14 @@ describe("Market", () => {
       market.recordTransaction(LocationsEnum.FyonarCity, "ore", 10, true);
       market.recordTransaction(LocationsEnum.BrayhornVillage, "ore", 20, true);
 
-      const record1 = market.getTransactionRecord(LocationsEnum.FyonarCity, "ore");
-      const record2 = market.getTransactionRecord(LocationsEnum.BrayhornVillage, "ore");
+      const record1 = market.getTransactionRecord(
+        LocationsEnum.FyonarCity,
+        "ore",
+      );
+      const record2 = market.getTransactionRecord(
+        LocationsEnum.BrayhornVillage,
+        "ore",
+      );
 
       expect(record1.bought).toBe(10);
       expect(record2.bought).toBe(20);
@@ -287,8 +341,14 @@ describe("Market", () => {
       market.recordTransaction(LocationsEnum.FyonarCity, "ore", 10, true);
       market.recordTransaction(LocationsEnum.FyonarCity, "grain", 20, true);
 
-      const oreRecord = market.getTransactionRecord(LocationsEnum.FyonarCity, "ore");
-      const grainRecord = market.getTransactionRecord(LocationsEnum.FyonarCity, "grain");
+      const oreRecord = market.getTransactionRecord(
+        LocationsEnum.FyonarCity,
+        "ore",
+      );
+      const grainRecord = market.getTransactionRecord(
+        LocationsEnum.FyonarCity,
+        "grain",
+      );
 
       expect(oreRecord.bought).toBe(10);
       expect(grainRecord.bought).toBe(20);
@@ -297,8 +357,11 @@ describe("Market", () => {
 
   describe("getTransactionRecord()", () => {
     it("should return zero record for no transactions", () => {
-      const record = market.getTransactionRecord(LocationsEnum.FyonarCity, "ore");
-      
+      const record = market.getTransactionRecord(
+        LocationsEnum.FyonarCity,
+        "ore",
+      );
+
       expect(record.bought).toBe(0);
       expect(record.sold).toBe(0);
     });
@@ -307,7 +370,10 @@ describe("Market", () => {
       market.recordTransaction(LocationsEnum.FyonarCity, "ore", 10, true);
       market.recordTransaction(LocationsEnum.FyonarCity, "ore", 5, false);
 
-      const record = market.getTransactionRecord(LocationsEnum.FyonarCity, "ore");
+      const record = market.getTransactionRecord(
+        LocationsEnum.FyonarCity,
+        "ore",
+      );
 
       expect(record.bought).toBe(10);
       expect(record.sold).toBe(5);
@@ -318,9 +384,42 @@ describe("Market", () => {
     it("should calculate realistic prices through a year", () => {
       // Create locations with different ore capacities
       const config1: ResourceGenerationConfig = {
-        capacity: { ore: 1000, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 },
-        rate: { ore: 100, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 },
-        stockpile: { ore: 800, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 }
+        capacity: {
+          ore: 1000,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
+        rate: {
+          ore: 100,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
+        stockpile: {
+          ore: 800,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
       };
 
       const loc = new Location(
@@ -332,7 +431,7 @@ describe("Market", () => {
         undefined,
         undefined,
         undefined,
-        config1
+        config1,
       );
 
       locationRepository.set(LocationsEnum.FyonarCity, loc);
@@ -343,7 +442,7 @@ describe("Market", () => {
         id: "ironSword",
         name: "Iron Sword",
         cost: new ItemCost({ baseCost: 100 }),
-        primaryResource: "ore"
+        primaryResource: "ore",
       });
 
       // Initial price
@@ -355,7 +454,7 @@ describe("Market", () => {
         LocationsEnum.FyonarCity,
         SubRegionEnum.GoldenPlains,
         "ore",
-        1200 // Above baseline
+        1200, // Above baseline
       );
 
       // Adjust yearly prices
@@ -368,9 +467,42 @@ describe("Market", () => {
 
     it("should handle event modifiers affecting final price", () => {
       const config: ResourceGenerationConfig = {
-        capacity: { ore: 1000, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 },
-        rate: { ore: 100, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 },
-        stockpile: { ore: 500, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 }
+        capacity: {
+          ore: 1000,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
+        rate: {
+          ore: 100,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
+        stockpile: {
+          ore: 500,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
       };
 
       const loc = new Location(
@@ -382,7 +514,7 @@ describe("Market", () => {
         undefined,
         undefined,
         undefined,
-        config
+        config,
       );
 
       locationRepository.set(LocationsEnum.FyonarCity, loc);
@@ -393,7 +525,7 @@ describe("Market", () => {
         id: "ironSword",
         name: "Iron Sword",
         cost: new ItemCost({ baseCost: 100 }),
-        primaryResource: "ore"
+        primaryResource: "ore",
       });
 
       const basePrice = market.getPrice(ironSword, LocationsEnum.FyonarCity);
@@ -419,12 +551,12 @@ describe("Market", () => {
       const genericItem = new Item({
         id: "magicScroll",
         name: "Magic Scroll",
-        cost: new ItemCost({ baseCost: 50 })
+        cost: new ItemCost({ baseCost: 50 }),
         // No primaryResource
       });
 
       const price = market.getPrice(genericItem, LocationsEnum.FyonarCity);
-      
+
       // Should return base price (no resource modifiers)
       expect(price).toBeGreaterThan(0);
     });
@@ -434,7 +566,7 @@ describe("Market", () => {
         id: "stick",
         name: "Stick",
         cost: new ItemCost({ baseCost: 0 }),
-        primaryResource: "wood"
+        primaryResource: "wood",
       });
 
       const price = market.getPrice(freeItem, LocationsEnum.FyonarCity);
@@ -446,14 +578,14 @@ describe("Market", () => {
         id: "ironSword",
         name: "Iron Sword",
         cost: new ItemCost({ baseCost: 100 }),
-        primaryResource: "ore"
+        primaryResource: "ore",
       });
 
       // Clear repository
       locationRepository.clear();
 
       const price = market.getPrice(item, LocationsEnum.FyonarCity);
-      
+
       // Should still return a price (uses defaults)
       expect(price).toBeGreaterThan(0);
     });
@@ -462,9 +594,42 @@ describe("Market", () => {
   describe("yearly cycle simulation", () => {
     it("should track production and adjust prices over a year", () => {
       const config: ResourceGenerationConfig = {
-        capacity: { ore: 1000, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 },
-        rate: { ore: 100, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 },
-        stockpile: { ore: 0, gemstone: 0, wood: 0, herbs: 0, silk: 0, fish: 0, grain: 0, vegetables: 0, fruits: 0, livestock: 0 }
+        capacity: {
+          ore: 1000,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
+        rate: {
+          ore: 100,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
+        stockpile: {
+          ore: 0,
+          gemstone: 0,
+          wood: 0,
+          herbs: 0,
+          silk: 0,
+          fish: 0,
+          grain: 0,
+          vegetables: 0,
+          fruits: 0,
+          livestock: 0,
+        },
       };
 
       const loc = new Location(
@@ -476,7 +641,7 @@ describe("Market", () => {
         undefined,
         undefined,
         undefined,
-        config
+        config,
       );
 
       locationRepository.set(LocationsEnum.FyonarCity, loc);
@@ -488,21 +653,22 @@ describe("Market", () => {
         LocationsEnum.FyonarCity,
         SubRegionEnum.GoldenPlains,
         "ore",
-        300 // 30% of baseline (1000)
+        300, // 30% of baseline (1000)
       );
 
       market.adjustYearlyPrices();
 
       const oreModifier = market.yearlyModifiers.get("ore");
-      
+
       // Low production (30%) should result in HIGH prices (clamped at 1.6)
       expect(oreModifier).toBe(1.6); // Clamped max
 
       // Reset for new year
       market.resourceTracker.resetYearlyTracking();
 
-      expect(market.resourceTracker.yearlyProduction.global.get("ore")).toBeUndefined();
+      expect(
+        market.resourceTracker.yearlyProduction.global.get("ore"),
+      ).toBeUndefined();
     });
   });
 });
-

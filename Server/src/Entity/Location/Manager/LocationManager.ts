@@ -8,17 +8,17 @@ import type {
 import type { NewsDistribution } from "../../News/News";
 import type { Location } from "../Location";
 import type { Region } from "../Regions";
-import { locationRepository } from "../../Repository/location";
-import { regionRepository } from "../../Repository/region";
-import { subregionRepository } from "../../Repository/subregion";
+import { locationRepository } from "../Location/repository";
+import { regionRepository } from "../Region/repository";
+import { subregionRepository } from "../SubRegion/repository";
 import type { SubRegion } from "../SubRegion";
 import { market } from "../../Market/Market";
 import { mergeNewsStructures } from "../../../Utils/mergeNewsStructure";
 
 class LocationManager {
-  regions: Map<RegionEnum, Region> = regionRepository;
-  subRegions: Map<SubRegionEnum, SubRegion> = subregionRepository;
-  locations: Map<LocationsEnum, Location> = locationRepository;
+  regions: Record<RegionEnum, Region> = regionRepository;
+  subRegions: Record<SubRegionEnum, SubRegion> = subregionRepository;
+  locations: Record<LocationsEnum, Location> = locationRepository;
 
   async processEncounters(
     day: DayOfWeek,
@@ -33,7 +33,7 @@ class LocationManager {
       privateScope: new Map(),
     };
     const results: NewsDistribution[] = [];
-    for (const [_, location] of this.locations) {
+    for (const location of Object.values(this.locations)) {
       const result = await location.processEncounters();
       results.push(result);
     }
@@ -56,7 +56,7 @@ class LocationManager {
       privateScope: new Map(),
     };
     const results: NewsDistribution[] = [];
-    for (const [_, location] of this.locations) {
+    for (const location of Object.values(this.locations)) {
       const result = await location.processActions(day, phase);
       results.push(result);
     }
@@ -72,17 +72,17 @@ class LocationManager {
   refillResources() {
     // Import market here to avoid circular dependencies
     // const { market } = require("../../Market/Market");
-    
-    for (const [_, location] of this.locations) {
+
+    for (const location of Object.values(this.locations)) {
       const generated = location.refillResources();
-      
+
       // Report production to market tracker
       for (const [resourceType, amount] of generated.entries()) {
         market.resourceTracker.recordProduction(
           location.id,
           location.subRegion,
           resourceType,
-          amount
+          amount,
         );
       }
     }

@@ -4,7 +4,8 @@ import type {
   ProficiencyKey,
 } from "src/InterFacesEnumsAndTypes/Enums.ts";
 import { DayOfWeek, TimeOfDay } from "src/InterFacesEnumsAndTypes/Time.ts";
-import type { BookId, ItemId } from "../../../Item/Item";
+import type { ItemId } from "../../../Item/type";
+import type { BookId } from "../../../Item/Books";
 import type { SkillId } from "../../../Skill/enums";
 
 export enum restEnums {

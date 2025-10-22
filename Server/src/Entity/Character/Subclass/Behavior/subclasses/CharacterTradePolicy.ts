@@ -3,7 +3,7 @@
 // =================================================
 
 import type { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers.ts";
-import type { ItemId } from "../../../../Item/Item";
+import type { ItemId } from "../../../../Item/type";
 
 /*
 		Trade System Flags:

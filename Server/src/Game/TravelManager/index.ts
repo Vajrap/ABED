@@ -1,8 +1,8 @@
 import type { RemoveLocationError } from "../../../Common/Text/TextEnum";
 import { ActionInput } from "../../Entity/Character/Subclass/Action/CharacterAction";
-import { locationRepository } from "../../Entity/Repository/location";
-import { regionRepository } from "../../Entity/Repository/region";
-import { subregionRepository } from "../../Entity/Repository/subregion";
+import { locationRepository } from "src/Entity/Location/Location/repository";
+import { subregionRepository } from "src/Entity/Location/SubRegion/repository";
+import { regionRepository } from "src/Entity/Location/Region/repository";
 import {
   createNews,
   emptyNewsDistribution,
@@ -40,13 +40,13 @@ class TravelManager {
     Report.error(`Party Not found`, { partyID });
     if (party === undefined) return false;
 
-    let currentLocation = locationRepository.get(party.currentLocation);
+    let currentLocation = locationRepository[party.currentLocation];
     Report.error("Current location not found in repository", {
       current: party.currentLocation,
     });
     if (currentLocation === undefined) return false;
 
-    let targetLocation = locationRepository.get(locationName);
+    let targetLocation = locationRepository[locationName];
     Report.error("Target location not found in repository", {
       target: locationName,
     });
@@ -72,7 +72,7 @@ class TravelManager {
       if (lastLocation === undefined) return false;
       if (
         locationRepository
-          .get(lastLocation)
+          [lastLocation]
           ?.checkIfLocationConnected(targetLocation)
       ) {
         party.path.push(locationName);
@@ -126,10 +126,7 @@ class TravelManager {
     }
   }
 
-  async allTravel(
-    day: DayOfWeek,
-    phase: TimeOfDay,
-  ): Promise<NewsDistribution> {
+  async allTravel(day: DayOfWeek, phase: TimeOfDay): Promise<NewsDistribution> {
     let travelingParties = [];
     const newsWithScope = emptyNewsDistribution();
     for (const [partyId, travelingParty] of this.travelingParties) {
@@ -158,6 +155,14 @@ class TravelManager {
     return newsWithScope;
   }
 
+  stopTravel(partyId: string) {
+    const travelingParty = this.travelingParties.get(partyId);
+    if (!travelingParty) return;
+
+    travelingParty.isTraveling = false;
+    this.travelingParties.delete(partyId);
+  }
+
   travel(party: TravelingParty): NewsDistribution | null {
     // Early return if the party has no path or already arrived at the last location in the path. Which shouldn't happen.
     if (
@@ -167,10 +172,10 @@ class TravelManager {
       return null;
 
     // Check if random 'Event' happens during travel.
-    const location = locationRepository.get(party.currentLocation);
+    const location = locationRepository[party.currentLocation];
     if (!location) return null;
-    const subRegion = subregionRepository.get(location.subRegion);
-    const region = regionRepository.get(location.region);
+    const subRegion = subregionRepository[location.subRegion];
+    const region = regionRepository[location.region];
     if (!subRegion || !region) return null;
     const randomRoll = rollTwenty().total;
     const randomEvent = location.getRandomEventFor("travel", randomRoll);
@@ -195,76 +200,86 @@ class TravelManager {
     if (handleResult.reachNextLocation) {
       const leader = party.party.leader;
       const locId = party.currentLocation;
-      let locName = locationRepository.get(locId)?.name;
+      let locName = locationRepository[locId]?.name;
       if (!locName) {
-        Report.error("Location name not found in repository")
+        Report.error("Location name not found in repository");
         locName = {
-          en: 'Undefined',
-          th: 'ไม่ระบุ'
-        }
+          en: "Undefined",
+          th: "ไม่ระบุ",
+        };
       }
 
       const news = createNews({
         scope: {
           kind: "partyScope",
-          partyId: party.party.partyID
+          partyId: party.party.partyID,
         },
         content: L10NWithEntities(
           {
             en: `[char:${leader.id}]${leader.name}[/char]'s party has reached [loc:${locId}]${locName.en}[/loc]`,
-            th: `ปาร์ตี้ของ [char:${leader.id}]${leader.name}[/char] เดินทางมาถึง [loc:${locId}]${locName.th}[/loc]`
+            th: `ปาร์ตี้ของ [char:${leader.id}]${leader.name}[/char] เดินทางมาถึง [loc:${locId}]${locName.th}[/loc]`,
           },
           {
             characters: [leader],
-            locations: [locId]
-          }
+            locations: [locId],
+          },
         ),
         context: {
-          region: RegionEnum.CentralPlain,
-          subRegion: SubRegionEnum.FyonarCapitalDistrict,
+          region: region.id,
+          subRegion: subRegion.id,
           location: party.currentLocation,
           partyId: party.party.partyID,
-          characterIds: party.party.characters.map(character => character !== "none" ? character.id : "")
-        }
+          characterIds: party.party.characters.map((character) =>
+            character !== "none" ? character.id : "",
+          ),
+        },
       });
-      travelNews = mergeNewsStructures(travelNews, newsArrayToStructure([news]));
+      travelNews = mergeNewsStructures(
+        travelNews,
+        newsArrayToStructure([news]),
+      );
     }
     if (handleResult.atDestination) {
       const leader = party.party.leader;
       const locId = party.currentLocation;
-      let locName = locationRepository.get(locId)?.name;
+      let locName = locationRepository[locId]?.name;
       if (!locName) {
-        Report.error("Location name not found in repository")
+        Report.error("Location name not found in repository");
         locName = {
-          en: 'Undefined',
-          th: 'ไม่ระบุ'
-        }
+          en: "Undefined",
+          th: "ไม่ระบุ",
+        };
       }
-      
+
       const news = createNews({
         scope: {
           kind: "partyScope",
-          partyId: party.party.partyID
+          partyId: party.party.partyID,
         },
         content: L10NWithEntities(
           {
             en: `[char:${leader.id}]${leader.name}[/char]'s party has arrived at [loc:${locId}]${locName.en}[/loc]!`,
-            th: `ปาร์ตี้ของ [char:${leader.id}]${leader.name}[/char] มาถึง [loc:${locId}]${locName.th}[/loc] แล้ว!`
+            th: `ปาร์ตี้ของ [char:${leader.id}]${leader.name}[/char] มาถึง [loc:${locId}]${locName.th}[/loc] แล้ว!`,
           },
           {
             characters: [leader],
-            locations: [locId]
-          }
+            locations: [locId],
+          },
         ),
         context: {
-          region: RegionEnum.CentralPlain,
-          subRegion: SubRegionEnum.FyonarCapitalDistrict,
+          region: region.id,
+          subRegion: subRegion.id,
           location: party.currentLocation,
           partyId: party.party.partyID,
-          characterIds: party.party.characters.map(character => character !== "none" ? character.id : "")
-        }
+          characterIds: party.party.characters.map((character) =>
+            character !== "none" ? character.id : "",
+          ),
+        },
       });
-      travelNews = mergeNewsStructures(travelNews, newsArrayToStructure([news]));
+      travelNews = mergeNewsStructures(
+        travelNews,
+        newsArrayToStructure([news]),
+      );
     }
 
     // Decrease mood and energy after travelling
@@ -310,11 +325,25 @@ class TravelManager {
     // Check if new current is the same one as last location in path, which seems to be done by the same get Next function
     // If so, it reach destination, isTraveling = false
 
-    const currentLocation = locationRepository.get(
-      travelingParty.currentLocation,
-    )!;
+
+    const currentLocation = locationRepository[travelingParty.currentLocation];
+    if (!currentLocation) {
+      Report.error("Current location not found in repository", {
+        current: travelingParty.currentLocation,
+      });
+      return {
+        currentLocation: travelingParty.currentLocation,
+        reachNextLocation: false,
+        atDestination: false,
+      } 
+    }
     const firstNextLocationEnum = travelingParty.getNextLocation();
-    const nextLocation = locationRepository.get(firstNextLocationEnum)!;
+    const nextLocation = locationRepository[firstNextLocationEnum];
+    if (!nextLocation) {
+      Report.error("Next location not found in repository", {
+        next: firstNextLocationEnum,
+      });
+    }
 
     let reachNextLocation = false;
     let atDestination = false;
@@ -362,29 +391,6 @@ function getAverageLuckModifier(party: TravelingParty): number {
 
   return statMod(totalLuck / allCharacters);
 }
-
-//   let paceModifier = 0;
-//   switch (party.party.behavior.travelPace) {
-//     case "bold":
-//       paceModifier = 20;
-//       break;
-//     case "measured":
-//       paceModifier = 0;
-//       break;
-//     case "careful":
-//       paceModifier = -20;
-//       break;
-//     default:
-//       paceModifier = 0;
-//   }
-
-//   return (
-//     100 +
-//     statMod(totalAgility / numberOfCharacter) +
-//     subRegion.getSpeedBonusFor(party.currentTravelMethod) +
-//     paceModifier
-//   );
-// }
 
 type RemoveLocationResult =
   | { success: true }

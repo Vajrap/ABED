@@ -29,9 +29,9 @@ describe("trainStat call counting via invoker", () => {
   });
 
   it("proficiencies: no-op when base >= 30 (trainStat not called)", () => {
-    const profs = CharacterProficienciesFactory.create().with("axe" as any, { base: 30 }).build();
+    const profs = CharacterProficienciesFactory.create().with("axe", { base: 30 }).build();
     const char = CharacterFactory.create().withProficiencies(profs).build();
-    trainProficiency(char, "axe" as any);
+    trainProficiency(char, "axe");
     expect(trainInvoker.trainStat).not.toHaveBeenCalled()
   });
 

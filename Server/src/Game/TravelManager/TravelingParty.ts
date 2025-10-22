@@ -1,6 +1,6 @@
 import type { Location } from "../../Entity/Location/Location";
-import { locationRepository } from "../../Entity/Repository/location";
-import { subregionRepository } from "../../Entity/Repository/subregion";
+import { locationRepository } from "../../Entity/Location/Location/repository";
+import { subregionRepository } from "../../Entity/Location/SubRegion/repository";
 import type { Party } from "../../Entity/Party/Party";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { statMod } from "../../Utils/statMod";
@@ -45,7 +45,7 @@ export class TravelingParty {
       this.currentLocation = this.path[this.currentLocationIndex]!;
       this.distanceCovered = 0;
 
-      const location = locationRepository.get(this.currentLocation)!;
+      const location = locationRepository[this.currentLocation];
       location.partyMovesIn(this.party);
     }
   }
@@ -54,11 +54,10 @@ export class TravelingParty {
     if (this.currentLocationIndex >= this.path.length - 1) {
       return false;
     }
-    const nextLocation = locationRepository.get(
-      this.path[this.currentLocationIndex + 1]!,
-    )!;
+    const nextLocation = locationRepository[this.path[this.currentLocationIndex + 1]!];
+    
 
-    const location = locationRepository.get(this.currentLocation)!;
+    const location = locationRepository[this.currentLocation];
 
     return this.distanceCovered >= location.getDistanceTo(nextLocation)!;
   }
@@ -91,8 +90,7 @@ export class TravelingParty {
         paceModifier = 0.7;
         break;
     }
-    const subRegion = subregionRepository
-      .get(locationRepository.get(this.currentLocation)!.subRegion)!
+    const subRegion = subregionRepository[locationRepository[this.currentLocation]!.subRegion]
       .getSpeedBonusFor(this.currentTravelMethod); // Likely be multiplier like walk:1, horse: 2, caravan: 0.7 etc, base on subRegion context;
     return baseSpeed * paceModifier * subRegion;
   }
