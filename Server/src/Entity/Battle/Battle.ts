@@ -1,12 +1,15 @@
-import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
+import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums";
 import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 import { statMod } from "../../Utils/statMod";
 import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
 import { buffsAndDebuffsRepository } from "../BuffsAndDebuffs/repository";
 import type { Character } from "../Character/Character";
+import { trainAttribute } from "../Character/Subclass/Stats/train";
 import type { Location } from "../Location/Location";
 import type { Party } from "../Party/Party";
+import type { TurnResult } from "../Skill/types";
 import { BattleReport } from "./BattleReport";
+import { getPlayableSkill } from "./getPlayableSkill";
 import { battleTypeConfig, type BattleType } from "./types";
 
 export class Battle {
@@ -49,6 +52,12 @@ export class Battle {
     ];
   }
 
+  async startBattle() {
+    // Battle Loop should return Result of the Battle along with TurnReport[]
+    await this.battleLoop();
+
+  }
+
   private async battleLoop() {
     if (this.allParticipants.length === 0)
       throw new Error("No participants found in the battle.");
@@ -69,31 +78,45 @@ export class Battle {
 
         if (updateAbGaugeAndDecideTurnTaking(actor)) {
           turnCount++;
-          // resolveBuffAndDebuff
-          const buffResolveResult = resolveBuffAndDebuff(actor);
-          if (buffResolveResult.ableToTakesTurn) {
-            // TODO: Start Actor Turn
-            const actorTurnResult = startActorTurn(actor);
-            // Update battle report
-            // Maybe like this.battleReport.results.push(actorTurnResult) that simple;
+          const canTakeTurn = resolveBuffAndDebuff(actor);
+          if (canTakeTurn.ableToTakesTurn) {
+            const actorTurnResult = this.startActorTurn(actor);
+            this.battleReport.addTurnResult(actorTurnResult);
+            
             this.allParticipants.push(
               this.allParticipants.shift() as Character,
             );
           } else {
-            // let reason = buffResolveResult.reason;
-            // Update battle report, maybe just
-            // result = {character, can't take turn, because of} and this.battleReport.results.push(result)
+            const turnResult: TurnResult = {
+              content: {
+                en: `${actor.name.en} cannot take action due to ${buffsAndDebuffsRepository[canTakeTurn.reason!].name.en}.`,
+                th: `${actor.name.th} ไม่สามารถเข้าสู่เทิร์นได้เพราะ ${buffsAndDebuffsRepository[canTakeTurn.reason!].name.th}.`,
+              },
+              actor: {
+                actorId: actor.id,
+                effect: "none"
+              },
+              targets: []
+            }
+            this.battleReport.addTurnResult(turnResult);
           }
 
-          // Check for battle end after the actor's turn
           const battleStatus = this.checkBattleEnd();
           if (
             battleStatus.status === BattleStatus.END ||
             battleStatus.status === BattleStatus.DRAW_END
           ) {
             this.isOngoing = false;
-            // Handle Battle end
-            //
+            this.handleBattleEnd(battleStatus);
+            this.battleReport.setOutcome(
+              battleStatus.winner ? battleStatus.winner.partyID : "",
+              { 
+                en: battleStatus.status === BattleStatus.DRAW_END ? "A battle ended in a draw" : `${battleStatus.winner?.leader.name.en} 's party win the battle!`, 
+                th: battleStatus.status === BattleStatus.DRAW_END ? "การต่อสู้จบลงด้วยการเสมอกัน" : `ปาร์ตี้ของ ${battleStatus.winner?.leader.name.th} ชนะในการต่อสู้!`
+              },
+              // TODO: Rewards calculation placeholder
+              {},
+            )
             break;
           }
         }
@@ -103,6 +126,52 @@ export class Battle {
         break;
       }
     }
+  }
+
+  startActorTurn(actor: Character): TurnResult {
+    activePassiveSkillEffect(actor);
+
+    actor.replenishResource();
+    // check if can play any card
+    const {skill, skillLevel} = getPlayableSkill(actor);
+    // Consume Resource
+    for (const consume of skill.consume.elements) {
+      actor.resources[consume.element] -= consume.value;
+    }
+    skill.consume.hp && (actor.vitals.decHp(skill.consume.hp));
+    skill.consume.mp && (actor.vitals.decMp(skill.consume.mp));
+    skill.consume.sp && (actor.vitals.decSp(skill.consume.sp));
+
+    // Execute
+    const isPartyA = this.partyA.characters.includes(actor);
+    const userParty = isPartyA
+      ? this.partyA.characters.filter(
+          (char): char is Character => char !== "none",
+        )
+      : this.partyB.characters.filter(
+          (char): char is Character => char !== "none",
+        );
+    const targetParty = isPartyA
+      ? this.partyB.characters.filter(
+          (char): char is Character => char !== "none",
+        )
+      : this.partyA.characters.filter(
+          (char): char is Character => char !== "none",
+        );
+
+    const turnResult = skill.exec(actor, userParty, targetParty, skillLevel, this.location);
+    // Produce Resource
+
+    for (const produce of skill.produce.elements) {
+      const amountProduced =
+        Math.floor(Math.random() * (produce.max - produce.min + 1)) + produce.min;
+      actor.resources[produce.element] += amountProduced;
+    }
+    skill.produce.hp && actor.vitals.incHp(skill.produce.hp);
+    skill.produce.mp && actor.vitals.incMp(skill.produce.mp);
+    skill.produce.sp && actor.vitals.incSp(skill.produce.sp);
+
+    return turnResult;
   }
 
   checkBattleEnd(): {
@@ -188,13 +257,19 @@ export class Battle {
     winnerParty: Party,
     defeatedParty: Party,
   ) {
-    const possibleAttributesToBeTrained = [
-      "strength",
-      "agility",
-      "endurance",
-      "breath",
+    const possibleAttributesToBeTrained: AttributeKey[] = [
+      "charisma",
+      "luck",
+      "intelligence",
+      "leadership",
+      "vitality",
+      "willpower",
       "planar",
+      "control",
       "dexterity",
+      "agility",
+      "strength",
+      "endurance",
     ];
 
     const timesOfTraining = 3;
@@ -205,13 +280,15 @@ export class Battle {
     );
 
     const trainCharacters = (party: Party, exp: number) => {
-      for (const character of party.characters.filter((c) => c !== undefined)) {
+      for (const character of party.characters.filter((c) => c !== undefined && c !== "none") as Character[]) {
         for (let i = 0; i < timesOfTraining; i++) {
           let trainedAttribute =
             possibleAttributesToBeTrained[
               Math.floor(Math.random() * possibleAttributesToBeTrained.length)
             ];
-          // character.train(trainedAttribute);
+            if (trainedAttribute) {
+              trainAttribute(character, trainedAttribute);
+            }
         }
       }
     };
@@ -304,15 +381,6 @@ function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
   return false;
 }
 
-const resolved = {
-  ableToTakesTurn: true,
-};
-
-const unresolved = {
-  ableToTakesTurn: false,
-  reason: BuffsAndDebuffsEnum,
-};
-
 function resolveBuffAndDebuff(actor: Character): {
   ableToTakesTurn: boolean;
   reason: BuffsAndDebuffsEnum | undefined;
@@ -321,7 +389,6 @@ function resolveBuffAndDebuff(actor: Character): {
   let reason;
 
   for (const [buffsOrDebuffs, entry] of actor.buffsAndDebuffs.entry) {
-    // Safe guard, no 0 buffs resolve
     if (entry.value === 0 && entry.permValue === 0) {
       return { ableToTakesTurn, reason };
     }
@@ -341,13 +408,7 @@ function resolveBuffAndDebuff(actor: Character): {
   };
 }
 
-function startActorTurn(actor: Character): void {
-  // TODO
-  actor.replenishResource();
-}
 
 function activePassiveSkillEffect(actor: Character) {
-  for (const charSkill of actor.activeSkills) {
-    const skillObj = charSkill.id;
-  }
+  // Passive skill take effect here
 }

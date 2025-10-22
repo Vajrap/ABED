@@ -22,7 +22,8 @@ export class Skill {
   produce: SkillProduce;
   exec: (
     user: Character,
-    target: Character,
+    userParty: Character[],
+    targetParty: Character[],
     skillLevel: number,
     location: Location,
   ) => TurnResult;
@@ -37,7 +38,8 @@ export class Skill {
     produce: SkillProduce;
     exec: (
       user: Character,
-      target: Character,
+      userParty: Character[],
+      targetParty: Character[],      
       skillLevel: number,
       location: Location,
     ) => TurnResult;

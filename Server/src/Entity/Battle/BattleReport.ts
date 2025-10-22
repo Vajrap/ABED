@@ -1,11 +1,11 @@
 import type { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import type { TurnResult } from "../Skill/Skill";
 import type { GameTimeInterface } from "src/InterFacesEnumsAndTypes/Time";
 import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import type { Party } from "../Party/Party";
 import type { Character } from "../Character/Character";
 import { GameTime } from "src/Game/GameTime/GameTime";
 import type { BattleType } from "./types";
+import type { TurnResult } from "../Skill/types";
 
 export class BattleReport {
   id: string;

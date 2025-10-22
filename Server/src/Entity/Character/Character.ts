@@ -1,5 +1,4 @@
 import {
-  CharacterEquipmentSlot,
   CharacterType,
   RelationStatusEnum,
   type ElementKey,
@@ -37,26 +36,16 @@ import { statMod } from "src/Utils/statMod.ts";
 import type { Weapon } from "../Item/Equipment/Weapon/Weapon.ts";
 import type { ItemId } from "../Item/type.ts";
 import {
-  BareHandId,
-  getEquipment,
+  ArmorClass,
+  BodyId,
   getWeaponFromRepository,
-  type BodyId,
-  type EarId,
-  type Equipment,
   type EquipmentId,
-  type FootId,
-  type HandId,
-  type HeadWearId,
-  type LegId,
-  type NeckId,
-  type RingId,
-  type UtilId,
   type WeaponId,
 } from "../Item/index.ts";
-import Report from "src/Utils/Reporter.ts";
 import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes.ts";
 import type { Location } from "../Location/Location.ts";
+import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
 
 export class Character {
   id: string = "";
@@ -113,7 +102,7 @@ export class Character {
   equipments: {
     // TODO
     headWear: EquipmentId | null;
-    body: EquipmentId | null;
+    body: BodyId | null;
     leg: EquipmentId | null;
     hand: EquipmentId | null;
     foot: EquipmentId | null;
@@ -168,6 +157,8 @@ export class Character {
     fire: 0,
     none: 0,
   };
+
+  position: 0 | 1 | 2 | 3 | 4 | 5 = 0;
 
   createdAt: Date;
   updatedAt: Date;
@@ -268,31 +259,30 @@ export class Character {
     this.replenishElement();
   }
 
-  // Conceptually talking, we'll get equal to control/endurance stat mod replenish if wearing medium armor
   private replenishSpAndMp() {
     const staminaDice = roll(1).d(3).total;
     const manaDice = roll(1).d(3).total;
     const controlMod = statMod(this.attribute.getTotal("control"));
     const enduranceMod = statMod(this.attribute.getTotal("endurance"));
 
-    // TODO:
-    // const armorPenaltyMap: Record<ArmorType, number> = {
-    //   [ArmorType.cloth]: 0,
-    //   [ArmorType.light]: 1,
-    //   [ArmorType.medium]: 2,
-    //   [ArmorType.heavy]: 3,
-    // };
+    const armorPenaltyMap: Record<ArmorClass, number> = {
+      [ArmorClass.Cloth]: 0,
+      [ArmorClass.Light]: 1,
+      [ArmorClass.Medium]: 2,
+      [ArmorClass.Heavy]: 3,
+    };
 
-    let armorpenalty = 0;
-    // if (
-    //   this.equipments.armor !== undefined &&
-    //   this.equipments.armor.armorType !== null
-    // ) {
-    //   armorpenalty = armorPenaltyMap[this.equipments.armor?.armorType];
-    // }
+    const armorPenalty = () => {
+      let armor;
+      if (this.equipments.body) {
+        armor = bodyRepository[this.equipments.body];
+      }
+      if (!armor) return 0;
+      return armorPenaltyMap[armor.armorData.armorClass];
+    }
 
-    this.vitals.incSp(staminaDice - armorpenalty + enduranceMod);
-    this.vitals.incMp(manaDice - armorpenalty + controlMod);
+    this.vitals.incSp(staminaDice - armorPenalty() + enduranceMod);
+    this.vitals.incMp(manaDice - armorPenalty() + controlMod);
   }
 
   private replenishElement() {

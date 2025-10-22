@@ -52,7 +52,7 @@ function checkSkillLearningRequirement(
 
   if (req.reqCharacterTrait) {
     for (const trait of req.reqCharacterTrait) {
-      if (!character.traits.includes(trait)) return false;
+      if (!character.traits.has(trait)) return false;
     }
   }
 
