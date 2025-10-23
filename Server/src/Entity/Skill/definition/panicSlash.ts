@@ -11,27 +11,33 @@ import {
 } from "src/InterFacesEnumsAndTypes/Enums";
 import type { TurnResult } from "../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { ActorEffect, TargetEffect } from "../effects";
 import { getTarget } from "src/Entity/Battle/getTarget";
+import { ActorEffect, TargetEffect } from "../effects";
+import { roll } from "src/Utils/Dice";
 
-export const basicAttack = new Skill({
-  id: SkillId.Basic,
+export const panicSlash = new Skill({
+  id: SkillId.PanicSlash,
   name: {
-    en: "Basic Attack",
-    th: "โจมตีปกติ",
+    en: "Panic Slash",
+    th: "ฟันแบบตื่นตระหนก",
   },
   description: {
-    en: "A basic attack, dealing damage equal to weapon's damage (+ modifier)",
-    th: "การโจมตีปกติ สร้างความเสียหายเท่ากับความเสียหายจากอาวุธ (+ modifier)",
+    en: "A reckless melee attack that consumes 1 Air. Deals 1.0× physical damage with a 25% chance to miss, but grants +10% crit chance if it hits.",
+    th: "การโจมตีระยะประชิดแบบไม่คิดหน้าคิดหลัง ใช้ 1 Air สร้างความเสียหายกายภาพ 1.0× มีโอกาสพลาด 25% แต่ถ้าตีโดนจะเพิ่มโอกาสคริติคอล 10%",
   },
   requirement: {},
-  equipmentNeeded: [],
+  equipmentNeeded: ["dagger", "sword", "machete"], // Melee weapons
   tier: TierEnum.common,
   consume: {
     hp: 0,
     mp: 0,
-    sp: 2,
-    elements: [],
+    sp: 3,
+    elements: [
+      {
+        element: "wind", // Air element
+        value: 1,
+      },
+    ],
   },
   produce: {
     hp: 0,
@@ -52,14 +58,13 @@ export const basicAttack = new Skill({
     skillLevel: number,
     location: Location,
   ) => {
-    // TODO: Get target methods;
     const target = getTarget(actor, targetParty).one().randomly()[0];
 
     if (!target) {
       return {
         content: {
-          en: `${actor.name.en} tried to attack with basic attack but has no target`,
-          th: `${actor.name.th} พยายามโจมตีด้วยการโจมตีปกติแต่ไม่พบเป้าหมาย`,
+          en: `${actor.name.en} tried to panic slash but has no target`,
+          th: `${actor.name.th} พยายามฟันแบบตื่นตระหนกแต่ไม่พบเป้าหมาย`,
         },
         actor: {
           actorId: actor.id,
@@ -68,18 +73,36 @@ export const basicAttack = new Skill({
         targets: [],
       };
     }
-    // Let's say it deal 1.2 weaponDamage
+
+    // Check for miss chance (25%)
+    if (roll(1).d(100).total <= 25) {
+      return {
+        content: {
+          en: `${actor.name.en} panicked and missed their wild slash!`,
+          th: `${actor.name.th} ตื่นตระหนกและฟันพลาด!`,
+        },
+        actor: {
+          actorId: actor.id,
+          effect: [ActorEffect.TestSkill],
+        },
+        targets: [],
+      };
+    }
+
     const weapon = actor.getWeapon();
     const type = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, type);
 
-    const positionMidifier = positionModifier(
+    const positionModifierValue = positionModifier(
       actor.position,
       target.position,
       weapon,
     );
 
-    damageOutput.damage = damageOutput.damage * positionMidifier;
+    damageOutput.damage = damageOutput.damage * positionModifierValue;
+
+    // Apply +10% crit chance (this would need to be implemented in the damage system)
+    // TODO: Implement crit chance bonus in damage calculation
 
     const totalDamage = target.receiveDamage(
       damageOutput,
@@ -91,7 +114,7 @@ export const basicAttack = new Skill({
       content: buildCombatMessage(
         actor,
         target,
-        { en: "Basic Attack", th: "การโจตีปกติ" },
+        { en: "Panic Slash", th: "ฟันแบบตื่นตระหนก" },
         totalDamage,
       ),
       actor: {

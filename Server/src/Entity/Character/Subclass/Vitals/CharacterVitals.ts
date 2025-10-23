@@ -1,6 +1,6 @@
 import { clamp } from "src/Utils/clamp.ts";
 
-class Vital {
+export class Vital {
   base: number;
   bonus: number;
   current: number;

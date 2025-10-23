@@ -15,48 +15,51 @@ import type { StatBlock } from "./CharacterStatArchetype";
 export function trainAttribute(
   character: Character,
   key: AttributeKey,
+  additionalExp: number
 ): Character {
   if (character.level >= 30 || character.attribute.getStat(key).base >= 30)
     return character;
-  return trainInvoker.trainStat(character, character.attribute.getStat(key));
+  return trainInvoker.trainStat(character, character.attribute.getStat(key), additionalExp);
 }
 
 export function trainProficiency(
   character: Character,
   key: ProficiencyKey,
+  additionalExp: number
 ): Character {
   if (character.level >= 30 || character.proficiencies.getStat(key).base >= 30)
     return character;
   return trainInvoker.trainStat(
     character,
     character.proficiencies.getStat(key),
+    additionalExp
   );
 }
 
-export function trainArtisan(character: Character, key: ArtisanKey): Character {
+export function trainArtisan(character: Character, key: ArtisanKey, additionalExp: number): Character {
   if (character.level >= 30 || character.artisans.getStat(key).base >= 30)
     return character;
-  return trainInvoker.trainStat(character, character.artisans.getStat(key));
+  return trainInvoker.trainStat(character, character.artisans.getStat(key), additionalExp);
 }
 
-export function trainStat(character: Character, status: StatBlock): Character {
+export function trainStat(character: Character, status: StatBlock, additionalExp: number): Character {
   const expNeeded = getExpNeededForStat(status.base);
 
   const rawGain =
     rollTwenty().total +
     statMod(character.attribute.getStat("intelligence").total);
-  const expGained = Math.max(rawGain, 0);
+  const expGained = Math.max(rawGain, 0) + additionalExp;
 
   status.exp += expGained;
 
   if (status.exp >= expNeeded) {
-    whenStatup(character, status, expNeeded);
+    whenStatUp(character, status, expNeeded);
   }
 
   return character;
 }
 
-function whenStatup(
+function whenStatUp(
   character: Character,
   status: StatBlock,
   expNeeded: number,

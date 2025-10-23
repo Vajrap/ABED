@@ -75,25 +75,45 @@ class TargetSelector {
   // Targeting, return Character[];
   randomly(): Character[] {
     this.returnIfNoTarget();
+    
+    // Filter targets based on row preference
+    const filteredTargets = this.filterTargetsByRow();
+    
+    if (filteredTargets.length === 0) {
+      return [];
+    }
+    
+    // Temporarily replace possibleTargets with filtered ones for random selection
+    const originalTargets = this.possibleTargets;
+    this.possibleTargets = filteredTargets;
+    
+    let result: Character[] = [];
+    
     switch (this.scope) {
       case "one":
-        return [this.getARandomTarget()];
+        result = [this.getARandomTarget()];
+        break;
       case "many":
-        let targets = [];
         for (let i = 1; i <= this.manyCount; i++) {
           if (this.possibleTargets.length === 0) {
-            return targets;
+            break;
           }
           const target = this.getARandomTarget();
           this.possibleTargets = this.possibleTargets.filter(
             (possibleTarget) => possibleTarget !== target,
           );
-          targets.push(target);
+          result.push(target);
         }
-        return targets;
+        break;
       case "all":
-        return this.possibleTargets;
+        result = this.possibleTargets;
+        break;
     }
+    
+    // Restore original targets
+    this.possibleTargets = originalTargets;
+    
+    return result;
   }
 
   with(
@@ -102,12 +122,19 @@ class TargetSelector {
   ): Character[] {
     this.returnIfNoTarget();
 
-    // Step 1: Handle taunting targets
+    // Step 1: Filter targets by row preference
+    const rowFilteredTargets = this.filterTargetsByRow();
+    
+    if (rowFilteredTargets.length === 0) {
+      return [];
+    }
+
+    // Step 2: Handle taunting targets
     let tauntingTargets: Character[] = [];
-    let nonTauntingTargets: Character[] = this.possibleTargets;
+    let nonTauntingTargets: Character[] = rowFilteredTargets;
 
     if (this.tauntCount) {
-      tauntingTargets = this.possibleTargets.filter((target) => {
+      tauntingTargets = rowFilteredTargets.filter((target) => {
         const taunt = target.buffsAndDebuffs.entry.get(
           BuffsAndDebuffsEnum.taunt,
         );
@@ -118,7 +145,7 @@ class TargetSelector {
         // Shuffle taunting targets randomly to avoid always picking the same one
         tauntingTargets = this.shuffleArray(tauntingTargets);
 
-        nonTauntingTargets = this.possibleTargets.filter(
+        nonTauntingTargets = rowFilteredTargets.filter(
           (target) => !tauntingTargets.includes(target),
         );
       }
@@ -200,8 +227,10 @@ class TargetSelector {
   allWith(buffOrDebuff: BuffsAndDebuffsEnum): Character[] {
     this.returnIfNoTarget();
 
-    // Filter all targets that have the specified buff/debuff
-    return this.possibleTargets.filter((target) => {
+    // First filter by row preference, then by buff/debuff
+    const rowFilteredTargets = this.filterTargetsByRow();
+    
+    return rowFilteredTargets.filter((target) => {
       const entry = target.buffsAndDebuffs.entry.get(buffOrDebuff);
       return entry !== undefined;
     });
@@ -240,10 +269,13 @@ class TargetSelector {
 
   dead(): Character[] {
     this.returnIfNoTarget();
-    const deadTargets = this.possibleTargets.filter(
+    
+    // First filter by row preference, then by dead status
+    const rowFilteredTargets = this.filterTargetsByRow();
+    
+    return rowFilteredTargets.filter(
       (target) => target.vitals.isDead,
     );
-    return deadTargets;
   }
 
   private getARandomTarget(): Character {
@@ -310,6 +342,30 @@ class TargetSelector {
       [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
     }
     return shuffled;
+  }
+
+  private filterTargetsByRow(): Character[] {
+    if (this.row === "any") {
+      return this.possibleTargets;
+    }
+
+    const frontRow = this.possibleTargets.filter(target => target.position <= 2);
+    const backRow = this.possibleTargets.filter(target => target.position > 2);
+
+    switch (this.row) {
+      case "frontOnly":
+        return frontRow;
+      case "backOnly":
+        return backRow;
+      case "frontPrefer":
+        // If front row has targets, use them; otherwise fall back to back row
+        return frontRow.length > 0 ? frontRow : backRow;
+      case "backPrefer":
+        // If back row has targets, use them; otherwise fall back to front row
+        return backRow.length > 0 ? backRow : frontRow;
+      default:
+        return this.possibleTargets;
+    }
   }
 
   private returnIfNoTarget() {

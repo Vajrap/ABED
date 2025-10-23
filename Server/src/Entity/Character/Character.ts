@@ -33,7 +33,7 @@ import type { CharacterEpithetEnum } from "./Subclass/Title/Epithet/enum";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N.ts";
 import { roll } from "src/Utils/Dice.ts";
 import { statMod } from "src/Utils/statMod.ts";
-import type { Weapon } from "../Item/Equipment/Weapon/Weapon.ts";
+import type { Weapon } from "src/Entity/Item";
 import type { ItemId } from "../Item/type.ts";
 import {
   ArmorClass,
@@ -286,7 +286,7 @@ export class Character {
       }
       if (!armor) return 0;
       return armorPenaltyMap[armor.armorData.armorClass];
-    }
+    };
 
     this.vitals.incSp(staminaDice - armorPenalty() + enduranceMod);
     this.vitals.incMp(manaDice - armorPenalty() + controlMod);
@@ -408,21 +408,18 @@ export class Character {
     };
   }
 
-  //MARK: RECEIVE HEAL
-  // receiveHeal({ healing }: { actor: Character; healing: number }) {
-  //   if (this.isDead === true) {
-  //     return this.hpUp(healing);
-  //   }
-  //   this.currentHP = Math.min(
-  //     this.currentHP + healing || this.maxHP(),
-  //     this.maxHP(),
-  //   );
+  receiveHeal({ healing }: { actor: Character; healing: number }): {
+    heal: number;
+  } {
+    if (this.vitals.isDead) {
+      return { heal: 0 };
+    }
+    const prior = this.vitals.hp.current;
+    this.vitals.hp.inc(healing);
+    const later = this.vitals.hp.current;
 
-  //   console.log(
-  //     `${this.name} healed for ${healing}: ${this.currentHP}/${this.maxHP()}`,
-  //   );
-  //   return this.hpUp(healing);
-  // }
+    return { heal: later - prior };
+  }
 }
 
 export type CharacterSkillObject = {

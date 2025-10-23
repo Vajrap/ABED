@@ -9,6 +9,7 @@ import type {
 import type { TraitEnum } from "../Trait.ts/enum";
 import type { SkillId } from "./enums";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
+import type { ActorEffect, TargetEffect } from "./effects";
 
 export type SkillLearningRequirement = Partial<{
   reqCharacterLevel: number;
@@ -52,10 +53,15 @@ export type ElementProduce = {
 export type TurnResult = {
   content: L10N;
   actor: ActorEffectPair;
-  targets: ActorEffectPair[];
+  targets: TargetEffectPair[];
 };
 
 export type ActorEffectPair = {
   actorId: string;
-  effect: string;
+  effect: ActorEffect[];
+};
+
+export type TargetEffectPair = {
+  actorId: string;
+  effect: TargetEffect[];
 };

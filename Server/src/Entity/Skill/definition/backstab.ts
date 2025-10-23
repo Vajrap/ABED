@@ -11,27 +11,36 @@ import {
 } from "src/InterFacesEnumsAndTypes/Enums";
 import type { TurnResult } from "../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { ActorEffect, TargetEffect } from "../effects";
 import { getTarget } from "src/Entity/Battle/getTarget";
+import { ActorEffect, TargetEffect } from "../effects";
 
-export const basicAttack = new Skill({
-  id: SkillId.Basic,
+export const backstab = new Skill({
+  id: SkillId.Backstab,
   name: {
-    en: "Basic Attack",
-    th: "โจมตีปกติ",
+    en: "Backstab",
+    th: "แทงข้างหลัง",
   },
   description: {
-    en: "A basic attack, dealing damage equal to weapon's damage (+ modifier)",
-    th: "การโจมตีปกติ สร้างความเสียหายเท่ากับความเสียหายจากอาวุธ (+ modifier)",
+    en: "A deadly finisher that consumes 1 Air + 1 Chaos. Deals 1.5× physical damage with +25% crit chance if target has Fear or Daze. 50% chance to generate 1 None if it crits.",
+    th: "การโจมตีจบที่อันตราย ใช้ 1 Air + 1 Chaos สร้างความเสียหายกายภาพ 1.5× และเพิ่มโอกาสคริติคอล 25% ถ้าเป้าหมายมีความกลัวหรือมึนงง มีโอกาส 50% ที่จะสร้าง 1 None ถ้าคริติคอล",
   },
   requirement: {},
-  equipmentNeeded: [],
+  equipmentNeeded: ["dagger", "sword", "machete"], // Melee weapons for backstab
   tier: TierEnum.common,
   consume: {
     hp: 0,
     mp: 0,
-    sp: 2,
-    elements: [],
+    sp: 5,
+    elements: [
+      {
+        element: "wind", // Air element
+        value: 1,
+      },
+      {
+        element: "chaos", // Chaos element
+        value: 1,
+      },
+    ],
   },
   produce: {
     hp: 0,
@@ -40,7 +49,7 @@ export const basicAttack = new Skill({
     elements: [
       {
         element: "none",
-        min: 1,
+        min: 0,
         max: 1,
       },
     ],
@@ -52,14 +61,13 @@ export const basicAttack = new Skill({
     skillLevel: number,
     location: Location,
   ) => {
-    // TODO: Get target methods;
     const target = getTarget(actor, targetParty).one().randomly()[0];
 
     if (!target) {
       return {
         content: {
-          en: `${actor.name.en} tried to attack with basic attack but has no target`,
-          th: `${actor.name.th} พยายามโจมตีด้วยการโจมตีปกติแต่ไม่พบเป้าหมาย`,
+          en: `${actor.name.en} tried to backstab but has no target`,
+          th: `${actor.name.th} พยายามแทงข้างหลังแต่ไม่พบเป้าหมาย`,
         },
         actor: {
           actorId: actor.id,
@@ -68,18 +76,30 @@ export const basicAttack = new Skill({
         targets: [],
       };
     }
-    // Let's say it deal 1.2 weaponDamage
+
     const weapon = actor.getWeapon();
     const type = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, type);
 
-    const positionMidifier = positionModifier(
+    const positionModifierValue = positionModifier(
       actor.position,
       target.position,
       weapon,
     );
 
-    damageOutput.damage = damageOutput.damage * positionMidifier;
+    // Apply 1.5x damage multiplier for backstab
+    damageOutput.damage = damageOutput.damage * 1.5 * positionModifierValue;
+
+    // Check if target has Fear or Daze for crit bonus
+    // TODO: Implement proper status effect checking
+    const hasFearOrDaze = false; // Placeholder - would check target status effects
+    let critBonus = 0;
+    if (hasFearOrDaze) {
+      critBonus = 25; // +25% crit chance
+    }
+
+    // TODO: Implement crit chance bonus in damage calculation
+    // TODO: Implement 50% chance to generate 1 None on crit
 
     const totalDamage = target.receiveDamage(
       damageOutput,
@@ -91,7 +111,7 @@ export const basicAttack = new Skill({
       content: buildCombatMessage(
         actor,
         target,
-        { en: "Basic Attack", th: "การโจตีปกติ" },
+        { en: "Backstab", th: "แทงข้างหลัง" },
         totalDamage,
       ),
       actor: {

@@ -35,8 +35,9 @@ export class CharacterStatArchetype<T extends string> {
     }
   }
 
-  setBase(attr: T, value: number): void {
+  setBase(attr: T, value: number) {
     this.stats[attr].base = value;
+    return this;
   }
 
   applyBattleChange(attr: T, value: number): void {

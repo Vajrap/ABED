@@ -127,7 +127,6 @@ export class Location {
   randomEvents: RandomEvents;
   weatherScale: number;
   volatility: WeatherVolatility;
-  // New resource generation system
   resourceGeneration: ResourceGenerationConfig;
 
   /*
