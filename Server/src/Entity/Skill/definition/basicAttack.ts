@@ -4,15 +4,12 @@ import { Skill } from "../Skill";
 import type { Location } from "src/Entity/Location/Location";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
-import { Weapon, WeaponPosition } from "src/Entity/Item";
-import {
-  PROFICIENCY_KEYS,
-  type ProficiencyKey,
-} from "src/InterFacesEnumsAndTypes/Enums";
 import type { TurnResult } from "../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { ActorEffect, TargetEffect } from "../effects";
 import { getTarget } from "src/Entity/Battle/getTarget";
+import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
+import { getPositionModifier } from "src/Utils/getPositionModifier";
 
 export const basicAttack = new Skill({
   id: SkillId.Basic,
@@ -52,7 +49,6 @@ export const basicAttack = new Skill({
     skillLevel: number,
     location: Location,
   ) => {
-    // TODO: Get target methods;
     const target = getTarget(actor, targetParty).one().randomly()[0];
 
     if (!target) {
@@ -68,12 +64,12 @@ export const basicAttack = new Skill({
         targets: [],
       };
     }
-    // Let's say it deal 1.2 weaponDamage
+
     const weapon = actor.getWeapon();
     const type = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, type);
 
-    const positionMidifier = positionModifier(
+    const positionMidifier = getPositionModifier(
       actor.position,
       target.position,
       weapon,
@@ -109,40 +105,3 @@ export const basicAttack = new Skill({
     return turnResult;
   },
 });
-
-function getWeaponDamageType(
-  weaponType: ProficiencyKey,
-): "physical" | "magical" {
-  const magicItems: ProficiencyKey[] = ["magicWand", "orb", "tome"];
-  if (magicItems.includes(weaponType)) {
-    return "magical";
-  } else {
-    return "physical";
-  }
-}
-
-function positionModifier(
-  actorPosition: number,
-  targetPosition: number,
-  weapon: Weapon,
-): number {
-  const actorFront = actorPosition <= 2;
-  const targetFront = targetPosition <= 2;
-
-  switch (weapon.preferredPosition) {
-    case WeaponPosition.Melee:
-      if (actorFront && targetFront) return 1;
-      if (actorFront || targetFront) return 0.7;
-      return 0.4;
-
-    case WeaponPosition.Ranged:
-      if (!actorFront && !targetFront) return 1;
-      if (actorFront && targetFront) return 0.7;
-      return 0.4;
-
-    case WeaponPosition.Versatile:
-      if (actorFront && !targetFront) return 1;
-      if (!actorFront && targetFront) return 1;
-      return 0.7;
-  }
-}

@@ -51,7 +51,10 @@ export const throwPebble = new Skill({
     skillLevel: number,
     location: Location,
   ) => {
-    const target = getTarget(actor, targetParty).one().from('backPrefer').randomly()[0];
+    const target = getTarget(actor, targetParty)
+      .one()
+      .from("backPrefer")
+      .randomly()[0];
 
     if (!target) {
       return {
@@ -67,29 +70,38 @@ export const throwPebble = new Skill({
       };
     }
 
-    const damageOutput = getDamageOutput(actor, 1, 6, ['strength'], 0, ['dexterity'], 0, [])
+    const damageOutput = getDamageOutput(
+      actor,
+      1,
+      6,
+      ["strength"],
+      0,
+      ["dexterity"],
+      0,
+      [],
+    );
     if (actor.position > 2) {
-        // If user is in the backrow
-        if (target.position > 2) {
-            // and target is in the backrow
-            // too far
-            damageOutput.damage = damageOutput.damage * 0.8;
-        } else {
-            // But the target is in the frontrow
-            // good position
-            damageOutput.damage = damageOutput.damage * 1.2;
-        }
+      // If user is in the backrow
+      if (target.position > 2) {
+        // and target is in the backrow
+        // too far
+        damageOutput.damage = damageOutput.damage * 0.8;
+      } else {
+        // But the target is in the frontrow
+        // good position
+        damageOutput.damage = damageOutput.damage * 1.2;
+      }
     } else {
-        // If user is in the frontrow
-        if (target.position > 2) {
-            // And the target is in the backrow
-            // good position
-            damageOutput.damage = damageOutput.damage * 1.2;
-        } else {
-            // And the target is in the frontrow
-            // too close
-            damageOutput.damage = damageOutput.damage * 0.8;
-        }
+      // If user is in the frontrow
+      if (target.position > 2) {
+        // And the target is in the backrow
+        // good position
+        damageOutput.damage = damageOutput.damage * 1.2;
+      } else {
+        // And the target is in the frontrow
+        // too close
+        damageOutput.damage = damageOutput.damage * 0.8;
+      }
     }
 
     const totalDamage = target.receiveDamage(
@@ -102,24 +114,29 @@ export const throwPebble = new Skill({
 
     let dazedHit = false;
     if (isHit) {
-        // let's say DC 15 chance to get daze
-        const roll = rollTwenty().total;
-        if (roll + statMod(actor.attribute.getTotal('strength')) >=
-        15 + statMod(target.attribute.getTotal('endurance'))) {
-            dazedHit = true;
-            buffsAndDebuffsRepository.dazed.appender(target, 1, false, 0);
-        }
+      const roll = rollTwenty().total;
+      if (
+        roll + statMod(actor.attribute.getTotal("strength")) >=
+        15 + statMod(target.attribute.getTotal("endurance"))
+      ) {
+        dazedHit = true;
+        buffsAndDebuffsRepository.dazed.appender(target, 1, false, 0);
+      }
     }
 
-    const targetEffect = dazedHit ? [TargetEffect.BluntOne, TargetEffect.Dazed] : isHit ? [TargetEffect.BluntOne] : [TargetEffect.Dodge];
+    const targetEffect = dazedHit
+      ? [TargetEffect.BluntOne, TargetEffect.Dazed]
+      : isHit
+        ? [TargetEffect.BluntOne]
+        : [TargetEffect.Dodge];
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(
         actor,
         target,
         {
-            en: `${actor.name.en} Throw Pebble at ${target.name.en} deal ${totalDamage.actualDamage} blunt damage. ${dazedHit ? "And dazed the target." : ""}`,
-            th: `${actor.name.th} ขว้างก้อนหินใส่ ${target.name.th} สร้างความเสียหาย blunt ${totalDamage.actualDamage} หน่วย. ${dazedHit ? "และทำให้เป้าหมายสับสน." : ""}`
+          en: `${actor.name.en} Throw Pebble at ${target.name.en} deal ${totalDamage.actualDamage} blunt damage. ${dazedHit ? "And dazed the target." : ""}`,
+          th: `${actor.name.th} ขว้างก้อนหินใส่ ${target.name.th} สร้างความเสียหาย blunt ${totalDamage.actualDamage} หน่วย. ${dazedHit ? "และทำให้เป้าหมายสับสน." : ""}`,
         },
         totalDamage,
       ),
@@ -134,7 +151,6 @@ export const throwPebble = new Skill({
         },
       ],
     };
-
 
     return turnResult;
   },
