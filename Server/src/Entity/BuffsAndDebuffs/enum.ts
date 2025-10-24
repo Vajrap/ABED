@@ -4,4 +4,5 @@ export enum BuffsAndDebuffsEnum {
   hiding = "hiding",
   taunt = "taunt",
   dazed = "dazed",
+    fear = "fear",
 }

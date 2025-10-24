@@ -1,28 +1,26 @@
-import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
-import type { Location } from "src/Entity/Location/Location";
-import type { Character } from "src/Entity/Character/Character";
-import {
-  PROFICIENCY_KEYS,
-  type ProficiencyKey,
-} from "src/InterFacesEnumsAndTypes/Enums";
-import type { TurnResult } from "../types";
-import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { getTarget } from "src/Entity/Battle/getTarget";
-import { ActorEffect, TargetEffect } from "../effects";
-import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll } from "src/Utils/Dice";
+import {TierEnum} from "src/InterFacesEnumsAndTypes/Tiers";
+import {SkillId} from "../enums";
+import {Skill} from "../Skill";
+import type {Location} from "src/Entity/Location/Location";
+import type {Character} from "src/Entity/Character/Character";
+import type {TurnResult} from "../types";
+import {buildCombatMessage} from "src/Utils/buildCombatMessage";
+import {getTarget} from "src/Entity/Battle/getTarget";
+import {ActorEffect, TargetEffect} from "../effects";
+import {DamageType} from "src/InterFacesEnumsAndTypes/DamageTypes";
+import {roll} from "src/Utils/Dice";
+import {statMod} from "src/Utils/statMod.ts";
+import {buffsAndDebuffsRepository} from "src/Entity/BuffsAndDebuffs/repository.ts";
 
 export const shriek = new Skill({
   id: SkillId.Shriek,
   name: {
     en: "Shriek",
-    th: "เสียงกรีดร้อง",
+    th: "กรีดร้อง",
   },
   description: {
-    en: "A panicked shriek has DC 10 (-target Endurance mod) chance to inflict Minor Fear. If Fear fails, applies Taunt to self for 1 turn.",
-    th: "เสียงกรีดร้องแบบตื่นตระหนก มีโอกาส DC 10 (-mod endurance ของเป้าหมาย) ที่จะทำให้เกิดความกลัวเล็กน้อย ถ้าล้มเหลวจะทำให้ตัวเองได้รับ Taunt 1 turn",
+    en: "A panicked shriek has roll 1D20 VS. DC15 (+target WIL) chance to inflict Minor Fear. If Fear fails, applies Taunt to self for 1 turn.",
+    th: "กรีดร้องด้วยความตื่นตระหนก ทอยลูกเต๋า 1D20 VS. DC15 (+target WIL) ที่จะทำให้เกิดความกลัวเล็กน้อย ถ้าล้มเหลวจะทำให้ตัวเองได้รับ Taunt 1 turn",
   },
   requirement: {},
   equipmentNeeded: [], // No equipment needed for vocal skill
@@ -73,41 +71,38 @@ export const shriek = new Skill({
       };
     }
 
-    // Check for Minor Fear effect (15% chance)
-    const fearSuccess = roll(1).d(100).total <= 15;
-    let effectMessage = "";
-    let targetEffect = [TargetEffect.TestSkill];
-
+    // DC 15 + will
+    const fearSuccess = roll(1).d(100).total <= 15 + statMod(target.attribute.getTotal('willpower'));
     if (fearSuccess) {
-      // TODO: Implement Minor Fear effect (-5% ATK, 1 turn)
-      effectMessage = " (Minor Fear!)";
-      targetEffect = [TargetEffect.Fear];
+        buffsAndDebuffsRepository.fear.appender(target, 1, false, 0);
     } else {
-      // TODO: Implement Taunt effect on self (1 turn)
-      effectMessage = " (Self-Taunt!)";
-      targetEffect = [TargetEffect.Taunt];
+        buffsAndDebuffsRepository.taunt.appender(actor, 1, false, 0);
     }
 
-    // Check for Air generation (50% chance)
-    const airGenerated = roll(1).d(100).total <= 50;
-    let airMessage = "";
-    if (airGenerated) {
-      airMessage = " (Generated Air!)";
-    }
+    const actorEffect = [ActorEffect.Shout]
+      if (!fearSuccess) actorEffect.push(ActorEffect.Taunt)
+      const targetEffect = []
+      if (fearSuccess) targetEffect.push(TargetEffect.Fear)
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(
         actor,
         target,
-        { 
-          en: `Shriek${effectMessage}${airMessage}`, 
-          th: `เสียงกรีดร้อง${effectMessage}${airMessage}` 
+        {
+          en: `${actor.name.en} Shriek caused ${fearSuccess 
+              ? `Fear on ${target.name.en}` 
+              : 'self to gain taunt'
+          }`,
+          th: `${actor.name.th} ส่งเสียงกรีดร้อง ${fearSuccess
+              ? `สร้างผลหวาดหลัวให้กับ ${target.name.th}` 
+              : `ทำให้ตนได้รับ "ยั่วยุ"`
+          }`
         },
         { isHit: true, actualDamage: 0, damageType: DamageType.arcane },
       ),
       actor: {
         actorId: actor.id,
-        effect: [ActorEffect.TestSkill],
+        effect: actorEffect,
       },
       targets: [
         {

@@ -2,7 +2,7 @@
 export enum ActorEffect {
   // Basic Attack Types
   SlashOne = "ActSlashOne",
-  SlashTwo = "ActSlashTwo", 
+  SlashTwo = "ActSlashTwo",
   SlashThree = "ActSlashThree",
   BluntOne = "ActBluntOne",
   BluntTwo = "ActBluntTwo",
@@ -10,13 +10,13 @@ export enum ActorEffect {
   PierceOne = "ActPierceOne",
   PierceTwo = "ActPierceTwo",
   PierceThree = "ActPierceThree",
-  
+
   // Elemental Attacks
   FireOne = "ActFireOne",
   FireTwo = "ActFireTwo",
   FireThree = "ActFireThree",
   WaterOne = "ActWaterOne",
-  WaterTwo = "ActWaterTwo", 
+  WaterTwo = "ActWaterTwo",
   WaterThree = "ActWaterThree",
   EarthOne = "ActEarthOne",
   EarthTwo = "ActEarthTwo",
@@ -30,7 +30,7 @@ export enum ActorEffect {
   ChaosOne = "ActChaosOne",
   ChaosTwo = "ActChaosTwo",
   ChaosThree = "ActChaosThree",
-  
+
   // Special Actions
   Cast = "ActCast",
   Shout = "ActShout",
@@ -38,7 +38,8 @@ export enum ActorEffect {
   Retreat = "ActRetreat",
   Charge = "ActCharge",
   Focus = "ActFocus",
-  
+  Taunt = "ActTaunt",
+
   // Generic/Test
   TestSkill = "ActTestSkill",
 }
@@ -48,21 +49,21 @@ export enum TargetEffect {
   // Basic Attack Types
   SlashOne = "TarSlashOne",
   SlashTwo = "TarSlashTwo",
-  SlashThree = "TarSlashThree", 
+  SlashThree = "TarSlashThree",
   BluntOne = "TarBluntOne",
   BluntTwo = "TarBluntTwo",
   BluntThree = "TarBluntThree",
   PierceOne = "TarPierceOne",
   PierceTwo = "TarPierceTwo",
   PierceThree = "TarPierceThree",
-  
+
   // Elemental Attacks
   FireOne = "TarFireOne",
   FireTwo = "TarFireTwo",
   FireThree = "TarFireThree",
   WaterOne = "TarWaterOne",
   WaterTwo = "TarWaterTwo",
-  WaterThree = "TarWaterThree", 
+  WaterThree = "TarWaterThree",
   EarthOne = "TarEarthOne",
   EarthTwo = "TarEarthTwo",
   EarthThree = "TarEarthThree",
@@ -75,7 +76,7 @@ export enum TargetEffect {
   ChaosOne = "TarChaosOne",
   ChaosTwo = "TarChaosTwo",
   ChaosThree = "TarChaosThree",
-  
+
   // Status Effects
   Dazed = "TarDazed",
   Fear = "TarFear",
@@ -83,13 +84,13 @@ export enum TargetEffect {
   Haste = "TarHaste",
   Slow = "TarSlow",
   Hiding = "TarHiding",
-  
+
   // Special Effects
   Evasion = "TarEvasion",
   Block = "TarBlock",
   Parry = "TarParry",
   Dodge = "TarDodge",
-  
+
   // Generic/Test
   TestSkill = "TarTestSkill",
 }

@@ -7,6 +7,7 @@ import type { BuffsAndDebuffsDef } from "./type";
 import { hiding } from "./definitions/hiding";
 import { taunt } from "./definitions/taunt";
 import { dazed } from "./definitions/dazed";
+import {fear} from "src/Entity/BuffsAndDebuffs/definitions/fear.ts";
 
 export const buffsAndDebuffsRepository: Record<
   BuffsAndDebuffsEnum,
@@ -17,4 +18,5 @@ export const buffsAndDebuffsRepository: Record<
   [BuffsAndDebuffsEnum.hiding]: hiding,
   [BuffsAndDebuffsEnum.taunt]: taunt,
   [BuffsAndDebuffsEnum.dazed]: dazed,
+  [BuffsAndDebuffsEnum.fear]: fear
 };

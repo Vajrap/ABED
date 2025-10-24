@@ -1,0 +1,5 @@
+{
+    "vscode-circular-dependency.error-level": "error",
+    "vscode-circular-dependency.allow-persistent-caching": true,
+    "vscode-circular-dependency.enable-dependency-loop": false
+}

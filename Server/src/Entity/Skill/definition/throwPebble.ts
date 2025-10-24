@@ -20,8 +20,8 @@ export const throwPebble = new Skill({
     th: "ขว้างก้อนหิน",
   },
   description: {
-    en: "A simple ranged attack with a pebble. Deals 1d6 blunt damage. If hit, roll DC 15 (+actor strength mod, -target endurance mod) to daze the target.",
-    th: "การโจมตีระยะไกลด้วยก้อนหิน สร้างความเสียหาย blunt 1d6 หน่วย หากโจมตีถูกเป้าหมาย ทอย DC 15 (+mod strength ของผู้ใช้, -mod endurance ของเป้าหมาย) ถ้าสำเร็จจะทำให้เป้าหมายสับสน",
+    en: "A simple ranged attack with a pebble. Deals 1d6 blunt damage. If hit, roll 1D20 (+self STR mod) VS. DC15 (+target END mod) to daze the target.",
+    th: "การโจมตีระยะไกลด้วยก้อนหิน สร้างความเสียหาย blunt 1d6 หน่วย หากโจมตีถูกเป้าหมาย ทอย 1D20 (+self STR mod) VS. DC15 (+target END mod) ถ้าสำเร็จจะทำให้เป้าหมายสับสน",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -91,7 +91,7 @@ export const throwPebble = new Skill({
             damageOutput.damage = damageOutput.damage * 0.8;
         }
     }
-    
+
     const totalDamage = target.receiveDamage(
       damageOutput,
       DamageType.blunt,
@@ -99,27 +99,27 @@ export const throwPebble = new Skill({
     );
 
     const isHit = totalDamage.isHit;
-    
+
     let dazedHit = false;
     if (isHit) {
         // let's say DC 15 chance to get daze
         const roll = rollTwenty().total;
-        if (roll + statMod(actor.attribute.getTotal('strength')) >= 
+        if (roll + statMod(actor.attribute.getTotal('strength')) >=
         15 + statMod(target.attribute.getTotal('endurance'))) {
             dazedHit = true;
             buffsAndDebuffsRepository.dazed.appender(target, 1, false, 0);
         }
     }
-   
+
     const targetEffect = dazedHit ? [TargetEffect.BluntOne, TargetEffect.Dazed] : isHit ? [TargetEffect.BluntOne] : [TargetEffect.Dodge];
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(
         actor,
         target,
-        { 
-            en: `${actor.name.en} Throw Pebble at ${target.name.en} deal ${totalDamage.actualDamage} blunt damage. ${dazedHit ? "And dazed the target." : ""}`, 
-            th: `${actor.name.th} ขว้างก้อนหินใส่ ${target.name.th} สร้างความเสียหาย blunt ${totalDamage.actualDamage} หน่วย. ${dazedHit ? "และทำให้เป้าหมายสับสน." : ""}` 
+        {
+            en: `${actor.name.en} Throw Pebble at ${target.name.en} deal ${totalDamage.actualDamage} blunt damage. ${dazedHit ? "And dazed the target." : ""}`,
+            th: `${actor.name.th} ขว้างก้อนหินใส่ ${target.name.th} สร้างความเสียหาย blunt ${totalDamage.actualDamage} หน่วย. ${dazedHit ? "และทำให้เป้าหมายสับสน." : ""}`
         },
         totalDamage,
       ),
