@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "@jest/globals";
 import { WeatherCard, WeatherDeck, type WeatherVolatility } from "../../../src/Entity/Card/WeatherCard/WeatherCard";
 
 describe("WeatherCard", () => {

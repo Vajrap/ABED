@@ -1,4 +1,4 @@
-import { expect, describe, it, beforeEach } from "bun:test";
+import { expect, describe, it, beforeEach } from "@jest/globals";
 import { Character } from "../../../src/Entity/Character/Character";
 import { CharacterFactory } from "../../Helper/Character";
 import { CharacterType } from "../../../src/InterFacesEnumsAndTypes/Enums";
@@ -42,7 +42,7 @@ describe("Character", () => {
 
       const character = new Character({
         id: "test-char-001",
-        name: "Test Character",
+        name: { en: "Test Character", th: "ทดสอบตัวอักษร" },
         type: CharacterType.humanoid,
         level: 1,
         alignment,
@@ -73,7 +73,7 @@ describe("Character", () => {
     it("should create character with optional fields", () => {
       const character = new Character({
         id: "test-char-002",
-        name: "Advanced Character",
+        name: { en: "Advanced Character", th: "ตัวอักษรขั้นสูง" },
         type: CharacterType.humanoid,
         gender: "FEMALE",
         level: 5,
@@ -113,7 +113,7 @@ describe("Character", () => {
       testTypes.forEach((type) => {
         const character = new Character({
           id: `test-${type}`,
-          name: `Test ${type}`,
+          name: { en: `Test ${type}`, th: `ทดสอบ ${type}` },
           type,
           level: 1,
           alignment: new CharacterAlignment({}),
@@ -138,7 +138,7 @@ describe("Character", () => {
       genders.forEach((gender) => {
         const character = new Character({
           id: `test-${gender}`,
-          name: `Test ${gender}`,
+          name: { en: `Test ${gender}`, th: `ทดสอบ ${gender}` },
           type: CharacterType.humanoid,
           gender,
           level: 1,
@@ -195,7 +195,7 @@ describe("Character", () => {
 
       const characterWithCustomActions = new Character({
         id: "custom-actions",
-        name: "Custom Character",
+        name: { en: "Custom Character", th: "ตัวอักษรขั้นสูง" },
         type: CharacterType.humanoid,
         level: 1,
         alignment: new CharacterAlignment({}),
@@ -310,7 +310,7 @@ describe("Character", () => {
         permValue: 1,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.timeWarp, {
+      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
         value: 2,
         isPerm: true,
         permValue: 5,
@@ -330,7 +330,7 @@ describe("Character", () => {
       expect(hasteEntry?.permValue).toBe(1); // permanent value kept
 
       const timeWarpEntry = character.buffsAndDebuffs.entry.get(
-        BuffsAndDebuffsEnum.timeWarp,
+        BuffsAndDebuffsEnum.slow,
       );
       expect(timeWarpEntry?.value).toBe(0);
       expect(timeWarpEntry?.isPerm).toBe(true);
@@ -351,7 +351,7 @@ describe("Character", () => {
         permValue: 1,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.timeWarp, {
+      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
         value: 1,
         isPerm: false,
         permValue: 0,
@@ -375,7 +375,7 @@ describe("Character", () => {
         character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.haste),
       ).toBe(false);
       expect(
-        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.timeWarp),
+        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.slow),
       ).toBe(false);
     });
 
@@ -392,7 +392,7 @@ describe("Character", () => {
         permValue: 0,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.timeWarp, {
+      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
         value: 3,
         isPerm: false,
         permValue: 0,
@@ -411,7 +411,7 @@ describe("Character", () => {
         character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.slow),
       ).toBe(true);
       expect(
-        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.timeWarp),
+        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.haste),
       ).toBe(false);
     });
 
@@ -422,93 +422,6 @@ describe("Character", () => {
 
       expect(result).toBe(character);
       expect(character.buffsAndDebuffs.entry.size).toBe(0);
-    });
-  });
-
-  describe("intoNewsInterface", () => {
-    let character: Character;
-
-    beforeEach(() => {
-      character = CharacterFactory.create()
-        .withName("Test Hero")
-        .withLevel(5)
-        .build();
-    });
-
-    it("should convert character to news interface with all fields", () => {
-      // Set a portrait
-      character.portrait = "hero_portrait.png";
-
-      const newsInterface = character.intoNewsInterface(
-        SubRegionEnum.FyonarCapitalDistrict,
-      );
-
-      expect(newsInterface.name).toBe("Test Hero");
-      expect(newsInterface.level).toBe(5);
-      expect(newsInterface.portrait).toBe("hero_portrait.png");
-      expect(newsInterface.title).toBeDefined(); // comes from title.string()
-      expect(newsInterface.fame).toBeDefined(); // comes from fame.getString()
-    });
-
-    it("should handle null portrait", () => {
-      character.portrait = null;
-
-      const newsInterface = character.intoNewsInterface(
-        SubRegionEnum.GoldenPlains,
-      );
-
-      expect(newsInterface.portrait).toBe("");
-      expect(newsInterface.name).toBe("Test Hero");
-      expect(newsInterface.level).toBe(5);
-    });
-
-    it("should work with different subregions", () => {
-      const testRegions = [
-        SubRegionEnum.FyonarCapitalDistrict,
-        SubRegionEnum.GoldenPlains,
-        SubRegionEnum.OceanTideCapitalDistrict,
-        SubRegionEnum.EmeraldCanopy,
-        SubRegionEnum.CrimsonIsles,
-      ];
-
-      testRegions.forEach((region) => {
-        const newsInterface = character.intoNewsInterface(region);
-
-        expect(newsInterface.name).toBe("Test Hero");
-        expect(newsInterface.level).toBe(5);
-        expect(newsInterface.portrait).toBe("");
-        expect(newsInterface.title).toBeDefined();
-        expect(newsInterface.fame).toBeDefined();
-        // Note: fame string might be different based on region
-      });
-    });
-
-    it("should reflect character level changes", () => {
-      character.level = 1;
-      let newsInterface = character.intoNewsInterface(
-        SubRegionEnum.FyonarCapitalDistrict,
-      );
-      expect(newsInterface.level).toBe(1);
-
-      character.level = 10;
-      newsInterface = character.intoNewsInterface(
-        SubRegionEnum.FyonarCapitalDistrict,
-      );
-      expect(newsInterface.level).toBe(10);
-
-      character.level = 50;
-      newsInterface = character.intoNewsInterface(
-        SubRegionEnum.FyonarCapitalDistrict,
-      );
-      expect(newsInterface.level).toBe(50);
-    });
-
-    it("should reflect character name changes", () => {
-      character.name = "New Name";
-      const newsInterface = character.intoNewsInterface(
-        SubRegionEnum.FyonarCapitalDistrict,
-      );
-      expect(newsInterface.name).toBe("New Name");
     });
   });
 
@@ -552,13 +465,13 @@ describe("Character", () => {
       expect(character.relations.size).toBe(0);
 
       expect(character.traits).toBeInstanceOf(Array);
-      expect(character.traits.length).toBe(0);
+      expect(character.traits.size).toBe(0);
 
       expect(character.inventory).toBeInstanceOf(Map);
       expect(character.inventory.size).toBe(0);
 
-      expect(character.equipments).toBeInstanceOf(Map);
-      expect(character.equipments.size).toBe(0);
+      expect(character.equipments).toBeInstanceOf(Object);
+      expect(Object.keys(character.equipments).length).toBe(0);
     });
 
     it("should have proper default inventory settings", () => {
@@ -609,7 +522,7 @@ describe("Character", () => {
 
       const character = new Character({
         id: "ref-test",
-        name: "Reference Test",
+        name: { en: "Reference Test", th: "ตัวอักษรขั้นสูง" },
         type: CharacterType.humanoid,
         level: 1,
         alignment: customAlignment,

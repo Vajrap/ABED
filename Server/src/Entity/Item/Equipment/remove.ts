@@ -33,7 +33,7 @@ export function remove(
   // 4. move item to inventory
   const inv = character.inventory.get(equippedId) ?? 0;
   character.inventory.set(equippedId, inv + 1);
-  character.equipments[slot] = null;
+  (character.equipments)[slot] = null;
 
   return true;
 }

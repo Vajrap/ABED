@@ -11,6 +11,9 @@ import type { TurnResult } from "../Skill/types";
 import { BattleReport } from "./BattleReport";
 import { getPlayableSkill } from "./getPlayableSkill";
 import { battleTypeConfig, type BattleType } from "./types";
+import {breathingSkillRepository} from "src/Entity/BreathingSkill/repository.ts";
+import Report from "src/Utils/Reporter.ts";
+import { activateBreathingSkillTurnPassive } from "../BreathingSkill/activeBreathingSkill";
 
 export class Battle {
   id: string;
@@ -82,7 +85,7 @@ export class Battle {
           if (canTakeTurn.ableToTakesTurn) {
             const actorTurnResult = this.startActorTurn(actor);
             this.battleReport.addTurnResult(actorTurnResult);
-            
+
             this.allParticipants.push(
               this.allParticipants.shift() as Character,
             );
@@ -94,7 +97,7 @@ export class Battle {
               },
               actor: {
                 actorId: actor.id,
-                effect: "none"
+                effect: []
               },
               targets: []
             }
@@ -110,8 +113,8 @@ export class Battle {
             this.handleBattleEnd(battleStatus);
             this.battleReport.setOutcome(
               battleStatus.winner ? battleStatus.winner.partyID : "",
-              { 
-                en: battleStatus.status === BattleStatus.DRAW_END ? "A battle ended in a draw" : `${battleStatus.winner?.leader.name.en} 's party win the battle!`, 
+              {
+                en: battleStatus.status === BattleStatus.DRAW_END ? "A battle ended in a draw" : `${battleStatus.winner?.leader.name.en} 's party win the battle!`,
                 th: battleStatus.status === BattleStatus.DRAW_END ? "การต่อสู้จบลงด้วยการเสมอกัน" : `ปาร์ตี้ของ ${battleStatus.winner?.leader.name.th} ชนะในการต่อสู้!`
               },
               // TODO: Rewards calculation placeholder
@@ -129,10 +132,10 @@ export class Battle {
   }
 
   startActorTurn(actor: Character): TurnResult {
-    activePassiveSkillEffect(actor);
+    activateBreathingSkillTurnPassive(actor);
 
     actor.replenishResource();
-    // check if can play any card
+    // Check: If a character can play any cards
     const {skill, skillLevel} = getPlayableSkill(actor);
     // Consume Resource
     for (const consume of skill.consume.elements) {
@@ -287,7 +290,7 @@ export class Battle {
               Math.floor(Math.random() * possibleAttributesToBeTrained.length)
             ];
             if (trainedAttribute) {
-              trainAttribute(character, trainedAttribute);
+              trainAttribute(character, trainedAttribute, 0);
             }
         }
       }
@@ -408,7 +411,3 @@ function resolveBuffAndDebuff(actor: Character): {
   };
 }
 
-
-function activePassiveSkillEffect(actor: Character) {
-  // Passive skill take effect here
-}

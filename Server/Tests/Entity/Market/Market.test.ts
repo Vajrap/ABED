@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { describe, expect, it, beforeEach, afterEach } from "@jest/globals";
 import { Market } from "../../../src/Entity/Market/Market";
 import { Item } from "../../../src/Entity/Item/Item";
 import { ItemCost } from "../../../src/Entity/Item/Subclass/ItemCost";

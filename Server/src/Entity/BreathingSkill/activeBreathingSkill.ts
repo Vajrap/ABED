@@ -1,8 +1,7 @@
-import { ELEMENT_KEYS } from "../../InterFacesEnumsAndTypes/Enums";
-import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import type { Character } from "../Character/Character";
-import { BreathingSkillId } from "./enum";
 import { BreathingSkill } from "./BreathinglSkill";
+import Report from "src/Utils/Reporter";
+import { breathingSkillRepository } from "./repository";
 
 export function activeBreathingSkill(
   character: Character,
@@ -20,52 +19,28 @@ export function deactiveBreathingSkill(
   internal.activateEffect.off(character, skillLevel);
 }
 
-// From the looks of it, this means when character 'train' the internal skill, or when it level goes up, we need to deactive it first, to make sure the passive stats given won't be wrong
-const testInt = new BreathingSkill({
-  id: BreathingSkillId.test,
-  name: {
-    en: "Test Internal",
-    th: "ทดสอบภายใน"
-  },
-  type: ELEMENT_KEYS[0],
-  tier: TierEnum.common,
-  activateEffect: {
-    on: (character: Character, skillLevel: number) => {
-      character.attribute.mutateBonus("strength", skillLevel);
-    },
-    off: (character: Character, skillLevel: number) => {
-      character.attribute.mutateBonus("strength", -skillLevel);
-    },
-    attacking: (
-      character: Character,
-      target: Character,
-      skillLevel: number,
-    ) => {
-      // should return some thing that aking to battle Report, so that user can read what happen
-      return;
-      // has no effect, this is a defensive internal
-      // The same goes to this as in the attacked
-    },
-    attacked: (character: Character, target: Character, skillLevel: number) => {
-      // should return some thing that aking to battle Report, so that user can read what happen
-      /*
-        Maybe we need to send a damage object here too, well actually internal effect can change many things
-        from damage, to effect in battle so... we might need to send all of those context in, and let the internal itself decided what to change
-        and return the mutated things?
-        let's say
-        DamageObject: {
-          damage: number,
-          type: DamageType
-        }
-        if damage.type === fire, damage.damage = Math.min(damage.damage - skillLevel, 0)
+export function activateBreathingSkillTurnPassive(actor: Character) {
+  const skillId = actor.activeBreathingSkill;
+  if (skillId !== null) {
+      const characterSkillObj = actor.breathingSkills.get(skillId);
+      if (characterSkillObj === undefined) {
+          Report.error(`Character trying to access self active skill ID: ${actor.activeBreathingSkill} Object that is active, but can't find`);
+          return;
+      }
+      const skill = breathingSkillRepository[skillId]
+      skill.activateEffect.takingTurn(actor, characterSkillObj.level)
+  }
+}
 
-        return damage, buff, character, attacker etc
-      */
-    },
-    takingTurn: (self: Character, skillLevel: number) => {
-      self.vitals.incHp(skillLevel);
-      self.vitals.incMp(skillLevel);
-      self.vitals.incSp(skillLevel);
-    },
-  },
-});
+export function resolveBreathingSkillInBattle(actor: Character, target: Character, damageObj: {damage: number, hit: number, crit: number}) {
+  const actorSkill: BreathingSkill | null = actor.activeBreathingSkill ? breathingSkillRepository[actor.activeBreathingSkill] : null;
+  if (actorSkill !== null && actor.activeBreathingSkill !== null) {
+    const skillLevel = actor.breathingSkills.get(actor.activeBreathingSkill)?.level;
+    actorSkill.activateEffect.attacking(actor, target, skillLevel!, damageObj);
+  }
+  const targetSkill: BreathingSkill | null = target.activeBreathingSkill ? breathingSkillRepository[target.activeBreathingSkill] : null;
+  if (targetSkill !== null && target.activeBreathingSkill !== null) {
+    const skillLevel = target.breathingSkills.get(target.activeBreathingSkill)?.level;
+    targetSkill.activateEffect.attacked(target, actor, skillLevel!, damageObj);
+  }
+}

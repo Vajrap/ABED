@@ -15,11 +15,12 @@ export class BreathingSkill {
     on: (self: Character, skillLevel: number) => void;
     off: (self: Character, skillLevel: number) => void;
     // Effect on when Attacking and when Attacker will be hooked into the battle steps function
-    attacking: (self: Character, target: Character, skillLevel: number) => void;
+    attacking: (self: Character, target: Character, skillLevel: number, damageObj: {damage: number, hit: number, crit: number}) => void;
     attacked: (
       self: Character,
       attacker: Character,
       skillLevel: number,
+      damageObj: {damage: number, hit: number, crit: number}
     ) => void;
     takingTurn: (self: Character, skillLevel: number) => void;
   };

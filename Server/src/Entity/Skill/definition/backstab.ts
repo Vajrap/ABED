@@ -101,6 +101,7 @@ export const backstab = new Skill({
       !!target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.dazed);
 
     const totalDamage = target.receiveDamage(
+      actor,
       damageOutput,
       DamageType.pierce,
       location,

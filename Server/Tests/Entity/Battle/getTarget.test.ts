@@ -1,12 +1,9 @@
-import { expect, describe, it, beforeEach } from "bun:test";
+import { expect, describe, it, beforeEach } from "@jest/globals";
 import { getTarget } from "../../../src/Entity/Battle/getTarget";
 import { Character } from "../../../src/Entity/Character/Character";
 import { CharacterFactory } from "../../Helper/Character";
 import { BuffsAndDebuffsEnum } from "../../../src/Entity/BuffsAndDebuffs/enum";
 import { CharacterVitals } from "../../../src/Entity/Character/Subclass/Vitals/CharacterVitals";
-import { CharacterAttributes } from "../../../src/Entity/Character/Subclass/Stats/CharacterAttributes";
-import { CharacterElements } from "../../../src/Entity/Character/Subclass/Stats/CharacterElements";
-import { L10N } from "../../../src/InterFacesEnumsAndTypes/L10N";
 
 // Helper to create characters with specific vital values
 class Vital {
@@ -32,32 +29,32 @@ describe("getTarget", () => {
 
   beforeEach(() => {
     // Create an actor
-    actor = CharacterFactory.create().withName("Actor").build();
+    actor = CharacterFactory.create().withName({ en: "Actor", th: "นักแสดง" }).build();
     actor.attribute.getStat("willpower").base = 10; // For perception checks
 
     // Create multiple targets with different HP values for testing
-    target1 = CharacterFactory.create().withName("Target1").build();
+    target1 = CharacterFactory.create().withName({ en: "Target1", th: "เป้าหมาย1" }).build();
     target1.vitals = new CharacterVitals({
       hp: new Vital({ base: 100, current: 100 }) as any,
       mp: new Vital({ base: 100, current: 100 }) as any,
       sp: new Vital({ base: 100, current: 100 }) as any,
     });
 
-    target2 = CharacterFactory.create().withName("Target2").build();
+    target2 = CharacterFactory.create().withName({ en: "Target2", th: "เป้าหมาย2" }).build();
     target2.vitals = new CharacterVitals({
       hp: new Vital({ base: 100, current: 50 }) as any,
       mp: new Vital({ base: 100, current: 100 }) as any,
       sp: new Vital({ base: 100, current: 100 }) as any,
     });
 
-    target3 = CharacterFactory.create().withName("Target3").build();
+    target3 = CharacterFactory.create().withName({ en: "Target3", th: "เป้าหมาย3" }).build();
     target3.vitals = new CharacterVitals({
       hp: new Vital({ base: 100, current: 75 }) as any,
       mp: new Vital({ base: 100, current: 100 }) as any,
       sp: new Vital({ base: 100, current: 100 }) as any,
     });
 
-    target4 = CharacterFactory.create().withName("Target4").build();
+    target4 = CharacterFactory.create().withName({ en: "Target4", th: "เป้าหมาย4" }).build();
     target4.vitals = new CharacterVitals({
       hp: new Vital({ base: 100, current: 25 }) as any,
       mp: new Vital({ base: 100, current: 100 }) as any,

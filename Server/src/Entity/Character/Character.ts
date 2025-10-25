@@ -53,6 +53,7 @@ import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes.ts";
 import type { Location } from "../Location/Location.ts";
 import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
+import { resolveBreathingSkillInBattle } from "../BreathingSkill/activeBreathingSkill.ts";
 
 export class Character {
   id: string = "";
@@ -94,7 +95,7 @@ export class Character {
   skillLearningProgress: Map<SkillId, number> = new Map();
   // Internal
   // TODO: breathing skill ideas
-  breathingSkills: Map<BreathingSkillId, CharacterInternalSkillObject> =
+  breathingSkills: Map<BreathingSkillId, CharacterBreathingSkillObject> =
     new Map();
   activeBreathingSkill: BreathingSkillId | null = null;
   breathingSkillsLearningProgress: Map<BreathingSkillId, number> = new Map();
@@ -335,6 +336,7 @@ export class Character {
   }
 
   receiveDamage(
+    attacker: Character,
     damageOutput: {
       damage: number;
       hit: number;
@@ -366,6 +368,8 @@ export class Character {
         isCrit: false,
       };
     }
+
+    resolveBreathingSkillInBattle(attacker, this, damageOutput);
 
     // --- MITIGATION ---
     const isPhysical =
@@ -428,7 +432,7 @@ export type CharacterSkillObject = {
   exp: number;
 };
 
-export type CharacterInternalSkillObject = {
+export type CharacterBreathingSkillObject = {
   id: BreathingSkillId;
   level: TierEnum;
   exp: number;

@@ -1,4 +1,4 @@
-import { expect, describe, it, beforeEach } from "bun:test";
+import { expect, describe, it, beforeEach } from "@jest/globals";
 import { PartyService } from "../../src/Services/PartyService";
 import { Party } from "../../src/Entity/Party/Party";
 import { PartyBehavior } from "../../src/Entity/Party/PartyBehavior";

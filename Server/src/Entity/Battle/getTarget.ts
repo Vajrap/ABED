@@ -257,8 +257,18 @@ class TargetSelector {
 
         // If perception check fails, try next target
         if (perception <= 15) {
-          // Try the next available target instead
-          return this.selectTargetWithHidingCheck(targets.slice(1));
+          // Check if this target has taunt - if so, don't skip it
+          const hasTaunt = target.buffsAndDebuffs.entry.get(
+            BuffsAndDebuffsEnum.taunt,
+          ) !== undefined;
+          
+          if (hasTaunt) {
+            // Taunt overrides hiding - return the taunting target even if hiding check fails
+            return target;
+          } else {
+            // Try the next available target instead
+            return this.selectTargetWithHidingCheck(targets.slice(1));
+          }
         }
       }
     }

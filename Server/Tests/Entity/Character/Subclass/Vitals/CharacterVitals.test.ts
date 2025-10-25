@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach } from "bun:test";
+import { describe, expect, test, beforeEach } from "@jest/globals";
 import { CharacterVitals } from "../../../../../src/Entity/Character/Subclass/Vitals/CharacterVitals";
 
 // Since Vital is not exported, we'll test it through CharacterVitals

@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach } from "bun:test";
+import { describe, expect, test, beforeEach } from "@jest/globals";
 import { CharacterAttributes } from "../../../../../src/Entity/Character/Subclass/Stats/CharacterAttributes";
 import { StatBlock } from "../../../../../src/Entity/Character/Subclass/Stats/CharacterStatArchetype";
 import { statMod } from "../../../../../src/Utils/statMod";
@@ -287,7 +287,7 @@ describe("CharacterAttributes", () => {
         agility: { base: 14, bonus: 1, battle: 0, exp: 50 },
       };
 
-      const attributes = CharacterAttributes.fromJSON(data);
+      const attributes = new CharacterAttributes(data);
 
       expect(attributes.getStat("strength").base).toBe(18);
       expect(attributes.getStat("strength").bonus).toBe(3);

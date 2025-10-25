@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "@jest/globals";
 import { CharacterAlignment } from "../../../../../src/Entity/Character/Subclass/Alignment/CharacterAlignment";
 import { CharacterAlignmentEnum } from "../../../../../src/InterFacesEnumsAndTypes/Enums";
 

@@ -1,3 +1,3 @@
 export enum BreathingSkillId {
-  test = "test",
+    basicBreathingTechnique = "basicBreathingTechnique",
 }

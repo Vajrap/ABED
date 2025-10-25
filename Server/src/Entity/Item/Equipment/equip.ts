@@ -32,12 +32,12 @@ export function equip(
   }
 
   // 3. if character already has equipment in slot, should remove it first
-  const equipped = character.equipments[slot] as Equipment | null;
-  if (equipped) {
-    if (equipmentId === equipped.id) {
+  const equippedId = character.equipments[slot] as EquipmentId | null;
+  if (equippedId) {
+    if (equipmentId === equippedId) {
       return true;
     }
-    remove(character, equipped.id, slot);
+    remove(character, equippedId, slot);
   }
 
   // 4. move equipment from inventory to slot

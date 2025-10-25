@@ -1,5 +1,5 @@
 import type { BreathingSkillId } from "../Entity/BreathingSkill/enum";
-import type { CharacterInternalSkillObject, CharacterSkillObject } from "../Entity/Character/Character";
+import type { CharacterBreathingSkillObject, CharacterSkillObject } from "../Entity/Character/Character";
 import type { CharacterActionSequence } from "../Entity/Character/Subclass/Action/CharacterAction";
 import type { CharacterCraftingPreference } from "../Entity/Character/Subclass/Behavior/subclasses/CharacterCraftingPreference";
 import type { DeckCondition } from "../Entity/Character/Subclass/DeckCondition/DeckCondition";
@@ -94,5 +94,5 @@ export interface CharacterInterface {
   traits: TraitEnum[];
   inventorySize: { base: number; bonus: number };
   inventory: Record<ItemId, number>;
-  equipments: Record<CharacterEquipmentSlot, ItemId>;  
+  equipments: Record<CharacterEquipmentSlot, ItemId>;
 }

@@ -1,4 +1,4 @@
-import { expect, describe, it } from "bun:test";
+import { expect, describe, it } from "@jest/globals";
 import { CharacterFactory } from "../../../../Helper/Character";
 import {
   activeEpithet,

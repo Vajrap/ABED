@@ -105,6 +105,7 @@ export const throwPebble = new Skill({
     }
 
     const totalDamage = target.receiveDamage(
+      actor,
       damageOutput,
       DamageType.blunt,
       location,

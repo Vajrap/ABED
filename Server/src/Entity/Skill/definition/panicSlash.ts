@@ -105,6 +105,7 @@ export const panicSlash = new Skill({
     // TODO: Implement crit chance bonus in damage calculation
 
     const totalDamage = target.receiveDamage(
+      actor,
       damageOutput,
       weapon.weaponData.damage[`${type}DamageType`],
       location,

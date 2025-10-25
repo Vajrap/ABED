@@ -1,6 +1,7 @@
-import { expect, describe, beforeEach, afterEach, it, mock} from "bun:test";
+import { expect, describe, beforeEach, afterEach, it} from "@jest/globals";
 import { trainInvoker, trainStat as realTrainStat, trainArtisan, trainAttribute, trainProficiency } from "../../../../../src/Entity/Character/Subclass/Stats/train";
 import { CharacterFactory, CharacterAttributesFactory, CharacterProficienciesFactory } from "../../../../Helper/Character";
+import { mock } from "bun:test";
 
 mock.module("../../../../../Utils/Dice", () => ({ rollTwenty: () => ({ total: 20 }) }));
 
@@ -15,23 +16,23 @@ describe("trainStat call counting via invoker", () => {
 
   it("does nothing when level >= 30 (trainStat not called)", () => {
     const char = CharacterFactory.create().withLevel(30).build();
-    trainArtisan(char, "alchemy");
-    trainAttribute(char, "agility");
-    trainProficiency(char, "axe");
+    trainArtisan(char, "alchemy", 0);
+    trainAttribute(char, "agility", 0);
+    trainProficiency(char, "axe", 0);
     expect(trainInvoker.trainStat).not.toHaveBeenCalled()
   });
 
   it("attributes: no-op when base >= 30 (trainStat not called)", () => {
     const attrs = CharacterAttributesFactory.create().with("agility", { base: 30 }).build();
     const char = CharacterFactory.create().withAttributes(attrs).build();
-    trainAttribute(char, "agility");
+    trainAttribute(char, "agility", 0);
     expect(trainInvoker.trainStat).not.toHaveBeenCalled()
   });
 
   it("proficiencies: no-op when base >= 30 (trainStat not called)", () => {
     const profs = CharacterProficienciesFactory.create().with("axe", { base: 30 }).build();
     const char = CharacterFactory.create().withProficiencies(profs).build();
-    trainProficiency(char, "axe");
+    trainProficiency(char, "axe", 0);
     expect(trainInvoker.trainStat).not.toHaveBeenCalled()
   });
 
@@ -41,7 +42,7 @@ describe("trainStat call counting via invoker", () => {
       .with("intelligence", { base: 18 })
       .build();
     const char = CharacterFactory.create().withAttributes(attrs).withStatTracker(0).build();
-    trainAttribute(char, "strength");
+    trainAttribute(char, "strength", 0);
     expect(trainInvoker.trainStat).toHaveBeenCalledTimes(1);
     expect(char.attribute.getStat("strength").base).toBeGreaterThan(1);
     expect(char.attribute.getStat("strength").exp).toBeLessThan(1_000_000);

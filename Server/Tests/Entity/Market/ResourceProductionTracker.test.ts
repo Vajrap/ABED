@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { describe, expect, it, beforeEach, afterEach } from "@jest/globals";
 import { ResourceProductionTracker } from "../../../src/Entity/Market/ResourceProductionTracker";
 import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
 import { SubRegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/SubRegion";

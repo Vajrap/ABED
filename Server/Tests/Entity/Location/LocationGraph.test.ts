@@ -1,4 +1,4 @@
-import { describe, test, expect } from "bun:test";
+import { describe, test, expect } from "@jest/globals";
 import { LocationGraph } from "../../../src/Entity/Location/LocationGraph";
 import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
 

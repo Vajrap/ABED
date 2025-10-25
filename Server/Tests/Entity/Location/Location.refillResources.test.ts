@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, afterEach, spyOn } from "bun:test";
+import { describe, expect, it, beforeEach, afterEach, spyOn } from "@jest/globals";
 import { Location } from "../../../src/Entity/Location/Location";
 import { SubRegion } from "../../../src/Entity/Location/SubRegion";
 import { Weather } from "../../../src/InterFacesEnumsAndTypes/Weather";

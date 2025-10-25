@@ -78,6 +78,7 @@ export const basicAttack = new Skill({
     damageOutput.damage = damageOutput.damage * positionMidifier;
 
     const totalDamage = target.receiveDamage(
+      actor,
       damageOutput,
       weapon.weaponData.damage[`${type}DamageType`],
       location,
