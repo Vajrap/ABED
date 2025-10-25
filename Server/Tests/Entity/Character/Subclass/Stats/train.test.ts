@@ -1,13 +1,12 @@
-import { expect, describe, beforeEach, afterEach, it} from "@jest/globals";
+import { expect, describe, beforeEach, afterEach, it, jest} from "@jest/globals";
 import { trainInvoker, trainStat as realTrainStat, trainArtisan, trainAttribute, trainProficiency } from "../../../../../src/Entity/Character/Subclass/Stats/train";
 import { CharacterFactory, CharacterAttributesFactory, CharacterProficienciesFactory } from "../../../../Helper/Character";
-import { mock } from "bun:test";
 
-mock.module("../../../../../Utils/Dice", () => ({ rollTwenty: () => ({ total: 20 }) }));
+jest.mock("src/Utils/Dice", () => ({ rollTwenty: () => ({ total: 20 }) }));
 
 describe("trainStat call counting via invoker", () => {
   beforeEach(() => {
-    trainInvoker.trainStat = mock(realTrainStat)
+    trainInvoker.trainStat = jest.fn(realTrainStat)
   });
 
   afterEach(() => {

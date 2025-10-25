@@ -5,4 +5,9 @@ export enum SkillId {
   Shriek = "Shriek",
   RetreatDash = "RetreatDash",
   Backstab = "Backstab",
+  Bash = "Bash",
+  Taunt = "Taunt",
+  Cleave = "Cleave",
+  HerosPose = "HerosPose",
+  ShieldUp = "ShieldUp",
 }

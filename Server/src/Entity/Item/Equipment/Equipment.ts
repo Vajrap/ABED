@@ -4,7 +4,7 @@ import {
   EquipmentSlot,
 } from "../../../InterFacesEnumsAndTypes/Enums";
 import { Item } from "../Item";
-import type { EquipmentId } from "./repository";
+import type { EquipmentId } from "./types";
 import { type EquipmentModifier } from "./type";
 import type { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import type { ItemCost } from "../Subclass/ItemCost";

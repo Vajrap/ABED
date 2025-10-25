@@ -1,6 +1,6 @@
 import { CharacterEquipmentSlot } from "../../../InterFacesEnumsAndTypes/Enums";
 import type { Character } from "../../Character/Character";
-import type { EquipmentId } from "./repository";
+import type { EquipmentId } from "./types";
 import { type Equipment, isCompatible } from "./Equipment";
 import { getEquipment } from "./repository";
 import { modifyBonusStats, modifyVitals } from "./modifiers";

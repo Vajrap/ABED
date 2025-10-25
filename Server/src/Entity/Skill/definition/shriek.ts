@@ -1,16 +1,16 @@
 import {TierEnum} from "src/InterFacesEnumsAndTypes/Tiers";
 import {SkillId} from "../enums";
 import {Skill} from "../Skill";
-import type {Location} from "src/Entity/Location/Location";
 import type {Character} from "src/Entity/Character/Character";
 import type {TurnResult} from "../types";
 import {buildCombatMessage} from "src/Utils/buildCombatMessage";
 import {getTarget} from "src/Entity/Battle/getTarget";
 import {ActorEffect, TargetEffect} from "../effects";
 import {DamageType} from "src/InterFacesEnumsAndTypes/DamageTypes";
-import {roll} from "src/Utils/Dice";
+import {roll, rollTwenty} from "src/Utils/Dice";
 import {statMod} from "src/Utils/statMod.ts";
 import {buffsAndDebuffsRepository} from "src/Entity/BuffsAndDebuffs/repository.ts";
+import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 
 export const shriek = new Skill({
   id: SkillId.Shriek,
@@ -53,7 +53,7 @@ export const shriek = new Skill({
     actorParty: Character[],
     targetParty: Character[],
     skillLevel: number,
-    location: Location,
+    location: LocationsEnum,
   ) => {
     const target = getTarget(actor, targetParty).one().randomly()[0];
 
@@ -72,7 +72,7 @@ export const shriek = new Skill({
     }
 
     // DC 15 + will
-    const fearSuccess = roll(1).d(100).total <= 15 + statMod(target.attribute.getTotal('willpower'));
+    const fearSuccess = rollTwenty().total + statMod(actor.attribute.getTotal('willpower')) >= 15 + statMod(target.attribute.getTotal('willpower'));
     if (fearSuccess) {
         buffsAndDebuffsRepository.fear.appender(target, 1, false, 0);
     } else {

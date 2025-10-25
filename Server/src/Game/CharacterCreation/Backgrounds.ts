@@ -1,5 +1,5 @@
 import { CharacterEpithetEnum } from "../../Entity/Character/Subclass/Title/Epithet/enum";
-import type { ItemId } from "../../Entity/Item/Item";
+import type { ItemId } from "../../Entity/Item/type";
 import type { ArtisanKey } from "../../InterFacesEnumsAndTypes/Enums";
 
 export interface BackgroundDefinition {
@@ -36,7 +36,7 @@ export const BACKGROUNDS: Record<string, BackgroundDefinition> = {
       electrics: 8,
     },
     startingItems: [],
-    epithet: CharacterEpithetEnum.Retainor
+    epithet: CharacterEpithetEnum.Retainer
   },
   peasant: {
     artisanBonuses: {

@@ -22,7 +22,7 @@ describe("CharacterService.createCharacter - Pure Function Tests", () => {
       const character = CharacterService.createCharacter("test-user-id", characterData);
 
       expect(character).toBeInstanceOf(Character);
-      expect(character.name).toBe("TestHero");
+      expect(character.name.en).toBe("TestHero");
       expect(character.gender).toBe("MALE");
       expect(character.userId).toBe("test-user-id");
       expect(character.level).toBe(1);
@@ -142,7 +142,7 @@ describe("CharacterService.createCharacter - Pure Function Tests", () => {
         if (!raceDef) throw new Error(`${race} not found in RACES`);
         
         expect(character.race).toBe(raceDef.name);
-        expect(character.name).toBe(`Test${race}`);
+        expect(character.name.en).toBe(`Test${race}`);
       });
     });
   });
@@ -355,8 +355,8 @@ describe("CharacterService.createCharacter - Pure Function Tests", () => {
 
       expect(character.conditionalSkills).toBeInstanceOf(Array);
       expect(character.relations).toBeInstanceOf(Map);
-      expect(character.traits).toBeInstanceOf(Array);
-      expect(character.equipments).toBeInstanceOf(Map);
+      expect(character.traits).toBeInstanceOf(Map);
+      expect(character.equipments).toBeInstanceOf(Object);
     });
   });
 

@@ -44,12 +44,11 @@ import { handleTrainArtisans } from "./Events/handlers/train/artisans";
 import { handleTrainAttribute } from "./Events/handlers/train/attribute";
 import { handleTrainProficiency } from "./Events/handlers/train/proficiency";
 import { handleTrainSkill } from "./Events/handlers/train/skill";
-import type { SubRegion } from "./SubRegion";
 import type { WeatherVolatility } from "../Card/WeatherCard/WeatherCard";
 import { Weather } from "../../InterFacesEnumsAndTypes/Weather";
 import Report from "../../Utils/Reporter";
 import { GameTime } from "../../Game/GameTime/GameTime";
-import type { ResourceType } from "../Market/types";
+import type { ResourceType } from "src/InterFacesEnumsAndTypes/ResourceTypes";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N";
 import { subregionRepository } from "./SubRegion/repository";
 
@@ -148,7 +147,7 @@ export class Location {
   constructor(
     id: LocationsEnum,
     name: L10N,
-    subRegion: SubRegion,
+    subRegion: SubRegionEnum,
     connectedLocations: { location: Location; distance: number }[],
     actions: ActionInput[],
     volatility: WeatherVolatility,
@@ -159,8 +158,8 @@ export class Location {
   ) {
     this.id = id;
     this.name = name;
-    this.subRegion = subRegion.id;
-    this.region = subRegion.region;
+    this.subRegion = subRegion;
+    this.region = subregionRepository[subRegion].region;
     this.connectedLocations = connectedLocations;
     this.actions = actions;
     this.randomEvents = randomEvents ? randomEvents : defaultRandomEvents;
@@ -462,6 +461,8 @@ export class Location {
   }
 
   getWeather(): Weather {
+    // Lazy import to avoid circular dependency
+    const { subregionRepository } = require("./SubRegion/repository");
     const subRegion = subregionRepository[this.subRegion];
     const weather = subRegion.getWeather(this.weatherScale);
     if (!weather) {

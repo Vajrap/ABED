@@ -1,17 +1,17 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SkillId } from "../enums";
 import { Skill } from "../Skill";
-import type { Location } from "src/Entity/Location/Location";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { rollTwenty } from "src/Utils/Dice";
-import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { getDamageOutput } from "src/Utils/getDamgeOutput";
 import { statMod } from "src/Utils/statMod";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { ActorEffect, TargetEffect } from "../effects";
+import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
+import { resolveDamage } from "src/Entity/Battle/damageResolution";
 
 export const throwPebble = new Skill({
   id: SkillId.ThrowPebble,
@@ -49,7 +49,7 @@ export const throwPebble = new Skill({
     actorParty: Character[],
     targetParty: Character[],
     skillLevel: number,
-    location: Location,
+    location: LocationsEnum,
   ) => {
     const target = getTarget(actor, targetParty)
       .one()
@@ -104,12 +104,7 @@ export const throwPebble = new Skill({
       }
     }
 
-    const totalDamage = target.receiveDamage(
-      actor,
-      damageOutput,
-      DamageType.blunt,
-      location,
-    );
+    const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
 
     const isHit = totalDamage.isHit;
 

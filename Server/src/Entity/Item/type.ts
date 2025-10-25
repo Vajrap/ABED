@@ -1,6 +1,6 @@
 import type { BookId } from "./Books";
 import type { ConsumableId } from "./Consumable";
-import type { EquipmentId } from "./Equipment/repository";
+import type { EquipmentId } from "./Equipment/types";
 import type { MiscItemId } from "./Misc";
 
 /**

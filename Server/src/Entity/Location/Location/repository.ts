@@ -1,7 +1,8 @@
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import type { Location } from "../Location";
-import type { SubRegionEnum } from "src/InterFacesEnumsAndTypes/Enums/SubRegion";
+import { Location } from "../Location";
+import { SubRegionEnum } from "src/InterFacesEnumsAndTypes/Enums/SubRegion";
 import { waywardInn } from "./definition/waywardInn";
+
 
 export const locationRepository: Record<LocationsEnum, Location> = {
   [LocationsEnum.WaywardInn]: waywardInn,

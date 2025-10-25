@@ -1,4 +1,5 @@
 import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
+import { NewsSignificance, NewsPropagation } from "../../../../../InterFacesEnumsAndTypes/NewsEnums";
 import { rollTwenty } from "../../../../../Utils/Dice";
 import { statMod } from "../../../../../Utils/statMod";
 import type { Character } from "../../../../Character/Character";
@@ -61,22 +62,13 @@ export function handleLearnSkill(
         kind: "privateScope",
         characterId: character.id,
       },
-      tokens: [
-        {
-          t: "char",
-          v: [character.intoNewsInterface(context.subRegion)],
-        },
-        {
-          t: "text",
-          v: `${learned ? "has learned" : "progressed towards learning"}`,
-        },
-        {
-          t: "skill",
-          id: skillId,
-        },
-      ],
+      content: {
+        en: `[char:${character.id}]${character.name.en}[/char] ${learned ? "has learned" : "progressed towards learning"} [skill:${skillId}]${skillId}[/skill]`,
+        th: `[char:${character.id}]${character.name.th}[/char] ${learned ? "ได้เรียนรู้" : "มีความก้าวหน้าในการเรียนรู้"} [skill:${skillId}]${skillId}[/skill]`,
+      },
       context,
-      secretTier: TierEnum.epic,
+      significance: NewsSignificance.MINOR,
+      propagation: NewsPropagation.LOCAL,
     });
 
     return news;

@@ -5,8 +5,7 @@ import {
   calculateLocalShortageFactor,
   monthsUntilNextProduction,
 } from "../../../src/Entity/Market/PriceModifiers";
-import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
-import { locationRepository } from "../../../src/Entity/Repository/location";
+
 import { GameTime } from "../../../src/Game/GameTime/GameTime";
 
 describe("factor() - Comfort Band and Smoothing", () => {

@@ -46,7 +46,7 @@ export class CharacterService {
       const character = this.createCharacter(userId, characterData);
 
       // 2. Create party for the character
-      const party = PartyService.createParty(character, LocationsEnum.None);
+      const party = PartyService.createParty(character, LocationsEnum.WaywardInn);
       character.partyID = party.partyID;
 
       // 3. Manager are for easy access to characters and parties
@@ -82,7 +82,7 @@ export class CharacterService {
       partyID: character.partyID,
 
       // Basic info
-      name: character.name,
+      name: character.name.en,
       gender: character.gender,
       race: character.race!,
       type: character.type,
@@ -165,7 +165,7 @@ export class CharacterService {
     const newCharacter = new Character({
       // random uuid as string
       id: randomUUID(),
-      name: characterData.name,
+      name: { en: characterData.name, th: characterData.name },
       type: CharacterType.humanoid,
       gender: characterData.gender,
       level: 1,

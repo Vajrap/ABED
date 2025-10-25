@@ -10,28 +10,30 @@ import { ActorEffect, TargetEffect } from "../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
+import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
+import { statMod } from "src/Utils/statMod";
 
-export const panicSlash = new Skill({
-  id: SkillId.PanicSlash,
+export const bash = new Skill({
+  id: SkillId.Bash,
   name: {
-    en: "Panic Slash",
-    th: "ฟันแบบตื่นตระหนก",
+    en: "Bash",
+    th: "ทุบ",
   },
   description: {
-    en: "A reckless melee attack that consumes 1 Air. Deals 1.0× physical damage with a 25% chance to miss, but grants +10% crit chance if it hits.",
-    th: "การโจมตีระยะประชิดแบบไม่คิดหน้าคิดหลัง ใช้ 1 Air สร้างความเสียหายกายภาพ 1.0× มีโอกาสพลาด 25% แต่ถ้าตีโดนจะเพิ่มโอกาสคริติคอล 10%",
+    en: "A powerful strike. Deals 1.3× (+0.05 per skill level) weapon damage (+ str mod)",
+    th: "การโจมตีที่รุนแรง สร้างความเสียหาย 1.3 เท่า (+0.05 ต่อเลเวลสกิล) ของความเสียหายอาวุธ (+ str mod)",
   },
   requirement: {},
-  equipmentNeeded: ["dagger", "sword", "machete"], // Melee weapons
+  equipmentNeeded: [], // Any physical weapon
   tier: TierEnum.common,
   consume: {
     hp: 0,
     mp: 0,
-    sp: 3,
+    sp: 5,
     elements: [
       {
-        element: "wind", // Air element
-        value: 1,
+        element: "none",
+        value: 2,
       },
     ],
   },
@@ -41,15 +43,15 @@ export const panicSlash = new Skill({
     sp: 0,
     elements: [
       {
-        element: "none",
+        element: "earth",
         min: 0,
         max: 1,
       },
       {
-        element: 'wind',
+        element: "fire",
         min: 0,
         max: 1,
-      }
+      },
     ],
   },
   exec: (
@@ -64,8 +66,8 @@ export const panicSlash = new Skill({
     if (!target) {
       return {
         content: {
-          en: `${actor.name.en} tried to panic slash but has no target`,
-          th: `${actor.name.th} พยายามฟันแบบตื่นตระหนกแต่ไม่พบเป้าหมาย`,
+          en: `${actor.name.en} tried to bash but has no target`,
+          th: `${actor.name.th} พยายามทุบแต่ไม่พบเป้าหมาย`,
         },
         actor: {
           actorId: actor.id,
@@ -76,21 +78,22 @@ export const panicSlash = new Skill({
     }
 
     const weapon = actor.getWeapon();
-    const damageOutput = getWeaponDamageOutput(actor, weapon, 'physical');
+    const damageType = getWeaponDamageType(weapon.weaponType);
+    const damageOutput = getWeaponDamageOutput(actor, weapon, damageType);
 
-    // True 25% additional miss chance
-    damageOutput.hit -= 5;
+    // Base multiplier: 1.3 + 0.05 per skill level
+    const multiplier = 1.3 + 0.05 * skillLevel;
     
-    // 10% crit chance
-    damageOutput.crit += 2;
-
+    // Add strength modifier
+    const strengthMod = statMod(actor.attribute.getTotal("strength"));
+    
     const positionModifierValue = getPositionModifier(
       actor.position,
       target.position,
       weapon,
     );
 
-    damageOutput.damage = damageOutput.damage * positionModifierValue;
+    damageOutput.damage = (damageOutput.damage * multiplier + strengthMod) * positionModifierValue;
 
     const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
 
@@ -98,7 +101,7 @@ export const panicSlash = new Skill({
       content: buildCombatMessage(
         actor,
         target,
-        { en: "Panic Slash", th: "ฟันแบบตื่นตระหนก" },
+        { en: "Bash", th: "ทุบ" },
         totalDamage,
       ),
       actor: {

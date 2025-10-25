@@ -3,7 +3,6 @@ import { ResourceProductionTracker } from "../../../src/Entity/Market/ResourcePr
 import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
 import { SubRegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/SubRegion";
 import { RegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Region";
-import { locationRepository } from "../../../src/Entity/Repository/location";
 import { Location } from "../../../src/Entity/Location/Location";
 import { SubRegion } from "../../../src/Entity/Location/SubRegion";
 import { Weather } from "../../../src/InterFacesEnumsAndTypes/Weather";
@@ -14,11 +13,9 @@ describe("ResourceProductionTracker", () => {
 
   beforeEach(() => {
     tracker = new ResourceProductionTracker();
-    locationRepository.clear();
   });
 
   afterEach(() => {
-    locationRepository.clear();
   });
 
   describe("recordProduction()", () => {

@@ -1,16 +1,12 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SkillId } from "../enums";
 import { Skill } from "../Skill";
-import type { Location } from "src/Entity/Location/Location";
 import type { Character } from "src/Entity/Character/Character";
-import {
-  PROFICIENCY_KEYS,
-  type ProficiencyKey,
-} from "src/InterFacesEnumsAndTypes/Enums";
 import type { TurnResult } from "../types";
 import { ActorEffect, TargetEffect } from "../effects";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
+import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 
 export const retreatDash = new Skill({
   id: SkillId.RetreatDash,
@@ -19,8 +15,8 @@ export const retreatDash = new Skill({
     th: "วิ่งหนี",
   },
   description: {
-    en: "A desperate retreat that consumes 1 Air. Only usable when HP < 30%. Grants +30% Evasion for 1 turn and attempts to move to backline.",
-    th: "การหนีแบบสิ้นหวัง ใช้ 1 Air ใช้ได้เฉพาะเมื่อ HP < 30% เพิ่มการหลบหลีก 30% เป็นเวลา 1 ตา และพยายามย้ายไปแถวหลัง",
+    en: "A desperate retreat. Grants +3 dodge for 1 turn and attempts to move to backline.",
+    th: "การหนีแบบสิ้นหวัง เพิ่ม dodge 3 หน่วย เป็นเวลา 1 เทิร์น และพยายามย้ายไปแถวหลัง",
   },
   requirement: {},
   equipmentNeeded: [], // No equipment needed for movement skill
@@ -28,10 +24,10 @@ export const retreatDash = new Skill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 4,
+    sp: 2,
     elements: [
       {
-        element: "wind", // Air element
+        element: "none", // Air element
         value: 1,
       },
     ],
@@ -42,7 +38,7 @@ export const retreatDash = new Skill({
     sp: 0,
     elements: [
       {
-        element: "none",
+        element: "wind",
         min: 1,
         max: 1,
       },
@@ -53,36 +49,32 @@ export const retreatDash = new Skill({
     actorParty: Character[],
     targetParty: Character[],
     skillLevel: number,
-    location: Location,
+    location: LocationsEnum,
   ) => {
-    // Check HP condition (HP < 30%)
-    const currentHp = actor.vitals.hp.current;
-    const maxHp = actor.vitals.hp.max;
-    const hpPercentage = (currentHp / maxHp) * 100;
-
-    if (hpPercentage >= 30) {
-      return {
-        content: {
-          en: `${actor.name.en} is not desperate enough to retreat!`,
-          th: `${actor.name.th} ยังไม่สิ้นหวังพอที่จะหนี!`,
-        },
-        actor: {
-          actorId: actor.id,
-          effect: [ActorEffect.TestSkill],
-        },
-        targets: [],
-      };
-    }
-
     // TODO: Implement Evasion +30% for 1 turn
+    actor.battleStats.mutateBattle('dodge', 3);
     // TODO: Implement movement to backline logic
-    // TODO: Implement flee logic if already far
+    let moved = false;
+
+    if (actor.position > 2) {
+        const allOccupiedPositions = actorParty.map(member => member.position);
+        for (const position of [3, 4, 5] as const) {
+          if (!allOccupiedPositions.includes(position)) {
+            actor.position = position;
+            moved = true;
+            break;
+          }
+      }
+    }
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(
         actor,
         actor, // Self-target for retreat
-        { en: "Retreat Dash", th: "วิ่งหนี" },
+        { 
+          en: `${actor.name} dashed to retreat gain +3 dodge. ${moved ? `and moved to back line` : ''}`, 
+          th: `${actor.name.th} วิ่งหนี ได้รับ +3 dodge. ${moved ? `และย้ายไปแถวหลัง` : ''}`,
+        },
         { isHit: true, actualDamage: 0, damageType: DamageType.arcane },
       ),
       actor: {

@@ -1,6 +1,6 @@
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { Location } from "../../Location";
-import { goldenPlains } from "../../SubRegion/definition/goldenPlains";
+import { SubRegionEnum } from "src/InterFacesEnumsAndTypes/Enums/SubRegion";
 
 export const waywardInn = new Location(
   LocationsEnum.WaywardInn,
@@ -8,9 +8,8 @@ export const waywardInn = new Location(
     en: "Wayward Inn",
     th: "โรงเตี๊ยมนักจร",
   },
-  goldenPlains,
-  [], // {location, distance}
+  SubRegionEnum.GoldenPlains,
   [],
-  "CALM",
-  // RandomEvent, InnConfig, weatherScale, resourceGeneration
-);
+  [],
+  "CALM"
+)

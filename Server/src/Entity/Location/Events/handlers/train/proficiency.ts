@@ -1,5 +1,6 @@
 import type { ProficiencyKey } from "../../../../../InterFacesEnumsAndTypes/Enums";
 import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
+import { NewsSignificance, NewsPropagation } from "../../../../../InterFacesEnumsAndTypes/NewsEnums";
 import { rollTwenty } from "../../../../../Utils/Dice";
 import { statMod } from "../../../../../Utils/statMod";
 import type { Character } from "../../../../Character/Character";
@@ -43,22 +44,13 @@ export function handleTrainProficiency(
         kind: "partyScope",
         partyId: context.partyId,
       },
-      tokens: [
-        {
-          t: "char",
-          v: [
-            {
-              name: character.name,
-              title: character.title.string(),
-              fame: character.fame.getString(context.subRegion),
-              portrait: character.portrait ? character.portrait : "",
-              level: character.level,
-            },
-          ],
-        },
-      ],
+      content: {
+        en: `[char:${character.id}]${character.name.en}[/char] trained proficiency [proficiency:${target}]${target}[/proficiency]`,
+        th: `[char:${character.id}]${character.name.th}[/char] ฝึกฝนความชำนาญ [proficiency:${target}]${target}[/proficiency]`,
+      },
       context,
-      secretTier: TierEnum.common
+      significance: NewsSignificance.MINOR,
+      propagation: NewsPropagation.PRIVATE,
     });
     results.push(news);
   }

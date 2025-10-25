@@ -3,10 +3,7 @@
  */
 export * from "./Equipment";
 export * from "./repository";
-export * from "./type";
-export * from "./equip";
-export * from "./remove";
-export * from "./modifiers";
+export * from "./types";
 export * from "./Armor";
 export * from "./Weapon";
 

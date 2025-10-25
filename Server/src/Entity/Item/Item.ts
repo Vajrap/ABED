@@ -1,6 +1,6 @@
 import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import { ItemCost } from "./Subclass/ItemCost";
-import type { ResourceType } from "../Market/types";
+import type { ResourceType } from "../../InterFacesEnumsAndTypes/ResourceTypes";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import type { ItemId } from "./type";
 

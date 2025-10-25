@@ -2,11 +2,13 @@ import type { Character } from "src/Entity/Character/Character";
 import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums";
 import { statMod } from "./statMod";
 import { roll, rollTwenty } from "./Dice";
+import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 
 type DamageOutPut = {
   damage: number;
   hit: number;
   crit: number;
+  type: DamageType;
 };
 
 export function getDamageOutput(
@@ -18,6 +20,7 @@ export function getDamageOutput(
   hitStat: AttributeKey[],
   crit: number,
   critStat: AttributeKey[],
+  type?: DamageType
 ): DamageOutPut {
   const getBonus = (stats: AttributeKey[]) =>
     stats.reduce(
@@ -41,5 +44,6 @@ export function getDamageOutput(
     damage: rollStat("Damage")?.damage ?? 0,
     hit: rollStat("Hit")?.hit ?? 0,
     crit: rollStat("Crit")?.crit ?? 0,
+    type: type ?? DamageType.blunt,
   };
 }

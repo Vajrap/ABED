@@ -3,11 +3,13 @@ import type { Weapon } from "src/Entity/Item";
 import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums";
 import { statMod } from "./statMod";
 import { roll, rollTwenty } from "./Dice";
+import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 
 type DamageOutPut = {
   damage: number;
   hit: number;
   crit: number;
+  type: DamageType;
 };
 
 export function getWeaponDamageOutput(
@@ -33,5 +35,6 @@ export function getWeaponDamageOutput(
     damage: Math.max(rollStat("Damage"), 0),
     hit: rollStat("Hit"),
     crit: rollStat("Crit"),
+    type: weaponDamage[`${type}DamageType`],
   };
 }

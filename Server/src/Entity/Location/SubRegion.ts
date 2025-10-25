@@ -7,9 +7,6 @@ import {
   WeatherDeck,
   type WeatherVolatility,
 } from "../Card/WeatherCard/WeatherCard";
-import {
-  locationRepository,
-} from "./Location/repository";
 import type { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import type { WeatherInterpreter } from "./Weather/types";
@@ -73,6 +70,8 @@ export class SubRegion {
     console.log(`  Processing ${this.locations.length} locations:`, this.locations);
 
     for (const locaEnum of this.locations) {
+      // Lazy import to avoid circular dependency
+      const { locationRepository } = require("./Location/repository");
       const location = locationRepository[locaEnum];
       if (!location) {
         console.log(`  WARNING: Location ${locaEnum} not found in repository`);

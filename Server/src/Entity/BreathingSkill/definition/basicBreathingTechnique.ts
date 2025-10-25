@@ -1,6 +1,8 @@
 import { BreathingSkill } from "../BreathinglSkill";
 import { BreathingSkillId } from "../enum";
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
+import Report from "src/Utils/Reporter";
+import { getCharacter } from "src/Utils/getCharacter";
 
 export const basicBreathingTechnique = new BreathingSkill({
     id: BreathingSkillId.basicBreathingTechnique,
@@ -11,13 +13,23 @@ export const basicBreathingTechnique = new BreathingSkill({
     type: "water",
     tier: TierEnum.common,
     activateEffect: {
-        on: (self, skillLevel) => {
+        on: (selfId, skillLevel) => {
+            const character = getCharacter(selfId);
+            if (character === undefined) {
+                Report.error(`Character with ID ${selfId} not found`);
+                return;
+            }
             // When activated - basic breathing technique starts
-            console.log(`${self.name.en} activates Basic Breathing Technique`);
+            console.log(`${character.name.en} activates Basic Breathing Technique`);
         },
-        off: (self, skillLevel) => {
+        off: (selfId, skillLevel) => {
+            const character = getCharacter(selfId);
+            if (character === undefined) {
+                Report.error(`Character with ID ${selfId} not found`);
+                return;
+            }
             // When deactivated - basic breathing technique ends
-            console.log(`${self.name.en} deactivates Basic Breathing Technique`);
+            console.log(`${character.name.en} deactivates Basic Breathing Technique`);
         },
         attacking: (self, target, skillLevel) => {
             // Effect when attacking - basic breathing provides slight focus
@@ -27,13 +39,18 @@ export const basicBreathingTechnique = new BreathingSkill({
             // Effect when attacked - basic breathing provides slight calm
             // Could add small defense bonus or similar
         },
-        takingTurn: (self, skillLevel) => {
+        takingTurn: (selfId, skillLevel) => {
+            const character = getCharacter(selfId);
+            if (character === undefined) {
+                Report.error(`Character with ID ${selfId} not found`);
+                return;
+            }
             // Effect when taking turn - basic breathing provides slight stamina recovery
             // Small SP recovery per turn
             const spRecovery = Math.floor(skillLevel * 0.5) + 1;
             const mpRecovery = Math.floor(skillLevel * 0.5) + 1;
-            self.vitals.incSp(spRecovery);
-            self.vitals.incMp(mpRecovery);
+            character.vitals.incSp(spRecovery);
+            character.vitals.incMp(mpRecovery);
         },
     },
 });

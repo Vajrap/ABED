@@ -1,4 +1,5 @@
 import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
+import { NewsSignificance, NewsPropagation } from "../../../../../InterFacesEnumsAndTypes/NewsEnums";
 import { rollTwenty } from "../../../../../Utils/Dice";
 import { statMod } from "../../../../../Utils/statMod";
 import type { Character } from "../../../../Character/Character";
@@ -67,22 +68,13 @@ export function handleTrainSkill(
         kind: "privateScope",
         characterId: character.id,
       },
-      tokens: [
-        {
-          t: "char",
-          v: [
-            {
-              name: character.name,
-              title: character.title.string(),
-              fame: character.fame.getString(context.subRegion),
-              portrait: character.portrait ? character.portrait : "",
-              level: character.level,
-            },
-          ],
-        },
-      ],
+      content: {
+        en: `[char:${character.id}]${character.name.en}[/char] trained skill [skill:${target}]${target}[/skill]`,
+        th: `[char:${character.id}]${character.name.th}[/char] ฝึกฝนทักษะ [skill:${target}]${target}[/skill]`,
+      },
       context,
-      secretTier: TierEnum.common
+      significance: NewsSignificance.MINOR,
+      propagation: NewsPropagation.SECRET,
     });
     results.push(news);
   }

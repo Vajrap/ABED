@@ -1,13 +1,16 @@
-import { describe, expect, it, beforeEach, afterEach, spyOn } from "@jest/globals";
+import { describe, expect, it, beforeEach, afterEach } from "@jest/globals";
+import { jest } from "@jest/globals";
 import { Location } from "../../../src/Entity/Location/Location";
 import { SubRegion } from "../../../src/Entity/Location/SubRegion";
 import { Weather } from "../../../src/InterFacesEnumsAndTypes/Weather";
 import { LocationsEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Location";
 import { SubRegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/SubRegion";
 import { RegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/Region";
+import { SeasonEnum } from "../../../src/InterFacesEnumsAndTypes/Time";
 import { GameTime } from "../../../src/Game/GameTime/GameTime";
 import * as Dice from "../../../src/Utils/Dice";
 import type { ResourceGenerationConfig } from "../../../src/InterFacesEnumsAndTypes/Interfaces/Resource";
+import type { WeatherInterpreter } from "../../../src/Entity/Location/Weather/types";
 
 describe("Location - refillResources()", () => {
   let testSubRegion: SubRegion;
@@ -18,13 +21,20 @@ describe("Location - refillResources()", () => {
     originalSeason = GameTime.season;
     
     // Create test subregion
-    const weatherInterpretation = new Map<number, Weather>([
-      [50, Weather.Clear],
-    ]);
+    const weatherInterpretation: WeatherInterpreter = {
+      [SeasonEnum.Seeding]: { 50: Weather.Clear },
+      [SeasonEnum.RainFall]: { 50: Weather.Clear },
+      [SeasonEnum.GreenTide]: { 50: Weather.Clear },
+      [SeasonEnum.HarvestMoon]: { 50: Weather.Clear },
+      [SeasonEnum.SunDry]: { 50: Weather.Clear },
+      [SeasonEnum.Frostveil]: { 50: Weather.Clear },
+      [SeasonEnum.LongDark]: { 50: Weather.Clear },
+    };
     
     testSubRegion = new SubRegion(
       SubRegionEnum.GoldenPlains,
       RegionEnum.CentralPlain,
+      [],
       { walk: 0, horse: 0, caravan: 0 },
       "STABLE",
       weatherInterpretation
@@ -82,8 +92,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -94,7 +105,7 @@ describe("Location - refillResources()", () => {
       );
 
       // Mock rollTwenty to return 10 (no fluctuation)
-      const spy = spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
+      const spy = jest.spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
 
       const beforeFish = location.resourceGeneration.stockpile.fish;
       location.refillResources();
@@ -148,8 +159,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -160,7 +172,7 @@ describe("Location - refillResources()", () => {
       );
 
       // Mock rollTwenty to return 10 (no fluctuation)
-      const spy = spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
+      const spy = jest.spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
 
       const beforeLivestock = location.resourceGeneration.stockpile.livestock;
       location.refillResources();
@@ -214,8 +226,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -287,8 +300,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -346,8 +360,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id ,
         [],
         [],
         "STABLE",
@@ -411,8 +426,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -476,8 +492,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -535,8 +552,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -600,8 +618,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -665,8 +684,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -730,8 +750,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -795,8 +816,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -853,8 +875,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -916,8 +939,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -980,8 +1004,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -1037,8 +1062,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -1100,8 +1126,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -1112,7 +1139,7 @@ describe("Location - refillResources()", () => {
       );
 
       // Mock rollTwenty to return 20 (maximum positive fluctuation)
-      const spy = spyOn(Dice, "rollTwenty").mockReturnValue({ total: 20, rolls: [20] } as any);
+      const spy = jest.spyOn(Dice, "rollTwenty").mockReturnValue({ total: 20, rolls: [20] } as any);
 
       location.refillResources();
 
@@ -1165,8 +1192,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -1177,7 +1205,7 @@ describe("Location - refillResources()", () => {
       );
 
       // Mock rollTwenty to return 1 (maximum negative fluctuation)
-      const spy = spyOn(Dice, "rollTwenty").mockReturnValue({ total: 1, rolls: [1] } as any);
+      const spy = jest.spyOn(Dice, "rollTwenty").mockReturnValue({ total: 1, rolls: [1] } as any);
 
       location.refillResources();
 
@@ -1230,8 +1258,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -1242,7 +1271,7 @@ describe("Location - refillResources()", () => {
       );
 
       // Mock rollTwenty to return 10 (no fluctuation)
-      const spy = spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
+      const spy = jest.spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
 
       location.refillResources();
 
@@ -1301,8 +1330,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -1313,7 +1343,7 @@ describe("Location - refillResources()", () => {
       );
 
       // Mock rollTwenty to return 10 (no fluctuation)
-      const spy = spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
+      const spy = jest.spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
 
       location.refillResources();
       expect(location.resourceGeneration.stockpile.fish).toBe(50);
@@ -1369,8 +1399,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -1381,7 +1412,7 @@ describe("Location - refillResources()", () => {
       );
 
       // Mock rollTwenty to return 10 (no fluctuation)
-      const spy = spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
+      const spy = jest.spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
 
       location.refillResources();
       expect(location.resourceGeneration.stockpile.fish).toBe(50);
@@ -1444,8 +1475,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",
@@ -1456,7 +1488,7 @@ describe("Location - refillResources()", () => {
       );
 
       // Mock rollTwenty to return 10 (no fluctuation)
-      const spy = spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
+      const spy = jest.spyOn(Dice, "rollTwenty").mockReturnValue({ total: 10, rolls: [10] } as any);
 
       location.refillResources();
 
@@ -1507,8 +1539,9 @@ describe("Location - refillResources()", () => {
       };
 
       const location = new Location(
-        LocationsEnum.FyonarCity,
-        testSubRegion,
+        LocationsEnum.WaywardInn,
+        { en: "Test Location", th: "สถานที่ทดสอบ" },
+        testSubRegion.id,
         [],
         [],
         "STABLE",

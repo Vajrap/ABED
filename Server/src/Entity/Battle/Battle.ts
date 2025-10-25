@@ -11,8 +11,6 @@ import type { TurnResult } from "../Skill/types";
 import { BattleReport } from "./BattleReport";
 import { getPlayableSkill } from "./getPlayableSkill";
 import { battleTypeConfig, type BattleType } from "./types";
-import {breathingSkillRepository} from "src/Entity/BreathingSkill/repository.ts";
-import Report from "src/Utils/Reporter.ts";
 import { activateBreathingSkillTurnPassive } from "../BreathingSkill/activeBreathingSkill";
 
 export class Battle {
@@ -132,7 +130,7 @@ export class Battle {
   }
 
   startActorTurn(actor: Character): TurnResult {
-    activateBreathingSkillTurnPassive(actor);
+    activateBreathingSkillTurnPassive(actor.id);
 
     actor.replenishResource();
     // Check: If a character can play any cards
@@ -162,7 +160,7 @@ export class Battle {
           (char): char is Character => char !== "none",
         );
 
-    const turnResult = skill.exec(actor, userParty, targetParty, skillLevel, this.location);
+    const turnResult = skill.exec(actor, userParty, targetParty, skillLevel, this.location.id);
     // Produce Resource
 
     for (const produce of skill.produce.elements) {

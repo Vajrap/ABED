@@ -1,5 +1,5 @@
 import { CharacterRoleEnum } from "../../Entity/Character/Subclass/Title/Role/enum";
-import type { ItemId } from "../../Entity/Item/Item";
+import type { ItemId } from "../../Entity/Item/type";
 import type { SkillId } from "../../Entity/Skill/enums";
 import type { ProficiencyKey } from "../../InterFacesEnumsAndTypes/Enums";
 

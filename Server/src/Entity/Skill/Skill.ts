@@ -1,7 +1,6 @@
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import type { Character } from "../Character/Character";
-import type { Location } from "../Location/Location";
 import type { SkillId } from "./enums";
 import type {
   SkillConsume,
@@ -10,6 +9,7 @@ import type {
   TurnResult,
 } from "./types";
 import type { ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
+import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 
 export class Skill {
   id: SkillId;
@@ -25,7 +25,7 @@ export class Skill {
     userParty: Character[],
     targetParty: Character[],
     skillLevel: number,
-    location: Location,
+    location: LocationsEnum,
   ) => TurnResult;
   constructor(data: {
     id: SkillId;
@@ -41,7 +41,7 @@ export class Skill {
       userParty: Character[],
       targetParty: Character[],      
       skillLevel: number,
-      location: Location,
+      location: LocationsEnum,
     ) => TurnResult;
   }) {
     this.id = data.id;

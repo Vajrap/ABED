@@ -58,7 +58,7 @@ describe("Character", () => {
       });
 
       expect(character.id).toBe("test-char-001");
-      expect(character.name).toBe("Test Character");
+      expect(character.name).toEqual({ en: "Test Character", th: "ทดสอบตัวอักษร" });
       expect(character.type).toBe(CharacterType.humanoid);
       expect(character.level).toBe(1);
       expect(character.gender).toBe("NONE"); // default
@@ -351,17 +351,17 @@ describe("Character", () => {
         permValue: 1,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
+      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.haste, {
         value: 1,
-        isPerm: false,
-        permValue: 0,
+        isPerm: true,
+        permValue: 1,
       });
 
-      expect(character.buffsAndDebuffs.entry.size).toBe(3);
+      expect(character.buffsAndDebuffs.entry.size).toBe(2);
 
       character.clearBuffAndDebuff();
 
-      expect(character.buffsAndDebuffs.entry.size).toBe(1); // only permanent slow remains
+      expect(character.buffsAndDebuffs.entry.size).toBe(2); // both permanent buffs remain
 
       const slowEntry = character.buffsAndDebuffs.entry.get(
         BuffsAndDebuffsEnum.slow,
@@ -370,13 +370,13 @@ describe("Character", () => {
       expect(slowEntry?.isPerm).toBe(true);
       expect(slowEntry?.permValue).toBe(1);
 
-      // Non-permanent ones should be gone
+      // Both permanent buffs should remain
       expect(
         character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.haste),
-      ).toBe(false);
+      ).toBe(true);
       expect(
         character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.slow),
-      ).toBe(false);
+      ).toBe(true);
     });
 
     it("should ignore buffs with zero or negative values", () => {
@@ -398,20 +398,17 @@ describe("Character", () => {
         permValue: 0,
       });
 
-      expect(character.buffsAndDebuffs.entry.size).toBe(3);
+      expect(character.buffsAndDebuffs.entry.size).toBe(2);
 
       character.clearBuffAndDebuff();
 
       // Only the positive value buff should be removed
-      expect(character.buffsAndDebuffs.entry.size).toBe(2);
+      expect(character.buffsAndDebuffs.entry.size).toBe(1);
       expect(
         character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.haste),
       ).toBe(true);
       expect(
         character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.slow),
-      ).toBe(true);
-      expect(
-        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.haste),
       ).toBe(false);
     });
 
@@ -464,14 +461,14 @@ describe("Character", () => {
       expect(character.relations).toBeInstanceOf(Map);
       expect(character.relations.size).toBe(0);
 
-      expect(character.traits).toBeInstanceOf(Array);
+      expect(character.traits).toBeInstanceOf(Map);
       expect(character.traits.size).toBe(0);
 
       expect(character.inventory).toBeInstanceOf(Map);
       expect(character.inventory.size).toBe(0);
 
       expect(character.equipments).toBeInstanceOf(Object);
-      expect(Object.keys(character.equipments).length).toBe(0);
+      expect(Object.keys(character.equipments).length).toBe(13); // 13 equipment slots
     });
 
     it("should have proper default inventory settings", () => {

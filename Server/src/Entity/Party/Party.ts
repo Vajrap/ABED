@@ -1,7 +1,7 @@
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { statMod } from "../../Utils/statMod";
 import { Character } from "../Character/Character";
-import type { ItemId } from "../Item/Item";
+import type { ItemId } from "../Item/type";
 import { PartyType, type PartyBehavior } from "./PartyBehavior";
 import {
   defaultPartyAction,

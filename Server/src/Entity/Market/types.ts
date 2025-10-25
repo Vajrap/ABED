@@ -1,22 +1,7 @@
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
-import type { ItemId } from "../Item/Item";
-
-/**
- * Resource types that can be produced and traded
- * These are generic resources tracked as numbers in Location stockpiles
- */
-export type ResourceType = 
-  | "ore" 
-  | "gemstone" 
-  | "wood" 
-  | "herbs" 
-  | "silk" 
-  | "fish" 
-  | "grain" 
-  | "vegetables" 
-  | "fruits" 
-  | "livestock";
+import type { ItemId } from "../Item/type";
+import type { ResourceType } from "../../InterFacesEnumsAndTypes/ResourceTypes";
 
 /**
  * Baseline production expectations at different scopes

@@ -50,10 +50,8 @@ import {
   NeckId,
 } from "../Item/index.ts";
 import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
-import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes.ts";
-import type { Location } from "../Location/Location.ts";
 import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
-import { resolveBreathingSkillInBattle } from "../BreathingSkill/activeBreathingSkill.ts";
+
 
 export class Character {
   id: string = "";
@@ -333,83 +331,6 @@ export class Character {
 
     // When both hands yields no result
     return bareHand;
-  }
-
-  receiveDamage(
-    attacker: Character,
-    damageOutput: {
-      damage: number;
-      hit: number;
-      crit: number /* consider: isNat20?: boolean */;
-    },
-    damageType: DamageType,
-    location: Location,
-    critModifier: number = 1.5,
-  ): {
-    actualDamage: number;
-    damageType: DamageType;
-    isHit: boolean;
-    isCrit: boolean;
-  } {
-    // --- HIT / DODGE ---
-    // If you mean "nat 20 can't be dodged", you need a raw die or a boolean flag.
-    // Here we treat 20+ as "auto-hit" only if that's your rule; adjust as needed.
-    const dodgeChance =
-      this.battleStats.getTotal("dodge") +
-      statMod(this.attribute.getTotal("agility"));
-
-    // Attacker’s 'hit' already includes their bonuses
-    const autoHit = damageOutput.crit >= 20; // ideally: damageOutput.isNat20 === true
-    if (!autoHit && dodgeChance >= damageOutput.hit) {
-      return {
-        actualDamage: 0,
-        damageType,
-        isHit: false,
-        isCrit: false,
-      };
-    }
-
-    resolveBreathingSkillInBattle(attacker, this, damageOutput);
-
-    // --- MITIGATION ---
-    const isPhysical =
-      damageType === DamageType.pierce ||
-      damageType === DamageType.slash ||
-      damageType === DamageType.blunt;
-
-    const mitigation = isPhysical
-      ? this.battleStats.getTotal("pDEF") +
-        statMod(this.attribute.getTotal("endurance"))
-      : this.battleStats.getTotal("mDEF") +
-        statMod(this.attribute.getTotal("planar"));
-
-    let damage = Math.max(damageOutput.damage - Math.max(mitigation, 0), 0);
-
-    // --- CRIT CHECK ---
-    // Keep stat usage consistent: use statMod(endurance) if dodge used statMod(agility)
-    const critDefense = statMod(this.attribute.getTotal("endurance"));
-    let isCrit = false;
-    if (damageOutput.crit - critDefense >= 20) {
-      damage *= critModifier;
-      isCrit = true;
-    }
-
-    // TODO
-    // --- BUFFS/DEBUFFS/TRAITS (future hooks) ---
-    // Example pattern:
-    // damage = this.applyElementalInteractions(damage, damageType);
-    // damage = this.applyShieldsAndAbsorbs(damage);
-
-    // --- ROUND & APPLY ---
-    const finalDamage = Math.max(Math.floor(damage), 0);
-    this.vitals.decHp(finalDamage);
-
-    return {
-      actualDamage: finalDamage,
-      damageType,
-      isHit: true,
-      isCrit,
-    };
   }
 
   receiveHeal({ healing }: { actor: Character; healing: number }): {

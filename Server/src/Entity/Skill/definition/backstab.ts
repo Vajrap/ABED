@@ -12,6 +12,8 @@ import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
+import { resolveDamage } from "src/Entity/Battle/damageResolution";
+import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 
 export const backstab = new Skill({
   id: SkillId.Backstab,
@@ -37,7 +39,7 @@ export const backstab = new Skill({
       },
       {
         element: "chaos",
-        value: 2,
+        value: 1,
       },
     ],
   },
@@ -58,7 +60,7 @@ export const backstab = new Skill({
     actorParty: Character[],
     targetParty: Character[],
     skillLevel: number,
-    location: Location,
+    location: LocationsEnum,
   ) => {
     const target = getTarget(actor, targetParty).one().randomly()[0];
 
@@ -100,13 +102,8 @@ export const backstab = new Skill({
       !!target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.fear) ||
       !!target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.dazed);
 
-    const totalDamage = target.receiveDamage(
-      actor,
-      damageOutput,
-      DamageType.pierce,
-      location,
-      hasFearOrDaze ? 4 : 0,
-    );
+    const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location, hasFearOrDaze ? 4 : 0);
+
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(

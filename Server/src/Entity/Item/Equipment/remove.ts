@@ -1,6 +1,6 @@
 import type { CharacterEquipmentSlot } from "../../../InterFacesEnumsAndTypes/Enums";
 import type { Character } from "../../Character/Character";
-import type { EquipmentId } from "./repository";
+import type { EquipmentId } from "./types";
 import type { Equipment } from "./Equipment";
 import { getEquipment } from "./repository";
 import { modifyBonusStats, modifyVitals } from "./modifiers";
@@ -33,7 +33,7 @@ export function remove(
   // 4. move item to inventory
   const inv = character.inventory.get(equippedId) ?? 0;
   character.inventory.set(equippedId, inv + 1);
-  (character.equipments)[slot] = null;
+  (character.equipments as any)[slot] = null;
 
   return true;
 }

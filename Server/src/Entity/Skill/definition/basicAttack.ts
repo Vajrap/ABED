@@ -1,7 +1,6 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SkillId } from "../enums";
 import { Skill } from "../Skill";
-import type { Location } from "src/Entity/Location/Location";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../types";
@@ -10,6 +9,8 @@ import { ActorEffect, TargetEffect } from "../effects";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
+import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
+import { resolveDamage } from "src/Entity/Battle/damageResolution";
 
 export const basicAttack = new Skill({
   id: SkillId.Basic,
@@ -47,7 +48,7 @@ export const basicAttack = new Skill({
     actorParty: Character[],
     targetParty: Character[],
     skillLevel: number,
-    location: Location,
+    location: LocationsEnum,
   ) => {
     const target = getTarget(actor, targetParty).one().randomly()[0];
 
@@ -77,12 +78,7 @@ export const basicAttack = new Skill({
 
     damageOutput.damage = damageOutput.damage * positionMidifier;
 
-    const totalDamage = target.receiveDamage(
-      actor,
-      damageOutput,
-      weapon.weaponData.damage[`${type}DamageType`],
-      location,
-    );
+    const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(
