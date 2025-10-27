@@ -2,8 +2,7 @@ import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SkillId } from "../enums";
 import { Skill } from "../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect } from "../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
@@ -37,7 +36,7 @@ export const shieldUp = new Skill({
     sp: 0,
     elements: [
       {
-        element: "none",
+        element: "neutral",
         min: 1,
         max: 1,
       },

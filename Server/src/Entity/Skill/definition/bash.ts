@@ -17,14 +17,14 @@ export const bash = new Skill({
   id: SkillId.Bash,
   name: {
     en: "Bash",
-    th: "ทุบ",
+    th: "ทุบสุดแรง",
   },
   description: {
-    en: "A powerful strike. Deals 1.3× (+0.05 per skill level) weapon damage (+ str mod)",
-    th: "การโจมตีที่รุนแรง สร้างความเสียหาย 1.3 เท่า (+0.05 ต่อเลเวลสกิล) ของความเสียหายอาวุธ (+ str mod)",
+    en: "Swing with your full strength, smashing the enemy with a crushing blow. Deals 1.4× (+0.05 per skill level) of weapon damage plus your Strength modifier.",
+    th: "เหวี่ยงอาวุธอย่างสุดแรง ทุบใส่ศัตรูด้วยพลังทำลายล้างสูง สร้างความเสียหาย 1.4 เท่า (+0.05 ต่อเลเวลสกิล) ของความเสียหายอาวุธ รวมค่าสถานะ STR",
   },
   requirement: {},
-  equipmentNeeded: [], // Any physical weapon
+  equipmentNeeded: [],
   tier: TierEnum.common,
   consume: {
     hp: 0,
@@ -32,7 +32,7 @@ export const bash = new Skill({
     sp: 5,
     elements: [
       {
-        element: "none",
+        element: "neutral",
         value: 2,
       },
     ],
@@ -47,11 +47,6 @@ export const bash = new Skill({
         min: 0,
         max: 1,
       },
-      {
-        element: "fire",
-        min: 0,
-        max: 1,
-      },
     ],
   },
   exec: (
@@ -61,7 +56,7 @@ export const bash = new Skill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const target = getTarget(actor, targetParty).one().randomly()[0];
+    const target = getTarget(actor, targetParty).one();
 
     if (!target) {
       return {
@@ -81,27 +76,32 @@ export const bash = new Skill({
     const damageType = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, damageType);
 
-    // Base multiplier: 1.3 + 0.05 per skill level
-    const multiplier = 1.3 + 0.05 * skillLevel;
-    
+    const multiplier = 1.4 + 0.05 * skillLevel;
+
     // Add strength modifier
     const strengthMod = statMod(actor.attribute.getTotal("strength"));
-    
+
     const positionModifierValue = getPositionModifier(
       actor.position,
       target.position,
       weapon,
     );
 
-    damageOutput.damage = (damageOutput.damage * multiplier + strengthMod) * positionModifierValue;
+    damageOutput.damage =
+      (damageOutput.damage * multiplier + strengthMod) * positionModifierValue;
 
-    const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
+    const totalDamage = resolveDamage(
+      actor.id,
+      target.id,
+      damageOutput,
+      location,
+    );
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(
         actor,
         target,
-        { en: "Bash", th: "ทุบ" },
+        { en: `Bash`, th: `ทุบสุดแรง` },
         totalDamage,
       ),
       actor: {

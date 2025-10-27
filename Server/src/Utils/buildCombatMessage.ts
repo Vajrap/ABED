@@ -5,7 +5,7 @@ export function buildCombatMessage(
   actor: Character,
   target: Character,
   skillName: { en: string; th: string },
-  totalDamage: { isHit: boolean; actualDamage: number; damageType: DamageType },
+  totalDamage: { isHit: boolean; isCrit: boolean; actualDamage: number; damageType: DamageType },
 ) {
   const hitTextEN = totalDamage.isHit
     ? `dealing ${totalDamage.actualDamage} ${totalDamage.damageType} damage.`
@@ -15,7 +15,7 @@ export function buildCombatMessage(
     : `แต่พลาดการโจมตี!`;
 
   return {
-    en: `${actor.name.en} attacked ${target.name.en} with ${skillName.en}, ${hitTextEN}`,
-    th: `${actor.name.th} โจมตี ${target.name.th} ด้วย ${skillName.th} ${hitTextTH}`,
+    en: `${actor.name.en} attacked ${target.name.en} with ${skillName.en}, ${hitTextEN} ${totalDamage.isCrit ? 'CRITICAL HIT!' : ''}`,
+    th: `${actor.name.th} โจมตี ${target.name.th} ด้วย ${skillName.th} ${hitTextTH} ${totalDamage.isCrit ? 'CRITICAL HIT!' : ''}`,
   };
 }

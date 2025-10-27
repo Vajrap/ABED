@@ -248,7 +248,7 @@ export class NewsArchive {
           spreadConfig: record.news.spreadConfig as any,
           currentReach: Array.from(record.currentLocations) as any,
           expiresAtGameDay: record.lastSpreadDay, // Store lastSpreadDay
-          secretTier: record.news.secretTier,
+          secretTier: record.news.secretTier ? (record.news.secretTier as unknown as string) : undefined,
         });
       }
 
@@ -295,7 +295,9 @@ export class NewsArchive {
         `NewsArchive saved: ${newsToInsert.length} news, ${reachToInsert.length} location reaches`,
       );
     } catch (error) {
-      Report.error("Failed to save news to database:", error);
+      Report.error("Failed to save news to database:", 
+        error instanceof Error ? { message: error.message, stack: error.stack } : { error: String(error) }
+      );
     }
   }
 
@@ -459,7 +461,7 @@ export class NewsArchive {
         break;
       case "regionScope":
         // Get all locations in region
-        for (const loc of require("../Repository/location").locationRepository.values()) {
+        for (const loc of Object.values(require("../Location/Location/repository").locationRepository) as any[]) {
           if (loc.region === news.scope.region) {
             locations.add(loc.id);
           }
@@ -511,6 +513,7 @@ export class NewsArchive {
       id: record.id,
       ts: record.gameTime,
       scope: this.reconstructScope(record.scopeKind, record.scopeData || {}),
+      content: record.content || { en: "", th: "" }, // Added content field
       tokens: record.tokens || [],
       context: record.context || {},
       tags: record.tags,

@@ -11,6 +11,11 @@ import {tauntSkill} from "./definition/taunt";
 import {cleave} from "./definition/cleave";
 import {herosPose} from "./definition/herosPose";
 import {shieldUp} from "./definition/shieldUp";
+import {fireBolt} from "./definition/fireBolt";
+import {burningHand} from "./definition/burningHand";
+import {fireBall} from "./definition/fireBall";
+import {arcaneShield} from "./definition/arcaneShield";
+import {backdraft} from "./definition/backdraft";
 
 export const skillRepository: Record<SkillId, Skill> = {
     [SkillId.Basic]: basicAttack,
@@ -23,5 +28,10 @@ export const skillRepository: Record<SkillId, Skill> = {
     [SkillId.Taunt]: tauntSkill,
     [SkillId.Cleave]: cleave,
     [SkillId.HerosPose]: herosPose,
-    [SkillId.ShieldUp]: shieldUp
+    [SkillId.ShieldUp]: shieldUp,
+    [SkillId.FireBolt]: fireBolt,
+    [SkillId.BurningHand]: burningHand,
+    [SkillId.FireBall]: fireBall,
+    [SkillId.ArcaneShield]: arcaneShield,
+    [SkillId.Backdraft]: backdraft,
 };

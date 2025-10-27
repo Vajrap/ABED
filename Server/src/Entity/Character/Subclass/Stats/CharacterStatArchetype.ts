@@ -27,11 +27,18 @@ export class CharacterStatArchetype<T extends string> {
   constructor(
     keys: readonly T[],
     initial?: Partial<Record<T, Partial<StatBlock>>>,
+    defaultBase: number = 6,
   ) {
     this.keys = keys;
     this.stats = {} as Record<T, StatBlock>;
     for (const key of keys) {
-      this.stats[key] = StatBlock.from(initial?.[key] ?? {});
+      const provided = initial?.[key];
+      this.stats[key] = StatBlock.from({
+        base: provided?.base ?? defaultBase,
+        bonus: provided?.bonus ?? 0,
+        battle: provided?.battle ?? 0,
+        exp: provided?.exp ?? 0,
+      });
     }
   }
 

@@ -1,7 +1,6 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SkillId } from "../enums";
 import { Skill } from "../Skill";
-import type { Location } from "src/Entity/Location/Location";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../types";
@@ -9,7 +8,6 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ActorEffect, TargetEffect } from "../effects";
 import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
-import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
@@ -22,8 +20,8 @@ export const backstab = new Skill({
     th: "แทงข้างหลัง",
   },
   description: {
-    en: "A deadly attack that deals 1.5x (+0.1 per skill level) weapon piercing damage. If the user is in a Hiding state, damage is increased by an additional 0.5x. Gains +25% critical chance if the target is affected by Fear or Daze.",
-    th: "การโจมตีที่รุนแรง สร้างความเสียหายแบบแทงทะลุ (piercing) 1.5 เท่าของความเสียหายอาวุธ (+0.1 ต่อเลเวลสกิล) หากอยู่ในสถานะเร้นกาย ความเสียหายจะเพิ่มขึ้นอีก 0.5 เท่า และมีโอกิตคริติคอลเพิ่มขึ้น 25% หากเป้าหมายอยู่ในสถานะหวาดกลัว (Fear) หรือมึนงง (Daze)",
+    en: "Slip into your enemy’s blind spot and drive your blade deep. Deals 1.3× (+0.1 per skill level) of weapon piercing damage. If hidden, damage increases by +0.5×. Gains +4 critical roll if the target is Frightened or Dazed. If skill level reached 5 the base damage went up to 1.5 times weapon damage and critical roll + 5.",
+    th: "เคลื่อนไหวจากเงามืด แทงทะลุจุดอ่อนของศัตรูสร้างความเสียหายแบบแทงทะลุ (Piercing) 1.3 เท่า (+0.1 ต่อเลเวลสกิล) ของความเสียหายอาวุธหากอยู่ในสถานะเร้นกาย ความเสียหายจะเพิ่มขึ้นอีก 0.5 เท่าและ critical roll เพิ่มขึ้น 4 หน่วย หากเป้าหมายอยู่ในสถานะ “หวาดกลัว” หรือ “มึนงง. เมื่อเลเวลสกิลถึง 5 ความเสียหายเพิ่มเป็น 1.5 เท่าและ critical roll 5 หน่วย”",
   },
   requirement: {},
   equipmentNeeded: ["dagger"],
@@ -49,7 +47,7 @@ export const backstab = new Skill({
     sp: 0,
     elements: [
       {
-        element: "none",
+        element: "neutral",
         min: 0,
         max: 1,
       },
@@ -62,7 +60,7 @@ export const backstab = new Skill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const target = getTarget(actor, targetParty).one().randomly()[0];
+    const target = getTarget(actor, targetParty).from("backFirst").one();
 
     if (!target) {
       return {
@@ -88,7 +86,8 @@ export const backstab = new Skill({
       weapon,
     );
 
-    const baseMultiplier = 1.5 + 0.1 * skillLevel;
+    const baseTimes = skillLevel >= 5 ? 1.5 : 1.3;
+    const baseMultiplier = baseTimes + 0.1 * skillLevel;
 
     if (actor.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.hiding)) {
       damageOutput.damage =
@@ -98,20 +97,26 @@ export const backstab = new Skill({
         damageOutput.damage * baseMultiplier * positionModifierValue;
     }
 
+    const additionCrit = skillLevel >= 5 ? 5 : 4;
     const hasFearOrDaze =
       !!target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.fear) ||
       !!target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.dazed);
 
-    const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location, hasFearOrDaze ? 4 : 0);
-
+    const totalDamage = resolveDamage(
+      actor.id,
+      target.id,
+      damageOutput,
+      location,
+      hasFearOrDaze ? additionCrit : 0,
+    );
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(
         actor,
         target,
         {
-          en: `${actor.name.en} use backstab on ${target.name.en} ${totalDamage.isHit ? `deal ${totalDamage.actualDamage} pierce damage.` : `but missed!`}`,
-          th: `${actor.name.th} ใช้ท่าจู่โจมจากด้านหลังใส่ ${target.name.th} ${totalDamage.isHit ? `สร้างความเสียหายแบบเจาะเกราะ ${totalDamage.actualDamage} หน่วย` : `แต่พลาดเป้า!`}`,
+          en: `backstab`,
+          th: `แทงข้างหลัง`,
         },
         totalDamage,
       ),

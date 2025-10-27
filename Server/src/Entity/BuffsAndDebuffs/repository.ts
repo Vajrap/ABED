@@ -9,6 +9,8 @@ import { taunt } from "./definitions/taunt";
 import { dazed } from "./definitions/dazed";
 import {fear} from "src/Entity/BuffsAndDebuffs/definitions/fear.ts";
 import { defenseUp } from "./definitions/defenseUp";
+import { burn } from "./definitions/burn";
+import { arcaneShield } from "./definitions/arcaneShield";
 
 export const buffsAndDebuffsRepository: Record<
   BuffsAndDebuffsEnum,
@@ -21,4 +23,7 @@ export const buffsAndDebuffsRepository: Record<
   [BuffsAndDebuffsEnum.dazed]: dazed,
   [BuffsAndDebuffsEnum.fear]: fear,
   [BuffsAndDebuffsEnum.defenseUp]: defenseUp,
+  [BuffsAndDebuffsEnum.burn]: burn,
+  [BuffsAndDebuffsEnum.arcaneShield]: arcaneShield,
+  [BuffsAndDebuffsEnum.retreat]:
 };

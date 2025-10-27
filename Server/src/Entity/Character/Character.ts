@@ -153,7 +153,7 @@ export class Character {
     water: number;
     wind: number;
     fire: number;
-    none: number;
+    neutral: number;
   } = {
     order: 0,
     chaos: 0,
@@ -161,7 +161,7 @@ export class Character {
     water: 0,
     wind: 0,
     fire: 0,
-    none: 0,
+    neutral: 0,
   };
 
   position: 0 | 1 | 2 | 3 | 4 | 5 = 0;

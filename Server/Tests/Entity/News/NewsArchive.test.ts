@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, mock } from "@jest/globals";
+import { describe, test, expect, beforeEach } from "@jest/globals";
 import { NewsArchive } from "../../../src/Entity/News/NewsArchive";
 import { createNews } from "../../../src/Entity/News/News";
 import { NewsSignificance, NewsPropagation } from "../../../src/InterFacesEnumsAndTypes/NewsEnums";
@@ -24,7 +24,7 @@ describe("NewsArchive - OOP Implementation", () => {
     test("news auto-infers significance and propagation from scope", () => {
       const worldNews = createNews({
         scope: { kind: "worldScope" },
-        tokens: [{ t: "text", v: "Test" }],
+        content: { en: "Test", th: "ทดสอบ" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -43,11 +43,11 @@ describe("NewsArchive - OOP Implementation", () => {
         scope: { kind: "partyScope", partyId: "party123" },
         significance: NewsSignificance.MOMENTOUS, // Override
         propagation: NewsPropagation.GLOBAL,       // Override
-        tokens: [{ t: "text", v: "Epic party achievement!" }],
+        content: { en: "Epic party achievement!", th: "ความสำเร็จของปาร์ตี้ที่ยิ่งใหญ่!" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
-          location: LocationsEnum.PlagueWaterCrossing,
+          location: LocationsEnum.WaywardInn,
           partyId: "party123",
           characterIds: []
         },
@@ -62,7 +62,7 @@ describe("NewsArchive - OOP Implementation", () => {
     test("archives news with initial freshness of 100", () => {
       const news = createNews({
         scope: { kind: "worldScope" },
-        tokens: [{ t: "text", v: "Test" }],
+        content: { en: "Test", th: "ทดสอบ" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -81,12 +81,12 @@ describe("NewsArchive - OOP Implementation", () => {
     
     test("tracks news by location", () => {
       const news = createNews({
-        scope: { kind: "locationScope", location: LocationsEnum.PlagueWaterCrossing },
-        tokens: [{ t: "text", v: "Local news" }],
+        scope: { kind: "locationScope", location: LocationsEnum.WaywardInn },
+        content: { en: "Local news", th: "ข่าวท้องถิ่น" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
-          location: LocationsEnum.PlagueWaterCrossing,
+          location: LocationsEnum.WaywardInn,
           partyId: "",
           characterIds: []
         },
@@ -94,9 +94,9 @@ describe("NewsArchive - OOP Implementation", () => {
       
       archive.archiveNews(news);
       
-      const atLocation = archive.getNewsAtLocation(LocationsEnum.PlagueWaterCrossing);
+      const atLocation = archive.getNewsAtLocation(LocationsEnum.WaywardInn);
       expect(atLocation.length).toBe(1);
-      expect(atLocation[0].id).toBe(news.id);
+      expect(atLocation[0]?.id).toBe(news.id);
     });
   });
   
@@ -105,7 +105,7 @@ describe("NewsArchive - OOP Implementation", () => {
       const news = createNews({
         scope: { kind: "worldScope" },
         significance: NewsSignificance.TRIVIAL,
-        tokens: [{ t: "text", v: "Trivial news" }],
+        content: { en: "Trivial news", th: "ข่าวเล็กน้อย" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -129,7 +129,7 @@ describe("NewsArchive - OOP Implementation", () => {
       const news = createNews({
         scope: { kind: "worldScope" },
         significance: NewsSignificance.MOMENTOUS,
-        tokens: [{ t: "text", v: "Legendary event" }],
+        content: { en: "Legendary event", th: "เหตุการณ์ในตำนาน" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -156,7 +156,7 @@ describe("NewsArchive - OOP Implementation", () => {
       const news = createNews({
         scope: { kind: "worldScope" },
         significance: NewsSignificance.NOTABLE, // Decay rate: 3.33/day
-        tokens: [{ t: "text", v: "Notable event" }],
+        content: { en: "Notable event", th: "เหตุการณ์สำคัญ" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -184,13 +184,13 @@ describe("NewsArchive - OOP Implementation", () => {
   describe("Daily Spread (Multi-Front with d20)", () => {
     test("news doesn't spread if period hasn't elapsed", () => {
       const news = createNews({
-        scope: { kind: "locationScope", location: LocationsEnum.PlagueWaterCrossing },
+        scope: { kind: "locationScope", location: LocationsEnum.WaywardInn },
         propagation: NewsPropagation.REGIONAL, // spreadPeriod: 2 days
-        tokens: [{ t: "text", v: "Test" }],
+        content: { en: "Test", th: "ทดสอบ" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
-          location: LocationsEnum.PlagueWaterCrossing,
+          location: LocationsEnum.WaywardInn,
           partyId: "",
           characterIds: []
         },
@@ -207,17 +207,17 @@ describe("NewsArchive - OOP Implementation", () => {
     
     test("spreadDC of 1 always succeeds", () => {
       const news = createNews({
-        scope: { kind: "locationScope", location: LocationsEnum.PlagueWaterCrossing },
+        scope: { kind: "locationScope", location: LocationsEnum.WaywardInn },
         propagation: NewsPropagation.GLOBAL, // spreadDC: 1 (always)
         spreadConfig: {
           spreadPeriod: 1,
           spreadDC: 1, // d20 >= 1 = 100% success
         },
-        tokens: [{ t: "text", v: "Test" }],
+        content: { en: "Test", th: "ทดสอบ" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
-          location: LocationsEnum.PlagueWaterCrossing,
+          location: LocationsEnum.WaywardInn,
           partyId: "",
           characterIds: []
         },
@@ -236,7 +236,7 @@ describe("NewsArchive - OOP Implementation", () => {
     test("marks news as read", () => {
       const news = createNews({
         scope: { kind: "worldScope" },
-        tokens: [{ t: "text", v: "Test" }],
+        content: { en: "Test", th: "ทดสอบ" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -250,7 +250,7 @@ describe("NewsArchive - OOP Implementation", () => {
       archive.markAsRead("char123", news.id);
       
       // Get news for character (only unread)
-      const unread = archive.getNewsForCharacter("char123", LocationsEnum.PlagueWaterCrossing, {
+      const unread = archive.getNewsForCharacter("char123", LocationsEnum.WaywardInn, {
         onlyUnread: true,
       });
       
@@ -262,7 +262,7 @@ describe("NewsArchive - OOP Implementation", () => {
       const news = createNews({
         scope: { kind: "worldScope" },
         propagation: NewsPropagation.REGIONAL, // Can be shared
-        tokens: [{ t: "text", v: "Test" }],
+        content: { en: "Test", th: "ทดสอบ" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -287,7 +287,7 @@ describe("NewsArchive - OOP Implementation", () => {
       const secret = createNews({
         scope: { kind: "privateScope", characterId: "char1" },
         propagation: NewsPropagation.SECRET,
-        tokens: [{ t: "text", v: "Secret" }],
+        content: { en: "Secret", th: "ความลับ" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -311,7 +311,7 @@ describe("NewsArchive - OOP Implementation", () => {
       const trivial = createNews({
         scope: { kind: "worldScope" },
         significance: NewsSignificance.TRIVIAL,
-        tokens: [{ t: "text", v: "Trivial" }],
+        content: { en: "Trivial", th: "เล็กน้อย" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -324,7 +324,7 @@ describe("NewsArchive - OOP Implementation", () => {
       const major = createNews({
         scope: { kind: "worldScope" },
         significance: NewsSignificance.MAJOR,
-        tokens: [{ t: "text", v: "Major" }],
+        content: { en: "Major", th: "สำคัญ" },
         context: {
           region: undefined as any,
           subRegion: undefined as any,
@@ -388,11 +388,11 @@ describe("NewsArchive - OOP Implementation", () => {
         scope: { kind: "partyScope", partyId: "party123" },
         significance: NewsSignificance.TRIVIAL,
         propagation: NewsPropagation.SECRET,
-        tokens: [{ t: "text", v: "Party rested" }],
+        content: { en: "Party rested", th: "ปาร์ตี้พักผ่อน" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
-          location: LocationsEnum.PlagueWaterCrossing,
+          location: LocationsEnum.WaywardInn,
           partyId: "party123",
           characterIds: []
         },
@@ -420,7 +420,7 @@ describe("NewsArchive - OOP Implementation", () => {
           spreadPeriod: 3,  // Every 3 days
           spreadDC: 10,     // Medium difficulty
         },
-        tokens: [{ t: "text", v: "Devastating flood!" }],
+        content: { en: "Devastating flood!", th: "น้ำท่วมรุนแรง!" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
@@ -445,26 +445,26 @@ describe("NewsArchive - OOP Implementation", () => {
   describe("Filtering", () => {
     test("filters by minimum significance", () => {
       const trivial = createNews({
-        scope: { kind: "locationScope", location: LocationsEnum.PlagueWaterCrossing },
+        scope: { kind: "locationScope", location: LocationsEnum.WaywardInn },
         significance: NewsSignificance.TRIVIAL,
-        tokens: [{ t: "text", v: "Trivial" }],
+        content: { en: "Trivial", th: "เล็กน้อย" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
-          location: LocationsEnum.PlagueWaterCrossing,
+          location: LocationsEnum.WaywardInn,
           partyId: "",
           characterIds: []
         },
       });
       
       const notable = createNews({
-        scope: { kind: "locationScope", location: LocationsEnum.PlagueWaterCrossing },
+        scope: { kind: "locationScope", location: LocationsEnum.WaywardInn },
         significance: NewsSignificance.NOTABLE,
-        tokens: [{ t: "text", v: "Notable" }],
+        content: { en: "Notable", th: "สำคัญ" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
-          location: LocationsEnum.PlagueWaterCrossing,
+          location: LocationsEnum.WaywardInn,
           partyId: "",
           characterIds: []
         },
@@ -473,23 +473,23 @@ describe("NewsArchive - OOP Implementation", () => {
       archive.archiveNews(trivial);
       archive.archiveNews(notable);
       
-      const filtered = archive.getNewsAtLocation(LocationsEnum.PlagueWaterCrossing, {
+      const filtered = archive.getNewsAtLocation(LocationsEnum.WaywardInn, {
         minSignificance: NewsSignificance.NOTABLE,
       });
       
       expect(filtered.length).toBe(1);
-      expect(filtered[0].id).toBe(notable.id);
+      expect(filtered[0]?.id).toBe(notable.id);
     });
     
     test("filters by minimum freshness", () => {
       const news = createNews({
-        scope: { kind: "locationScope", location: LocationsEnum.PlagueWaterCrossing },
+        scope: { kind: "locationScope", location: LocationsEnum.WaywardInn },
         significance: NewsSignificance.MINOR,
-        tokens: [{ t: "text", v: "Test" }],
+        content: { en: "Test", th: "ทดสอบ" },
         context: {
           region: RegionEnum.CentralPlain,
           subRegion: undefined as any,
-          location: LocationsEnum.PlagueWaterCrossing,
+          location: LocationsEnum.WaywardInn,
           partyId: "",
           characterIds: []
         },
@@ -503,13 +503,13 @@ describe("NewsArchive - OOP Implementation", () => {
       
       // freshness = 100 - 5 * 10 = 50
       
-      const fresh = archive.getNewsAtLocation(LocationsEnum.PlagueWaterCrossing, {
+      const fresh = archive.getNewsAtLocation(LocationsEnum.WaywardInn, {
         minFreshness: 60,
       });
       
       expect(fresh.length).toBe(0); // Too old!
       
-      const any = archive.getNewsAtLocation(LocationsEnum.PlagueWaterCrossing);
+      const any = archive.getNewsAtLocation(LocationsEnum.WaywardInn);
       expect(any.length).toBe(1); // Still exists
     });
   });

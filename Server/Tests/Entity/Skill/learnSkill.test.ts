@@ -1,5 +1,4 @@
 import { expect, describe, beforeEach, afterEach, it } from "@jest/globals";
-import { roll, rollTwenty } from "../../../src/Utils/Dice";
 import {
   CharacterArtisansFactory,
   CharacterAttributesFactory,
@@ -21,7 +20,17 @@ import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { TurnResult } from "src/Entity/Skill/types";
 
 jest.mock("../../../src/Utils/Dice", () => ({
-  rollDice: () => ({ totoal: 10 }),
+  roll: jest.fn((amount: number) => ({
+    d: jest.fn(() => ({
+      total: 10,
+      seed: () => ({ total: 10 }),
+      rolls: Array(amount).fill(5),
+    })),
+  })),
+  rollTwenty: jest.fn(() => ({
+    total: 10,
+    rolls: [10],
+  })),
 }));
 
 let skill = new Skill({
@@ -48,7 +57,7 @@ let skill = new Skill({
       content: {en: "Skill learned", th: "ทักษะเรียนรู้แล้ว"},
       actor: {
         actorId: "",
-        effect: ""
+        effect: []
       },
       targets: []
     }
@@ -82,7 +91,7 @@ const mutReqSkills: [string, Skill][] = [
           content: {en: "Skill learned", th: "ทักษะเรียนรู้แล้ว"},
           actor: {
             actorId: "",
-            effect: ""
+            effect: []
           },
           targets: []
         }
@@ -115,7 +124,7 @@ const mutReqSkills: [string, Skill][] = [
           content: {en: "Skill learned", th: "ทักษะเรียนรู้แล้ว"},
           actor: {
             actorId: "",
-            effect: ""
+            effect: []
           },
           targets: []
         }
@@ -125,7 +134,7 @@ const mutReqSkills: [string, Skill][] = [
   [
     "skill prerequisite",
     new Skill({
-      id: SkillId.Basic,
+      id: SkillId.ThrowPebble,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},
@@ -148,7 +157,7 @@ const mutReqSkills: [string, Skill][] = [
           content: {en: "Skill learned", th: "ทักษะเรียนรู้แล้ว"},
           actor: {
             actorId: "",
-            effect: ""
+            effect: []
           },
           targets: []
         }
@@ -181,7 +190,7 @@ const mutReqSkills: [string, Skill][] = [
           content: {en: "Skill learned", th: "ทักษะเรียนรู้แล้ว"},
           actor: {
             actorId: "",
-            effect: ""
+            effect: []
           },
           targets: []
         }
@@ -214,7 +223,7 @@ const mutReqSkills: [string, Skill][] = [
           content: {en: "Skill learned", th: "ทักษะเรียนรู้แล้ว"},
           actor: {
             actorId: "",
-            effect: ""
+            effect: []
           },
           targets: []
         }
@@ -247,7 +256,7 @@ const mutReqSkills: [string, Skill][] = [
           content: {en: "Skill learned", th: "ทักษะเรียนรู้แล้ว"},
           actor: {
             actorId: "",
-            effect: ""
+            effect: []
           },
           targets: []
         }
@@ -280,7 +289,7 @@ const mutReqSkills: [string, Skill][] = [
           content: {en: "Skill learned", th: "ทักษะเรียนรู้แล้ว"},
           actor: {
             actorId: "",
-            effect: ""
+            effect: []
           },
           targets: []
         }
@@ -352,8 +361,11 @@ describe("learn skill", () => {
       .build();
     char.traits.set(TraitEnum.Test, 1);
     char.traits.set(TraitEnum.Test2, 1);
-    console.log(char.traits);
-    char.skills.set(SkillId.Basic, { id: SkillId.Basic, level: 1, exp: 0 });
+    
+    // Add prerequisite skill for skill prerequisite test
+    if (skill.requirement.reqSkillId) {
+      char.skills.set(SkillId.Basic, { id: SkillId.Basic, level: 1, exp: 0 });
+    }
 
     const result = tryTolearnSkill(char, skill);
     expect(result.success).toBe(true);

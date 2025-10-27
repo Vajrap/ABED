@@ -10,4 +10,9 @@ export enum SkillId {
   Cleave = "Cleave",
   HerosPose = "HerosPose",
   ShieldUp = "ShieldUp",
+  FireBolt = "FireBolt",
+  BurningHand = "BurningHand",
+  FireBall = "FireBall",
+  ArcaneShield = "ArcaneShield",
+  Backdraft = "Backdraft",
 }

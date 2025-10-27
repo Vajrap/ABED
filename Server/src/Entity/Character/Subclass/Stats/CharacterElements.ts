@@ -6,7 +6,7 @@ import { CharacterStatArchetype, StatBlock } from "./CharacterStatArchetype";
 
 export class CharacterElements extends CharacterStatArchetype<ElementKey> {
   constructor(initial?: Partial<Record<ElementKey, Partial<StatBlock>>>) {
-    super(ELEMENT_KEYS, initial);
+    super(ELEMENT_KEYS, initial, 0);
   }
 
   // TODO: Element still needs more implications

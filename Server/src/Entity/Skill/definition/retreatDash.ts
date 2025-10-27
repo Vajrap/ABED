@@ -7,6 +7,7 @@ import { ActorEffect, TargetEffect } from "../effects";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
+import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const retreatDash = new Skill({
   id: SkillId.RetreatDash,
@@ -27,7 +28,7 @@ export const retreatDash = new Skill({
     sp: 2,
     elements: [
       {
-        element: "none", // Air element
+        element: "neutral",
         value: 1,
       },
     ],
@@ -52,18 +53,18 @@ export const retreatDash = new Skill({
     location: LocationsEnum,
   ) => {
     // TODO: Implement Evasion +30% for 1 turn
-    actor.battleStats.mutateBattle('dodge', 3);
+    buffsAndDebuffsRepository.retreat.appender(actor, 1, false, 0);
     // TODO: Implement movement to backline logic
     let moved = false;
 
     if (actor.position > 2) {
-        const allOccupiedPositions = actorParty.map(member => member.position);
-        for (const position of [3, 4, 5] as const) {
-          if (!allOccupiedPositions.includes(position)) {
-            actor.position = position;
-            moved = true;
-            break;
-          }
+      const allOccupiedPositions = actorParty.map((member) => member.position);
+      for (const position of [3, 4, 5] as const) {
+        if (!allOccupiedPositions.includes(position)) {
+          actor.position = position;
+          moved = true;
+          break;
+        }
       }
     }
 
@@ -71,11 +72,16 @@ export const retreatDash = new Skill({
       content: buildCombatMessage(
         actor,
         actor, // Self-target for retreat
-        { 
-          en: `${actor.name} dashed to retreat gain +3 dodge. ${moved ? `and moved to back line` : ''}`, 
-          th: `${actor.name.th} วิ่งหนี ได้รับ +3 dodge. ${moved ? `และย้ายไปแถวหลัง` : ''}`,
+        {
+          en: `${actor.name} dashed to retreat gain +3 dodge. ${moved ? `and moved to back line` : ""}`,
+          th: `${actor.name.th} วิ่งหนี ได้รับ +3 dodge. ${moved ? `และย้ายไปแถวหลัง` : ""}`,
         },
-        { isHit: true, actualDamage: 0, damageType: DamageType.arcane },
+        {
+          isHit: true,
+          isCrit: false,
+          actualDamage: 0,
+          damageType: DamageType.arcane,
+        },
       ),
       actor: {
         actorId: actor.id,

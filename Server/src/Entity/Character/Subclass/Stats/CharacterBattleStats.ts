@@ -6,6 +6,6 @@ import { CharacterStatArchetype, StatBlock } from "./CharacterStatArchetype";
 
 export class CharacterBattleStats extends CharacterStatArchetype<BattleStatKey> {
   constructor(initial?: Partial<Record<BattleStatKey, Partial<StatBlock>>>) {
-    super(BATTLE_STAT_KEYS, initial);
+    super(BATTLE_STAT_KEYS, initial, 0);
   }
 }

@@ -135,7 +135,7 @@ export const ELEMENT_RESOURCE_KEYS = [
   "water",
   "earth",
   "wind",
-  "none",
+  "neutral",
 ] as const;
 export type ElementResourceKey = (typeof ELEMENT_RESOURCE_KEYS)[number];
 

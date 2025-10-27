@@ -5,5 +5,6 @@ export enum TierEnum {
     'epic',
     'legendary',
     'unique',
-    'divine'
+    'divine',
+    'primordial'
 }

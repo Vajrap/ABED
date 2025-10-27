@@ -18,8 +18,8 @@ export const panicSlash = new Skill({
     th: "ฟันแบบตื่นตระหนก",
   },
   description: {
-    en: "A reckless melee attack that consumes 1 Air. Deals 1.0× physical damage with a 25% chance to miss, but grants +10% crit chance if it hits.",
-    th: "การโจมตีระยะประชิดแบบไม่คิดหน้าคิดหลัง ใช้ 1 Air สร้างความเสียหายกายภาพ 1.0× มีโอกาสพลาด 25% แต่ถ้าตีโดนจะเพิ่มโอกาสคริติคอล 10%",
+    en: "A reckless melee attack. Deals 1.0× physical damage (+skill Level) with a -4 hit roll penalty, but grants +2 crit roll instead.",
+    th: "การโจมตีระยะประชิดแบบไม่คิดหน้าคิดหลัง สร้างความเสียหายกายภาพ 1.0× (+เลเวบของสกิล) โอกาสโจมตีโดนลดลง 4 แต่โอกาสเกิดคริติคอลเพิ่มขึ้น 2",
   },
   requirement: {},
   equipmentNeeded: ["dagger", "sword", "machete"], // Melee weapons
@@ -41,15 +41,10 @@ export const panicSlash = new Skill({
     sp: 0,
     elements: [
       {
-        element: "none",
+        element: "neutral",
         min: 0,
         max: 1,
       },
-      {
-        element: 'wind',
-        min: 0,
-        max: 1,
-      }
     ],
   },
   exec: (
@@ -59,7 +54,7 @@ export const panicSlash = new Skill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const target = getTarget(actor, targetParty).one().randomly()[0];
+    const target = getTarget(actor, targetParty).one();
 
     if (!target) {
       return {
@@ -76,12 +71,10 @@ export const panicSlash = new Skill({
     }
 
     const weapon = actor.getWeapon();
-    const damageOutput = getWeaponDamageOutput(actor, weapon, 'physical');
+    const damageOutput = getWeaponDamageOutput(actor, weapon, "physical");
 
-    // True 25% additional miss chance
-    damageOutput.hit -= 5;
-    
-    // 10% crit chance
+    damageOutput.hit -= 4;
+
     damageOutput.crit += 2;
 
     const positionModifierValue = getPositionModifier(
@@ -92,7 +85,12 @@ export const panicSlash = new Skill({
 
     damageOutput.damage = damageOutput.damage * positionModifierValue;
 
-    const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
+    const totalDamage = resolveDamage(
+      actor.id,
+      target.id,
+      damageOutput,
+      location,
+    );
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(

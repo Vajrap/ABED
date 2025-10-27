@@ -6,4 +6,7 @@ export enum BuffsAndDebuffsEnum {
   dazed = "dazed",
   fear = "fear",
   defenseUp = "defenseUp",
+  burn = "burn",
+  arcaneShield = "arcaneShield",
+  retreat = "retreat",
 }

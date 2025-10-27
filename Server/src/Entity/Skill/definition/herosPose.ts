@@ -2,8 +2,7 @@ import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SkillId } from "../enums";
 import { Skill } from "../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect } from "../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
@@ -25,12 +24,7 @@ export const herosPose = new Skill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [
-      {
-        element: "none",
-        value: 0,
-      },
-    ],
+    elements: [],
   },
   produce: {
     hp: 0,
@@ -39,7 +33,7 @@ export const herosPose = new Skill({
     elements: [
       {
         element: "earth",
-        min: 0,
+        min: 1,
         max: 1,
       },
     ],
@@ -52,14 +46,15 @@ export const herosPose = new Skill({
     location: LocationsEnum,
   ) => {
     const DC = 15 - skillLevel;
-    
+
     const roll = rollTwenty().total;
-    
+
     const success = roll >= DC;
 
     if (success) {
-      
-      const healAmount = Math.floor(statMod(actor.attribute.getStat("vitality").total) + actor.vitals.hp.max * 0.1 * skillLevel); 
+      const healAmount = Math.floor(
+        statMod(actor.attribute.getStat("vitality").total) + skillLevel,
+      );
       actor.vitals.incHp(healAmount);
 
       return {

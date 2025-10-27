@@ -31,7 +31,7 @@ export const shriek = new Skill({
     sp: 2,
     elements: [
       {
-        element: "none",
+        element: "neutral",
         value: 1,
       },
     ],
@@ -55,7 +55,7 @@ export const shriek = new Skill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const target = getTarget(actor, targetParty).one().randomly()[0];
+    const target = getTarget(actor, targetParty).one();
 
     if (!target) {
       return {
@@ -98,7 +98,7 @@ export const shriek = new Skill({
               : `ทำให้ตนได้รับ "ยั่วยุ"`
           }`
         },
-        { isHit: true, actualDamage: 0, damageType: DamageType.arcane },
+        { isHit: true, isCrit: false, actualDamage: 0, damageType: DamageType.arcane },
       ),
       actor: {
         actorId: actor.id,

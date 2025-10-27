@@ -207,7 +207,7 @@ describe("WeatherDeck", () => {
       
       deck.reshuffle();
       
-      expect(deck.cards.length).toBe(3); // 3 cards reshuffled
+      expect(deck.cards.length).toBe(20); // All cards back in deck
       expect(deck.drawn.length).toBe(0); // Drawn pile empty
       
       // All cards should be back in the deck
@@ -216,12 +216,12 @@ describe("WeatherDeck", () => {
       expect(deck.cards).toContain(card3);
     });
 
-    it("should result in empty deck if drawn pile is empty", () => {
+    it("should result in same deck size if drawn pile is empty", () => {
       const deck = new WeatherDeck("STABLE");
       
       deck.reshuffle();
       
-      expect(deck.cards.length).toBe(0);
+      expect(deck.cards.length).toBe(20); // Deck unchanged if nothing drawn
       expect(deck.drawn.length).toBe(0);
     });
 

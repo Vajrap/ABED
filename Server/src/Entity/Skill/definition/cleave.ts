@@ -4,7 +4,6 @@ import { Skill } from "../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../types";
-import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ActorEffect, TargetEffect } from "../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
@@ -15,14 +14,23 @@ export const cleave = new Skill({
   id: SkillId.Cleave,
   name: {
     en: "Cleave",
-    th: "ฟันกว้าง",
+    th: "ฟันกวาด",
   },
   description: {
-    en: "A sweeping attack that consumes 2 Fire. Deals 1.0× weapon damage to all enemies in the front row. Requires slash weapons like sword or axe.",
-    th: "การโจมตีแบบกว้าง ใช้ 2 Fire สร้างความเสียหาย 1.0 เท่าให้ศัตรูทั้งหมดในแถวหน้า ต้องใช้อาวุธแบบฟันเช่นดาบหรือขวาน",
+    en: "A sweeping attack deals 1.0× weapon damage to all enemies in the front most row. At level 5 damage increase to 1.2× weapon damage",
+    th: "การโจมตีแบบกว้าง สร้างความเสียหาย 1.0 เท่าให้ศัตรูทั้งหมดในแถวหน้าสุด. เมื่อเลเวล 5 ความเสียหายเพิ่มเป็น 1.2 เท่า",
   },
   requirement: {},
-  equipmentNeeded: ["sword", "axe", "machete", "blade", "scimitar", "zanmadao", "warAxe", "greatSword"], // Slash weapons
+  equipmentNeeded: [
+    "sword",
+    "axe",
+    "machete",
+    "blade",
+    "scimitar",
+    "zanmadao",
+    "warAxe",
+    "greatSword",
+  ], // Slash weapons
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
@@ -41,7 +49,7 @@ export const cleave = new Skill({
     sp: 0,
     elements: [
       {
-        element: "none",
+        element: "neutral",
         min: 0,
         max: 1,
       },
@@ -55,9 +63,7 @@ export const cleave = new Skill({
     location: LocationsEnum,
   ) => {
     // Get all targets in front row (front prefer)
-    const targets = getTarget(actor, targetParty)
-      .from("frontPrefer")
-      .all();
+    const targets = getTarget(actor, targetParty).from("frontFirst").all();
 
     if (!targets || targets.length === 0) {
       return {
@@ -74,7 +80,7 @@ export const cleave = new Skill({
     }
 
     const weapon = actor.getWeapon();
-    
+
     // Process all targets
     const targetEffects: { actorId: string; effect: TargetEffect[] }[] = [];
 
@@ -89,9 +95,19 @@ export const cleave = new Skill({
       );
 
       // Cleave deals 1x weapon damage
-      damageOutput.damage = (damageOutput.damage * positionModifierValue) * (skillLevel * 0.1);
+      const baseTimes = skillLevel >= 5 ? 1.0 : 1.2;
 
-      const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
+      damageOutput.damage =
+        damageOutput.damage *
+        (baseTimes + skillLevel * 0.1) *
+        positionModifierValue;
+
+      const totalDamage = resolveDamage(
+        actor.id,
+        target.id,
+        damageOutput,
+        location,
+      );
 
       targetEffects.push({
         actorId: target.id,
@@ -101,8 +117,8 @@ export const cleave = new Skill({
 
     let turnResult: TurnResult = {
       content: {
-        en: `${actor.name.en} cleaved ${targets.length} enemies!`,
-        th: `${actor.name.th} ฟันกว้างใส่ศัตรู ${targets.length} ตัว!`,
+        en: `Cleave`,
+        th: `ฟันกวาด`,
       },
       actor: {
         actorId: actor.id,

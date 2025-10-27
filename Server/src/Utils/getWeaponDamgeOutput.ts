@@ -18,22 +18,24 @@ export function getWeaponDamageOutput(
   type: "physical" | "magical",
 ): DamageOutPut {
   const weaponDamage = weapon.weaponData.damage;
-  const getBonus = (stats: AttributeKey[]) =>
+  const getAttributeBonus = (stats: AttributeKey[]) =>
     stats.reduce(
-      (sum, s) => sum + statMod(actor.attribute.getStat(s).total),
+      (sum, s) => sum + statMod(actor.attribute.getTotal(s)),
       0,
     );
+
+  const proficiencyBonus = statMod(actor.proficiencies.getTotal(weapon.weaponType));
 
   const rollStat = (statType: "Damage" | "Hit" | "Crit") =>
     (statType === "Damage"
       ? roll(weaponDamage[`${type}DamageDice`].face).d(
           weaponDamage[`${type}DamageDice`].dice,
         ).total
-      : rollTwenty().total) + getBonus(weaponDamage[`${type}${statType}Stat`]);
+      : rollTwenty().total) + getAttributeBonus(weaponDamage[`${type}${statType}Stat`]) + proficiencyBonus;
 
   return {
     damage: Math.max(rollStat("Damage"), 0),
-    hit: rollStat("Hit"),
+    hit: rollStat("Hit") + proficiencyBonus,
     crit: rollStat("Crit"),
     type: weaponDamage[`${type}DamageType`],
   };

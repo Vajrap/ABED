@@ -38,7 +38,7 @@ export const throwPebble = new Skill({
     sp: 0,
     elements: [
       {
-        element: "none",
+        element: "neutral",
         min: 1,
         max: 1,
       },
@@ -51,10 +51,7 @@ export const throwPebble = new Skill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const target = getTarget(actor, targetParty)
-      .one()
-      .from("backPrefer")
-      .randomly()[0];
+    const target = getTarget(actor, targetParty).one();
 
     if (!target) {
       return {
