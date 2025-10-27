@@ -16,6 +16,10 @@ import {burningHand} from "./definition/burningHand";
 import {fireBall} from "./definition/fireBall";
 import {arcaneShield} from "./definition/arcaneShield";
 import {backdraft} from "./definition/backdraft";
+import {mendSpirit} from "./definition/mendSpirit";
+import {hexOfRot} from "./definition/hexOfRot";
+import {spiritRattle} from "./definition/spiritRattle";
+import {chaoticBlessing} from "./definition/chaoticBlessing";
 
 export const skillRepository: Record<SkillId, Skill> = {
     [SkillId.Basic]: basicAttack,
@@ -34,4 +38,8 @@ export const skillRepository: Record<SkillId, Skill> = {
     [SkillId.FireBall]: fireBall,
     [SkillId.ArcaneShield]: arcaneShield,
     [SkillId.Backdraft]: backdraft,
+    [SkillId.MendSpirit]: mendSpirit,
+    [SkillId.HexOfRot]: hexOfRot,
+    [SkillId.SpiritRattle]: spiritRattle,
+    [SkillId.ChaoticBlessing]: chaoticBlessing,
 };

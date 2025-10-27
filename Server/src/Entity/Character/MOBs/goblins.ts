@@ -50,7 +50,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: MOBs.goblinScout,
+    id: `${MOBs.goblinScout}_${Bun.randomUUIDv7()}`,
     level: difficulty + 1 - 1,
     name: {
       en: "Goblin Scout",
@@ -179,23 +179,23 @@ export function goblinWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
     alignment: new CharacterAlignment({}),
     artisans: new CharacterArtisans({}),
     attribute: makeAttribute({
-      charisma: scaleByDifficulty(4, difficulty, 1.8),
-      luck: scaleByDifficulty(7, difficulty, 1.8),
-      intelligence: scaleByDifficulty(5, difficulty, 1.8),
-      leadership: scaleByDifficulty(6, difficulty, 1.8),
-      vitality: scaleByDifficulty(10, difficulty, 1.8),
-      willpower: scaleByDifficulty(6, difficulty, 1.8),
-      planar: scaleByDifficulty(5, difficulty, 1.8),
-      control: scaleByDifficulty(6, difficulty, 1.8),
-      dexterity: scaleByDifficulty(8, difficulty, 1.8),
-      agility: scaleByDifficulty(7, difficulty, 1.8),
-      strength: scaleByDifficulty(11, difficulty, 1.8),
-      endurance: scaleByDifficulty(9, difficulty, 1.8),
+      charisma: scaleByDifficulty(4, difficulty),
+      luck: scaleByDifficulty(7, difficulty),
+      intelligence: scaleByDifficulty(5, difficulty),
+      leadership: scaleByDifficulty(6, difficulty),
+      vitality: scaleByDifficulty(10, difficulty),
+      willpower: scaleByDifficulty(6, difficulty),
+      planar: scaleByDifficulty(5, difficulty),
+      control: scaleByDifficulty(6, difficulty),
+      dexterity: scaleByDifficulty(8, difficulty),
+      agility: scaleByDifficulty(7, difficulty),
+      strength: scaleByDifficulty(11, difficulty),
+      endurance: scaleByDifficulty(9, difficulty),
     }),
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: MOBs.goblinWarrior,
+    id: `${MOBs.goblinWarrior}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Goblin Warrior",
@@ -297,7 +297,7 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: MOBs.goblinMage,
+    id: `${MOBs.goblinMage}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Goblin Mage",
@@ -332,7 +332,8 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
       orb: scaleByDifficulty(8, difficulty),
       relic: scaleByDifficulty(5, difficulty),
       shield: scaleByDifficulty(2, difficulty),
-    }),    type: CharacterType.humanoid,
+    }),
+    type: CharacterType.humanoid,
     vitals: new CharacterVitals({
       hp: new Vital({ base: hp }),
       mp: new Vital({ base: mp }),
@@ -341,34 +342,34 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
   });
 
   // TODO: Add fire mage skills when implemented
-  // character.activeSkills = [
-  //   { id: SkillId.FireBall, level: randomSkillLevel(difficulty), exp: 0 },
-  //   { id: SkillId.BurningHand, level: randomSkillLevel(difficulty), exp: 0 },
-  //   { id: SkillId.FireBolt, level: randomSkillLevel(difficulty), exp: 0 },
-  // ];
+  character.activeSkills = [
+    { id: SkillId.FireBall, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: SkillId.BurningHand, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: SkillId.FireBolt, level: randomSkillLevel(difficulty), exp: 0 },
+  ];
 
-  // character.conditionalSkills = [
-  //   { id: SkillId.Backdraft, level: randomSkillLevel(difficulty), exp: 0 },
-  //   { id: SkillId.ArcaneShield, level: randomSkillLevel(difficulty), exp: 0 },
-  // ];
+  character.conditionalSkills = [
+    { id: SkillId.Backdraft, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: SkillId.ArcaneShield, level: randomSkillLevel(difficulty), exp: 0 },
+  ];
 
-  // character.conditionalSkillsCondition = new DeckCondition({
-  //   selectedCondition: "SELF",
-  //   self: {
-  //     hp: {
-  //       min: 0,
-  //       max: character.vitals.hp.max * 0.4,
-  //     },
-  //     mp: {
-  //       min: 0,
-  //       max: character.vitals.mp.max,
-  //     },
-  //     sp: {
-  //       min: 0,
-  //       max: character.vitals.sp.max,
-  //     },
-  //   },
-  // });
+  character.conditionalSkillsCondition = new DeckCondition({
+    selectedCondition: "SELF",
+    self: {
+      hp: {
+        min: 0,
+        max: character.vitals.hp.max * 0.4,
+      },
+      mp: {
+        min: 0,
+        max: character.vitals.mp.max,
+      },
+      sp: {
+        min: 0,
+        max: character.vitals.sp.max,
+      },
+    },
+  });
 
   return character;
 }
@@ -399,7 +400,7 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(), // left intentionally empty
     fame: new CharacterFame(),
-    id: MOBs.goblinCleric,
+    id: `${MOBs.goblinCleric}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Goblin Cleric",
@@ -434,7 +435,8 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
       orb: scaleByDifficulty(5, difficulty),
       relic: scaleByDifficulty(9, difficulty),
       shield: scaleByDifficulty(7, difficulty),
-    }),    type: CharacterType.humanoid,
+    }),
+    type: CharacterType.humanoid,
     vitals: new CharacterVitals({
       hp: new Vital({ base: hp }),
       mp: new Vital({ base: mp }),
@@ -442,7 +444,14 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     }),
   });
 
-  // Skills will be defined later when the support set is implemented
+  // Goblin Cleric skills
+  character.activeSkills = [
+    { id: SkillId.ChaoticBlessing, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: SkillId.SpiritRattle, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: SkillId.HexOfRot, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: SkillId.MendSpirit, level: randomSkillLevel(difficulty), exp: 0 },
+  ];
+
   return character;
 }
 
@@ -472,7 +481,7 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(), // left intentionally empty
     fame: new CharacterFame(),
-    id: MOBs.goblinCaptain,
+    id: `${MOBs.goblinCaptain}_${Bun.randomUUIDv7()}`,
     level: difficulty + 2, // Slightly higher than standard mobs
     name: {
       en: "Goblin Captain",
@@ -507,7 +516,8 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
       orb: scaleByDifficulty(1, difficulty),
       relic: scaleByDifficulty(2, difficulty),
       shield: scaleByDifficulty(9, difficulty),
-    }),    type: CharacterType.humanoid,
+    }),
+    type: CharacterType.humanoid,
     vitals: new CharacterVitals({
       hp: new Vital({ base: hp }),
       mp: new Vital({ base: mp }),

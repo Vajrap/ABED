@@ -8,3 +8,6 @@ export const npcRepository: Record<NPCEnums, Character> = {
 
 export const playerRepository: Record<string, Character> = {
 };
+
+// Runtime registry for active character instances (including MOBs in battles)
+export const activeCharacterRegistry: Record<string, Character> = {};

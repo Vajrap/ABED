@@ -15,4 +15,8 @@ export enum SkillId {
   FireBall = "FireBall",
   ArcaneShield = "ArcaneShield",
   Backdraft = "Backdraft",
+  MendSpirit = "MendSpirit",
+  HexOfRot = "HexOfRot",
+  SpiritRattle = "SpiritRattle",
+  ChaoticBlessing = "ChaoticBlessing",
 }

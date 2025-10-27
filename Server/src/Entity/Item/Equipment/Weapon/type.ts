@@ -11,11 +11,15 @@ export enum BareHandId {
 }
 
 // Sword types
-export enum DaggerId {}
-// Add dagger IDs here as needed
+export enum DaggerId {
+  IronDagger = "IronDagger",
+  RustedIronDagger = "RustedIronDagger",
+}
 
-export enum SwordId {}
-// Add sword IDs here as needed
+export enum SwordId {
+  IronSword = "IronSword",
+  RustedIronSword = "RustedIronSword",
+}
 
 export enum RapierId {}
 // Add rapier IDs here as needed
@@ -37,8 +41,9 @@ export enum ZanmadaoId {}
 // Add zanmadao IDs here as needed
 
 // Axe types
-export enum AxeId {}
-// Add axe IDs here as needed
+export enum AxeId {
+  RustedIronAxe = "RustedIronAxe",
+}
 
 export enum WarAxeId {}
 // Add war axe IDs here as needed
@@ -54,8 +59,9 @@ export enum JavelinId {}
 // Add javelin IDs here as needed
 
 // Mace types
-export enum MaceId {}
-// Add mace IDs here as needed
+export enum MaceId {
+  RustedIronMace = "RustedIronMace",
+}
 
 export enum FlailId {}
 // Add flail IDs here as needed
@@ -83,6 +89,11 @@ export enum StaffId {}
 export enum MagicWandId {}
 // Add magic wand IDs here as needed
 
+// Shield types
+export enum ShieldId {
+  RottenWoodenShield = "RottenWoodenShield",
+}
+
 /**
  * Master WeaponId type - union of all weapon IDs
  */
@@ -109,4 +120,5 @@ export type WeaponId =
   | GunId
   | ThrowingKnifeId
   | StaffId
-  | MagicWandId;
+  | MagicWandId
+  | ShieldId;

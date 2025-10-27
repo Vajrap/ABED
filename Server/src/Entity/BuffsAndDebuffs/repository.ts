@@ -1,5 +1,3 @@
-import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
-import type { Character } from "../Character/Character";
 import { BuffsAndDebuffsEnum } from "./enum";
 import { haste } from "./definitions/haste";
 import { slow } from "./definitions/slow";
@@ -11,6 +9,7 @@ import {fear} from "src/Entity/BuffsAndDebuffs/definitions/fear.ts";
 import { defenseUp } from "./definitions/defenseUp";
 import { burn } from "./definitions/burn";
 import { arcaneShield } from "./definitions/arcaneShield";
+import { retreat } from "./definitions/retreat";
 
 export const buffsAndDebuffsRepository: Record<
   BuffsAndDebuffsEnum,
@@ -25,5 +24,5 @@ export const buffsAndDebuffsRepository: Record<
   [BuffsAndDebuffsEnum.defenseUp]: defenseUp,
   [BuffsAndDebuffsEnum.burn]: burn,
   [BuffsAndDebuffsEnum.arcaneShield]: arcaneShield,
-  [BuffsAndDebuffsEnum.retreat]:
+  [BuffsAndDebuffsEnum.retreat]: retreat,
 };

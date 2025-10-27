@@ -4,7 +4,8 @@
  */
 
 export enum BodyId {
-  // Add body armor IDs here as needed
+  PoorLeatherArmor = "PoorLeatherArmor",
+  TatteredClothes = "TatteredClothes",
 }
 
 export enum EarId {
@@ -20,7 +21,7 @@ export enum HandId {
 }
 
 export enum HeadWearId {
-  // Add headwear IDs here as needed
+  TatteredCap = "TatteredCap",
 }
 
 export enum LegId {

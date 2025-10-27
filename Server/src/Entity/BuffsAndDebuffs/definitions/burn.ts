@@ -31,7 +31,6 @@ export const burn: BuffsAndDebuffsDef = {
 
   resolver: function (actor: Character): { canAct: boolean; content: L10N } {
     const entry = actor.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.burn);
-    // TODO: Take damage based on burn stacks
     if (entry) {
       if (entry.value > 0) {
         actor.vitals.decHp(entry.value);

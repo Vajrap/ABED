@@ -11,6 +11,7 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
+import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const burningHand = new Skill({
   id: SkillId.BurningHand,
@@ -119,7 +120,10 @@ export const burningHand = new Skill({
         const burnRoll = rollTwenty().total;
         if (burnRoll >= burnDC) {
           const burnStacks = roll(maxBurnStacks).d(1).total;
-          burnMessage = `${target.name.en} gained ${Math.max(burnStacks, minBurnStacks)} burn stacks! (Not yet implemented)`;
+          const finalBurnStacks = Math.max(burnStacks, minBurnStacks);
+          // Actually apply the burn debuff
+          const burnResult = buffsAndDebuffsRepository.burn.appender(target, finalBurnStacks, false, 0);
+          burnMessage = burnResult.en;
         }
       }
 

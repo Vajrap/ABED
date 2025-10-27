@@ -17,19 +17,22 @@ export function handleTrainAction(
   context: NewsContext,
   config?: LocationInns,
 ): News {
-  
+
+    // TODO: Handle
   return createNews({
     scope: {
       kind: "worldScope",
     },
-    tokens: [],
+    content: {
+      en: "",
+      th: ""
+    },
     context: {
       region: RegionEnum.CentralPlain,
-      subRegion: SubRegionEnum.FyonarCapitalDistrict,
-      location: LocationsEnum.PlagueWaterCrossing,
+      subRegion: SubRegionEnum.GoldenPlains,
+      location: LocationsEnum.WaywardInn,
       partyId: "",
       characterIds: [],
     },
-    secretTier: TierEnum.rare
   });
 }

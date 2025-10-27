@@ -11,6 +11,7 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
+import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const fireBall = new Skill({
   id: SkillId.FireBall,
@@ -120,7 +121,9 @@ export const fireBall = new Skill({
         const burnRoll = rollTwenty().total;
         if (burnRoll <= 13) {
           const burnStacks = roll(2).d(1).total; // 1-2 stacks
-          burnMessage = `${target.name.en} gained ${burnStacks} burn stacks! (Not yet implemented)`;
+          // Actually apply the burn debuff
+          const burnResult = buffsAndDebuffsRepository.burn.appender(target, burnStacks, false, 0);
+          burnMessage = burnResult.en;
         }
       }
 

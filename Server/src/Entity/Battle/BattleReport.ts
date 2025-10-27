@@ -88,18 +88,16 @@ export class PartySnapshot {
   constructor(party: Party) {
     this.partyId = party.partyID;
     this.leaderName = party.leader.name;
-    this.members = party.characters.map(
+    const actualCharacters = party.getCharacters();
+    this.members = actualCharacters.map(
       (character) =>
-        new PartyMemberSnapshot(character as Character, party.leader.id),
+        new PartyMemberSnapshot(character, party.leader.id),
     );
-    this.hasPlayers = party.characters.some(
-      (character) => character !== "none" && character.isPlayer,
+    this.hasPlayers = actualCharacters.some(
+      (character) => character.isPlayer,
     );
-    this.playerIds = party.characters
-      .filter(
-        (character): character is Character =>
-          character !== "none" && character.isPlayer,
-      )
+    this.playerIds = actualCharacters
+      .filter((character) => character.isPlayer)
       .map((character) => character.id);
   }
 }

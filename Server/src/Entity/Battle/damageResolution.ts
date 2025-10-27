@@ -21,6 +21,8 @@ export interface DamageInput {
   type: DamageType;
 }
 
+const NEUTRAL_AC = 10;
+
 export function resolveDamage(
   attackerId: string,
   targetId: string,
@@ -45,22 +47,30 @@ export function resolveDamage(
     };
   }
 
+  console.log(`      Damage Calculation:`);
+  console.log(`        Base Damage: ${damageOutput.damage} | Hit: ${damageOutput.hit} | Crit: ${damageOutput.crit} | Type: ${damageOutput.type}`);
+
   // Apply breathing skill effects before damage calculation, might change something
   resolveBreathingSkillInBattle(attackerId, targetId, damageOutput);
 
   // --- HIT / DODGE ---
   // If you mean "nat 20 can't be dodged", you need a raw die or a boolean flag.
   // Here we treat 20+ as "auto-hit" only if that's your rule; adjust as needed.
+  // Neutral AC is added to the dodge chance to prevent the player from always hitting;
   const dodgeChance =
     target.battleStats.getTotal("dodge") +
-    statMod(target.attribute.getTotal("agility"));
+    statMod(target.attribute.getTotal("agility")) +
+    NEUTRAL_AC;
 
   // Attacker's 'hit' already includes their bonuses
   const critDefense = statMod(target.attribute.getTotal("endurance"));
   const autoHitByCrit = damageOutput.crit >= 20 + critDefense; // ideally: damageOutput.isNat20 === true
 
+  console.log(`        Hit Check: Hit(${damageOutput.hit}) vs Dodge(${dodgeChance})`);
+
   // not auto hit and dodge > hit ==> miss
   if (!autoHitByCrit && dodgeChance >= damageOutput.hit) {
+    console.log(`        ❌ MISSED!`);
     return {
       actualDamage: 0,
       damageType: damageOutput.type,
@@ -68,6 +78,8 @@ export function resolveDamage(
       isCrit: false,
     };
   }
+
+  console.log(`        ✅ HIT!`);
 
   // Aptitude
   if (isMagic) {
@@ -92,11 +104,16 @@ export function resolveDamage(
           target.planarAptitude.getMagicResistanceAptitude(),
       };
 
+  const effectiveMitigation = Math.max(baseMitigation, 0);
+  console.log(`        Mitigation: ${baseMitigation} (pDEF: ${target.battleStats.getTotal("pDEF")} + Endurance: ${statMod(target.attribute.getTotal("endurance"))}) = effective ${effectiveMitigation}`);
+
   let damage = Math.max(
     damageOutput.damage / ifMagicAptitudeMultiplier -
-      Math.max(baseMitigation, 0),
+      effectiveMitigation,
     0,
   );
+
+  console.log(`        Damage after mitigation: ${damage.toFixed(1)} (${damageOutput.damage} - ${effectiveMitigation})`);
 
   // --- CRIT CHECK ---
   // Keep stat usage consistent: use statMod(endurance) if dodge used statMod(agility)
@@ -104,6 +121,7 @@ export function resolveDamage(
   if (damageOutput.crit - critDefense >= 20) {
     damage *= critModifier;
     isCrit = true;
+    console.log(`        💥 CRITICAL HIT! Damage × ${critModifier}`);
   }
 
   // --- BUFFS/DEBUFFS/TRAITS (future hooks) ---
@@ -134,6 +152,9 @@ export function resolveDamage(
 
   // --- ROUND & APPLY ---
   const finalDamage = Math.max(Math.floor(damage), 0);
+  
+  console.log(`        Final Damage: ${finalDamage} (${damage.toFixed(1)} rounded down)`);
+  
   target.vitals.decHp(finalDamage);
 
   return {
