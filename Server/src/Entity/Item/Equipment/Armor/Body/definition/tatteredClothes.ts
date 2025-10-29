@@ -14,7 +14,7 @@ export const tatteredClothes = new Body(
     image: "tatteredClothes",
     isCraftable: false,
     weight: 1,
-    resource: new Map(),
+    craftingRecipe: new Map(),
   },
   {},
   {

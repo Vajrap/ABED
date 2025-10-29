@@ -1,26 +1,28 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { BareHandId } from "../../type";
-import { BareHand } from "../BareHand";
+import { DaggerId } from "../../type";
+import { Dagger } from "../Dagger";
 import { SeasonEnum } from "src/InterFacesEnumsAndTypes/Time";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
+import { ResourceType} from "src/InterFacesEnumsAndTypes/ResourceTypes";
+import { ItemId } from "src/Entity/Item";
 
-export const bareHand = new BareHand(
+export const ironKnife = new Dagger(
   {
-    id: BareHandId.BareHand,
+    id: DaggerId.IronKnife,
     name: {
-      en: "bare hand",
-      th: "มือเป่า",
+      en: "Iron Knife",
+      th: "มีดสั้นเหล็ก",
     },
     description: {
-      en: "Your bare hand, actually a weapon and not a weapon at the same time.",
-      th: "มือเปล่า ๆ ของคุณ บาทีก็เป็นอาวุธ บางทีก็ไม่ใช่",
+      en: "A sharp knife, use in cutting",
+      th: "มีดขนาดเล็ก ใช้สำหรับเฉือน",
     },
     tier: TierEnum.common,
     cost: {
-      baseCost: 0,
+      baseCost: 30,
       bonusCost: 0,
-      cost: 0,
-      marketCost: 0,
+      cost: 30,
+      marketCost: 30,
       numberOfSellThisWeek: 0,
       possibleDeviation: 0,
       seasonalDeviation: {
@@ -33,29 +35,35 @@ export const bareHand = new BareHand(
         [SeasonEnum.LongDark]: 0,
       },
     },
-    image: "bareHand",
-    isCraftable: false,
-    weight: 0,
+    image: "ironStiletto",
+    isCraftable: true,
+    weight: 1,
     craftingRecipe: {
-        resource: new Map(),
-        item: new Map()
+        resource: new Map<ResourceType, number>([
+           ['ore', 20],
+            ['wood', 5]
+        ]),
+        item: new Map<ItemId, number>([
+            // [ItemId.ironIngot, 2]
+            // [ItemId.woodenGrip, 1]
+        ])
     }
   },
   {},
   {
-    handle: 2,
+    handle: 1,
     damage: {
       physicalDamageDice: {
-        face: 4,
+        face: 6,
         dice: 1,
       },
       magicalDamageDice: {
         face: 4,
         dice: 1,
       },
-      physicalDamageType: DamageType.blunt,
+      physicalDamageType: DamageType.slash,
       magicalDamageType: DamageType.arcane,
-      physicalDamageStat: ["strength"],
+      physicalDamageStat: ["dexterity"],
       magicalDamageStat: ["planar"],
       physicalHitStat: ["dexterity"],
       magicalHitStat: ["control"],
@@ -64,3 +72,4 @@ export const bareHand = new BareHand(
     },
   },
 );
+

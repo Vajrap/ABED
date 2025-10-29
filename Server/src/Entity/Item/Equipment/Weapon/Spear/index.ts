@@ -1,2 +1,1 @@
-export * from "./Spear";
-
+export * from './Spear'

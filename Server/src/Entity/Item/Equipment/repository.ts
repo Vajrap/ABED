@@ -1,21 +1,30 @@
 import type { Equipment } from "./Equipment";
 import type { EquipmentId } from "./types";
 import { bareHand } from "./Weapon/BareHand/definition/bareHand";
-import { ironSword } from "./Weapon/Sword/definition/ironSword";
-import { ironDagger } from "./Weapon/Dagger/definition/ironDagger";
-import { rustedIronSword } from "./Weapon/Sword/definition/rustedIronSword";
-import { rustedIronDagger } from "./Weapon/Dagger/definition/rustedIronDagger";
-import { rustedIronMace } from "./Weapon/Mace/definition/rustedIronMace";
-import { rustedIronAxe } from "./Weapon/Axe/definition/rustedIronAxe";
-import { rottenWoodenShield } from "./Weapon/Shield/definition/rottenWoodenShield";
 import { poorLeatherArmor } from "./Armor/Body/definition/poorLeatherArmor";
 import { tatteredClothes } from "./Armor/Body/definition/tatteredClothes";
 import { tatteredCap } from "./Armor/HeadWear/definition/tatteredCap";
-import { Weapon } from "./Weapon";
+import {BladeId, BowId, SpearId, Weapon} from "./Weapon";
 import { BareHandId, SwordId, DaggerId, MaceId, AxeId, ShieldId } from "./Weapon/type";
 import { BodyId, HeadWearId } from "./Armor/type";
 import { WeaponId } from "./Weapon/type";
-import { ArmorId } from "./Armor/type";
+import {ironShortSword} from "src/Entity/Item/Equipment/Weapon/Sword/definition/ironShortSword.ts";
+import {ironLongSword} from "src/Entity/Item/Equipment/Weapon/Sword/definition/ironLongSword.ts";
+import {ironGreatSword} from "src/Entity/Item/Equipment/Weapon/Sword/definition/ironGreatSword.ts";
+import {ironRapier} from "src/Entity/Item/Equipment/Weapon/Sword/definition/ironRapier.ts";
+import {ironKatana} from "src/Entity/Item/Equipment/Weapon/Blade/definition/ironKatana.ts";
+import {ironScimitar} from "src/Entity/Item/Equipment/Weapon/Blade/definition/ironScimitar.ts";
+import {ironCutlass} from "src/Entity/Item/Equipment/Weapon/Blade/definition/ironCutlass.ts";
+import {ironFalchion} from "src/Entity/Item/Equipment/Weapon/Blade/definition/ironFalchion.ts";
+import {ironStiletto} from "src/Entity/Item/Equipment/Weapon/Dagger/definition/ironStiletto.ts";
+import {ironKnife} from "src/Entity/Item/Equipment/Weapon/Dagger/definition/ironKnife.ts";
+import {ironDory} from "src/Entity/Item/Equipment/Weapon/Spear/definition/ironDory.ts";
+import {ironJavelin} from "src/Entity/Item/Equipment/Weapon/Spear/definition/ironJavelin.ts";
+import {ironHalberd} from "src/Entity/Item/Equipment/Weapon/Spear/definition/ironHalberd.ts";
+import {oakLongBow} from "src/Entity/Item/Equipment/Weapon/Bow/definition/oakLongBow.ts";
+import {oakShortBow} from "src/Entity/Item/Equipment/Weapon/Bow/definition/oakShortBow.ts";
+import {oakCrossBow} from "src/Entity/Item/Equipment/Weapon/Bow/definition/oakCrossBow.ts";
+
 
 /**
  * Equipment Repository
@@ -23,15 +32,37 @@ import { ArmorId } from "./Armor/type";
  * All equipment items must be registered here for the game to use them
  */
 export const equipmentRepository: Record<EquipmentId, Equipment> = {
-  // Weapons
-  [BareHandId.BareHand]: bareHand,
-  [SwordId.IronSword]: ironSword,
-  [DaggerId.IronDagger]: ironDagger,
-  [SwordId.RustedIronSword]: rustedIronSword,
-  [DaggerId.RustedIronDagger]: rustedIronDagger,
-  [MaceId.RustedIronMace]: rustedIronMace,
-  [AxeId.RustedIronAxe]: rustedIronAxe,
-  [ShieldId.RottenWoodenShield]: rottenWoodenShield,
+    // Weapons
+
+    // Hands
+    [BareHandId.BareHand]: bareHand,
+
+    // Swords
+    [SwordId.IronShortSword]: ironShortSword,
+    [SwordId.IronLongSword]: ironLongSword,
+    [SwordId.IronGreatSword]: ironGreatSword,
+    [SwordId.IronRapier]: ironRapier,
+
+    // Blade
+    [BladeId.IronKatana]: ironKatana,
+    [BladeId.IronScimitar]: ironScimitar,
+    [BladeId.IronCutlass]: ironCutlass,
+    [BladeId.IronFalchion]: ironFalchion,
+
+    // Dagger
+    [DaggerId.IronStiletto]: ironStiletto,
+    [DaggerId.IronKnife]: ironKnife,
+
+    // Spear
+    [SpearId.IronDory]: ironDory,
+    [SpearId.IronJavelin]: ironJavelin,
+    [SpearId.IronHalberd]: ironHalberd,
+
+    // Bow
+    [BowId.OakLongBow]: oakLongBow,
+    [BowId.OakShortBow]: oakShortBow,
+    [BowId.OakCrossbow]: oakCrossBow,
+
   // Armor
   [BodyId.PoorLeatherArmor]: poorLeatherArmor,
   [BodyId.TatteredClothes]: tatteredClothes,

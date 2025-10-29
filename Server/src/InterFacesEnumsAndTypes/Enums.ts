@@ -143,40 +143,17 @@ export type ExpandedElementKey = (typeof EXPANDED_ELEMENT_KEYS)[number];
 
 export const PROFICIENCY_KEYS = [
   "bareHand",
-  // Sword
-  "dagger",
   "sword",
-  "rapier",
-  "greatSword",
-  // Blade
-  "machete",
   "blade",
-  "scimitar",
-  "zanmadao",
-  // Axe
-  "axe",
-  "warAxe",
-  "halberd",
-  // Spear
+  "dagger",
   "spear",
-  "javelin",
-  // Mace
-  "mace",
-  "flail",
-  "warHammer",
-  // Throwing-Range
-  "throwingKnife",
-  "crossbow",
   "bow",
-  "gun",
-  // Magic
-  "magicWand",
-  "staff",
-  "tome",
+  "hammer",
   "orb",
-  "relic",
-  // Shield
   "shield",
+  "staff",
+  "book",
+  "wand",
 ] as const;
 
 export type ProficiencyKey = (typeof PROFICIENCY_KEYS)[number];

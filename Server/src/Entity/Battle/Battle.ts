@@ -59,7 +59,7 @@ export class Battle {
     console.log(`Party A: ${this.partyA.characters.filter(c => c !== "none").map(c => c.name.en).join(", ")}`);
     console.log(`Party B: ${this.partyB.characters.filter(c => c !== "none").map(c => c.name.en).join(", ")}`);
     console.log("=====================================\n");
-    
+
     await this.battleLoop();
   }
 
@@ -94,7 +94,7 @@ export class Battle {
           turnCount++;
           console.log(`\n--- Turn ${turnCount} ---`);
           console.log(`${actor.name.en} (HP: ${actor.vitals.hp.current}/${actor.vitals.hp.max}) takes turn`);
-          
+
           const canTakeTurn = resolveBuffAndDebuff(actor);
           if (canTakeTurn.ableToTakesTurn) {
             const actorTurnResult = this.startActorTurn(actor);
@@ -126,7 +126,7 @@ export class Battle {
             battleStatus.status === BattleStatus.DRAW_END
           ) {
             this.isOngoing = false;
-            
+
             // Log remaining HP for all characters
             console.log(`\n--- Battle End ---`);
             console.log(`Party A survivors:`);
@@ -138,7 +138,7 @@ export class Battle {
               console.log(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
             });
             console.log(`Winning party: ${battleStatus.winner?.leader.name.en}'s party`);
-            
+
             this.handleBattleEnd(battleStatus);
             this.battleReport.setOutcome(
               battleStatus.winner ? battleStatus.winner.partyID : "",
@@ -164,7 +164,7 @@ export class Battle {
     activateBreathingSkillTurnPassive(actor.id);
 
     actor.replenishResource();
-    
+
     // Log current resources
     console.log(`  Resources: HP ${actor.vitals.hp.current}/${actor.vitals.hp.max} | MP ${actor.vitals.mp.current}/${actor.vitals.mp.max} | SP ${actor.vitals.sp.current}/${actor.vitals.sp.max}`);
     const elementResources = Object.entries(actor.resources)
@@ -172,11 +172,11 @@ export class Battle {
       .map(([key, value]) => `${key}=${value}`)
       .join(' ');
     if (elementResources) console.log(`  Elemental Resources: ${elementResources}`);
-    
+
     // Determine which party the actor belongs to (needed for conditional deck check)
     const isPartyA = this.partyA.characters.includes(actor);
     const actorParty = isPartyA ? this.partyA : this.partyB;
-    
+
     // Check: If a character can play any cards
     const {skill, skillLevel} = getPlayableSkill(actor, actorParty);
     console.log(`  Selected Skill: ${skill.name.en} (Level ${skillLevel})`);
@@ -332,7 +332,7 @@ export class Battle {
               Math.floor(Math.random() * possibleAttributesToBeTrained.length)
             ];
             if (trainedAttribute) {
-              trainAttribute(character, trainedAttribute, 0);
+              trainAttribute(character, trainedAttribute, exp);
             }
         }
       }

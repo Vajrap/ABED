@@ -8,6 +8,12 @@ import type { ItemId } from "./type";
  * Base Item class for all items in the game
  * All item types (Equipment, Consumable, Books, Misc, etc.) extend from this
  */
+type CraftingRecipe = {
+    resource: Map<ResourceType, number>;
+    item: Map<ItemId, number>
+}
+
+
 export class Item {
   id: ItemId;
   name: L10N;
@@ -17,7 +23,7 @@ export class Item {
   tier: TierEnum;
   cost: ItemCost;
   isCraftable: boolean;
-  resource: Map<string, number> = new Map(); // Crafting recipe
+  craftingRecipe: CraftingRecipe;
 
   /**
    * Primary resource used for dynamic pricing
@@ -25,8 +31,6 @@ export class Item {
    * Items crafted from resources inherit price fluctuations from that resource.
    * Example: Iron Sword uses "ore" as primary resource, so price follows ore market.
    */
-  primaryResource?: ResourceType;
-
   constructor(data: {
     id: ItemId;
     name: L10N;
@@ -36,7 +40,7 @@ export class Item {
     tier: TierEnum;
     cost: ItemCost;
     isCraftable?: boolean;
-    primaryResource?: ResourceType;
+    craftingRecipe: CraftingRecipe;
   }) {
     this.id = data.id;
     this.name = data.name ?? { en: "", th: "" };
@@ -46,6 +50,6 @@ export class Item {
     this.tier = data.tier ?? TierEnum.common;
     this.cost = data.cost ?? new ItemCost({});
     this.isCraftable = data.isCraftable ?? false;
-    this.primaryResource = data.primaryResource;
+    this.craftingRecipe = data.craftingRecipe ?? {};
   }
 }

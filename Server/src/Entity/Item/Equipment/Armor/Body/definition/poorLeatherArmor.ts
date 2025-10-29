@@ -14,7 +14,7 @@ export const poorLeatherArmor = new Body(
     image: "poorLeatherArmor",
     isCraftable: true,
     weight: 3,
-    resource: new Map(),
+    craftingRecipe: new Map(),
   },
   {},
   {

@@ -14,7 +14,7 @@ export const tatteredCap = new HeadWear(
     image: "tatteredCap",
     isCraftable: false,
     weight: 0,
-    resource: new Map(),
+    craftingRecipe: new Map(),
   },
   {},
   {

@@ -10,88 +10,78 @@ export enum BareHandId {
   BareHand = "BareHand",
 }
 
-// Sword types
 export enum DaggerId {
-  IronDagger = "IronDagger",
-  RustedIronDagger = "RustedIronDagger",
+  IronStiletto = "IronStiletto",
+  IronKnife = "IronKnife",
 }
 
 export enum SwordId {
-  IronSword = "IronSword",
-  RustedIronSword = "RustedIronSword",
+  IronShortSword = "IronShortSword",
+  IronLongSword = "IronLongSword",
+  IronRapier = "IronRapier",
+  IronGreatSword = "IronGreatSword",
 }
-
-export enum RapierId {}
-// Add rapier IDs here as needed
-
-export enum GreatSwordId {}
-// Add greatsword IDs here as needed
 
 // Blade types
-export enum MacheteId {}
-// Add machete IDs here as needed
+export enum BladeId {
+    IronKatana = "IronKatana",
+    IronScimitar = "IronScimitar",
+    IronCutlass = "IronCutlass",
+    IronFalchion = "IronFalchion",
+}
 
-export enum BladeId {}
-// Add blade IDs here as needed
-
-export enum ScimitarId {}
-// Add scimitar IDs here as needed
-
-export enum ZanmadaoId {}
-// Add zanmadao IDs here as needed
-
-// Axe types
 export enum AxeId {
-  RustedIronAxe = "RustedIronAxe",
+  IronAxe = "IronAxe",
+    IronBroadAxe = "IronBroadAxe",
+    IronWarAxe = "IronWarAxe",
 }
 
-export enum WarAxeId {}
-// Add war axe IDs here as needed
-
-export enum HalberdId {}
-// Add halberd IDs here as needed
-
-// Spear types
-export enum SpearId {}
-// Add spear IDs here as needed
-
-export enum JavelinId {}
-// Add javelin IDs here as needed
-
-// Mace types
-export enum MaceId {
-  RustedIronMace = "RustedIronMace",
+export enum SpearId {
+    IronDory = "IronDory",
+    IronJavelin  = "IronJavelin",
+    IronHalberd = "IronHalberd",
 }
 
-export enum FlailId {}
-// Add flail IDs here as needed
+export enum HammerId {
+  IronMorningStar = "IronMorningStar",
+    IronHammer = "IronHammer",
+    IronWarHammer = "IronWarHammer",
+    IronScepter = "IronScepter",
+}
 
-export enum WarHammerId {}
-// Add war hammer IDs here as needed
+export enum BowId {
+    OakLongBow = "OakLongBow",
+    OakShortBow = "OakShortBow",
+    OakCrossbow = "OakCrossbow",
+}
 
-// Ranged types
-export enum BowId {}
-// Add bow IDs here as needed
+export enum OrbId {
+    CrystalOrb = "CrystalOrb",
+}
 
-export enum CrossbowId {}
-// Add crossbow IDs here as needed
-
-export enum GunId {}
-// Add gun IDs here as needed
-
-export enum ThrowingKnifeId {}
-// Add throwing knife IDs here as needed
-
-// Magic types
-export enum StaffId {}
-// Add staff IDs here as needed
-
-export enum MagicWandId {}
-// Add magic wand IDs here as needed
-
-// Shield types
 export enum ShieldId {
-  RottenWoodenShield = "RottenWoodenShield",
+  WoodenBuckler = "WoodenBuckler",
+    WoodenKiteShield = "WoodenKiteShield",
+    WoodenTowerShield = "WoodenTowerShield",
+    IronBucker = "IronBucker",
+    IronKiteShield = "IronKiteShield",
+    IronTowerShield = "IronTowerShield",
+}
+
+export enum StaffId {
+    OakQuaterStaff = "OakQuaterStaff",
+    OakLongestStaff = "OakLongestStaff",
+    OakStaff = "OakStaff",
+}
+
+export enum BookWId {
+    LeatherBible = "LeatherBible",
+    LeatherGrimoire = "LeatherGrimoire",
+    LeatherCodex = "LeatherCodex",
+}
+
+export enum WandId {
+    OakWand = "OakWand",
 }
 
 /**
@@ -101,24 +91,13 @@ export type WeaponId =
   | BareHandId
   | DaggerId
   | SwordId
-  | RapierId
-  | GreatSwordId
-  | MacheteId
   | BladeId
-  | ScimitarId
-  | ZanmadaoId
   | AxeId
-  | WarAxeId
-  | HalberdId
   | SpearId
-  | JavelinId
-  | MaceId
-  | FlailId
-  | WarHammerId
   | BowId
-  | CrossbowId
-  | GunId
-  | ThrowingKnifeId
   | StaffId
-  | MagicWandId
-  | ShieldId;
+  | ShieldId
+  | HammerId
+    | BookWId
+    | WandId
+| OrbId

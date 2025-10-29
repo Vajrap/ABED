@@ -10,7 +10,7 @@ import { ItemCost } from "../../Subclass/ItemCost";
 export class Gold extends ItemMisc {
   // Override to narrow type from MiscItemId to GoldId
   declare id: GoldId;
-  
+
   constructor(data: Item) {
     super(data);
   }
@@ -34,5 +34,5 @@ export const gold = new Gold({
     bonusCost: 0,
   }),
   isCraftable: false,
-  resource: new Map()
+  craftingRecipe: new Map()
 })
