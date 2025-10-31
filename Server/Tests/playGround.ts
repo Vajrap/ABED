@@ -2,7 +2,6 @@ import { Battle } from "src/Entity/Battle/Battle";
 import { BattleType } from "src/Entity/Battle/types";
 import { MOBs } from "src/Entity/Character/MOBs/enums";
 import {
-  goblinCaptain,
   goblinCleric,
   goblinMage,
   goblinScout,
@@ -14,14 +13,14 @@ import { Party } from "src/Entity/Party/Party";
 import { PartyBehavior } from "src/Entity/Party/PartyBehavior";
 import { GameTime } from "src/Game/GameTime/GameTime";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { SwordId, DaggerId, MaceId, AxeId, ShieldId } from "src/Entity/Item/Equipment/Weapon/type";
+import { SwordId, DaggerId, HammerId, ShieldId } from "src/Entity/Item/Equipment/Weapon/type";
 import { BodyId, HeadWearId } from "src/Entity/Item/Equipment/Armor/type";
 
 // Party A: Team with Warrior (with rusted gear) and Mage
 const warrior_A = goblinWarrior(3);
 warrior_A.name = { en: "Warrior A", th: "Warrior A" };
-warrior_A.equipments.rightHand = SwordId.RustedIronSword;
-warrior_A.equipments.leftHand = ShieldId.RottenWoodenShield;
+warrior_A.equipments.rightHand = SwordId.IronLongSword;
+warrior_A.equipments.leftHand = ShieldId.IronBucker;
 warrior_A.equipments.body = BodyId.PoorLeatherArmor;
 warrior_A.equipments.headWear = HeadWearId.TatteredCap;
 warrior_A.position = 1;
@@ -42,13 +41,13 @@ const partyA = new Party({
 // Party B: Team with Scout and Cleric (both with rusted gear)
 const scout_B = goblinScout(3);
 scout_B.name = { en: "Scout B", th: "Scout B" };
-scout_B.equipments.rightHand = DaggerId.RustedIronDagger;
+scout_B.equipments.rightHand = DaggerId.IronStiletto;
 scout_B.equipments.body = BodyId.TatteredClothes;
 scout_B.position = 2;
 
 const cleric_B = goblinCleric(3);
 cleric_B.name = { en: "Cleric B", th: "Cleric B" };
-cleric_B.equipments.rightHand = MaceId.RustedIronMace;
+cleric_B.equipments.rightHand = HammerId.IronMorningStar;
 cleric_B.equipments.body = BodyId.PoorLeatherArmor;
 cleric_B.equipments.headWear = HeadWearId.TatteredCap;
 cleric_B.position = 3;
