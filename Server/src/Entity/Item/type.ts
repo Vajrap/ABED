@@ -7,5 +7,4 @@ import type { MiscItemId } from "./Misc";
  * Master ItemId type - union of all item IDs in the game
  * All items must be categorized under one of these types
  */
-export type ItemId = EquipmentId | ConsumableId | MiscItemId | BookId | "none";
-
+export type ItemId = EquipmentId | ConsumableId | MiscItemId | BookId;

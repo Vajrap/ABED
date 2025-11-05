@@ -10,22 +10,12 @@ import { Equipment } from "../Equipment";
 import type { EquipmentModifier } from "../type";
 import type { WeaponId } from "./type";
 
-/**
- * Weapon positioning/range types
- */
 export enum WeaponPosition {
   Melee = "Melee",
   Ranged = "Ranged",
-  Versatile = "Versatile", // Can be used in both melee and ranged
+  Versatile = "Versatile",
 }
 
-/**
- * Generic WeaponData type
- * T = ProficiencyKey (weapon type like "sword", "axe", etc.)
- * P = WeaponPosition (Melee/Ranged/Versatile)
- *
- * By using generics, each specific weapon class can narrow both properties!
- */
 export type WeaponData<
   T extends ProficiencyKey = ProficiencyKey,
   P extends WeaponPosition = WeaponPosition,

@@ -21,16 +21,13 @@ async function testDatabase() {
     const testUser = await UserService.createUser({
       password: "testpassword123",
       email: `test${Date.now()}@example.com`,
-      characterId: `char_${Date.now()}`,
-      lastNewsReceived: "news_001",
-      createdBy: "test_script",
-      updatedBy: "test_script",
+      username: "testUser",
     });
 
     console.log("✅ User created:", {
       id: testUser.id,
       email: testUser.email,
-      characterId: testUser.characterId,
+      characterId: testUser.id,
     });
 
     // Test user retrieval
@@ -38,16 +35,14 @@ async function testDatabase() {
     const retrievedUser = await UserService.getUserById(testUser.id);
     console.log("✅ User retrieved:", retrievedUser ? "Success" : "Failed");
 
-    const userByEmail = await UserService.getUserByEmail(testUser.email);
+    const userByEmail = await UserService.getUserByEmail(testUser.email!);
     console.log("✅ User by email:", userByEmail ? "Success" : "Failed");
 
     // Test user update
     console.log("📝 Testing User update...");
-    const updatedUser = await UserService.updateUser(
-      testUser.id,
-      { lastNewsReceived: "news_002" },
-      "test_script_update",
-    );
+    const updatedUser = await UserService.updateUser(testUser.id, {
+      lastNewsReceived: "news_002",
+    });
     console.log("✅ User updated:", updatedUser ? "Success" : "Failed");
 
     // Test user count

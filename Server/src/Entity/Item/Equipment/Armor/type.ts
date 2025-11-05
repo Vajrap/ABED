@@ -4,40 +4,96 @@
  */
 
 export enum BodyId {
-  PoorLeatherArmor = "PoorLeatherArmor",
-  TatteredClothes = "TatteredClothes",
-}
-
-export enum EarId {
-  // Add earring IDs here as needed
-}
-
-export enum FootId {
-  // Add footwear IDs here as needed
-}
-
-export enum HandId {
-  // Add hand armor/glove IDs here as needed
+  // Cloth
+  Tunic = "Tunic",
+  Robe = "Robe",
+  MageRobe = "MageRobe",
+  // Light
+  PaddedArmor = "PaddedArmor",
+  LeatherArmor = "LeatherArmor",
+  StuddedLeatherArmor = "StuddedLeatherArmor",
+  // Medium
+  HideArmor = "HideArmor",
+  ChainShirt = "ChainShirt",
+  ScaleMail = "ScaleMail",
+  // Heavy
+  ChainMail = "ChainMail",
+  SplintMail = "SplintMail",
+  PlateArmor = "PlateArmor",
 }
 
 export enum HeadWearId {
-  TatteredCap = "TatteredCap",
+  // Cloth
+  SimpleHood = "SimpleHood",
+  ScholarCap = "ScholarCap",
+  // Light
+  LeatherCap = "LeatherCap",
+  ScoutHood = "ScoutHood",
+  // Medium
+  ChainCoif = "ChainCoif",
+  // Heavy
+  SteelHelm = "SteelHelm",
+}
+
+export enum HandId {
+  // Cloth
+  ClothGloves = "ClothGloves",
+  // Light
+  LeatherGloves = "LeatherGloves",
+  // Medium
+  ReinforcedGloves = "ReinforcedGloves",
+  // Heavy
+  SteelGauntlets = "SteelGauntlets",
 }
 
 export enum LegId {
-  // Add leg armor IDs here as needed
+  // Cloth
+  LinenPants = "LinenPants",
+  // Light
+  LeatherPants = "LeatherPants",
+  // Medium
+  ChainLeggings = "ChainLeggings",
+  // Heavy
+  PlateGreaves = "PlateGreaves",
+}
+
+export enum FootId {
+  // Cloth
+  ClothShoes = "ClothShoes",
+  // Light
+  TravelerBoots = "TravelerBoots",
+  LeatherBoots = "LeatherBoots",
+  // Medium
+  ChainBoots = "ChainBoots",
+  // Heavy
+  PlateSabatons = "PlateSabatons",
+}
+
+export enum EarId {
+  CopperEarring = "CopperEarring",
+  IronEarring = "IronEarring",
+  SilverEarring = "SilverEarring",
+  GoldEarring = "GoldEarring",
 }
 
 export enum NeckId {
-  // Add necklace IDs here as needed
+  CopperNecklace = "CopperNecklace",
+  SilverNecklace = "SilverNecklace",
+  GoldNecklace = "GoldNecklace",
 }
 
 export enum RingId {
-  // Add ring IDs here as needed
+  CopperRing = "CopperRing",
+  IronRing = "IronRing",
+  SilverRing = "SilverRing",
+  GoldRing = "GoldRing",
 }
 
 export enum UtilId {
-  // Add utility item IDs here as needed
+  Idol = "Idol",
+  Relic = "Relic",
+  Totem = "Totem",
+  Mechanic = "Mechanic",
 }
 
 export type ArmorId =

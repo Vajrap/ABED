@@ -1,12 +1,8 @@
-import type { Character } from "src/Database/Schema";
+import { Character } from "src/Entity/Character/Character";
 import { Item } from "../Item";
 import type { ConsumableId } from "./index";
 
-/**
- * Base class for all consumable items
- */
 export class ItemConsumable extends Item {
-  // Override to narrow type from ItemId to ConsumableId
   consume: (actor: Character) => void;
   declare id: ConsumableId;
 
@@ -15,4 +11,3 @@ export class ItemConsumable extends Item {
     this.consume = consume;
   }
 }
-

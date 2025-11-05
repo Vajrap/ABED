@@ -13,13 +13,18 @@ import { Party } from "src/Entity/Party/Party";
 import { PartyBehavior } from "src/Entity/Party/PartyBehavior";
 import { GameTime } from "src/Game/GameTime/GameTime";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { SwordId, DaggerId, HammerId, ShieldId } from "src/Entity/Item/Equipment/Weapon/type";
+import {
+  SwordId,
+  DaggerId,
+  HammerId,
+  ShieldId,
+} from "src/Entity/Item/Equipment/Weapon/type";
 import { BodyId, HeadWearId } from "src/Entity/Item/Equipment/Armor/type";
 
 // Party A: Team with Warrior (with rusted gear) and Mage
 const warrior_A = goblinWarrior(3);
 warrior_A.name = { en: "Warrior A", th: "Warrior A" };
-warrior_A.equipments.rightHand = SwordId.IronLongSword;
+warrior_A.equipments.rightHand = SwordId.LongSword;
 warrior_A.equipments.leftHand = ShieldId.IronBucker;
 warrior_A.equipments.body = BodyId.PoorLeatherArmor;
 warrior_A.equipments.headWear = HeadWearId.TatteredCap;
@@ -68,10 +73,16 @@ activeCharacterRegistry[scout_B.id] = scout_B;
 activeCharacterRegistry[cleric_B.id] = cleric_B;
 
 console.log("Setting up battle: Warrior & Mage vs Scout & Cleric");
-console.log(`${warrior_A.name.en} equipped with Rusted Iron Sword, Shield & Leather Armor!`);
+console.log(
+  `${warrior_A.name.en} equipped with Rusted Iron Sword, Shield & Leather Armor!`,
+);
 console.log(`${mage_A.name.en} equipped with Tattered Clothes`);
-console.log(`${scout_B.name.en} equipped with Rusted Iron Dagger & Tattered Clothes!`);
-console.log(`${cleric_B.name.en} equipped with Rusted Iron Mace, Leather Armor & Cap!`);
+console.log(
+  `${scout_B.name.en} equipped with Rusted Iron Dagger & Tattered Clothes!`,
+);
+console.log(
+  `${cleric_B.name.en} equipped with Rusted Iron Mace, Leather Armor & Cap!`,
+);
 
 const battle = new Battle(
   partyA,

@@ -1,6 +1,3 @@
-// getTargetFromList().one().randomly()
-// getTargetFromList().many(3).withLessCurrentHp()
-
 import {
   ATTRIBUTE_KEYS,
   ELEMENT_KEYS,
@@ -35,7 +32,7 @@ class TargetSelector {
   };
   tauntCount: boolean = true;
   skipHiding: boolean = false;
-  deadTarget: 'include' | 'exclude' | 'only' = 'exclude';
+  deadTarget: "include" | "exclude" | "only" = "exclude";
   constructor(actor: Character, possibleTargets: Character[]) {
     this.actor = actor;
     this.possibleTargets = possibleTargets;
@@ -109,12 +106,15 @@ class TargetSelector {
 
   withAptitudeBetween(min: number, max: number) {
     this.possibleTargets = this.possibleTargets.filter((target) => {
-      return target.planarAptitude.aptitude >= min && target.planarAptitude.aptitude <= max;
+      return (
+        target.planarAptitude.aptitude >= min &&
+        target.planarAptitude.aptitude <= max
+      );
     });
     return this;
   }
 
-  dead(deadTarget: 'include' | 'exclude' | 'only' = 'include') {
+  dead(deadTarget: "include" | "exclude" | "only" = "include") {
     this.deadTarget = deadTarget;
     return this;
   }
@@ -124,33 +124,38 @@ class TargetSelector {
     if (this.possibleTargets.length === 0) {
       return undefined;
     }
-    
+
     // Apply filters FIRST
     const filtered = this.getFilteredTargets();
-    
+
     if (filtered.length === 0) {
       return undefined;
     }
-    
+
     if (filtered.length === 1) {
       return filtered[0];
     }
-    
+
     // Check for taunt targets AFTER filtering
     if (this.tauntCount) {
       const tauntingTargets = filtered.filter((target) => {
-        return target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !== undefined;
+        return (
+          target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !==
+          undefined
+        );
       });
       if (tauntingTargets.length > 0) {
-        return tauntingTargets[Math.floor(Math.random() * tauntingTargets.length)];
+        return tauntingTargets[
+          Math.floor(Math.random() * tauntingTargets.length)
+        ];
       }
     }
-    
+
     // For "one", we select based on type configuration or random
     if (this.type.direction && this.type.target) {
       return this.selectByType(filtered, 1)[0]!;
     }
-    
+
     return this.selectRandomOne(filtered);
   }
 
@@ -159,83 +164,101 @@ class TargetSelector {
     if (filtered.length === 0) {
       return [];
     }
-    
+
     const maxCount = Math.min(count, filtered.length);
-    
+
     // Prioritize taunting targets if tauntCount is enabled
     if (this.tauntCount) {
       const tauntingTargets = filtered.filter((target) => {
-        return target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !== undefined;
+        return (
+          target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !==
+          undefined
+        );
       });
-      
+
       if (tauntingTargets.length > 0) {
         // If we want more targets than we have taunting, fill the rest
         const remainingSlots = Math.max(0, maxCount - tauntingTargets.length);
         const nonTauntingTargets = filtered.filter((target) => {
-          return target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) === undefined;
+          return (
+            target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) ===
+            undefined
+          );
         });
-        
+
         if (this.type.direction && this.type.target) {
           // Use type-based selection for non-taunting targets
-          const selectedNonTaunting = this.selectByType(nonTauntingTargets, remainingSlots);
+          const selectedNonTaunting = this.selectByType(
+            nonTauntingTargets,
+            remainingSlots,
+          );
           return [...tauntingTargets, ...selectedNonTaunting];
         } else {
           // Use random selection for non-taunting targets
-          const selectedNonTaunting = this.selectRandomMany(nonTauntingTargets, remainingSlots);
+          const selectedNonTaunting = this.selectRandomMany(
+            nonTauntingTargets,
+            remainingSlots,
+          );
           return [...tauntingTargets, ...selectedNonTaunting];
         }
       }
     }
-    
+
     // No taunting targets or tauntCount disabled, proceed normally
     if (this.type.direction && this.type.target) {
       return this.selectByType(filtered, maxCount);
     }
-    
+
     return this.selectRandomMany(filtered, maxCount);
   }
 
   all(): Character[] {
     const filtered = this.getFilteredTargets();
-    
+
     // Prioritize taunting targets if enabled
     if (this.tauntCount && filtered.length > 0) {
       const tauntingTargets = filtered.filter((target) => {
-        return target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !== undefined;
+        return (
+          target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !==
+          undefined
+        );
       });
-      
+
       if (tauntingTargets.length > 0) {
         const nonTauntingTargets = filtered.filter((target) => {
-          return target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) === undefined;
+          return (
+            target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) ===
+            undefined
+          );
         });
         return [...tauntingTargets, ...nonTauntingTargets];
       }
     }
-    
+
     return filtered;
   }
 
   // Private helper methods
   private getFilteredTargets(): Character[] {
     let targets = [...this.possibleTargets];
-    
+
     // Apply all filters in order
     targets = this.filterDeadTargets(targets);
     targets = this.filterByRow(targets);
     targets = this.filterByHiding(targets);
-    
+
     return targets;
   }
 
   private filterDeadTargets(targets: Character[]): Character[] {
-    if (this.deadTarget === 'include') {
+    if (this.deadTarget === "include") {
       return targets; // Include all
     }
-    if (this.deadTarget === 'only') {
-      return targets.filter(target => target.vitals.isDead);
+    if (this.deadTarget === "only") {
+      return targets.filter((target) => target.vitals.isDead);
     }
     // 'exclude' is default
-    return targets.filter(target => !target.vitals.isDead);
+    return targets.filter((target) => !target.vitals.isDead);
   }
 
   private filterByRow(targets: Character[]): Character[] {
@@ -243,8 +266,8 @@ class TargetSelector {
       return targets;
     }
 
-    const frontRow = targets.filter(target => target.position <= 2);
-    const backRow = targets.filter(target => target.position > 2);
+    const frontRow = targets.filter((target) => target.position <= 2);
+    const backRow = targets.filter((target) => target.position > 2);
 
     switch (this.row) {
       case "frontOnly":
@@ -266,12 +289,14 @@ class TargetSelector {
     }
 
     // Separate by row
-    const frontRow = targets.filter(target => target.position <= 2);
-    const backRow = targets.filter(target => target.position > 2);
+    const frontRow = targets.filter((target) => target.position <= 2);
+    const backRow = targets.filter((target) => target.position > 2);
 
     // If only one row has targets, just return random from that row
-    if (frontRow.length === 0) return backRow[Math.floor(Math.random() * backRow.length)]!;
-    if (backRow.length === 0) return frontRow[Math.floor(Math.random() * frontRow.length)]!;
+    if (frontRow.length === 0)
+      return backRow[Math.floor(Math.random() * backRow.length)]!;
+    if (backRow.length === 0)
+      return frontRow[Math.floor(Math.random() * frontRow.length)]!;
 
     // Determine weights based on preference
     let frontWeight: number;
@@ -309,7 +334,7 @@ class TargetSelector {
     if (this.skipHiding) {
       return targets;
     }
-    
+
     // If we need to consider hiding, do it during selection, not filtering
     // This allows us to try multiple targets
     return targets;
@@ -319,51 +344,56 @@ class TargetSelector {
     // Separate taunting and non-taunting targets
     let tauntingTargets: Character[] = [];
     let nonTauntingTargets: Character[] = [];
-    
+
     if (this.tauntCount) {
       tauntingTargets = targets.filter((target) => {
-        return target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !== undefined;
+        return (
+          target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !==
+          undefined
+        );
       });
-      nonTauntingTargets = targets.filter((target) => !tauntingTargets.includes(target));
+      nonTauntingTargets = targets.filter(
+        (target) => !tauntingTargets.includes(target),
+      );
     } else {
       nonTauntingTargets = targets;
     }
-    
+
     // Sort non-taunting targets by type
     const sortMultiplier = this.type.direction === "least" ? 1 : -1;
-    
+
     nonTauntingTargets = this.sortTargets(nonTauntingTargets, sortMultiplier);
-    
+
     // Combine: taunting first, then sorted
     const allTargets = [...tauntingTargets, ...nonTauntingTargets];
-    
+
     // Now select with hiding checks
     const selected: Character[] = [];
     const attempted = new Set<Character>();
-    
+
     for (let i = 0; i < count && selected.length < targets.length; i++) {
       // Try each target in order until we get one that passes hiding check
       for (const candidate of allTargets) {
         if (attempted.has(candidate)) continue;
         attempted.add(candidate);
-        
+
         if (this.canPerceive(candidate)) {
           selected.push(candidate);
           break;
         }
       }
     }
-    
+
     return selected;
   }
 
   private sortTargets(targets: Character[], multiplier: number): Character[] {
     const sorted = [...targets];
-    
+
     sorted.sort((a, b) => {
       let valueA: number;
       let valueB: number;
-      
+
       if (this.type.target === "currentHP") {
         valueA = a.vitals.hp.current;
         valueB = b.vitals.hp.current;
@@ -383,10 +413,10 @@ class TargetSelector {
         valueA = 0;
         valueB = 0;
       }
-      
+
       return (valueA - valueB) * multiplier;
     });
-    
+
     return sorted;
   }
 
@@ -399,63 +429,68 @@ class TargetSelector {
     if (this.row === "any") {
       return this.getWeightedRandomTarget(targets);
     }
-    
+
     // Otherwise, shuffle to randomize
     const shuffled = this.shuffleArray(targets);
-    
+
     const attempted = new Set<Character>();
-    
+
     for (const candidate of shuffled) {
       if (attempted.has(candidate)) continue;
       attempted.add(candidate);
-      
+
       if (this.canPerceive(candidate)) {
         return candidate;
       }
     }
-    
+
     // If all attempts failed, just return the first one anyway
     return targets[0]!;
   }
 
   private selectRandomMany(targets: Character[], count: number): Character[] {
     if (targets.length === 0) return [];
-    
+
     // Shuffle to randomize
     const shuffled = this.shuffleArray(targets);
-    
+
     const selected: Character[] = [];
     const attempted = new Set<Character>();
-    
+
     for (let i = 0; i < count && attempted.size < targets.length; i++) {
       for (const candidate of shuffled) {
         if (attempted.has(candidate)) continue;
         attempted.add(candidate);
-        
+
         if (this.canPerceive(candidate)) {
           selected.push(candidate);
           break;
         }
       }
     }
-    
+
     return selected;
   }
 
   private canPerceive(target: Character): boolean {
     if (this.skipHiding) return true;
-    
-    const hiding = target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.hiding)?.value;
-    
+
+    const hiding = target.buffsAndDebuffs.entry.get(
+      BuffsAndDebuffsEnum.hiding,
+    )?.value;
+
     if (!hiding || hiding <= 0) return true;
-    
+
     // Check if target has taunt - taunt overrides hiding
-    if (target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !== undefined) {
+    if (
+      target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !== undefined
+    ) {
       return true;
     }
-    
+
     // Perception check
-    const perception = rollTwenty().total + statMod(this.actor.attribute.getTotal("willpower"));
+    const perception =
+      rollTwenty().total + statMod(this.actor.attribute.getTotal("willpower"));
     return perception > 15;
   }
 

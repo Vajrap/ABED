@@ -1,92 +1,77 @@
-/**
- * Weapon item IDs
- * All weapon items must have an entry here for type safety and repository lookup
- * Each enum corresponds to a ProficiencyKey weapon type
- */
-
-// Bare Hand
 export enum BareHandId {
-  // Add bare hand IDs here as needed
   BareHand = "BareHand",
 }
 
 export enum DaggerId {
-  IronStiletto = "IronStiletto",
-  IronKnife = "IronKnife",
+  Stiletto = "Stiletto",
+  Knife = "Knife",
 }
 
 export enum SwordId {
-  IronShortSword = "IronShortSword",
-  IronLongSword = "IronLongSword",
-  IronRapier = "IronRapier",
-  IronGreatSword = "IronGreatSword",
+  ShortSword = "ShortSword",
+  LongSword = "LongSword",
+  Rapier = "Rapier",
+  GreatSword = "GreatSword",
 }
 
-// Blade types
 export enum BladeId {
-    IronKatana = "IronKatana",
-    IronScimitar = "IronScimitar",
-    IronCutlass = "IronCutlass",
-    IronFalchion = "IronFalchion",
+  Katana = "Katana",
+  Scimitar = "Scimitar",
+  Cutlass = "Cutlass",
+  Falchion = "Falchion",
 }
 
 export enum AxeId {
-  IronAxe = "IronAxe",
-    IronBroadAxe = "IronBroadAxe",
-    IronWarAxe = "IronWarAxe",
+  Axe = "Axe",
+  BroadAxe = "BroadAxe",
+  WarAxe = "WarAxe",
 }
 
 export enum SpearId {
-    IronDory = "IronDory",
-    IronJavelin  = "IronJavelin",
-    IronHalberd = "IronHalberd",
+  Dory = "Dory",
+  Javelin = "Javelin",
+  Halberd = "Halberd",
 }
 
 export enum HammerId {
-  IronMorningStar = "IronMorningStar",
-    IronHammer = "IronHammer",
-    IronWarHammer = "IronWarHammer",
-    IronScepter = "IronScepter",
+  MorningStar = "MorningStar",
+  Hammer = "Hammer",
+  WarHammer = "WarHammer",
+  Scepter = "Scepter",
 }
 
 export enum BowId {
-    OakLongBow = "OakLongBow",
-    OakShortBow = "OakShortBow",
-    OakCrossbow = "OakCrossbow",
+  LongBow = "LongBow",
+  ShortBow = "ShortBow",
+  Crossbow = "Crossbow",
 }
 
 export enum OrbId {
-    CrystalOrb = "CrystalOrb",
+  Orb = "Orb",
 }
 
 export enum ShieldId {
-  WoodenBuckler = "WoodenBuckler",
-    WoodenKiteShield = "WoodenKiteShield",
-    WoodenTowerShield = "WoodenTowerShield",
-    IronBucker = "IronBucker",
-    IronKiteShield = "IronKiteShield",
-    IronTowerShield = "IronTowerShield",
+  Buckler = "Buckler",
+  KiteShield = "KiteShield",
+  TowerShield = "TowerShield",
 }
 
 export enum StaffId {
-    OakQuaterStaff = "OakQuaterStaff",
-    OakLongestStaff = "OakLongestStaff",
-    OakStaff = "OakStaff",
+  QuarterStaff = "QuarterStaff",
+  LongestStaff = "LongestStaff",
+  Staff = "Staff",
 }
 
 export enum BookWId {
-    LeatherBible = "LeatherBible",
-    LeatherGrimoire = "LeatherGrimoire",
-    LeatherCodex = "LeatherCodex",
+  Bible = "Bible",
+  Grimoire = "Grimoire",
+  Codex = "Codex",
 }
 
 export enum WandId {
-    OakWand = "OakWand",
+  Wand = "Wand",
 }
 
-/**
- * Master WeaponId type - union of all weapon IDs
- */
 export type WeaponId =
   | BareHandId
   | DaggerId
@@ -98,6 +83,6 @@ export type WeaponId =
   | StaffId
   | ShieldId
   | HammerId
-    | BookWId
-    | WandId
-| OrbId
+  | BookWId
+  | WandId
+  | OrbId;

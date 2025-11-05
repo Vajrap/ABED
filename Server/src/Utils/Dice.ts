@@ -11,7 +11,7 @@ export function roll(amount: number) {
           { length: amount },
           () => Math.floor(rng() * faces) + 1,
         );
-        return new DiceRollResult(rolls);
+        return new DiceRollResult(rolls, { amount, faces });
       };
 
       // Roll immediately with no seed
@@ -33,8 +33,10 @@ export function rollTwenty(seed?: number): DiceRollResult {
 
 class DiceRollResult {
   rolls: number[];
-  constructor(rolls: number[]) {
+  from: { amount: number; faces: number };
+  constructor(rolls: number[], from: { amount: number; faces: number }) {
     this.rolls = rolls;
+    this.from = from;
   }
 
   get total(): number {
@@ -57,6 +59,18 @@ class DiceRollResult {
       return Math.min(...this.rolls);
     }
     return this.rolls.sort((a, b) => a - b).slice(0, count);
+  }
+
+  adv(): DiceRollResult {
+    const secondRoll = roll(this.from.amount).d(this.from.faces);
+    const chosen = this.total > secondRoll.total ? this : secondRoll;
+    return chosen;
+  }
+
+  dis(): DiceRollResult {
+    const secondRoll = roll(this.from.amount).d(this.from.faces);
+    const chosen = this.total < secondRoll.total ? this : secondRoll;
+    return chosen;
   }
 }
 

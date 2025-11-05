@@ -5,22 +5,88 @@
 
 // Resource IDs
 export enum WoodId {
-  // Add wood types here as needed
-  // oak = "oak",
-  // pine = "pine",
+  Oak = "Oak",
+  Pine = "Pine",
+  Maple = "Maple",
+  Ironwood = "Ironwood",
 }
 
 export enum SkinId {
-  // Add skin types here as needed
-  // leather = "leather",
+  Hide = "Hide",
+  Fur = "Fur",
+  Scale = "Scale",
 }
 
 export enum BoneId {
-  // Add bone types here as needed
-  // bone = "bone",
+  Bone = "Bone",
+  Fang = "Fang",
+  Horn = "Horn",
 }
 
-export type ResourceId = WoodId | SkinId | BoneId;
+export enum OreId {
+  CopperOre = "CopperOre",
+  TinOre = "TinOre",
+  IronOre = "IronOre",
+  SilverOre = "SilverOre",
+  GoldOre = "GoldOre",
+  PlanariteOre = "PlanariteOre",
+  ErebiteOre = "ErebiteOre",
+}
+
+export type RawResourceID = WoodId | SkinId | BoneId | OreId;
+
+/**
+ * Refined Resource IDs
+ */
+
+export enum IngotId {
+  CopperIngot = "CopperIngot",
+  TinIngot = "TinIngot",
+  IronIngot = "IronIngot",
+  SilverIngot = "SilverIngot",
+  GoldIngot = "GoldIngot",
+  BronzeIngot = "BronzeIngot",
+  SteelIngot = "SteelIngot",
+  ElectrumIngot = "ElectrumIngot",
+  AethersteelIngot = "AetherSteelIngot",
+  VoidforgedIngot = "VoidforgedIngot",
+}
+
+export enum PlankId {
+  OakPlank = "OakPlank",
+  PinePlank = "PinePlank",
+  MaplePlank = "MaplePlank",
+  IronwoodPlank = "IronwoodPlank",
+}
+
+export enum LeatherId {
+  Leather = "Leather",
+  FineLeather = "FineLeather",
+  ScaledLeather = "ScaledLeather",
+}
+
+export enum ThreadId {
+  WoolThread = "WoolThread",
+  SilkThread = "SilkThread",
+  LinenThread = "LinenThread",
+}
+
+export enum ClothId {}
+
+export enum GemId {
+  RoughGem = "RoughGem",
+  CutGem = "CutGem",
+}
+
+export type RefinedResourceID =
+  | IngotId
+  | PlankId
+  | LeatherId
+  | ThreadId
+  | GemId
+  // | ClothId
+
+export type ResourceId = RawResourceID | RefinedResourceID;
 
 // Other Misc IDs
 export enum GoldId {
@@ -28,4 +94,3 @@ export enum GoldId {
 }
 
 export type MiscItemId = ResourceId | GoldId;
-

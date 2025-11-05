@@ -1,4 +1,5 @@
 import {
+  AttributeKey,
   CharacterType,
   RelationStatusEnum,
   type ElementKey,
@@ -31,7 +32,7 @@ import type { News } from "../News/News";
 import type { CharacterRoleEnum } from "./Subclass/Title/Role/enum";
 import type { CharacterEpithetEnum } from "./Subclass/Title/Epithet/enum";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N.ts";
-import { roll } from "src/Utils/Dice.ts";
+import { roll, rollTwenty } from "src/Utils/Dice.ts";
 import { statMod } from "src/Utils/statMod.ts";
 import type { Weapon } from "src/Entity/Item";
 import type { ItemId } from "../Item/type.ts";
@@ -52,7 +53,6 @@ import {
 import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
 import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
 
-
 export class Character {
   id: string = "";
   userId: string | null = null;
@@ -72,6 +72,7 @@ export class Character {
   battleStats: CharacterBattleStats = new CharacterBattleStats();
   elements: CharacterElements = new CharacterElements();
   proficiencies: CharacterProficiencies = new CharacterProficiencies();
+  saveRolls: CharacterAttributes = new CharacterAttributes();
 
   needs: CharacterNeeds = new CharacterNeeds();
   vitals: CharacterVitals = new CharacterVitals({});
@@ -106,7 +107,6 @@ export class Character {
   inventorySize: { base: number; bonus: number } = { base: 20, bonus: 0 };
   inventory: Map<ItemId, number> = new Map();
   equipments: {
-    // TODO
     headWear: HeadWearId | null;
     body: BodyId | null;
     leg: LegId | null;
@@ -184,6 +184,7 @@ export class Character {
     attribute: CharacterAttributes;
     battleStats: CharacterBattleStats;
     proficiencies: CharacterProficiencies;
+    saveRolls: CharacterAttributes;
     elements: CharacterElements;
     needs: CharacterNeeds;
     vitals: CharacterVitals;
@@ -206,6 +207,7 @@ export class Character {
     this.artisans = data.artisans;
     this.attribute = data.attribute;
     this.battleStats = data.battleStats;
+    this.saveRolls = data.saveRolls;
     this.elements = data.elements;
     this.proficiencies = data.proficiencies;
     this.needs = data.needs;
@@ -344,6 +346,13 @@ export class Character {
     const later = this.vitals.hp.current;
 
     return { heal: later - prior };
+  }
+
+  rollSave(stat: AttributeKey, mode: "norm" | "adv" | "dis" = "norm") {
+    let rollRes = rollTwenty();
+    if (mode === "adv") rollRes = rollRes.adv();
+    if (mode === "dis") rollRes = rollRes.dis();
+    return statMod(this.attribute.getTotal(stat)) + rollRes.total;
   }
 }
 

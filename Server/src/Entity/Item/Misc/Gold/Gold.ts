@@ -34,5 +34,8 @@ export const gold = new Gold({
     bonusCost: 0,
   }),
   isCraftable: false,
-  craftingRecipe: new Map()
-})
+  blueprintId: {
+    resource: new Map(),
+    item: new Map(),
+  },
+});

@@ -1,13 +1,8 @@
 import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums.ts";
-import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers.ts";
 import { rollTwenty } from "src/Utils/Dice.ts";
 import { statMod } from "src/Utils/statMod.ts";
 import type { Character } from "../../../../Character/Character";
-import {
-  createNews,
-  type NewsContext,
-  type News,
-} from "../../../../News/News";
+import { createNews, type NewsContext, type News } from "../../../../News/News";
 import { getExpNeededForStatus } from "./getExpNeeded";
 import { gainStatTracker } from "./statTracker";
 
@@ -43,10 +38,10 @@ export function handleTrainAttribute(
         kind: "partyScope",
         partyId: context.partyId,
       },
-        content: {
-            en: "",
-            th: "",
-        },
+      content: {
+        en: "",
+        th: "",
+      },
       context,
     });
     results.push(news);

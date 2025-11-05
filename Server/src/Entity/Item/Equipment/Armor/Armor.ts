@@ -1,7 +1,10 @@
 import { Equipment } from "../Equipment";
 import type { Item } from "../../Item";
 import type { EquipmentModifier } from "../type";
-import { EquipmentSlot } from "../../../../InterFacesEnumsAndTypes/Enums";
+import {
+  AttributeKey,
+  EquipmentSlot,
+} from "../../../../InterFacesEnumsAndTypes/Enums";
 import type { ArmorId } from "./type";
 
 /**
@@ -12,7 +15,7 @@ export class Armor extends Equipment {
   // Override to narrow type from EquipmentId to ArmorId
   declare id: ArmorId;
   armorData: ArmorData;
-  
+
   constructor(
     data: Item,
     slot: EquipmentSlot,
@@ -25,26 +28,40 @@ export class Armor extends Equipment {
 }
 
 export interface ArmorData {
-    armorClass: ArmorClass;
-    pDef: {
-        slash: number;
-        pierce: number;
-        blunt: number;
-    };
-    mDef: {
-        order: number;
-        chaos: number;
-        fire: number;
-        earth: number;
-        water: number;
-        air: number;
-    };
-    dodge: number; // only negative value is valid
+  armorClass: ArmorClass;
+  requirement?: Partial<Record<AttributeKey, number>>;
+  pDef?: {
+    slash: number;
+    pierce: number;
+    blunt: number;
+  };
+  mDef?: {
+    order: number;
+    chaos: number;
+    fire: number;
+    earth: number;
+    water: number;
+    air: number;
+  };
+  mAtk?: {
+    order: number;
+    chaos: number;
+    fire: number;
+    earth: number;
+    water: number;
+    air: number;
+  };
+  pAtk?: {
+    slash: number;
+    pierce: number;
+    blunt: number;
+  };
+  dodge?: number;
 }
 
 export enum ArmorClass {
-    Cloth = 'Cloth',
-    Light = 'Light',
-    Medium = 'Medium',
-    Heavy = 'Heavy',
+  Cloth = "Cloth",
+  Light = "Light",
+  Medium = "Medium",
+  Heavy = "Heavy",
 }

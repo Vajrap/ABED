@@ -148,6 +148,7 @@ export const PROFICIENCY_KEYS = [
   "dagger",
   "spear",
   "bow",
+  "axe",
   "hammer",
   "orb",
   "shield",

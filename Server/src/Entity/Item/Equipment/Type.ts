@@ -15,6 +15,7 @@ export type EquipmentModifier = {
   proficiencies?: Partial<Record<ProficiencyKey, number>>;
   artisans?: Partial<Record<ArtisanKey, number>>;
   battleStatus?: Partial<Record<BattleStatKey, number>>;
+  saves?: Partial<Record<AttributeKey, number>>;
   vitals?: { hp?: number; mp?: number; sp?: number };
   buffsAndDebuffs?: Map<BuffsAndDebuffsEnum, number>;
   traits?: TraitEnum[];

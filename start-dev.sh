@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# ABED Development Startup Script
-# This script starts all services needed for development
-
 set -e  # Exit on any error
 
 # Colors for output

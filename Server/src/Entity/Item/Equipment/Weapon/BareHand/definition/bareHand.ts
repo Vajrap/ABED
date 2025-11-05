@@ -36,10 +36,7 @@ export const bareHand = new BareHand(
     image: "bareHand",
     isCraftable: false,
     weight: 0,
-    craftingRecipe: {
-        resource: new Map(),
-        item: new Map()
-    }
+    blueprintId: undefined
   },
   {},
   {
