@@ -20,7 +20,7 @@ export const basicBreathingTechnique = new BreathingSkill({
                 return;
             }
             // When activated - basic breathing technique starts
-            console.log(`${character.name.en} activates Basic Breathing Technique`);
+            Report.debug(`${character.name.en} activates Basic Breathing Technique`);
         },
         off: (selfId, skillLevel) => {
             const character = getCharacter(selfId);
@@ -29,7 +29,7 @@ export const basicBreathingTechnique = new BreathingSkill({
                 return;
             }
             // When deactivated - basic breathing technique ends
-            console.log(`${character.name.en} deactivates Basic Breathing Technique`);
+            Report.debug(`${character.name.en} deactivates Basic Breathing Technique`);
         },
         attacking: (self, target, skillLevel) => {
             // Effect when attacking - basic breathing provides slight focus

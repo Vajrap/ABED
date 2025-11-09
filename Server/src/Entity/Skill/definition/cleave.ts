@@ -24,12 +24,7 @@ export const cleave = new Skill({
   equipmentNeeded: [
     "sword",
     "axe",
-    "machete",
     "blade",
-    "scimitar",
-    "zanmadao",
-    "warAxe",
-    "greatSword",
   ], // Slash weapons
   tier: TierEnum.uncommon,
   consume: {

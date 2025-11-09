@@ -19,21 +19,7 @@ export const halberd = new Spear(
     },
     tier: TierEnum.common,
     cost: {
-      baseCost: 1110, // TEMP: ore: 100*10=1000 + wood: 2*5=10 + handicraft: 100 + hitmod -2 = 1110
-      bonusCost: 0,
-      cost: 1110,
-      marketCost: 1110,
-      numberOfSellThisWeek: 0,
-      possibleDeviation: 0,
-      seasonalDeviation: {
-        [SeasonEnum.Seeding]: 0,
-        [SeasonEnum.RainFall]: 0,
-        [SeasonEnum.GreenTide]: 0,
-        [SeasonEnum.HarvestMoon]: 0,
-        [SeasonEnum.SunDry]: 0,
-        [SeasonEnum.Frostveil]: 0,
-        [SeasonEnum.LongDark]: 0,
-      },
+      baseCost: 1110,
     },
     image: "ironHalberd",
     isCraftable: true,

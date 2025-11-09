@@ -5,7 +5,10 @@ import { SessionService } from "../../Services/SessionService";
 export const authRoutes = express.Router();
 
 authRoutes.post("/auto", async (req: Request, res: Response) => {
-  console.log("🔥 AUTH AUTO ROUTE HIT!");
+  Report.debug("Auth auto route hit", {
+    route: "/auth/auto",
+    ip: req.ip,
+  });
   try {
     const { token } = req.body as { token: string };
 
@@ -37,7 +40,10 @@ authRoutes.post("/auto", async (req: Request, res: Response) => {
 });
 
 authRoutes.post("/logout", async (req: Request, res: Response) => {
-  console.log("🔥 AUTH LOGOUT ROUTE HIT!");
+  Report.debug("Auth logout route hit", {
+    route: "/auth/logout",
+    ip: req.ip,
+  });
   try {
     const { token } = req.body as { token: string };
 

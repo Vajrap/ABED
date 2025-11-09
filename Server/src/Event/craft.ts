@@ -220,11 +220,11 @@ export function craft(
   } else if (blueprint instanceof WeaponBlueprint) {
     // Validate material selection
     if (!validateWeaponMaterialSelection(blueprint, materialSelection)) {
-      return 0; // Invalid or missing material selection
+      return { reason: "Invalid or missing material selection" };
     }
 
     if (!materialSelection) {
-      return 0; // Material selection is required for weapon crafting
+      return { reason: "Material selection is required for weapon crafting" };
     }
 
     // Create a copy of inventory to modify
@@ -277,7 +277,7 @@ export function craft(
     for (const [itemId, quantityNeeded] of materialsNeeded.entries()) {
       const available = actor.inventory.get(itemId) || 0;
       if (available < quantityNeeded) {
-        return 0; // Not enough materials
+        return { reason: "Not enough materials" };
       }
     }
 
@@ -300,10 +300,12 @@ export function craft(
     // Update actor's inventory
     actor.inventory = newActorInventory;
 
-    return 1; // Successfully crafted 1 weapon
+    // return { item: itemRepository[blueprint.], amount: 1 };
+    // TODO: This needs to create actual new instance of the weapon
+    return { reason: "Weapon crafting not implemented" };
   }
 
-  return 0;
+  return { reason: "Invalid blueprint" };
 }
 
 /**
@@ -443,8 +445,8 @@ export function processCharacterCraftingPreferences(actor: Character): number {
       let craftedThisSlot = 0;
       for (let i = 0; i < craftQuantity; i++) {
         const result = craft(actor, blueprintId);
-        if (result > 0) {
-          craftedThisSlot += result;
+        if ("item" in result) {
+          craftedThisSlot += result.amount;
         } else {
           // Ran out of materials mid-craft, stop
           break;
@@ -471,8 +473,8 @@ export function processCharacterCraftingPreferences(actor: Character): number {
       // Since weapon crafting is more complex, we'll simplify to "craftOne" for now
       // TODO: Implement quantity calculation for weapon crafting
       const result = craft(actor, blueprintId, slot.materialSelection);
-      if (result > 0) {
-        totalCrafted += result;
+      if ("item" in result) {
+        totalCrafted += result.amount;
       }
 
       continue;

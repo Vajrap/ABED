@@ -21,7 +21,10 @@ function isCharacterCreationValidSimple(body: any): body is CharacterCreationDat
 export const characterRoutes = express.Router();
 
 characterRoutes.post("/create", async (req: Request, res: Response) => {
-  console.log("🔥 CHARACTER CREATE ROUTE HIT!");
+  Report.debug("Character create request received", {
+    route: "/character/create",
+    ip: req.ip,
+  });
   try {
     // Extract token from Authorization header or body
     const authHeader = req.headers.authorization;
@@ -33,7 +36,9 @@ characterRoutes.post("/create", async (req: Request, res: Response) => {
 
     // Validate request body (token is now optional in body)
     if (!isCharacterCreationValidSimple(req.body)) {
-      Report.error(`Invalid character creation data: ${JSON.stringify(req.body)}`);
+      Report.warn("Invalid character creation payload", {
+        keys: Object.keys(req.body ?? {}).sort(),
+      });
       return res.json({ success: false, messageKey: "character.invalidData" });
     }
 
@@ -60,22 +65,36 @@ characterRoutes.post("/create", async (req: Request, res: Response) => {
     });
 
     if (!result.success) {
-      Report.error(`Character creation failed: ${result.error}`);
+      Report.error("Character creation failed", {
+        userId: user.id,
+        username: user.username,
+        error: result.error,
+      });
       return res.status(500).json({ success: false, messageKey: "character.creationError" });
     }
 
-    Report.info(`Character ${req.body.name} created for user ${user.username}`);
-    
+    Report.info("Character created", {
+      userId: user.id,
+      username: user.username,
+      characterName: req.body.name,
+    });
+
     // Return success - frontend will fetch character data after landing on game page
     return res.json({ success: true, messageKey: "character.creationSuccess" });
   } catch (error) {
-    Report.error(`Character creation error: ${error}`);
+    Report.error("Character creation error", {
+      error,
+      username: req.body?.name,
+    });
     return res.json({ success: false, messageKey: "character.creationFailed" });
   }
 });
 
 characterRoutes.post("/checkName", async (req: Request, res: Response) => {
-  console.log("🔥 CHARACTER CHECK NAME ROUTE HIT!");
+  Report.debug("Character name availability check", {
+    route: "/character/checkName",
+    ip: req.ip,
+  });
   try {
     const { name } = req.body as { name: string };
 
@@ -92,7 +111,10 @@ characterRoutes.post("/checkName", async (req: Request, res: Response) => {
       messageKey: isAvailable ? "character.nameAvailable" : "character.nameTaken"
     });
   } catch (error) {
-    Report.error(`Character name check error: ${error}`);
+    Report.error("Character name check error", {
+      error,
+      name: req.body?.name,
+    });
     return res.json({ success: false, messageKey: "character.nameCheckFailed" });
   }
 });

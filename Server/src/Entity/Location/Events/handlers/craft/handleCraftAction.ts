@@ -6,16 +6,16 @@ export function handleCraftAction(character: Character, context: NewsContext): N
     const news: News[] = [];
     let isCrafted = false;
     const a = character.behavior.craftingPreference.craftingList
-    if (a[1].bluePrintID !== 0) {
+    if (a[1].bluePrintID) {
         // Handle crafting for blueprint 1
     }
-    if (a[2].bluePrintID !== 0) {
+    if (a[2].bluePrintID) {
         // Handle crafting for blueprint 2
     }
-    if (a[3].bluePrintID !== 0) {
+    if (a[3].bluePrintID) {
         // Handle crafting for blueprint 3
     }
-    if (a[4].bluePrintID !== 0) {
+    if (a[4].bluePrintID) {
         // Handle crafting for blueprint 4
     }
     return news;

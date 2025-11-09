@@ -1,46 +1,21 @@
-export function roll(amount: number) {
-  if (amount < 1) throw new Error("Invalid amount");
-
-  return {
-    d: (faces: number) => {
-      if (faces < 1) throw new Error("Invalid face");
-
-      const doRoll = (seed?: number): DiceRollResult => {
-        const rng = seed !== undefined ? seededRNG(seed) : Math.random;
-        const rolls = Array.from(
-          { length: amount },
-          () => Math.floor(rng() * faces) + 1,
-        );
-        return new DiceRollResult(rolls, { amount, faces });
-      };
-
-      // Roll immediately with no seed
-      const result = doRoll();
-
-      // Attach .seed to the result
-      return Object.assign(result, {
-        seed: (s: number) => doRoll(s),
-      });
-    },
-  };
+export function roll(diceAmount: number): Dice {
+  return new Dice(diceAmount).d(6);
 }
 
-export function rollTwenty(seed?: number): DiceRollResult {
-  let res = roll(1).d(20);
-  if (seed) res.seed(seed);
-  return res;
+export function rollTwenty(): Dice {
+  return new Dice(1).d(20);
 }
+class Dice {
+  face: number = 6;
+  rolls: number[] = [];
+  constructor(public amount: number){}
 
-class DiceRollResult {
-  rolls: number[];
-  from: { amount: number; faces: number };
-  constructor(rolls: number[], from: { amount: number; faces: number }) {
-    this.rolls = rolls;
-    this.from = from;
+  get total() {
+    return this.rolls.reduce((acc, curr) => acc + curr, 0);
   }
 
-  get total(): number {
-    return this.rolls.reduce((acc, curr) => acc + curr, 0);
+  from() {
+    return { amount: this.amount, faces: this.face };
   }
 
   highest(): number;
@@ -49,7 +24,7 @@ class DiceRollResult {
     if (count === undefined) {
       return Math.max(...this.rolls);
     }
-    return this.rolls.sort((a, b) => b - a).slice(0, count);
+    return [...this.rolls].sort((a, b) => b - a).slice(0, count);
   }
 
   lowest(): number;
@@ -58,26 +33,36 @@ class DiceRollResult {
     if (count === undefined) {
       return Math.min(...this.rolls);
     }
-    return this.rolls.sort((a, b) => a - b).slice(0, count);
+    return [...this.rolls].sort((a, b) => a - b).slice(0, count);
   }
 
-  adv(): DiceRollResult {
-    const secondRoll = roll(this.from.amount).d(this.from.faces);
-    const chosen = this.total > secondRoll.total ? this : secondRoll;
-    return chosen;
+
+  d(face: number) {
+    if (this.amount < 1) throw new Error("Invalid dice amount");
+    if (face < 1) throw new Error("Invalid face count");
+
+    this.face = face;
+    this.rolls = [];
+    for (let i = 0; i < this.amount; i++) {
+      this.rolls.push(Math.floor(Math.random() * this.face) + 1);
+    }
+    return this
   }
 
-  dis(): DiceRollResult {
-    const secondRoll = roll(this.from.amount).d(this.from.faces);
-    const chosen = this.total < secondRoll.total ? this : secondRoll;
-    return chosen;
+  adv() {
+    const secondRoll = roll(this.amount).d(this.face);
+    if (this.total > secondRoll.total) {
+      return this;
+    }
+    return secondRoll;
   }
-}
 
-function seededRNG(seed: number): () => number {
-  let s = seed >>> 0;
-  return () => {
-    s = (1664525 * s + 1013904223) >>> 0;
-    return s / 0x100000000;
-  };
+  dis() {
+    const secondRoll = roll(this.amount).d(this.face);
+    if (this.total < secondRoll.total) {
+      return this;
+    }
+    return secondRoll;
+  }
+
 }

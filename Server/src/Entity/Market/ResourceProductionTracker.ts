@@ -1,8 +1,8 @@
-import type { 
-  ResourceType, 
-  ProductionBaselines, 
-  YearlyProduction 
+import type {
+  ProductionBaselines,
+  YearlyProduction,
 } from "./types";
+import type { ResourceType } from "../../InterFacesEnumsAndTypes/ResourceTypes";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import { calculateYearlyBaseModifier } from "./PriceModifiers";
@@ -15,6 +15,9 @@ import { locationRepository } from "../Location/Location/repository";
  * actual production vs expected baselines.
  */
 export class ResourceProductionTracker {
+  // Database row identifier for persistence
+  dbId: string | null = null;
+
   // Current year's production tracking
   yearlyProduction: YearlyProduction;
   

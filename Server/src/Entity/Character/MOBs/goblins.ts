@@ -263,7 +263,7 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
       vitality: scaleByDifficulty(5, difficulty),
       willpower: scaleByDifficulty(7, difficulty),
       planar: scaleByDifficulty(8, difficulty),
-      control: scaleByDifficulty(6, difficulty),
+      control: scaleByDifficulty(10, difficulty),
       dexterity: scaleByDifficulty(5, difficulty),
       agility: scaleByDifficulty(5, difficulty),
       strength: scaleByDifficulty(3, difficulty),
@@ -395,7 +395,11 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Goblin Cleric skills
   character.activeSkills = [
-    { id: SkillId.ChaoticBlessing, level: randomSkillLevel(difficulty), exp: 0 },
+    {
+      id: SkillId.ChaoticBlessing,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
     { id: SkillId.SpiritRattle, level: randomSkillLevel(difficulty), exp: 0 },
     { id: SkillId.HexOfRot, level: randomSkillLevel(difficulty), exp: 0 },
     { id: SkillId.MendSpirit, level: randomSkillLevel(difficulty), exp: 0 },

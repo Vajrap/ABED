@@ -4,6 +4,7 @@ import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums";
 import { statMod } from "./statMod";
 import { roll, rollTwenty } from "./Dice";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
+import Report from "./Reporter";
 
 type DamageOutPut = {
   damage: number;
@@ -26,7 +27,7 @@ export function getWeaponDamageOutput(
 
   const proficiencyBonus = statMod(actor.proficiencies.getTotal(weapon.weaponType));
   
-  console.log(`      Weapon: ${weapon.name.en} | Proficiency: ${actor.proficiencies.getTotal(weapon.weaponType)} (bonus: ${proficiencyBonus})`);
+  Report.debug(`      Weapon: ${weapon.name.en} | Proficiency: ${actor.proficiencies.getTotal(weapon.weaponType)} (bonus: ${proficiencyBonus})`);
 
   const rollStat = (statType: "Damage" | "Hit" | "Crit") => {
     const diceRoll = statType === "Damage"
@@ -37,7 +38,7 @@ export function getWeaponDamageOutput(
     const total = diceRoll + attrBonus + profBonus;
     
     if (statType === "Damage") {
-      console.log(`      Damage Roll: ${diceRoll} (${weaponDamage[`${type}DamageDice`].dice}d${weaponDamage[`${type}DamageDice`].face}) + ${attrBonus} (${weaponDamage[`${type}${statType}Stat`].join('+')}) = ${total}`);
+      Report.debug(`      Damage Roll: ${diceRoll} (${weaponDamage[`${type}DamageDice`].dice}d${weaponDamage[`${type}DamageDice`].face}) + ${attrBonus} (${weaponDamage[`${type}${statType}Stat`].join('+')}) = ${total}`);
     }
     
     return total;

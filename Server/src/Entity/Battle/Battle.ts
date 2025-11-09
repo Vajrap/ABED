@@ -12,6 +12,7 @@ import { BattleReport } from "./BattleReport";
 import { getPlayableSkill } from "./getPlayableSkill";
 import { battleTypeConfig, type BattleType } from "./types";
 import { activateBreathingSkillTurnPassive } from "../BreathingSkill/activeBreathingSkill";
+import Report from "../../Utils/Reporter";
 
 export class Battle {
   id: string;
@@ -55,10 +56,10 @@ export class Battle {
 
   async startBattle() {
     // Battle Loop should return Result of the Battle along with TurnReport[]
-    console.log("\n========== BATTLE STARTED ==========");
-    console.log(`Party A: ${this.partyA.characters.filter(c => c !== "none").map(c => c.name.en).join(", ")}`);
-    console.log(`Party B: ${this.partyB.characters.filter(c => c !== "none").map(c => c.name.en).join(", ")}`);
-    console.log("=====================================\n");
+    Report.debug("\n========== BATTLE STARTED ==========");
+    Report.debug(`Party A: ${this.partyA.characters.filter(c => c !== "none").map(c => c.name.en).join(", ")}`);
+    Report.debug(`Party B: ${this.partyB.characters.filter(c => c !== "none").map(c => c.name.en).join(", ")}`);
+    Report.debug("=====================================\n");
 
     await this.battleLoop();
   }
@@ -73,14 +74,14 @@ export class Battle {
     while (this.isOngoing) {
       if (turnCount >= 100) {
         this.isOngoing = false;
-        console.log(`\n--- Battle ended due to turn limit (100 turns) ---`);
-        console.log(`Party A survivors:`);
+        Report.debug(`\n--- Battle ended due to turn limit (100 turns) ---`);
+        Report.debug(`Party A survivors:`);
         this.partyA.characters.filter(c => c !== "none").forEach(c => {
-          console.log(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
+          Report.debug(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
         });
-        console.log(`Party B survivors:`);
+        Report.debug(`Party B survivors:`);
         this.partyB.characters.filter(c => c !== "none").forEach(c => {
-          console.log(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
+          Report.debug(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
         });
         break;
       }
@@ -92,13 +93,13 @@ export class Battle {
 
         if (updateAbGaugeAndDecideTurnTaking(actor)) {
           turnCount++;
-          console.log(`\n--- Turn ${turnCount} ---`);
-          console.log(`${actor.name.en} (HP: ${actor.vitals.hp.current}/${actor.vitals.hp.max}) takes turn`);
+          Report.debug(`\n--- Turn ${turnCount} ---`);
+          Report.debug(`${actor.name.en} (HP: ${actor.vitals.hp.current}/${actor.vitals.hp.max}) takes turn`);
 
           const canTakeTurn = resolveBuffAndDebuff(actor);
           if (canTakeTurn.ableToTakesTurn) {
             const actorTurnResult = this.startActorTurn(actor);
-            console.log(`→ ${actorTurnResult.content.en}`);
+            Report.debug(`→ ${actorTurnResult.content.en}`);
             this.battleReport.addTurnResult(actorTurnResult);
 
             this.allParticipants.push(
@@ -116,7 +117,7 @@ export class Battle {
               },
               targets: []
             }
-            console.log(`→ ${turnResult.content.en}`);
+            Report.debug(`→ ${turnResult.content.en}`);
             this.battleReport.addTurnResult(turnResult);
           }
 
@@ -128,16 +129,16 @@ export class Battle {
             this.isOngoing = false;
 
             // Log remaining HP for all characters
-            console.log(`\n--- Battle End ---`);
-            console.log(`Party A survivors:`);
+            Report.debug(`\n--- Battle End ---`);
+            Report.debug(`Party A survivors:`);
             this.partyA.characters.filter(c => c !== "none").forEach(c => {
-              console.log(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
+              Report.debug(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
             });
-            console.log(`Party B survivors:`);
+            Report.debug(`Party B survivors:`);
             this.partyB.characters.filter(c => c !== "none").forEach(c => {
-              console.log(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
+              Report.debug(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
             });
-            console.log(`Winning party: ${battleStatus.winner?.leader.name.en}'s party`);
+            Report.debug(`Winning party: ${battleStatus.winner?.leader.name.en}'s party`);
 
             this.handleBattleEnd(battleStatus);
             this.battleReport.setOutcome(
@@ -166,12 +167,12 @@ export class Battle {
     actor.replenishResource();
 
     // Log current resources
-    console.log(`  Resources: HP ${actor.vitals.hp.current}/${actor.vitals.hp.max} | MP ${actor.vitals.mp.current}/${actor.vitals.mp.max} | SP ${actor.vitals.sp.current}/${actor.vitals.sp.max}`);
+    Report.debug(`  Resources: HP ${actor.vitals.hp.current}/${actor.vitals.hp.max} | MP ${actor.vitals.mp.current}/${actor.vitals.mp.max} | SP ${actor.vitals.sp.current}/${actor.vitals.sp.max}`);
     const elementResources = Object.entries(actor.resources)
       .filter(([_, value]) => value > 0)
       .map(([key, value]) => `${key}=${value}`)
       .join(' ');
-    if (elementResources) console.log(`  Elemental Resources: ${elementResources}`);
+    if (elementResources) Report.debug(`  Elemental Resources: ${elementResources}`);
 
     // Determine which party the actor belongs to (needed for conditional deck check)
     const isPartyA = this.partyA.characters.includes(actor);
@@ -179,7 +180,7 @@ export class Battle {
 
     // Check: If a character can play any cards
     const {skill, skillLevel} = getPlayableSkill(actor, actorParty);
-    console.log(`  Selected Skill: ${skill.name.en} (Level ${skillLevel})`);
+    Report.debug(`  Selected Skill: ${skill.name.en} (Level ${skillLevel})`);
     // Consume Resource
     for (const consume of skill.consume.elements) {
       actor.resources[consume.element] -= consume.value;
@@ -228,12 +229,12 @@ export class Battle {
     const allPartyBDead = this.partyB.isAllDead();
 
     if (allPartyADead && allPartyBDead) {
-      console.log(`Both parties are dead. The battle ends in a draw.`);
+      Report.debug(`Both parties are dead. The battle ends in a draw.`);
       return { status: BattleStatus.DRAW_END };
     }
 
     if (allPartyADead) {
-      console.log(`Party A is dead. Party B wins.`);
+      Report.debug(`Party A is dead. Party B wins.`);
       return {
         status: BattleStatus.END,
         winner: this.partyB,
@@ -242,7 +243,7 @@ export class Battle {
     }
 
     if (allPartyBDead) {
-      console.log(`Party B is dead. Party A wins.`);
+      Report.debug(`Party B is dead. Party A wins.`);
       return {
         status: BattleStatus.END,
         winner: this.partyA,

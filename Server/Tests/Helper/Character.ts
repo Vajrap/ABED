@@ -75,6 +75,7 @@ export class CharacterFactory {
       attribute: new CharacterAttributes(),
       battleStats: new CharacterBattleStats(),
       proficiencies: new CharacterProficiencies(),
+      saveRolls: new CharacterAttributes(),
       elements: new CharacterElements(),
       needs: new CharacterNeeds(),
       vitals: new CharacterVitals({}),

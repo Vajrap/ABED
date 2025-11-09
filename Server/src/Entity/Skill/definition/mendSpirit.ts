@@ -2,7 +2,6 @@ import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SkillId } from "../enums";
 import { Skill } from "../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
 import { ActorEffect, TargetEffect } from "../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { roll, rollTwenty } from "src/Utils/Dice";
@@ -46,7 +45,6 @@ export const mendSpirit = new Skill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    // Find injured allies (HP < max)
     let injuredAllies = actorParty.filter(
       (ally) => ally.vitals.hp.current < ally.vitals.hp.max && !ally.vitals.isDead
     );

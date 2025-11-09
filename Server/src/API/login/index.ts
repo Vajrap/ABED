@@ -8,14 +8,16 @@ import { CharacterService } from "../../Services/CharacterService";
 export const loginRoutes = express.Router();
 
 loginRoutes.post("/", async (req: Request, res: Response) => {
-  console.log("🔥 LOGIN ROUTE HIT!");
-  Report.info("Login request received");
-  Report.info(`Body received: ${JSON.stringify(req.body)}`);
-  
+  Report.debug("Login request received", {
+    route: "/login",
+    ip: req.ip,
+  });
+
   if (!isBodyValid(UserLoginSchema, req.body)) {
-    Report.error(
-      `Wrong message type in Login Schema with body ${JSON.stringify(req.body)}`,
-    );
+    Report.warn("Login payload failed validation", {
+      route: "/login",
+      bodyShape: Object.keys(req.body ?? {}).sort(),
+    });
     return res.json({ success: false, messageKey: "loginPage.loginError" });
   }
 
@@ -24,11 +26,18 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
   try {
     const user = await UserService.getUserByUsername(validatedBody.username);
     if (!user) {
+      Report.warn("Login attempt for unknown user", {
+        username: validatedBody.username,
+      });
       return res.json({ success: false, messageKey: "loginPage.userNotFound" });
     }
 
     // TODO: Add password verification (bcrypt)
     if (user.password !== validatedBody.password) {
+      Report.warn("Login attempt with invalid credentials", {
+        userId: user.id,
+        username: user.username,
+      });
       return res.json({ success: false, messageKey: "loginPage.invalidCredentials" });
     }
 
@@ -43,21 +52,27 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
       ipAddress
     );
 
-    Report.info(`User ${user.username} logged in successfully with session ${session.id}`);
-
     // Check if user has a character (don't send character data, just a flag)
     const character = await CharacterService.getUserCharacter(user.id);
     const hasCharacter = character !== null;
-    
-    Report.info(`User ${user.username} has character: ${hasCharacter}`);
-    
-    return res.json({ 
-      success: true, 
+
+    Report.info("User logged in successfully", {
+      userId: user.id,
+      username: user.username,
+      sessionId: session.id,
+      hasCharacter,
+    });
+
+    return res.json({
+      success: true,
       hasCharacter, // Boolean flag - FE will fetch character data on game page if needed
       token,
     });
   } catch (error) {
-    Report.error(`Login error: ${error}`);
+    Report.error("Login error", {
+      error,
+      username: req.body?.username,
+    });
     return res.json({ success: false, messageKey: "loginPage.networkError" });
   }
 });

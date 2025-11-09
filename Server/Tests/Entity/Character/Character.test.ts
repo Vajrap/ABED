@@ -14,14 +14,12 @@ import { CharacterFame } from "../../../src/Entity/Character/Subclass/Fame/Chara
 import {
   ActionInput,
   defaultActionSequence,
-  type CharacterActionSequence,
 } from "../../../src/Entity/Character/Subclass/Action/CharacterAction";
 import {
   DayOfWeek,
   TimeOfDay,
 } from "../../../src/InterFacesEnumsAndTypes/Time";
 import { BuffsAndDebuffsEnum } from "../../../src/Entity/BuffsAndDebuffs/enum";
-import { SubRegionEnum } from "../../../src/InterFacesEnumsAndTypes/Enums/SubRegion";
 
 describe("Character", () => {
   describe("Constructor", () => {
@@ -34,6 +32,7 @@ describe("Character", () => {
       const battleStats = new CharacterBattleStats();
       const elements = new CharacterElements();
       const proficiencies = new CharacterProficiencies();
+      const saveRolls = new CharacterAttributes();
       const artisans = new CharacterArtisans();
       const needs = new CharacterNeeds();
       const vitals = new CharacterVitals({});
@@ -51,6 +50,7 @@ describe("Character", () => {
         battleStats,
         elements,
         proficiencies,
+        saveRolls,
         needs,
         vitals,
         fame,
@@ -82,6 +82,7 @@ describe("Character", () => {
         alignment: new CharacterAlignment({}),
         artisans: new CharacterArtisans(),
         attribute: new CharacterAttributes(),
+        saveRolls: new CharacterAttributes(),
         battleStats: new CharacterBattleStats(),
         elements: new CharacterElements(),
         proficiencies: new CharacterProficiencies(),
@@ -119,6 +120,7 @@ describe("Character", () => {
           alignment: new CharacterAlignment({}),
           artisans: new CharacterArtisans(),
           attribute: new CharacterAttributes(),
+          saveRolls: new CharacterAttributes(),
           battleStats: new CharacterBattleStats(),
           elements: new CharacterElements(),
           proficiencies: new CharacterProficiencies(),
@@ -145,6 +147,7 @@ describe("Character", () => {
           alignment: new CharacterAlignment({}),
           artisans: new CharacterArtisans(),
           attribute: new CharacterAttributes(),
+          saveRolls: new CharacterAttributes(),
           battleStats: new CharacterBattleStats(),
           elements: new CharacterElements(),
           proficiencies: new CharacterProficiencies(),
@@ -201,6 +204,7 @@ describe("Character", () => {
         alignment: new CharacterAlignment({}),
         artisans: new CharacterArtisans(),
         attribute: new CharacterAttributes(),
+        saveRolls: new CharacterAttributes(),
         battleStats: new CharacterBattleStats(),
         elements: new CharacterElements(),
         proficiencies: new CharacterProficiencies(),
@@ -525,6 +529,7 @@ describe("Character", () => {
         alignment: customAlignment,
         artisans: new CharacterArtisans(),
         attribute: customAttributes,
+        saveRolls: new CharacterAttributes(),
         battleStats: new CharacterBattleStats(),
         elements: new CharacterElements(),
         proficiencies: new CharacterProficiencies(),

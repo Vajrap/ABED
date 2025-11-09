@@ -1,4 +1,4 @@
-import type { Equipment } from "./Equipment";
+import { Equipment } from "./Equipment";
 import type { EquipmentId } from "./types";
 import { Weapon } from "./Weapon";
 import { WeaponId } from "./Weapon/type";
@@ -12,6 +12,7 @@ import { earRepository } from "./Armor/Ear/repository";
 import { necklaceRepository } from "./Armor/Neck/repository";
 import { ringRepository } from "./Armor/Ring/repository";
 import { utilRepository } from "./Armor/Util/repository";
+import { getItemInstance } from "./ItemInstance/repository";
 
 export const equipmentRepository: Record<EquipmentId, Equipment> = {
   // Weapons
@@ -29,9 +30,16 @@ export const equipmentRepository: Record<EquipmentId, Equipment> = {
   ...utilRepository,
 };
 
-export function getEquipment(id: EquipmentId): Equipment | null {
-  const equipment = equipmentRepository[id];
-  return equipment ?? null;
+export function getEquipment(id: EquipmentId | string): Equipment | null {
+  const equipment = equipmentRepository[id as EquipmentId];
+  if (equipment) {
+    return equipment;
+  }
+  const instance = getItemInstance(id as string);
+  if (instance) {
+    return instance
+  }
+  return null;
 }
 
 export function getWeaponFromRepository(id: WeaponId) {

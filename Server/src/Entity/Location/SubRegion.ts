@@ -10,6 +10,7 @@ import {
 import type { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import type { WeatherInterpreter } from "./Weather/types";
+import Report from "../../Utils/Reporter";
 
 export class SubRegion {
   id: SubRegionEnum;
@@ -61,20 +62,22 @@ export class SubRegion {
   }
 
   handleDailyWeatherUpdate(): News[] {
-    console.log(`  Drawing weather card for ${this.id}`);
+    Report.debug(`  Drawing weather card for ${this.id}`);
     const card = this.drawWeatherCard();
-    console.log(`  Weather card drawn: value=${card.value}`);
+    Report.debug(`  Weather card drawn: value=${card.value}`);
 
     let allNews = [];
 
-    console.log(`  Processing ${this.locations.length} locations:`, this.locations);
+    Report.debug(`  Processing ${this.locations.length} locations`, {
+      locations: this.locations,
+    });
 
     for (const locaEnum of this.locations) {
       // Lazy import to avoid circular dependency
       const { locationRepository } = require("./Location/repository");
       const location = locationRepository[locaEnum];
       if (!location) {
-        console.log(`  WARNING: Location ${locaEnum} not found in repository`);
+        Report.warn(`  Location ${locaEnum} not found in repository`);
         continue;
       }
       
@@ -82,7 +85,7 @@ export class SubRegion {
       const oldWeatherScale = location.weatherScale;
       location.weatherScale += updateVal;
       
-      console.log(`  Location ${locaEnum}: weather scale ${oldWeatherScale} -> ${location.weatherScale} (change: +${updateVal})`);
+      Report.debug(`  Location ${locaEnum}: weather scale ${oldWeatherScale} -> ${location.weatherScale} (change: +${updateVal})`);
 
       const news = createNews({
         scope: {
@@ -105,7 +108,7 @@ export class SubRegion {
       allNews.push(news);
     }
 
-    console.log(`  Generated ${allNews.length} weather news items for ${this.id}`);
+    Report.debug(`  Generated ${allNews.length} weather news items for ${this.id}`);
     return allNews;
   }
 

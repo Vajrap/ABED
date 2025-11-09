@@ -1,17 +1,17 @@
 import { BodyId } from "../type";
 import type { Body } from "./Body";
-import { chainMail } from "./definition/ChainMail";
-import { chainShirt } from "./definition/ChainShirt";
-import { hideArmor } from "./definition/HideArmor";
+import { chainMail } from "./definition/chainMail";
+import { chainShirt } from "./definition/chainShirt";
+import { hideArmor } from "./definition/hideArmor";
 import { leatherArmor } from "./definition/leatherArmor";
-import { mageRobe } from "./definition/MageRobe";
+import { mageRobe } from "./definition/mageRobe";
 import { paddedArmor } from "./definition/paddedArmor";
-import { plateArmor } from "./definition/PlateMail";
-import { robe } from "./definition/Robe";
-import { scaleMail } from "./definition/ScaleMail";
-import { splintMail } from "./definition/SplintMail";
+import { plateArmor } from "./definition/plateMail";
+import { robe } from "./definition/robe";
+import { scaleMail } from "./definition/scaleMail";
+import { splintMail } from "./definition/splintMail";
 import { studdedLeatherArmor } from "./definition/studdedLeatherArmor";
-import { tunic } from "./definition/Tunic";
+import { tunic } from "./definition/tunic";
 
 export const bodyRepository: Record<BodyId, Body> = {
   [BodyId.PaddedArmor]: paddedArmor,

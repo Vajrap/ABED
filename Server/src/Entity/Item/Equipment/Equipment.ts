@@ -2,7 +2,7 @@ import {
   CharacterEquipmentSlot,
   EquipmentSlot,
 } from "../../../InterFacesEnumsAndTypes/Enums";
-import { Item } from "../Item";
+import { Item, type ItemDefinition } from "../Item";
 import type { EquipmentId } from "./types";
 import { type EquipmentModifier } from "./type";
 
@@ -13,7 +13,7 @@ export class Equipment extends Item {
   modifier: EquipmentModifier;
 
   constructor(
-    data: Item,
+    data: ItemDefinition,
     slot: EquipmentSlot,
     modifier: EquipmentModifier,
   ) {

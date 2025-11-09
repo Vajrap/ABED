@@ -22,7 +22,7 @@ export const panicSlash = new Skill({
     th: "การโจมตีระยะประชิดแบบไม่คิดหน้าคิดหลัง สร้างความเสียหายกายภาพ 1.0× (+เลเวบของสกิล) โอกาสโจมตีโดนลดลง 4 แต่โอกาสเกิดคริติคอลเพิ่มขึ้น 2",
   },
   requirement: {},
-  equipmentNeeded: ["dagger", "sword", "machete"], // Melee weapons
+  equipmentNeeded: ["dagger", "sword", 'axe'], // Melee weapons
   tier: TierEnum.common,
   consume: {
     hp: 0,

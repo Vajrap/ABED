@@ -1,4 +1,3 @@
-import { config } from "dotenv";
 import { GameTime } from "./GameTime/GameTime";
 import type { DayOfWeek, TimeOfDay } from "../InterFacesEnumsAndTypes/Time";
 import {
@@ -16,77 +15,91 @@ import { drawGlobalEventCard } from "../Event/drawGlobalEventCard.ts";
 import { drawRegionEventCard } from "../Event/drawRegionEventCard.ts";
 import { market } from "../Entity/Market/Market.ts";
 import { newsArchiveService } from "../Entity/News/NewsArchive";
+import { getGameLoopMode } from "../config/gameLoop";
+import { persistLastProcessedPhase } from "../Database/gameStateStore";
+import { saveDailyState } from "../Database/persistence";
+
+type RunGameLoopOptions = {
+  now?: Date;
+  force?: boolean;
+  label?: string;
+};
+
+type ProcessPhaseOptions = RunGameLoopOptions & {
+  label: string;
+  skipBacklog?: boolean;
+};
+
+const loopMetrics = {
+  totalRuns: 0,
+  successfulRuns: 0,
+  skippedRuns: 0,
+  failedRuns: 0,
+  lastDurationMs: 0,
+};
+
+const nowMs = () =>
+  typeof performance !== "undefined" && typeof performance.now === "function"
+    ? performance.now()
+    : Date.now();
+
+let runQueue: Promise<void> = Promise.resolve();
 
 export async function runSchedule() {
+  const mode = getGameLoopMode();
+
+  if (mode !== "prod") {
+    Report.info(
+      `Game loop scheduler disabled (mode=${mode}). Use manual trigger to advance phases.`,
+    );
+    GameTime.synchronize();
+    return;
+  }
+
+  try {
+    await runGameLoop({ label: "startup" });
+  } catch (error) {
+    Report.error("Initial game loop run failed during scheduler start", {
+      error,
+    });
+  }
+
+  scheduleNextTick();
+}
+
+function scheduleNextTick() {
   const now = new Date();
-
-  const nextScheduledTime = nextScheduleTick(now);
-
-  const delay = nextScheduledTime.getTime() - now.getTime();
+  const delay = GameTime.timeUntilNextPhase(now);
+  const nextRun = new Date(now.getTime() + delay);
 
   Report.info(
-    `Next game loop scheduled for ${nextScheduledTime.toLocaleTimeString()}`,
+    `Next game loop scheduled for ${nextRun.toLocaleTimeString()} (in ${Math.round(
+      delay / 1000,
+    )}s)`,
   );
 
   setTimeout(async () => {
-    await runGameLoop();
-    await runSchedule();
+    try {
+      await runGameLoop();
+    } catch (error) {
+      Report.error("Scheduled game loop run failed", { error });
+    } finally {
+      scheduleNextTick();
+    }
   }, delay);
 }
 
-async function runGameLoop() {
-  try {
-    console.log("\n=== GAME LOOP START ===");
-    console.log(
-      `Current Game Time: Year ${GameTime.year}, Season ${GameTime.season}, Day ${GameTime.dayOfSeason}, Hour ${GameTime.hour}`,
-    );
-
-    GameTime.advanceOnePhrase();
-    console.log(
-      `Advanced to: Year ${GameTime.year}, Season ${GameTime.season}, Day ${GameTime.dayOfSeason}, Hour ${GameTime.hour}`,
-    );
-
-    console.log("\n--- Processing Milestones ---");
-    const mileStoneNews = await handleGameMilestones();
-
-    console.log("\n--- Processing Events ---");
-    const news = await processEvents(
-      GameTime.getCurrentGameDayOfWeek(),
-      GameTime.getCurrentGamePhase(),
-    );
-
-    const allNews = mergeNewsStructures(news, mileStoneNews);
-
-    // TODO: Archivers should record the news here
-
-    await sendPartyData(allNews);
-    console.log("Game loop executed successfully.");
-    console.log("=== GAME LOOP END ===\n");
-  } catch (error) {
-    console.error("Error during game loop:", error);
-  }
+export async function runGameLoop(options: RunGameLoopOptions = {}) {
+  const label = options.label ?? "scheduled";
+  const task = () =>
+    processPhaseInternal({
+      ...options,
+      label,
+    });
+  const taskPromise = runQueue.then(task);
+  runQueue = taskPromise.catch(() => {});
+  await taskPromise;
 }
-
-const nextScheduleTick = (now: Date) => {
-  // config();
-  // const isTestMode = process.env.TEST_MODE === "true";
-
-  const isTestMode = true;
-
-  if (isTestMode) {
-    return new Date(now.getTime() + 10_000);
-  } else {
-    return new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      now.getHours(),
-      now.getMinutes() + (15 - (now.getMinutes() % 15)),
-      0,
-      0,
-    );
-  }
-};
 
 async function handleGameMilestones(): Promise<NewsDistribution> {
   const { hour, dayOfSeason, season } = GameTime;
@@ -141,21 +154,18 @@ async function handleGameMilestones(): Promise<NewsDistribution> {
   }
 
   if (hour === 1) {
-    console.log("  New day milestone triggered");
-
     // Save
     // await newsArchiveService.saveToDatabase();
     // save things to database here
     // News, Character, Party, Location, SubRegion, Region, Weather, Event Card, Game State, too much to think now
-
+    //
     // Check if global event card is completed
     if (gameState.activeGlobalEventCards?.completionCondition()) {
-      console.log("  Global event card completed");
       // Call cleanup handler before marking as complete
       if (gameState.activeGlobalEventCards.onEnd) {
         gameState.activeGlobalEventCards.onEnd();
         Report.info(
-          `Global event "${gameState.activeGlobalEventCards.name}" ended, cleanup executed`,
+          `Global event "${gameState.activeGlobalEventCards.name}" has ended.`,
         );
       }
       gameState.lastGlobalEventCardCompleted = true;
@@ -166,21 +176,16 @@ async function handleGameMilestones(): Promise<NewsDistribution> {
     }
 
     // News propagation and decay
-    console.log("  Processing news spread and decay");
     newsArchiveService.dailySpread();
     newsArchiveService.dailyDecay();
 
-    // Save news to database
+    await saveDailyState();
 
     // New day
     // Draw weather cards for all subregions update accordingly
-    console.log("  Drawing weather cards for all subregions");
     const weatherNews = drawSubRegionsWeatherCard();
     const weatherStruct = newsArrayToStructure(weatherNews);
     allNews = mergeNewsStructures(allNews, weatherStruct);
-    console.log(`  Weather news merged into milestone news`);
-  } else {
-    console.log(`  Not a new day (hour=${hour}), skipping weather cards`);
   }
 
   return allNews;
@@ -190,21 +195,18 @@ async function processEvents(
   day: DayOfWeek,
   phase: TimeOfDay,
 ): Promise<NewsDistribution> {
-  console.log(`  Processing events for day=${day}, phase=${phase}`);
+  Report.info(`Processing events for day=${day}, phase=${phase}`);
 
-  console.log("  Processing encounters...");
   const enc: NewsDistribution = await locationManager.processEncounters(
     day,
     phase,
   );
 
-  console.log("  Processing actions...");
   const act: NewsDistribution = await locationManager.processActions(
     day,
     phase,
   );
 
-  console.log("  Processing travel...");
   const tra: NewsDistribution = await travelManager.allTravel(day, phase);
 
   const merged = mergeNewsStructures(enc, act, tra);
@@ -214,4 +216,88 @@ async function processEvents(
 
 async function sendPartyData(news: NewsDistribution) {
   postman.deliver(news);
+}
+
+async function processPhaseInternal(options: ProcessPhaseOptions): Promise<void> {
+  const now = options.now ?? new Date();
+  const force = options.force ?? false;
+  const label = options.label;
+  const skipBacklog = options.skipBacklog ?? false;
+
+  GameTime.synchronize(now);
+
+  if (!skipBacklog && !force) {
+    const lastProcessed = GameTime.getLastProcessedPhaseIndex();
+    const currentPhase = GameTime.getCurrentPhaseIndex();
+    let nextPhaseToProcess =
+      lastProcessed === null ? currentPhase : lastProcessed + 1;
+
+    while (nextPhaseToProcess < currentPhase) {
+      const timestamp = GameTime.computePhaseTimestamp(nextPhaseToProcess);
+      await processPhaseInternal({
+        now: timestamp,
+        force: true,
+        label: "catch-up",
+        skipBacklog: true,
+      });
+      nextPhaseToProcess++;
+    }
+
+    // Resync after catch-up to ensure we're positioned at the current phase
+    GameTime.synchronize(now);
+  }
+
+  const shouldProcess = GameTime.markCurrentPhaseProcessed(force);
+  if (!shouldProcess) {
+    loopMetrics.skippedRuns++;
+    Report.debug("Skipping game loop; phase already processed", {
+      phaseIndex: GameTime.getCurrentPhaseIndex(),
+      trigger: label,
+    });
+    return;
+  }
+
+  loopMetrics.totalRuns++;
+  const startMs = nowMs();
+
+  try {
+    Report.info(
+      `Processing Game Loop @ ${now.toISOString()} (phase=${GameTime.getCurrentPhaseIndex()}, trigger=${label})`,
+    );
+    Report.info(
+      `Current Game Time: Year ${GameTime.year}, Season ${GameTime.season}, Day ${GameTime.dayOfSeason}, Hour ${GameTime.hour}`,
+    );
+
+    const mileStoneNews = await handleGameMilestones();
+
+    const news = await processEvents(
+      GameTime.getCurrentGameDayOfWeek(),
+      GameTime.getCurrentGamePhase(),
+    );
+
+    const allNews = mergeNewsStructures(news, mileStoneNews);
+
+    // TODO: Archivers should record the news here
+
+    await sendPartyData(allNews);
+    await persistLastProcessedPhase(GameTime.getCurrentPhaseIndex());
+
+    loopMetrics.successfulRuns++;
+    loopMetrics.lastDurationMs = Math.round(nowMs() - startMs);
+    Report.info(
+      `Game loop completed (phase=${GameTime.getCurrentPhaseIndex()}, trigger=${label}, duration=${loopMetrics.lastDurationMs}ms)`,
+    );
+  } catch (error) {
+    loopMetrics.failedRuns++;
+    loopMetrics.lastDurationMs = Math.round(nowMs() - startMs);
+    Report.error("Error during game loop", {
+      error,
+      phaseIndex: GameTime.getCurrentPhaseIndex(),
+      trigger: label,
+      durationMs: loopMetrics.lastDurationMs,
+    });
+    throw error;
+  }
+
+  Report.debug("Game loop metrics", { ...loopMetrics });
 }

@@ -6,17 +6,16 @@ import { UserService, CreateUserSchema } from "../../Entity/User/index";
 export const registerRoutes = express.Router();
 
 registerRoutes.post("/", async (req: Request, res: Response) => {
-  console.log("🔥 REGISTER ROUTE HIT!");
-  Report.info("Register request received");
-  Report.info(`Body received: ${JSON.stringify(req.body)}`);
-  
-  const validation = CreateUserSchema.safeParse(req.body);
-  Report.info(`Validation result: ${JSON.stringify(validation)}`);
-  
+  Report.debug("Register request received", {
+    route: "/register",
+    ip: req.ip,
+  });
+
   if (!isBodyValid(CreateUserSchema, req.body)) {
-    Report.error(
-      `Wrong message type in Registration Schema with body ${JSON.stringify(req.body)}`,
-    );
+    Report.warn("Register payload failed validation", {
+      route: "/register",
+      bodyShape: Object.keys(req.body ?? {}).sort(),
+    });
     return res.json({ success: false, messageKey: "registerPage.registrationError" });
   }
 
@@ -32,6 +31,9 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
       validatedBody.username,
     );
     if (existingUser) {
+      Report.warn("Registration attempted with taken username", {
+        username: validatedBody.username,
+      });
       return res.json({ success: false, messageKey: "registerPage.usernameTaken" });
     }
 
@@ -40,10 +42,16 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
       ...validatedBody,
     });
 
-    Report.info(`New user registered: ${newUser.username}`);
+    Report.info("New user registered", {
+      userId: newUser.id,
+      username: newUser.username,
+    });
     return res.json({ success: true, userId: newUser.id, username: newUser.username });
   } catch (error) {
-    Report.error(`Registration error: ${error}`);
+    Report.error("Registration error", {
+      error,
+      username: req.body?.username,
+    });
     return res.json({ success: false, messageKey: "registerPage.networkError" });
   }
 });

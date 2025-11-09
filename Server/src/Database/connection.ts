@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import Report from "../Utils/Reporter";
 
 // Database configuration
 const DATABASE_URL =
@@ -28,10 +29,10 @@ export const testConnection = async (): Promise<boolean> => {
     const client = await pool.connect();
     await client.query("SELECT 1");
     client.release();
-    console.log("✅ Database connection successful");
+    Report.info("✅ Database connection successful");
     return true;
   } catch (error) {
-    console.error("❌ Database connection failed:", error);
+    Report.error("❌ Database connection failed", { error });
     return false;
   }
 };
@@ -40,9 +41,9 @@ export const testConnection = async (): Promise<boolean> => {
 export const closeConnection = async (): Promise<void> => {
   try {
     await pool.end();
-    console.log("🔌 Database connection closed");
+    Report.info("🔌 Database connection closed");
   } catch (error) {
-    console.error("❌ Error closing database connection:", error);
+    Report.error("❌ Error closing database connection", { error });
   }
 };
 

@@ -26,7 +26,7 @@ export const merchantCaravan = new RegionEventCard({
     th: "คาราวานพ่อค้า"
   },
   globalEventScale: 10,
-  targetRegions: [RegionEnum.CentralPlain, RegionEnum.SouthernShore],
+  targetRegions: [RegionEnum.CentralPlain], //, RegionEnum.SouthernShore],
   description,
   onDraw: () => {
     const centralPlainNews = createNews({
@@ -47,11 +47,13 @@ export const merchantCaravan = new RegionEventCard({
     const southernShoreNews = createNews({
       scope: {
         kind: "regionScope",
-        region: RegionEnum.SouthernShore
+        // region: RegionEnum.SouthernShore
+        region: RegionEnum.CentralPlain
       },
       content: L10N(newsSouthernShore),
       context: {
-        region: RegionEnum.SouthernShore,
+        // region: RegionEnum.SouthernShore,
+        region: RegionEnum.CentralPlain,
         subRegion: undefined as any,
         location: undefined as any,
         partyId: "",

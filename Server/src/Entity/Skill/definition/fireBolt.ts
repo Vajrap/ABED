@@ -20,8 +20,8 @@ export const fireBolt = new Skill({
     th: "ลูกไฟ",
   },
   description: {
-    en: "Unleash a focused spark of fire toward an enemy. Deals 1d4 + Planar modifier + 0.5× Skill Level as Fire damage. On hit, roll DC 13 to apply 1–2 Burn stacks to enemy.",
-    th: "ปล่อยประกายไฟพุ่งใส่ศัตรู สร้างความเสียหาย 1d4 + ค่าพลังเวท (Planar) + 0.5×เลเวลสกิล เป็นความเสียหายประเภทไฟ หลังโจมตีโดน ทอย DC 13 เพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่ศัตรู",
+    en: "Unleash a focused spark of fire toward an enemy. Deals 1d6 + Planar modifier + 0.5× Skill Level as Fire damage. On hit, roll DC 13 to apply 1–2 Burn stacks to enemy.",
+    th: "ปล่อยประกายไฟพุ่งใส่ศัตรู สร้างความเสียหาย 1d6 + ค่าพลังเวท (Planar) + 0.5×เลเวลสกิล เป็นความเสียหายประเภทไฟ หลังโจมตีโดน ทอย DC 13 เพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่ศัตรู",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -73,7 +73,7 @@ export const fireBolt = new Skill({
     const luckMod = statMod(actor.attribute.getTotal("luck"));
 
     // Calculate base damage
-    const baseDiceDamage = roll(4).d(1).total;
+    const baseDiceDamage = roll(1).d(6).total;
     const skillLevelBonus = 0.5 * skillLevel;
     const totalDamage = Math.max(
       0,
@@ -109,7 +109,12 @@ export const fireBolt = new Skill({
       if (burnRoll <= 13) {
         const burnStacks = roll(2).d(1).total; // 1-2 stacks
         // Actually apply the burn debuff
-        const burnResult = buffsAndDebuffsRepository.burn.appender(target, burnStacks, false, 0);
+        const burnResult = buffsAndDebuffsRepository.burn.appender(
+          target,
+          burnStacks,
+          false,
+          0,
+        );
         burnMessage = burnResult.en;
       }
     }

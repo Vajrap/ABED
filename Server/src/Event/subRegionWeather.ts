@@ -1,21 +1,21 @@
 import { subregionRepository } from "src/Entity/Location/SubRegion/repository.ts";
-import type {News} from "../Entity/News/News.ts";
-
+import type { News } from "../Entity/News/News.ts";
+import Report from "../Utils/Reporter";
 
 export const drawSubRegionsWeatherCard = (): News[] => {
-    console.log("\n--- Drawing Weather Cards ---");
-    let news: News[] = [];
+  Report.debug("\n--- Drawing Weather Cards ---");
+  let news: News[] = [];
 
-    const subRegions = Object.values(subregionRepository);
-    console.log(`Found ${subRegions.length} subregions:`, subRegions.map(sr => sr.id));
+  const subRegions = Object.values(subregionRepository);
+  Report.debug(`Found ${subRegions.length} subregions`, subRegions.map(sr => sr.id));
 
-    for (const subRegion of subRegions) {
-        console.log(`Processing weather for subregion: ${subRegion.id}`);
-        const allNews = subRegion.handleDailyWeatherUpdate();
-        console.log(`Generated ${allNews.length} weather news items for ${subRegion.id}`);
-        news.push(...allNews);
-    }
+  for (const subRegion of subRegions) {
+    Report.debug(`Processing weather for subregion: ${subRegion.id}`);
+    const allNews = subRegion.handleDailyWeatherUpdate();
+    Report.debug(`Generated ${allNews.length} weather news items for ${subRegion.id}`);
+    news.push(...allNews);
+  }
 
-    console.log(`Total weather news generated: ${news.length}`);
-    return news;
-}
+  Report.debug(`Total weather news generated: ${news.length}`);
+  return news;
+};

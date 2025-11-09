@@ -3,8 +3,11 @@ import type { GlobalEventCard } from "../Entity/Card/GlobalEventCard/GlobalEvent
 import type { News, NewsDistribution } from "../Entity/News/News";
 import { regionEventCardDeck } from "../Entity/Card/RegionEventCard/definitions";
 import type { RegionEventCard } from "../Entity/Card/RegionEventCard/RegionEventCard";
+import Report from "../Utils/Reporter";
 
 export class GameState {
+  id: string | null;
+
   // Global Event Cards
   lastGlobalEventCardCompleted: boolean;
   activeGlobalEventCards: GlobalEventCard | undefined;
@@ -18,7 +21,11 @@ export class GameState {
   // Global Event Scale (0-250)
   globalEventScale: number;
 
+  // Loop progression
+  lastProcessedPhaseIndex: number;
+
   constructor(data?: GameState) {
+    this.id = data?.id ?? null;
     this.lastGlobalEventCardCompleted =
       data?.lastGlobalEventCardCompleted ?? false;
     this.activeGlobalEventCards = data?.activeGlobalEventCards ?? undefined;
@@ -30,28 +37,29 @@ export class GameState {
     ];
     this.completedRegionEventCards = data?.completedRegionEventCards ?? [];
     this.globalEventScale = data?.globalEventScale ?? 0;
+    this.lastProcessedPhaseIndex = data?.lastProcessedPhaseIndex ?? 0;
   }
 
   // TODO: Rethink, some global event shouln't reappear, especially the story-line events
   drawGlobalCard(): NewsDistribution | undefined {
-    console.log("Drawing global event card");
+    Report.debug("Drawing global event card");
     if (this.globalEventCardDeck.length === 0) {
       this.reshuffleGlobalEventCardDeck();
     }
     const card = this.globalEventCardDeck.pop()!;
     this.activeGlobalEventCards = card;
-    console.log(`Get Card: ${card.name}`);
+    Report.debug(`Get Card: ${card.name}`);
     return card.onDraw?.();
   }
 
   drawRegionCard(): NewsDistribution | null {
-    console.log("Drawing region event card");
+    Report.debug("Drawing region event card");
     if (this.regionEventCardDeck.length === 0) {
       this.reshuffleRegionEventCardDeck();
     }
 
     const card = this.regionEventCardDeck.pop()!;
-    console.log(`Get Card: ${card.name}`);
+    Report.debug(`Get Card: ${card.name}`);
     this.completedRegionEventCards.push(card);
 
     // Update global event scale

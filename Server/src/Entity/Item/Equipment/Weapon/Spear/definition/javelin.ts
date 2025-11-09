@@ -19,35 +19,12 @@ export const javelin = new Spear(
     },
     tier: TierEnum.common,
     cost: {
-      baseCost: 305, // TEMP: ore: 20*10=200 + wood: 1*5=5 + handicraft: 100 = 305
-      bonusCost: 0,
-      cost: 305,
-      marketCost: 305,
-      numberOfSellThisWeek: 0,
-      possibleDeviation: 0,
-      seasonalDeviation: {
-        [SeasonEnum.Seeding]: 0,
-        [SeasonEnum.RainFall]: 0,
-        [SeasonEnum.GreenTide]: 0,
-        [SeasonEnum.HarvestMoon]: 0,
-        [SeasonEnum.SunDry]: 0,
-        [SeasonEnum.Frostveil]: 0,
-        [SeasonEnum.LongDark]: 0,
-      },
+      baseCost: 305,
     },
     image: "ironJavelin",
     isCraftable: true,
     weight: 8,
-    blueprintId: {
-      resource: new Map<ResourceType, number>([
-        ["ore", 20],
-        ["wood", 1],
-      ]),
-      item: new Map<ItemCategoryType, number>([
-        ["ingot", 2],
-        ["plank", 1],
-      ]),
-    },
+    blueprintId: undefined
   },
   {},
   {

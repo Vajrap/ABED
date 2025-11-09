@@ -1,6 +1,7 @@
 import { connectionManager } from "../Connection/connectionManager";
 import type { News, NewsDistribution } from "./News";
 import WebSocket from "bun";
+import Report from "../../Utils/Reporter";
 
 type NewsPayload =
   | { type: "NEWS"; data: { worldScope: News[] } }
@@ -78,7 +79,10 @@ class Postman {
       try {
         cl.ws.send(JSON.stringify(parts));
       } catch (e) {
-        console.error(`Immediate send error for ${cl.context.userId}`, e);
+        Report.error("Immediate news delivery send error", {
+          userId: cl.context.userId,
+          error: e,
+        });
         connectionManager.unregister(cl.context.userId);
       }
     }

@@ -178,6 +178,7 @@ export class CharacterService {
       artisans: new CharacterArtisans(),
       attribute: new CharacterAttributes(),
       proficiencies: new CharacterProficiencies(),
+      saveRolls: new CharacterAttributes(),
 
       battleStats: new CharacterBattleStats(),
       elements: new CharacterElements(),

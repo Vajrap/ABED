@@ -47,8 +47,8 @@ export function resolveDamage(
     };
   }
 
-  console.log(`      Damage Calculation:`);
-  console.log(`        Base Damage: ${damageOutput.damage} | Hit: ${damageOutput.hit} | Crit: ${damageOutput.crit} | Type: ${damageOutput.type}`);
+  Report.debug(`      Damage Calculation:`);
+  Report.debug(`        Base Damage: ${damageOutput.damage} | Hit: ${damageOutput.hit} | Crit: ${damageOutput.crit} | Type: ${damageOutput.type}`);
 
   // Apply breathing skill effects before damage calculation, might change something
   resolveBreathingSkillInBattle(attackerId, targetId, damageOutput);
@@ -66,11 +66,11 @@ export function resolveDamage(
   const critDefense = statMod(target.attribute.getTotal("endurance"));
   const autoHitByCrit = damageOutput.crit >= 20 + critDefense; // ideally: damageOutput.isNat20 === true
 
-  console.log(`        Hit Check: Hit(${damageOutput.hit}) vs Dodge(${dodgeChance})`);
+  Report.debug(`        Hit Check: Hit(${damageOutput.hit}) vs Dodge(${dodgeChance})`);
 
   // not auto hit and dodge > hit ==> miss
   if (!autoHitByCrit && dodgeChance >= damageOutput.hit) {
-    console.log(`        ❌ MISSED!`);
+    Report.debug(`        ❌ MISSED!`);
     return {
       actualDamage: 0,
       damageType: damageOutput.type,
@@ -79,7 +79,7 @@ export function resolveDamage(
     };
   }
 
-  console.log(`        ✅ HIT!`);
+  Report.debug(`        ✅ HIT!`);
 
   // Aptitude
   if (isMagic) {
@@ -105,7 +105,7 @@ export function resolveDamage(
       };
 
   const effectiveMitigation = Math.max(baseMitigation, 0);
-  console.log(`        Mitigation: ${baseMitigation} (pDEF: ${target.battleStats.getTotal("pDEF")} + Endurance: ${statMod(target.attribute.getTotal("endurance"))}) = effective ${effectiveMitigation}`);
+  Report.debug(`        Mitigation: ${baseMitigation} (pDEF: ${target.battleStats.getTotal("pDEF")} + Endurance: ${statMod(target.attribute.getTotal("endurance"))}) = effective ${effectiveMitigation}`);
 
   let damage = Math.max(
     damageOutput.damage / ifMagicAptitudeMultiplier -
@@ -113,7 +113,7 @@ export function resolveDamage(
     0,
   );
 
-  console.log(`        Damage after mitigation: ${damage.toFixed(1)} (${damageOutput.damage} - ${effectiveMitigation})`);
+  Report.debug(`        Damage after mitigation: ${damage.toFixed(1)} (${damageOutput.damage} - ${effectiveMitigation})`);
 
   // --- CRIT CHECK ---
   // Keep stat usage consistent: use statMod(endurance) if dodge used statMod(agility)
@@ -121,7 +121,7 @@ export function resolveDamage(
   if (damageOutput.crit - critDefense >= 20) {
     damage *= critModifier;
     isCrit = true;
-    console.log(`        💥 CRITICAL HIT! Damage × ${critModifier}`);
+    Report.debug(`        💥 CRITICAL HIT! Damage × ${critModifier}`);
   }
 
   // --- BUFFS/DEBUFFS/TRAITS (future hooks) ---
@@ -153,7 +153,7 @@ export function resolveDamage(
   // --- ROUND & APPLY ---
   const finalDamage = Math.max(Math.floor(damage), 0);
   
-  console.log(`        Final Damage: ${finalDamage} (${damage.toFixed(1)} rounded down)`);
+  Report.debug(`        Final Damage: ${finalDamage} (${damage.toFixed(1)} rounded down)`);
   
   target.vitals.decHp(finalDamage);
 

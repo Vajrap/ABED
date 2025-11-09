@@ -15,7 +15,9 @@ export const banditRaids = new RegionEventCard({
     th: "โจรร้ายเหิมเกริม"
   },
   globalEventScale: 20,
-  targetRegions: [RegionEnum.EasternFrontier, RegionEnum.WesternForest],
+  // TODO: Add back the EasternFrontier and WesternForest when they are implemented
+  targetRegions: [RegionEnum.CentralPlain],
+  // targetRegions: [RegionEnum.EasternFrontier, RegionEnum.WesternForest],
   description,
   onDraw: () => {
     const worldNews = createNews({
@@ -35,11 +37,13 @@ export const banditRaids = new RegionEventCard({
     const newsEastern = createNews({
       scope: {
         kind: "regionScope",
-        region: RegionEnum.EasternFrontier
+        region: RegionEnum.CentralPlain
+        // region: RegionEnum.EasternFrontier
       },
       content: description,
       context: {
-        region: RegionEnum.EasternFrontier,
+        // region: RegionEnum.EasternFrontier,
+        region: RegionEnum.CentralPlain,
         subRegion: undefined as any,
         location: undefined as any,
         partyId: "",
@@ -50,11 +54,13 @@ export const banditRaids = new RegionEventCard({
     const newsWestern = createNews({
       scope: {
         kind: "regionScope",
-        region: RegionEnum.WesternForest
+        // region: RegionEnum.WesternForest
+        region: RegionEnum.CentralPlain
       },
       content: description,
       context: {
-        region: RegionEnum.WesternForest,
+        // region: RegionEnum.WesternForest,
+        region: RegionEnum.CentralPlain,
         subRegion: undefined as any,
         location: undefined as any,
         partyId: "",

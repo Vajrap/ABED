@@ -1,10 +1,14 @@
 import type { Item } from "../Item/Item";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
-import type { ResourceType } from "./types";
-import type { Tradeable, TransactionHistory, TransactionRecord } from "./types";
+import type {
+  Tradeable,
+  TransactionHistory,
+  TransactionRecord,
+} from "./types";
 import { ResourceProductionTracker } from "./ResourceProductionTracker";
 import { calculateLocalShortageFactor } from "./PriceModifiers";
 import { locationRepository } from "../Location/Location/repository";
+import type { ResourceType } from "src/InterFacesEnumsAndTypes/ResourceTypes";
 /**
  * Central market system
  * 
@@ -17,6 +21,9 @@ export class Market {
   // Production tracking for yearly price adjustments
   resourceTracker: ResourceProductionTracker;
   
+  // Database row identifiers for persistence
+  stateId: string | null = null;
+
   // Cached modifiers (recalculated yearly)
   yearlyModifiers: Map<ResourceType, number> = new Map();
   
@@ -48,7 +55,8 @@ export class Market {
    * Formula: basePrice * yearlyModifier * localShortageModifier * eventModifier
    */
   getPrice(item: Item, location: LocationsEnum): number {
-    const basePrice = item.cost.baseCost;
+    const basePrice =
+      item.cost.marketCost ?? item.cost.cost ?? item.cost.baseCost ?? 0;
     
     let yearlyMod = 1.0;
     let localMod = 1.0;

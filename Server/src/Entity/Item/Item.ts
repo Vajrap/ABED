@@ -1,8 +1,9 @@
 import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
-import { ItemCost } from "./Subclass/ItemCost";
+import { ItemCost, type ItemCostInit } from "./Subclass/ItemCost";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import type { ItemId } from "./type";
 import { BlueprintId } from "../Blueprint/enum";
+import type { ResourceType } from "src/InterFacesEnumsAndTypes/ResourceTypes";
 
 export type ItemCategoryType =
   | "ingot" // Accepts any IngotId
@@ -16,6 +17,26 @@ export type ItemCategoryType =
   | "skin" // Accepts any SkinId
   | "bone"; // Accepts any BoneId
 
+export type BlueprintRequirement = {
+  resource: Map<ResourceType, number>;
+  item: Map<ItemCategoryType, number>;
+};
+
+export type BlueprintReference = BlueprintId | BlueprintRequirement;
+
+export interface ItemDefinition {
+  id: ItemId;
+  name?: L10N;
+  description?: L10N;
+  image?: string;
+  weight?: number;
+  tier?: TierEnum;
+  cost?: ItemCost | ItemCostInit;
+  isCraftable?: boolean;
+  blueprintId?: BlueprintReference;
+  primaryResource?: ResourceType | null;
+}
+
 export class Item {
   id: ItemId;
   name: L10N;
@@ -25,17 +46,20 @@ export class Item {
   tier: TierEnum;
   cost: ItemCost;
   isCraftable: boolean;
-  blueprintId: BlueprintId | undefined;
+  blueprintId?: BlueprintReference;
+  primaryResource?: ResourceType | null;
 
-  constructor(data: Item) {
+  constructor(data: ItemDefinition) {
     this.id = data.id;
     this.name = data.name ?? { en: "", th: "" };
     this.description = data.description ?? { en: "", th: "" };
     this.image = data.image ?? "";
     this.weight = data.weight ?? 0;
     this.tier = data.tier ?? TierEnum.common;
-    this.cost = data.cost ?? new ItemCost({});
-    this.isCraftable = data.isCraftable;
+    this.cost =
+      data.cost instanceof ItemCost ? data.cost : new ItemCost(data.cost ?? {});
+    this.isCraftable = data.isCraftable ?? false;
     this.blueprintId = data.blueprintId;
+    this.primaryResource = data.primaryResource ?? null;
   }
 }

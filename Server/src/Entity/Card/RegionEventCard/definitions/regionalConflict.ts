@@ -31,7 +31,9 @@ export const regionalConflict = new RegionEventCard({
     th: "ความขัดแย้งระดับภูมิภาค"
   },
   globalEventScale: 30,
-  targetRegions: [RegionEnum.NorthernReach, RegionEnum.BorealFrost],
+  // TODO: Add back the NorthernReach and BorealFrost when they are implemented
+  targetRegions: [RegionEnum.CentralPlain],
+  // targetRegions: [RegionEnum.NorthernReach, RegionEnum.BorealFrost],
   description,
   onDraw: () => {
     const worldNews = createNews({
@@ -51,11 +53,13 @@ export const regionalConflict = new RegionEventCard({
     const newsNorthern = createNews({
       scope: {
         kind: "regionScope",
-        region: RegionEnum.NorthernReach
+        // region: RegionEnum.NorthernReach
+        region: RegionEnum.CentralPlain
       },
       content: L10N(northernNewsContent),
       context: {
-        region: RegionEnum.NorthernReach,
+        // region: RegionEnum.NorthernReach,
+        region: RegionEnum.CentralPlain,
         subRegion: undefined as any,
         location: undefined as any,
         partyId: "",
@@ -66,11 +70,13 @@ export const regionalConflict = new RegionEventCard({
     const newsBoreal = createNews({
       scope: {
         kind: "regionScope",
-        region: RegionEnum.BorealFrost
+        // region: RegionEnum.BorealFrost
+        region: RegionEnum.CentralPlain
       },
       content: L10N(borealNewsContent),
       context: {
-        region: RegionEnum.BorealFrost,
+        // region: RegionEnum.BorealFrost,
+        region: RegionEnum.CentralPlain,
         subRegion: undefined as any,
         location: undefined as any,
         partyId: "",

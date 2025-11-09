@@ -23,7 +23,11 @@ app.use(express.json());
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`🔥 ${req.method} ${req.url}`);
+  Report.debug("Incoming request", {
+    method: req.method,
+    url: req.url,
+    ip: req.ip,
+  });
   next();
 });
 
@@ -32,7 +36,10 @@ app.use('/api', apiRoutes);
 
 // Error handling middleware
 app.use((err: any, req: any, res: any, next: any) => {
-  console.error('Error:', err);
+  Report.error("Unhandled error in request pipeline", {
+    error: err,
+    path: req?.url,
+  });
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
@@ -50,12 +57,12 @@ async function startServer() {
     const server = app.listen(PORT, () => {
       Report.info(`Server running on port ${PORT}`);
       Report.info("🎉 Server startup completed successfully");
-      console.log(`🚀 Server is running on http://localhost:${PORT}`);
+      Report.info(`🚀 Server is running on http://localhost:${PORT}`);
     });
 
     // Handle graceful shutdown
     process.on('SIGINT', async () => {
-      console.log('\n🛑 Shutting down server...');
+      Report.info('🛑 Shutting down server...');
       server.close(async () => {
         await shutdownDatabase();
         process.exit(0);

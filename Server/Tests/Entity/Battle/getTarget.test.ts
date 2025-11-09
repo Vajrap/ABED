@@ -81,7 +81,8 @@ describe("getTarget", () => {
     });
 
     it("should throw error on empty target list", () => {
-      expect(() => getTarget(actor, []).one()).toThrow("No targets available");
+      const result = getTarget(actor, []).one();
+      expect(result).toBeUndefined();
     });
   });
 

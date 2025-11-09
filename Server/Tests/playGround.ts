@@ -25,14 +25,14 @@ import { BodyId, HeadWearId } from "src/Entity/Item/Equipment/Armor/type";
 const warrior_A = goblinWarrior(3);
 warrior_A.name = { en: "Warrior A", th: "Warrior A" };
 warrior_A.equipments.rightHand = SwordId.LongSword;
-warrior_A.equipments.leftHand = ShieldId.IronBucker;
-warrior_A.equipments.body = BodyId.PoorLeatherArmor;
-warrior_A.equipments.headWear = HeadWearId.TatteredCap;
+warrior_A.equipments.leftHand = ShieldId.Buckler;
+warrior_A.equipments.body = BodyId.LeatherArmor;
+warrior_A.equipments.headWear = HeadWearId.ScoutHood;
 warrior_A.position = 1;
 
 const mage_A = goblinMage(3);
 mage_A.name = { en: "Mage A", th: "Mage A" };
-mage_A.equipments.body = BodyId.TatteredClothes;
+mage_A.equipments.body = BodyId.Robe;
 mage_A.position = 4;
 
 const partyA = new Party({
@@ -46,15 +46,15 @@ const partyA = new Party({
 // Party B: Team with Scout and Cleric (both with rusted gear)
 const scout_B = goblinScout(3);
 scout_B.name = { en: "Scout B", th: "Scout B" };
-scout_B.equipments.rightHand = DaggerId.IronStiletto;
-scout_B.equipments.body = BodyId.TatteredClothes;
+scout_B.equipments.rightHand = DaggerId.Stiletto;
+scout_B.equipments.body = BodyId.Robe;
 scout_B.position = 2;
 
 const cleric_B = goblinCleric(3);
 cleric_B.name = { en: "Cleric B", th: "Cleric B" };
-cleric_B.equipments.rightHand = HammerId.IronMorningStar;
-cleric_B.equipments.body = BodyId.PoorLeatherArmor;
-cleric_B.equipments.headWear = HeadWearId.TatteredCap;
+cleric_B.equipments.rightHand = HammerId.MorningStar;
+cleric_B.equipments.body = BodyId.LeatherArmor;
+cleric_B.equipments.headWear = HeadWearId.ScholarCap;
 cleric_B.position = 3;
 
 const partyB = new Party({

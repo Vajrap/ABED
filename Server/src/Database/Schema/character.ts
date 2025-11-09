@@ -23,6 +23,7 @@ export const characters = pgTable("characters", {
   battleStats: jsonb("battle_stats").default({}).notNull(),
   elements: jsonb("elements").default({}).notNull(),
   proficiencies: jsonb("proficiencies").default({}).notNull(),
+  saveRolls: jsonb("save_rolls").default({}).notNull(),
   needs: jsonb("needs").default({}).notNull(),
   vitals: jsonb("vitals").notNull(),
   fame: jsonb("fame").default({}).notNull(),

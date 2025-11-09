@@ -6,6 +6,8 @@ import { epithetRepository } from "../Epithet/repository";
 import type { CharacterRoleEnum } from "../Role/enum";
 import { roleRepository } from "../Role/repository";
 import { combineKey } from "../Combination/combineKey";
+import Report from "src/Utils/Reporter";
+
 
 type PartKind = "role" | "epithet";
 
@@ -13,7 +15,7 @@ function getCombo(char: Character): TitleCombination | null {
   const e = char.title.epithet;
   const r = char.title.role;
   if (!r || !e) return null;
-  console.log(`NEXT: ${combineKey(e, r)}`);
+  Report.debug(`NEXT: ${combineKey(e, r)}`);
   return titleCombination.get(combineKey(e, r)) ?? null;
 }
 
@@ -56,7 +58,7 @@ function swapPart<K extends PartKind>(
 
   // 5) synergy ON (if now both parts set)
   const nextCombo = getCombo(char);
-  console.log(`NEXT: ${nextCombo}`);
+  Report.debug(`NEXT: ${nextCombo}`);
   if (nextCombo) nextCombo.active(char);
 }
 

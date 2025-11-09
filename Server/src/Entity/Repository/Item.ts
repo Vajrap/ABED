@@ -1,5 +1,19 @@
 import { equipmentRepository } from "../Item";
 import { weaponRepository } from "../Item/Equipment/Weapon/repository";
+import { UtilId } from "../Item/Equipment/Armor/type";
+import { PotionId, FoodId, UsableId } from "../Item/Consumable";
+import {
+  WoodId,
+  SkinId,
+  BoneId,
+  OreId,
+  IngotId,
+  PlankId,
+  LeatherId,
+  ThreadId,
+  GemId,
+  GoldId,
+} from "../Item/Misc";
 import type { Item } from "../Item/Item";
 import type { ItemId } from "../Item/type";
 
@@ -10,7 +24,7 @@ import type { ItemId } from "../Item/type";
  * This repository contains ALL items in the game (equipment, consumables, books, misc)
  * For specialized equipment lookups, use equipmentRepository from Equipment/repository
  */
-export const itemRepository: Record<ItemId, Item> = {
+export const itemRepository: Record<ItemId, Item | undefined> = {
   ...equipmentRepository,
   [UtilId.Idol]: undefined,
   [UtilId.Relic]: undefined,

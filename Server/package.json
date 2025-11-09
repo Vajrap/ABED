@@ -17,6 +17,7 @@
     "db:reset": "bun run scripts/db-management.ts reset",
     "db:seed": "bun run scripts/db-management.ts seed",
     "db:setup": "bun run scripts/db-management.ts full-setup",
+    "game:loop": "bun run scripts/game-loop.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

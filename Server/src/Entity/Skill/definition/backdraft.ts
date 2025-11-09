@@ -45,7 +45,6 @@ export const backdraft = new Skill({
     location: LocationsEnum,
   ) => {
     // Find all targets with burn debuff
-    // TODO: Filter targets by burn debuff
     const targetsWithBurn = getTarget(actor, targetParty)
       .witBuff(BuffsAndDebuffsEnum.burn)
       .all();

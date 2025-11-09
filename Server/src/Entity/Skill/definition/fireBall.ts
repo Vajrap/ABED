@@ -10,8 +10,9 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
+
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { roll, rollTwenty } from "src/Utils/Dice";
 
 export const fireBall = new Skill({
   id: SkillId.FireBall,

@@ -8,21 +8,7 @@ import { BlueprintId } from "src/Entity/Blueprint/enum";
 export const scimitar = new Blade(
     {
         cost: {
-            baseCost: 605, // TEMP: ore: 50*10=500 + wood: 1*5=5 + handicraft: 100 = 605
-            bonusCost: 0,
-            cost: 605,
-            marketCost: 605,
-            numberOfSellThisWeek: 0,
-            possibleDeviation: 0,
-            seasonalDeviation: {
-                [SeasonEnum.Seeding]: 0,
-                [SeasonEnum.RainFall]: 0,
-                [SeasonEnum.GreenTide]: 0,
-                [SeasonEnum.HarvestMoon]: 0,
-                [SeasonEnum.SunDry]: 0,
-                [SeasonEnum.Frostveil]: 0,
-                [SeasonEnum.LongDark]: 0
-            }
+            baseCost: 605,
         },
         blueprintId: BlueprintId.Weapon_Scimitar,
         description: {en: '', th: ''},
