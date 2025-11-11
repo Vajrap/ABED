@@ -24,22 +24,25 @@ type StageKey = "flawed" | "polished" | "brilliant" | "perfect";
 
 const DEFAULT_GEM_WEIGHT = 3;
 
-const STAGE_INFO: Record<StageKey, { tier: TierEnum; baseCost: number; descriptionHook: string; isCraftable: boolean }> = {
+const STAGE_INFO: Record<
+  StageKey,
+  { tier: TierEnum; baseCost: number; descriptionHook: string; isCraftable: boolean }
+> = {
   flawed: {
     tier: TierEnum.common,
-    baseCost: 180,
+    baseCost: 160,
     descriptionHook: "Impure and unstable, suitable for low-tier work.",
     isCraftable: false,
   },
   polished: {
     tier: TierEnum.uncommon,
-    baseCost: 420,
+    baseCost: 320,
     descriptionHook: "Refined for consistent use in standard enchantments.",
     isCraftable: true,
   },
   brilliant: {
     tier: TierEnum.rare,
-    baseCost: 900,
+    baseCost: 720,
     descriptionHook: "Radiant core ideal for advanced rituals and focuses.",
     isCraftable: true,
   },
@@ -281,49 +284,49 @@ const CONDUCTIVE_LINE: Array<{
     id: GemId.ArcQuartz,
     name: "Arc Quartz",
     tier: TierEnum.rare,
-    baseCost: 680,
+    baseCost: 600,
     description: "Oscillating quartz crystal that generates steady planar current.",
   },
   {
     id: GemId.ChargedDiamond,
     name: "Charged Diamond",
     tier: TierEnum.epic,
-    baseCost: 1200,
+    baseCost: 1800,
     description: "Diamond lattice infused with lightning, conducting energy with minimal loss.",
   },
   {
     id: GemId.WaveAmethyst,
     name: "Wave Amethyst",
     tier: TierEnum.rare,
-    baseCost: 780,
+    baseCost: 650,
     description: "Modulates current frequencies for communication arrays.",
   },
   {
     id: GemId.ChargedRuby,
     name: "Charged Ruby",
     tier: TierEnum.epic,
-    baseCost: 1100,
+    baseCost: 1800,
     description: "Converts stored current into intense heat for plasma tools.",
   },
   {
     id: GemId.GroundOnyx,
     name: "Ground Onyx",
     tier: TierEnum.rare,
-    baseCost: 720,
+    baseCost: 620,
     description: "Absorbs excess current, acting as safety sink in circuits.",
   },
   {
     id: GemId.CryoSapphire,
     name: "Cryo Sapphire",
     tier: TierEnum.epic,
-    baseCost: 1180,
+    baseCost: 1800,
     description: "Maintains low temperatures as energy flows through, stabilising conduits.",
   },
   {
     id: GemId.PulseTopaz,
     name: "Pulse Topaz",
     tier: TierEnum.rare,
-    baseCost: 840,
+    baseCost: 640,
     description: "Stores and releases planar pulses, powering capacitors and signal beacons.",
   },
 ];
@@ -421,7 +424,7 @@ PLANARITE_LINES.forEach((line) => {
     name: line.name,
     description: `Gem fused with planar ore, radiating ${line.essence}.`,
     tier: TierEnum.epic,
-    baseCost: 2100,
+    baseCost: 3600,
     weight: DEFAULT_GEM_WEIGHT,
     isCraftable: false,
     craftingOverrides: baseOverrides,
@@ -447,7 +450,7 @@ PLANARITE_LINES.forEach((line) => {
     name: `Perfect ${line.name}`,
     description: `Flawless ${line.name.toLowerCase()} embodying ${line.essence} in pure focus.`,
     tier: TierEnum.legendary,
-    baseCost: 280000,
+    baseCost: 90000,
     weight: DEFAULT_GEM_WEIGHT,
     isCraftable: true,
     craftingOverrides: perfectOverrides,
@@ -461,7 +464,7 @@ INDUSTRIAL_LINES.forEach((line) => {
     name: `Refined ${line.name}`,
     description: `${line.name} polished through industrial means for ${line.purpose}.`,
     tier: TierEnum.uncommon,
-    baseCost: 320,
+    baseCost: 300,
     weight: DEFAULT_GEM_WEIGHT,
     isCraftable: true,
     craftingOverrides: {
@@ -475,7 +478,7 @@ INDUSTRIAL_LINES.forEach((line) => {
     name: `Machined ${line.name}`,
     description: `${line.name} cut with precision machinery, optimized for ${line.purpose}.`,
     tier: TierEnum.rare,
-    baseCost: 640,
+    baseCost: 600,
     weight: DEFAULT_GEM_WEIGHT,
     isCraftable: true,
     craftingOverrides: {

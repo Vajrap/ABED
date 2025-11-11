@@ -19,7 +19,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Standard treated hide, durable and flexible.",
     tier: TierEnum.common,
     weight: 8,
-    baseCost: 150,
+    baseCost: 140,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [LeatherId.FineLeather]: {
@@ -27,7 +27,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Smooth, supple leather favored for quality garments.",
     tier: TierEnum.uncommon,
     weight: 7,
-    baseCost: 280,
+    baseCost: 300,
     craftingAttributes: createEquipmentCraftingAttributes({ tags: ["comfort"] }),
   },
   [LeatherId.ThickLeather]: {
@@ -35,7 +35,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Heavy-duty leather suited for rugged armor.",
     tier: TierEnum.uncommon,
     weight: 12,
-    baseCost: 260,
+    baseCost: 300,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { pDef: 1 } }),
   },
   [LeatherId.RuggedLeather]: {
@@ -43,7 +43,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Dense leather from massive beasts like elephants or boars.",
     tier: TierEnum.rare,
     weight: 14,
-    baseCost: 360,
+    baseCost: 450,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { blunt: 1 } }),
   },
   [LeatherId.ScaledLeather]: {
@@ -59,7 +59,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Light yet potent leather that retains a magical charge.",
     tier: TierEnum.rare,
     weight: 9,
-    baseCost: 720,
+    baseCost: 650,
     craftingAttributes: createEquipmentCraftingAttributes({ elements: { wind: 1 } }),
   },
   [LeatherId.DrakeLeather]: {
@@ -67,7 +67,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Heavy draconic leather used in elite armors.",
     tier: TierEnum.epic,
     weight: 12,
-    baseCost: 980,
+    baseCost: 1800,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1, earth: 1 } }),
   },
   [LeatherId.HydraLeather]: {
@@ -75,7 +75,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Self-mending leather with residual regenerative power.",
     tier: TierEnum.legendary,
     weight: 13,
-    baseCost: 150000,
+    baseCost: 65000,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: {water: 2}, vitals: {hp: 20}, tags: ["regen"] }),
   },
   [LeatherId.LeviathanLeather]: {
@@ -83,7 +83,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Waterproof leather crafted from leviathan hide.",
     tier: TierEnum.legendary,
     weight: 16,
-    baseCost: 180000,
+    baseCost: 70000,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { water: 3 }, tags: ["waterproof"] }),
   },
   [LeatherId.FiendLeather]: {
@@ -91,7 +91,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Fire-resistant leather tanned from planar fiends.",
     tier: TierEnum.epic,
     weight: 10,
-    baseCost: 920,
+    baseCost: 1900,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1 } }),
   },
   [LeatherId.AetherLeather]: {
@@ -99,7 +99,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Shimmering leather from magical beasts; conducts mana.",
     tier: TierEnum.epic,
     weight: 8,
-    baseCost: 900,
+    baseCost: 1850,
     craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 1 }),
   },
   [LeatherId.SpiritLeather]: {
@@ -107,7 +107,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Ethereal leather favored in arcane garments.",
     tier: TierEnum.rare,
     weight: 6,
-    baseCost: 620,
+    baseCost: 520,
     craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 1, 
       // traits: [TraitEnum.magitech] 
     }),
@@ -117,7 +117,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Insulating leather suited for extreme cold.",
     tier: TierEnum.rare,
     weight: 11,
-    baseCost: 540,
+    baseCost: 480,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { water: 1 } }),
   },
   [LeatherId.SalamanderLeather]: {
@@ -125,7 +125,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Heat-proof leather comfortable even near flames.",
     tier: TierEnum.rare,
     weight: 8,
-    baseCost: 600,
+    baseCost: 500,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1 } }),
   },
   [LeatherId.ManticoreLeather]: {
@@ -133,7 +133,7 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     description: "Spiked and toxin-resistant hide prized by rogues.",
     tier: TierEnum.epic,
     weight: 10,
-    baseCost: 950,
+    baseCost: 1950,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { pierce: 1 }, tags: ["venom"] }),
   },
 };

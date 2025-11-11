@@ -19,7 +19,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Light woven fabric favored for summer garments.",
     tier: TierEnum.common,
     weight: 4,
-    baseCost: 160,
+    baseCost: 140,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       // Mundane cloth, no bonuses
     }),
@@ -29,7 +29,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Soft breathable cloth used across the realm.",
     tier: TierEnum.common,
     weight: 4,
-    baseCost: 180,
+    baseCost: 150,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       // Mundane cloth, no bonuses
     }),
@@ -39,7 +39,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Warm insulating cloth suited for colder climates.",
     tier: TierEnum.uncommon,
     weight: 5,
-    baseCost: 240,
+    baseCost: 280,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       defense: { water: 1 }, // Slight water defense for cold climates
       needs: { moodBonus: 1 },
@@ -50,7 +50,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Luxurious smooth cloth favored by nobility.",
     tier: TierEnum.rare,
     weight: 3,
-    baseCost: 520,
+    baseCost: 600,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       planarAttunement: 2, // Superior conduit compared to raw silk thread
     }),
@@ -60,7 +60,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Featherlight fabric woven from giant spider silk strands.",
     tier: TierEnum.rare,
     weight: 2,
-    baseCost: 640,
+    baseCost: 650,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       dodge: 1, // Small dodge bonus for agility
       attributes: { dexterity: 1 },
@@ -71,7 +71,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Thick insulating weave for extreme winter gear.",
     tier: TierEnum.uncommon,
     weight: 6,
-    baseCost: 280,
+    baseCost: 300,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       defense: { water: 1 }, // Small water defense for insulation
       needs: { moodBonus: 1 },
@@ -82,7 +82,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Flame-resistant cloth that radiates gentle warmth.",
     tier: TierEnum.epic,
     weight: 3,
-    baseCost: 940,
+    baseCost: 2000,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       defense: { fire: 2 }, // Fire defense
       vitals: { hp: 20 }, // Bonus HP representing warmth and vitality
@@ -93,7 +93,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Semi-transparent weave infused with spectral energy.",
     tier: TierEnum.rare,
     weight: 3,
-    baseCost: 600,
+    baseCost: 560,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       planarAttunement: 1, // Planar attunement bonus
       defense: { order: 1 }, // Minor order defense
@@ -104,7 +104,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Planar-threaded fabric ideal for enchantments.",
     tier: TierEnum.epic,
     weight: 3,
-    baseCost: 980,
+    baseCost: 2100,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       planarAttunement: 3, // Enhanced planar attunement ceiling
     }),
@@ -114,7 +114,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Heat-resistant cloth tanned from infernal fibers.",
     tier: TierEnum.epic,
     weight: 4,
-    baseCost: 960,
+    baseCost: 2000,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       defense: { fire: 2 }, // Fire defense
     }),
@@ -124,7 +124,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Magitech fabric laced with energy conduits.",
     tier: TierEnum.rare,
     weight: 4,
-    baseCost: 700,
+    baseCost: 620,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       defense: { order: 1, chaos: 1 }, // Balanced order and chaos defense
       // traits: [TraitEnum.magitech], // Trait tag for magitech
@@ -135,7 +135,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Armored textile woven from draconic fibers.",
     tier: TierEnum.legendary,
     weight: 6,
-    baseCost: 180000,
+    baseCost: 70000,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       defense: { pDef: 2, fire: 1, earth: 1 }, // Physical and elemental defense
     }),
@@ -145,7 +145,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Waterproof lining fashioned from leviathan hide.",
     tier: TierEnum.legendary,
     weight: 7,
-    baseCost: 200000,
+    baseCost: 75000,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       defense: { water: 2 }, // Water defense
       // traits: [TraitEnum.waterproof], // Waterproof trait
@@ -156,7 +156,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     description: "Self-repairing enchanted cloth imbued with hydra essence.",
     tier: TierEnum.legendary,
     weight: 5,
-    baseCost: 190000,
+    baseCost: 65000,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
       needs: { satietyBonus: 2 },
       defense: { water: 1, earth: 1 }, // Water and earth defense

@@ -18,7 +18,7 @@ export const ingotCopper = new Ingot({
   image: "ingotCopper",
   weight: 10,
   tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 60, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 120, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_CopperIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -37,7 +37,7 @@ export const ingotTin = new Ingot({
   image: "ingotTin",
   weight: 9,
   tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 80, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 150, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_TinIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -55,7 +55,7 @@ export const ingotIron = new Ingot({
   image: "ingotIron",
   weight: 12,
   tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 120, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 180, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_IronIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -74,7 +74,7 @@ export const ingotSilver = new Ingot({
   image: "ingotSilver",
   weight: 12,
   tier: TierEnum.uncommon,
-  cost: new ItemCost({ baseCost: 350, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 320, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_SilverIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -93,7 +93,7 @@ export const ingotGold = new Ingot({
   image: "ingotGold",
   weight: 12,
   tier: TierEnum.rare,
-  cost: new ItemCost({ baseCost: 1200, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 900, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_GoldIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -115,7 +115,7 @@ export const ingotBronze = new Ingot({
   image: "ingotBronze",
   weight: 11,
   tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 250, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 200, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_BronzeIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -134,7 +134,7 @@ export const ingotSteel = new Ingot({
   image: "ingotSteel",
   weight: 12,
   tier: TierEnum.uncommon,
-  cost: new ItemCost({ baseCost: 750, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 360, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_SteelIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -153,7 +153,7 @@ export const ingotElectrum = new Ingot({
   image: "ingotElectrum",
   weight: 11,
   tier: TierEnum.rare,
-  cost: new ItemCost({ baseCost: 2500, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 1200, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_ElectrumIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -175,7 +175,7 @@ export const ingotAethersteel = new Ingot({
   image: "ingotAethersteel",
   weight: 13,
   tier: TierEnum.epic,
-  cost: new ItemCost({ baseCost: 9000, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 3600, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Infusion_AethersteelIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -194,7 +194,7 @@ export const ingotVoidforged = new Ingot({
   image: "ingotVoidforged",
   weight: 14,
   tier: TierEnum.legendary,
-  cost: new ItemCost({ baseCost: 2500000, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 90000, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Infusion_VoidforgedIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({

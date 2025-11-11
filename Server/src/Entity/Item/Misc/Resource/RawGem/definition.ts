@@ -14,7 +14,7 @@ export const rawGemItems: Record<RawGemId, RawGem> = {
     },
     tier: TierEnum.common,
     weight: 3,
-    cost: new ItemCost({ baseCost: 210 }),
+    cost: new ItemCost({ baseCost: 180 }),
     isCraftable: false,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes(),
   }),

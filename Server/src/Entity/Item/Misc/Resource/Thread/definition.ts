@@ -19,7 +19,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Simple spun wool used for everyday cloth.",
     tier: TierEnum.common,
     weight: 2,
-    baseCost: 80,
+    baseCost: 110,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [ThreadId.LinenThread]: {
@@ -27,7 +27,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Durable thread spun from flax fibers.",
     tier: TierEnum.uncommon,
     weight: 2,
-    baseCost: 180,
+    baseCost: 240,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [ThreadId.SilkThread]: {
@@ -35,7 +35,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Smooth and fine thread for noble garments and enchantments.",
     tier: TierEnum.rare,
     weight: 1,
-    baseCost: 420,
+    baseCost: 480,
     craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 1 }),
   },
   [ThreadId.CottonThread]: {
@@ -43,7 +43,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Soft, versatile thread used across the realm.",
     tier: TierEnum.common,
     weight: 2,
-    baseCost: 90,
+    baseCost: 100,
     craftingAttributes: createEquipmentCraftingAttributes({ tags: ["comfort"] }),
   },
   [ThreadId.SpiderSilk]: {
@@ -51,7 +51,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Incredibly strong thread spun from giant spider silk.",
     tier: TierEnum.rare,
     weight: 1,
-    baseCost: 520,
+    baseCost: 540,
     craftingAttributes: createEquipmentCraftingAttributes({ dodge: 1 }),
   },
   [ThreadId.YetiThread]: {
@@ -59,7 +59,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Thick insulating thread from Yeti fur.",
     tier: TierEnum.uncommon,
     weight: 3,
-    baseCost: 220,
+    baseCost: 240,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { water: 1 } }),
   },
   [ThreadId.PhoenixThread]: {
@@ -67,7 +67,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Glowing thread woven from phoenix down, faintly warm.",
     tier: TierEnum.epic,
     weight: 1,
-    baseCost: 900,
+    baseCost: 1800,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1 }, vitals: { hp: 5 } }),
   },
   [ThreadId.SalamanderThread]: {
@@ -75,7 +75,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Heatproof thread ideal for flame-resistant garb.",
     tier: TierEnum.rare,
     weight: 1,
-    baseCost: 380,
+    baseCost: 500,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1 } }),
   },
   [ThreadId.SpiritThread]: {
@@ -83,7 +83,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Ethereal fiber that shimmers with spectral light.",
     tier: TierEnum.rare,
     weight: 1,
-    baseCost: 460,
+    baseCost: 520,
     craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 1 }),
   },
   [ThreadId.AetherThread]: {
@@ -91,7 +91,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Planar essence spun into thread; highly conductive to magic.",
     tier: TierEnum.epic,
     weight: 1,
-    baseCost: 820,
+    baseCost: 1900,
     craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 2 }),
   },
   [ThreadId.SteamspunFiber]: {
@@ -99,7 +99,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Machine-made fiber with uniform tension and resilience.",
     tier: TierEnum.uncommon,
     weight: 2,
-    baseCost: 200,
+    baseCost: 220,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { order: 1 } }),
   },
   [ThreadId.FluxWeave]: {
@@ -107,7 +107,7 @@ const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
     description: "Hybrid mechanical-magical fiber used in magitech clothing.",
     tier: TierEnum.rare,
     weight: 2,
-    baseCost: 480,
+    baseCost: 540,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { order: 1, chaos: 1 }, tags: ["magitech"] }),
   },
 };

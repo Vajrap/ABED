@@ -14,7 +14,7 @@ export const plankPine = new ItemMisc({
   image: "plankPine",
   weight: 8,
   tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 100, bonusCost: 0 }), // 1 silver = 100 copper
+  cost: new ItemCost({ baseCost: 120, bonusCost: 0 }),
   isCraftable: true,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes(), // no bonus, soft and easy to shape
 });
@@ -53,7 +53,7 @@ export const plankIronwood = new ItemMisc({
   image: "plankIronwood",
   weight: 15,
   tier: TierEnum.rare,
-  cost: new ItemCost({ baseCost: 600, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 900, bonusCost: 0 }),
   isCraftable: true,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({ defense: { pDef: 1, blunt: 1 } }), // strong physical and blunt defense
 });

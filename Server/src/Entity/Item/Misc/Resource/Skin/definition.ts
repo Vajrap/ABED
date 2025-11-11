@@ -19,7 +19,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Coarse pelt stripped from wolves; common material for warm cloaks.",
     tier: TierEnum.common,
     weight: 6,
-    baseCost: 90,
+    baseCost: 80,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.DirewolfPelt]: {
@@ -35,7 +35,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Dense and heavy hide from bears; excellent for rugged armor.",
     tier: TierEnum.uncommon,
     weight: 14,
-    baseCost: 210,
+    baseCost: 190,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { blunt: 1 } }),
   },
   [SkinId.BoarHide]: {
@@ -43,7 +43,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Fibrous hide from boars; suited for sturdy leatherworking.",
     tier: TierEnum.common,
     weight: 12,
-    baseCost: 120,
+    baseCost: 100,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { pDef: 1 } }),
   },
   [SkinId.StagFur]: {
@@ -51,7 +51,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Soft decorative fur taken from proud stags.",
     tier: TierEnum.uncommon,
     weight: 5,
-    baseCost: 160,
+    baseCost: 170,
     craftingAttributes: createEquipmentCraftingAttributes({ tags: ["comfort"] }),
   },
   [SkinId.ElephantHide]: {
@@ -59,7 +59,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Massive, wrinkled hide; prized for shield plating.",
     tier: TierEnum.rare,
     weight: 20,
-    baseCost: 360,
+    baseCost: 450,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { blunt: 1 } }),
   },
   [SkinId.CrocodileHide]: {
@@ -67,7 +67,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Scaled hide from river beasts; difficult to pierce.",
     tier: TierEnum.uncommon,
     weight: 16,
-    baseCost: 220,
+    baseCost: 180,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { pierce: 1 } }),
   },
   [SkinId.TigerPelt]: {
@@ -75,7 +75,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Vibrant striped pelt; ceremonial and deadly.",
     tier: TierEnum.rare,
     weight: 7,
-    baseCost: 320,
+    baseCost: 420,
     craftingAttributes: createEquipmentCraftingAttributes({ attributes: { dexterity: 1 } }),
   },
   [SkinId.LionMane]: {
@@ -83,7 +83,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Luxurious mane from a lion; valued by nobles.",
     tier: TierEnum.rare,
     weight: 6,
-    baseCost: 340,
+    baseCost: 420,
     craftingAttributes: createEquipmentCraftingAttributes({ attributes: { charisma: 1 } }),
   },
   [SkinId.DeerHide]: {
@@ -91,7 +91,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Soft, supple hide ideal for light armor.",
     tier: TierEnum.common,
     weight: 6,
-    baseCost: 110,
+    baseCost: 90,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { pDef: 1 } }),
   },
   [SkinId.GoatHide]: {
@@ -99,7 +99,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Coarse hide from mountain goats; rugged everyday leather.",
     tier: TierEnum.common,
     weight: 7,
-    baseCost: 100,
+    baseCost: 85,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { pDef: 1 } }),
   },
   [SkinId.BisonHide]: {
@@ -107,7 +107,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Heavy hide from plains bison; thick and durable.",
     tier: TierEnum.uncommon,
     weight: 18,
-    baseCost: 230,
+    baseCost: 200,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { pDef: 1 } }),
   },
   [SkinId.DragonlingScale]: {
@@ -115,7 +115,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Small draconic scales that hum with latent heat.",
     tier: TierEnum.rare,
     weight: 6,
-    baseCost: 480,
+    baseCost: 500,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.WyvernScale]: {
@@ -123,7 +123,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Flexible flight scales retaining a faint charge.",
     tier: TierEnum.rare,
     weight: 8,
-    baseCost: 620,
+    baseCost: 520,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.DrakeScale]: {
@@ -131,7 +131,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Large reinforced scales from land drakes.",
     tier: TierEnum.epic,
     weight: 10,
-    baseCost: 900,
+    baseCost: 1800,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.WyrmScale]: {
@@ -139,7 +139,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Massive scales from deep wyrms; nearly impenetrable.",
     tier: TierEnum.legendary,
     weight: 12,
-    baseCost: 160000,
+    baseCost: 60000,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.SeaWyrmScale]: {
@@ -147,7 +147,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Salt-resistant scales that shimmer with azure light.",
     tier: TierEnum.epic,
     weight: 11,
-    baseCost: 980,
+    baseCost: 1900,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.DragonScale]: {
@@ -155,7 +155,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Apex draconic scale resonating with elemental power.",
     tier: TierEnum.legendary,
     weight: 14,
-    baseCost: 210000,
+    baseCost: 75000,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.LizardSkin]: {
@@ -163,7 +163,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Small flexible scales; favored in light armor.",
     tier: TierEnum.common,
     weight: 4,
-    baseCost: 90,
+    baseCost: 75,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.TurtleShell]: {
@@ -171,7 +171,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Hardened shell fragments used for shields.",
     tier: TierEnum.uncommon,
     weight: 18,
-    baseCost: 260,
+    baseCost: 200,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.SharkSkin]: {
@@ -179,7 +179,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Rough skin from a shark; abrasive and durable.",
     tier: TierEnum.uncommon,
     weight: 8,
-    baseCost: 210,
+    baseCost: 180,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.WhaleSkin]: {
@@ -187,7 +187,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Thick oily hide; naturally water-resistant.",
     tier: TierEnum.rare,
     weight: 24,
-    baseCost: 420,
+    baseCost: 480,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.Chitin]: {
@@ -195,7 +195,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Segmented exoskeleton from large insects.",
     tier: TierEnum.common,
     weight: 5,
-    baseCost: 120,
+    baseCost: 90,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.SerpentSkin]: {
@@ -211,7 +211,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Planar-tainted hide faintly warm to the touch.",
     tier: TierEnum.epic,
     weight: 9,
-    baseCost: 950,
+    baseCost: 1900,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1 }, planarAttunement: 1 }),
   },
   [SkinId.AetherSkin]: {
@@ -219,7 +219,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Translucent hide from magical beasts; shimmers in moonlight.",
     tier: TierEnum.epic,
     weight: 7,
-    baseCost: 880,
+    baseCost: 1850,
     craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 1 }),
   },
   [SkinId.SpiritHide]: {
@@ -227,7 +227,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Ethereal hide from phantasmal beasts; featherlight.",
     tier: TierEnum.rare,
     weight: 3,
-    baseCost: 540,
+    baseCost: 500,
     craftingAttributes: createEquipmentCraftingAttributes({ elements: { order: 1 } }),
   },
   [SkinId.CrystalCarapace]: {
@@ -235,7 +235,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Gemlike plates from crystal-shelled creatures.",
     tier: TierEnum.epic,
     weight: 10,
-    baseCost: 1100,
+    baseCost: 2000,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.GriffonFeatheredHide]: {
@@ -243,7 +243,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Durable hide flecked with feathers from a griffon.",
     tier: TierEnum.rare,
     weight: 9,
-    baseCost: 620,
+    baseCost: 520,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.BasiliskScale]: {
@@ -251,7 +251,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Petrifying scale; dangerous to handle unaided.",
     tier: TierEnum.epic,
     weight: 9,
-    baseCost: 1200,
+    baseCost: 2100,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.ChimeraHide]: {
@@ -259,7 +259,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Chaotic hide stitched by nature; radiates volatile energy.",
     tier: TierEnum.epic,
     weight: 12,
-    baseCost: 1050,
+    baseCost: 2000,
     craftingAttributes: createEquipmentCraftingAttributes(),
   },
   [SkinId.HydraSkin]: {
@@ -267,7 +267,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Regenerative scaled hide harvested from a hydra.",
     tier: TierEnum.legendary,
     weight: 13,
-    baseCost: 170000,
+    baseCost: 60000,
     craftingAttributes: createEquipmentCraftingAttributes({ elements: { water: 1 }, tags: ["regen-potential"] }),
   },
   [SkinId.YetiFur]: {
@@ -283,7 +283,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Heat-resistant hide; remains cool even in flame.",
     tier: TierEnum.rare,
     weight: 7,
-    baseCost: 560,
+    baseCost: 500,
     craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1 } }),
   },
   [SkinId.PhoenixFeatheredHide]: {
@@ -291,7 +291,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Fiery feathers fused to hide; pulses with embers.",
     tier: TierEnum.legendary,
     weight: 6,
-    baseCost: 190000,
+    baseCost: 65000,
     craftingAttributes: createEquipmentCraftingAttributes({ elements: { fire: 2 }, planarAttunement: 1, tags: ["resonates:fire"] }),
   },
   [SkinId.ManticoreHide]: {
@@ -299,7 +299,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Spiked hide laced with venom; prized by daring artisans.",
     tier: TierEnum.epic,
     weight: 11,
-    baseCost: 980,
+    baseCost: 2000,
     craftingAttributes: createEquipmentCraftingAttributes({ tags: ["venomous"] }),
   },
   [SkinId.LeviathanScale]: {
@@ -307,7 +307,7 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     description: "Colossal oceanic scale; nearly indestructible.",
     tier: TierEnum.legendary,
     weight: 18,
-    baseCost: 220000,
+    baseCost: 70000,
     craftingAttributes: createEquipmentCraftingAttributes({ elements: { water: 2 }, tags: ["resonates:water"] }),
   },
 };

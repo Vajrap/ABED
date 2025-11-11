@@ -17,7 +17,7 @@ export const oreCopper = new Ore({
   image: "oreCopper",
   weight: 12,
   tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 25, bonusCost: 0 }), // Cheap, abundant
+  cost: new ItemCost({ baseCost: 40, bonusCost: 0 }),
   isCraftable: false,
   blueprintId: undefined,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes(),
@@ -33,7 +33,7 @@ export const oreTin = new Ore({
   image: "oreTin",
   weight: 10,
   tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 35, bonusCost: 0 }), // Slightly rarer than copper
+  cost: new ItemCost({ baseCost: 50, bonusCost: 0 }),
   isCraftable: false,
   blueprintId: undefined,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes(),
@@ -49,7 +49,7 @@ export const oreIron = new Ore({
   image: "oreIron",
   weight: 14,
   tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 60, bonusCost: 0 }), // Common, but heavier and more valuable
+  cost: new ItemCost({ baseCost: 90, bonusCost: 0 }),
   isCraftable: false,
   blueprintId: undefined,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -68,7 +68,7 @@ export const oreSilver = new Ore({
   image: "oreSilver",
   weight: 14,
   tier: TierEnum.uncommon,
-  cost: new ItemCost({ baseCost: 200, bonusCost: 0 }), // 2 silver
+  cost: new ItemCost({ baseCost: 180, bonusCost: 0 }),
   isCraftable: false,
   blueprintId: undefined,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -87,7 +87,7 @@ export const oreGold = new Ore({
   image: "oreGold",
   weight: 14,
   tier: TierEnum.rare,
-  cost: new ItemCost({ baseCost: 500, bonusCost: 0 }), // 5 silver
+  cost: new ItemCost({ baseCost: 450, bonusCost: 0 }),
   isCraftable: false,
   blueprintId: undefined,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -109,7 +109,7 @@ export const orePlanarite = new Ore({
   image: "orePlanarite",
   weight: 8,
   tier: TierEnum.epic,
-  cost: new ItemCost({ baseCost: 5000, bonusCost: 0 }), // 50 silver, very rare
+  cost: new ItemCost({ baseCost: 2400, bonusCost: 0 }),
   isCraftable: false,
   blueprintId: undefined,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
@@ -129,7 +129,7 @@ export const oreErebite = new Ore({
   image: "oreErebite",
   weight: 16,
   tier: TierEnum.legendary,
-  cost: new ItemCost({ baseCost: 15000, bonusCost: 0 }), // 150 silver (≈15 gold)
+  cost: new ItemCost({ baseCost: 60000, bonusCost: 0 }),
   isCraftable: false,
   blueprintId: undefined,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
