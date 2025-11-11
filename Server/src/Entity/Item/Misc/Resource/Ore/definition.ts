@@ -2,6 +2,7 @@ import { OreId } from "../..";
 import { Ore } from "./Ore";
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { createEquipmentCraftingAttributes } from "src/Entity/Item/Misc/Resource/EquipmentCraftingAttributes";
 
 /**
  * Base Ores
@@ -19,6 +20,7 @@ export const oreCopper = new Ore({
   cost: new ItemCost({ baseCost: 25, bonusCost: 0 }), // Cheap, abundant
   isCraftable: false,
   blueprintId: undefined,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes(),
 });
 
 export const oreTin = new Ore({
@@ -34,6 +36,7 @@ export const oreTin = new Ore({
   cost: new ItemCost({ baseCost: 35, bonusCost: 0 }), // Slightly rarer than copper
   isCraftable: false,
   blueprintId: undefined,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes(),
 });
 
 export const oreIron = new Ore({
@@ -49,6 +52,10 @@ export const oreIron = new Ore({
   cost: new ItemCost({ baseCost: 60, bonusCost: 0 }), // Common, but heavier and more valuable
   isCraftable: false,
   blueprintId: undefined,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 1 },
+    defense: { pDef: 1 },
+  }),
 });
 
 export const oreSilver = new Ore({
@@ -64,6 +71,10 @@ export const oreSilver = new Ore({
   cost: new ItemCost({ baseCost: 200, bonusCost: 0 }), // 2 silver
   isCraftable: false,
   blueprintId: undefined,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 1, mDmg: 1 },
+    defense: { pDef: 1, mDef: 1 },
+  }),
 });
 
 export const oreGold = new Ore({
@@ -79,6 +90,10 @@ export const oreGold = new Ore({
   cost: new ItemCost({ baseCost: 500, bonusCost: 0 }), // 5 silver
   isCraftable: false,
   blueprintId: undefined,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 1, mDmg: 1 },
+    defense: { pDef: 1, mDef: 1 },
+  }),
 });
 
 /**
@@ -97,6 +112,11 @@ export const orePlanarite = new Ore({
   cost: new ItemCost({ baseCost: 5000, bonusCost: 0 }), // 50 silver, very rare
   isCraftable: false,
   blueprintId: undefined,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    elements: { order: 1, chaos: 1 },
+    planarAttunement: 4,
+    tags: ["planar-resonant"],
+  }),
 });
 
 export const oreErebite = new Ore({
@@ -112,4 +132,10 @@ export const oreErebite = new Ore({
   cost: new ItemCost({ baseCost: 15000, bonusCost: 0 }), // 150 silver (≈15 gold)
   isCraftable: false,
   blueprintId: undefined,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { chaos: 2 },
+    elements: { chaos: 2 },
+    planarAttunement: 3,
+    tags: ["void-tainted", "life-drain"],
+  }),
 });

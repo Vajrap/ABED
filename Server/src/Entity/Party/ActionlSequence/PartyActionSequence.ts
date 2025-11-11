@@ -1,162 +1,50 @@
 import { DayOfWeek, TimeOfDay } from "../../../InterFacesEnumsAndTypes/Time";
 import { ActionInput } from "../../Character/Subclass/Action/CharacterAction";
 
+type PartyActionOption =
+  | ActionInput.None
+  | ActionInput.Travel
+  | ActionInput.RailTravel
+  | ActionInput.Inn
+  | ActionInput.Camping
+  | ActionInput.HouseRest;
+
 export type PartyActionSequence = {
   [DayOfWeek.laoh]: {
-    [TimeOfDay.morning]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.afternoon]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.evening]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.night]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
+    [TimeOfDay.morning]: PartyActionOption;
+    [TimeOfDay.afternoon]: PartyActionOption;
+    [TimeOfDay.evening]: PartyActionOption;
+    [TimeOfDay.night]: PartyActionOption;
   };
   [DayOfWeek.rowana]: {
-    [TimeOfDay.morning]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.afternoon]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.evening]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.night]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
+    [TimeOfDay.morning]: PartyActionOption;
+    [TimeOfDay.afternoon]: PartyActionOption;
+    [TimeOfDay.evening]: PartyActionOption;
+    [TimeOfDay.night]: PartyActionOption;
   };
   [DayOfWeek.aftree]: {
-    [TimeOfDay.morning]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.afternoon]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.evening]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.night]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
+    [TimeOfDay.morning]: PartyActionOption;
+    [TimeOfDay.afternoon]: PartyActionOption;
+    [TimeOfDay.evening]: PartyActionOption;
+    [TimeOfDay.night]: PartyActionOption;
   };
   [DayOfWeek.udur]: {
-    [TimeOfDay.morning]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.afternoon]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.evening]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.night]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
+    [TimeOfDay.morning]: PartyActionOption;
+    [TimeOfDay.afternoon]: PartyActionOption;
+    [TimeOfDay.evening]: PartyActionOption;
+    [TimeOfDay.night]: PartyActionOption;
   };
   [DayOfWeek.matris]: {
-    [TimeOfDay.morning]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.afternoon]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.evening]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.night]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
+    [TimeOfDay.morning]: PartyActionOption;
+    [TimeOfDay.afternoon]: PartyActionOption;
+    [TimeOfDay.evening]: PartyActionOption;
+    [TimeOfDay.night]: PartyActionOption;
   };
   [DayOfWeek.seethar]: {
-    [TimeOfDay.morning]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.afternoon]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.evening]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
-    [TimeOfDay.night]:
-      | ActionInput.None
-      | ActionInput.Travel
-      | ActionInput.Inn
-      | ActionInput.Camping
-      | ActionInput.HouseRest;
+    [TimeOfDay.morning]: PartyActionOption;
+    [TimeOfDay.afternoon]: PartyActionOption;
+    [TimeOfDay.evening]: PartyActionOption;
+    [TimeOfDay.night]: PartyActionOption;
   };
 };
 

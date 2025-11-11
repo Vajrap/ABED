@@ -2,42 +2,128 @@ import { ThreadId } from "../..";
 import { ItemMisc } from "../../Misc";
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { createEquipmentCraftingAttributes } from "src/Entity/Item/Misc/Resource/EquipmentCraftingAttributes";
 
-export const threadWool = new ItemMisc({
-  id: ThreadId.WoolThread,
-  name: { en: "Wool Thread", th: "" },
-  description: { en: "Simple spun wool used for basic cloth.", th: "" },
-  image: "threadWool",
-  weight: 2,
-  tier: TierEnum.common,
-  cost: new ItemCost({ baseCost: 80, bonusCost: 0 }),
-  isCraftable: true,
-  craftingRecipe: { resource: new Map(), item: new Map() },
-});
+type ThreadDefinition = {
+  name: string;
+  description: string;
+  tier: TierEnum;
+  weight: number;
+  baseCost: number;
+  craftingAttributes?: ReturnType<typeof createEquipmentCraftingAttributes>;
+};
 
-export const threadLinen = new ItemMisc({
-  id: ThreadId.LinenThread,
-  name: { en: "Linen Thread", th: "" },
-  description: { en: "Durable thread spun from flax fibers.", th: "" },
-  image: "threadLinen",
-  weight: 2,
-  tier: TierEnum.uncommon,
-  cost: new ItemCost({ baseCost: 200, bonusCost: 0 }),
-  isCraftable: true,
-  craftingRecipe: { resource: new Map(), item: new Map() },
-});
-
-export const threadSilk = new ItemMisc({
-  id: ThreadId.SilkThread,
-  name: { en: "Silk Thread", th: "" },
-  description: {
-    en: "Smooth and fine, used for noble garments and enchantments.",
-    th: "",
+const THREAD_DATA: Record<ThreadId, ThreadDefinition> = {
+  [ThreadId.WoolThread]: {
+    name: "Wool Thread",
+    description: "Simple spun wool used for everyday cloth.",
+    tier: TierEnum.common,
+    weight: 2,
+    baseCost: 80,
+    craftingAttributes: createEquipmentCraftingAttributes(),
   },
-  image: "threadSilk",
-  weight: 1,
-  tier: TierEnum.rare,
-  cost: new ItemCost({ baseCost: 600, bonusCost: 0 }),
-  isCraftable: true,
-  craftingRecipe: { resource: new Map(), item: new Map() },
-});
+  [ThreadId.LinenThread]: {
+    name: "Linen Thread",
+    description: "Durable thread spun from flax fibers.",
+    tier: TierEnum.uncommon,
+    weight: 2,
+    baseCost: 180,
+    craftingAttributes: createEquipmentCraftingAttributes(),
+  },
+  [ThreadId.SilkThread]: {
+    name: "Silk Thread",
+    description: "Smooth and fine thread for noble garments and enchantments.",
+    tier: TierEnum.rare,
+    weight: 1,
+    baseCost: 420,
+    craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 1 }),
+  },
+  [ThreadId.CottonThread]: {
+    name: "Cotton Thread",
+    description: "Soft, versatile thread used across the realm.",
+    tier: TierEnum.common,
+    weight: 2,
+    baseCost: 90,
+    craftingAttributes: createEquipmentCraftingAttributes({ tags: ["comfort"] }),
+  },
+  [ThreadId.SpiderSilk]: {
+    name: "Spider Silk Thread",
+    description: "Incredibly strong thread spun from giant spider silk.",
+    tier: TierEnum.rare,
+    weight: 1,
+    baseCost: 520,
+    craftingAttributes: createEquipmentCraftingAttributes({ dodge: 1 }),
+  },
+  [ThreadId.YetiThread]: {
+    name: "Yeti Thread",
+    description: "Thick insulating thread from Yeti fur.",
+    tier: TierEnum.uncommon,
+    weight: 3,
+    baseCost: 220,
+    craftingAttributes: createEquipmentCraftingAttributes({ defense: { water: 1 } }),
+  },
+  [ThreadId.PhoenixThread]: {
+    name: "Phoenix Thread",
+    description: "Glowing thread woven from phoenix down, faintly warm.",
+    tier: TierEnum.epic,
+    weight: 1,
+    baseCost: 900,
+    craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1 }, vitals: { hp: 5 } }),
+  },
+  [ThreadId.SalamanderThread]: {
+    name: "Salamander Thread",
+    description: "Heatproof thread ideal for flame-resistant garb.",
+    tier: TierEnum.rare,
+    weight: 1,
+    baseCost: 380,
+    craftingAttributes: createEquipmentCraftingAttributes({ defense: { fire: 1 } }),
+  },
+  [ThreadId.SpiritThread]: {
+    name: "Spirit Thread",
+    description: "Ethereal fiber that shimmers with spectral light.",
+    tier: TierEnum.rare,
+    weight: 1,
+    baseCost: 460,
+    craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 1 }),
+  },
+  [ThreadId.AetherThread]: {
+    name: "Aether Thread",
+    description: "Planar essence spun into thread; highly conductive to magic.",
+    tier: TierEnum.epic,
+    weight: 1,
+    baseCost: 820,
+    craftingAttributes: createEquipmentCraftingAttributes({ planarAttunement: 2 }),
+  },
+  [ThreadId.SteamspunFiber]: {
+    name: "Steamspun Fiber",
+    description: "Machine-made fiber with uniform tension and resilience.",
+    tier: TierEnum.uncommon,
+    weight: 2,
+    baseCost: 200,
+    craftingAttributes: createEquipmentCraftingAttributes({ defense: { order: 1 } }),
+  },
+  [ThreadId.FluxWeave]: {
+    name: "Flux Weave Fiber",
+    description: "Hybrid mechanical-magical fiber used in magitech clothing.",
+    tier: TierEnum.rare,
+    weight: 2,
+    baseCost: 480,
+    craftingAttributes: createEquipmentCraftingAttributes({ defense: { order: 1, chaos: 1 }, tags: ["magitech"] }),
+  },
+};
+
+export const threadItems: Record<ThreadId, ItemMisc> = Object.fromEntries(
+  Object.entries(THREAD_DATA).map(([id, data]) => [
+    id,
+    new ItemMisc({
+      id: id as ThreadId,
+      name: { en: data.name, th: "" },
+      description: { en: data.description, th: "" },
+      tier: data.tier,
+      weight: data.weight,
+      cost: new ItemCost({ baseCost: data.baseCost }),
+      isCraftable: true,
+      equipmentCraftingAttributes: data.craftingAttributes ?? createEquipmentCraftingAttributes(),
+    }),
+  ]),
+) as Record<ThreadId, ItemMisc>;

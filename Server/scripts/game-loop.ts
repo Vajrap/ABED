@@ -14,17 +14,21 @@ type CLIOptions = {
 function parseArgs(): CLIOptions {
   const args = process.argv.slice(2);
 
-  const phasesIndex = args.findIndex((arg) => arg === "--phases");
-  const phasesValue =
-    phasesIndex >= 0 && args[phasesIndex + 1]
-      ? Number(args[phasesIndex + 1])
-      : 1;
+  let phasesValue: number | undefined;
+  for (const key of ["--phases", "--phase"]) {
+    const idx = args.findIndex((arg) => arg === key);
+    if (idx >= 0) {
+      const raw = args[idx + 1];
+      phasesValue = raw ? Number(raw) : undefined;
+      break;
+    }
+  }
 
   const force = args.includes("--force");
   const simulate = args.includes("--simulate");
 
   return {
-    phases: Number.isFinite(phasesValue) && phasesValue > 0 ? phasesValue : 1,
+    phases: phasesValue !== undefined && Number.isFinite(phasesValue) && phasesValue > 0 ? phasesValue : 1,
     force: force || simulate,
     simulate,
   };
@@ -33,16 +37,37 @@ function parseArgs(): CLIOptions {
 async function main() {
   const options = parseArgs();
 
-  Report.info(
-    `Manual game loop trigger starting (phases=${options.phases}, force=${options.force}, simulate=${options.simulate})`,
-  );
-
   await initializeDatabase();
+
+  let startPhaseIndex = 0;
+  let startGameTime = {
+    year: 0,
+    season: 0,
+    dayOfSeason: 0,
+    hour: 0,
+    phaseIndex: 0,
+  };
 
   try {
     GameTime.synchronize();
 
-    let lastPhaseIndex = GameTime.getCurrentPhaseIndex();
+    startPhaseIndex = GameTime.getCurrentPhaseIndex();
+    startGameTime = {
+      year: GameTime.year,
+      season: GameTime.season,
+      dayOfSeason: GameTime.dayOfSeason,
+      hour: GameTime.hour,
+      phaseIndex: startPhaseIndex,
+    };
+
+    Report.info(
+      `Manual game loop trigger starting (phases=${options.phases}, force=${options.force}, simulate=${options.simulate})`,
+      {
+        startGameTime,
+      },
+    );
+
+    let lastPhaseIndex = startPhaseIndex;
     const epoch = getGameEpoch().getTime();
     const msPerPhase = getMsPerPhase();
 
@@ -63,6 +88,23 @@ async function main() {
       });
     }
   } finally {
+    const endPhaseIndex = GameTime.getCurrentPhaseIndex();
+    const endGameTime = {
+      year: GameTime.year,
+      season: GameTime.season,
+      dayOfSeason: GameTime.dayOfSeason,
+      hour: GameTime.hour,
+      phaseIndex: endPhaseIndex,
+    };
+
+    Report.info("Manual game loop trigger finished", {
+      startPhaseIndex,
+      endPhaseIndex,
+      phaseDelta: endPhaseIndex - startPhaseIndex,
+      startGameTime,
+      endGameTime,
+    });
+
     await shutdownDatabase();
   }
 }

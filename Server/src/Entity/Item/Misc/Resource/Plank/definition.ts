@@ -2,6 +2,7 @@ import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { PlankId, WoodId } from "../..";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
 import { ItemMisc } from "../../Misc";
+import { createEquipmentCraftingAttributes } from "src/Entity/Item/Misc/Resource/EquipmentCraftingAttributes";
 
 export const plankPine = new ItemMisc({
   id: PlankId.PinePlank,
@@ -15,7 +16,7 @@ export const plankPine = new ItemMisc({
   tier: TierEnum.common,
   cost: new ItemCost({ baseCost: 100, bonusCost: 0 }), // 1 silver = 100 copper
   isCraftable: true,
-  craftingRecipe: { item: new Map([[WoodId.Pine, 2]]), resource: new Map() },
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes(), // no bonus, soft and easy to shape
 });
 
 export const plankOak = new ItemMisc({
@@ -27,7 +28,7 @@ export const plankOak = new ItemMisc({
   tier: TierEnum.common,
   cost: new ItemCost({ baseCost: 150, bonusCost: 0 }),
   isCraftable: true,
-  craftingRecipe: { item: new Map([[WoodId.Oak, 2]]), resource: new Map() },
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({ defense: { blunt: 1 } }), // small physical defense bonus
 });
 
 export const plankMaple = new ItemMisc({
@@ -39,7 +40,7 @@ export const plankMaple = new ItemMisc({
   tier: TierEnum.uncommon,
   cost: new ItemCost({ baseCost: 300, bonusCost: 0 }),
   isCraftable: true,
-  craftingRecipe: { item: new Map([[WoodId.Maple, 2]]), resource: new Map() },
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({ attributes: { dexterity: 1 } }), // refined craftsmanship bonus
 });
 
 export const plankIronwood = new ItemMisc({
@@ -54,8 +55,5 @@ export const plankIronwood = new ItemMisc({
   tier: TierEnum.rare,
   cost: new ItemCost({ baseCost: 600, bonusCost: 0 }),
   isCraftable: true,
-  craftingRecipe: {
-    item: new Map([[WoodId.Ironwood, 2]]),
-    resource: new Map(),
-  },
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({ defense: { pDef: 1, blunt: 1 } }), // strong physical and blunt defense
 });

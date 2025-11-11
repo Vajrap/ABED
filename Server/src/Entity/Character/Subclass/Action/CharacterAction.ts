@@ -20,6 +20,7 @@ export enum restEnums {
 export enum ActionInput {
   None = "None",
   Travel = "Travel",
+  RailTravel = "Rail Travel",
 
   // rest
   Rest = "Rest",
@@ -177,6 +178,7 @@ export function defaultActionSequence(): CharacterActionSequence {
 export type CharacterAction =
   | { type: ActionInput.None }
   | { type: ActionInput.Travel }
+  | { type: ActionInput.RailTravel }
   | { type: ActionInput.Rest }
   | { type: ActionInput.Inn }
   | { type: ActionInput.Camping }

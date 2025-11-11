@@ -18,6 +18,7 @@ import { newsArchiveService } from "../Entity/News/NewsArchive";
 import { getGameLoopMode } from "../config/gameLoop";
 import { persistLastProcessedPhase } from "../Database/gameStateStore";
 import { saveDailyState } from "../Database/persistence";
+import { railTravelManager } from "./TravelManager/Rail/index.ts";
 
 type RunGameLoopOptions = {
   now?: Date;
@@ -35,8 +36,14 @@ const loopMetrics = {
   successfulRuns: 0,
   skippedRuns: 0,
   failedRuns: 0,
+  consecutiveFailedRuns: 0,
   lastDurationMs: 0,
+  lastFailureAt: null as Date | null,
+  lastError: null as { message: string; trigger: string } | null,
+  warnedOnThreshold: false,
 };
+
+const FAILURE_ALERT_THRESHOLD = 3;
 
 const nowMs = () =>
   typeof performance !== "undefined" && typeof performance.now === "function"
@@ -208,10 +215,9 @@ async function processEvents(
   );
 
   const tra: NewsDistribution = await travelManager.allTravel(day, phase);
+  const rail: NewsDistribution = await railTravelManager.allTravel(day, phase);
 
-  const merged = mergeNewsStructures(enc, act, tra);
-
-  return merged;
+  return mergeNewsStructures(enc, act, tra, rail);
 }
 
 async function sendPartyData(news: NewsDistribution) {
@@ -284,20 +290,43 @@ async function processPhaseInternal(options: ProcessPhaseOptions): Promise<void>
 
     loopMetrics.successfulRuns++;
     loopMetrics.lastDurationMs = Math.round(nowMs() - startMs);
+    loopMetrics.consecutiveFailedRuns = 0;
+    loopMetrics.lastError = null;
+    loopMetrics.warnedOnThreshold = false;
     Report.info(
       `Game loop completed (phase=${GameTime.getCurrentPhaseIndex()}, trigger=${label}, duration=${loopMetrics.lastDurationMs}ms)`,
     );
   } catch (error) {
     loopMetrics.failedRuns++;
     loopMetrics.lastDurationMs = Math.round(nowMs() - startMs);
+    loopMetrics.consecutiveFailedRuns++;
+    loopMetrics.lastFailureAt = new Date();
+    loopMetrics.lastError = {
+      message: error instanceof Error ? error.message : String(error),
+      trigger: label,
+    };
     Report.error("Error during game loop", {
       error,
       phaseIndex: GameTime.getCurrentPhaseIndex(),
       trigger: label,
       durationMs: loopMetrics.lastDurationMs,
     });
+    if (
+      loopMetrics.consecutiveFailedRuns >= FAILURE_ALERT_THRESHOLD &&
+      !loopMetrics.warnedOnThreshold
+    ) {
+      loopMetrics.warnedOnThreshold = true;
+      Report.warn("Game loop consecutive failures exceeded threshold", {
+        failures: loopMetrics.consecutiveFailedRuns,
+        lastFailureAt: loopMetrics.lastFailureAt?.toISOString(),
+      });
+    }
     throw error;
   }
 
   Report.debug("Game loop metrics", { ...loopMetrics });
+}
+
+export function getGameLoopMetrics() {
+  return { ...loopMetrics };
 }

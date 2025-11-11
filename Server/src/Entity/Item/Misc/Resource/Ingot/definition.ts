@@ -3,6 +3,7 @@ import { Ingot } from "./Ingot";
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
 import { BlueprintId } from "src/Entity/Blueprint/enum";
+import { createEquipmentCraftingAttributes } from "src/Entity/Item/Misc/Resource/EquipmentCraftingAttributes";
 
 /**
  * Base Ingots
@@ -20,6 +21,10 @@ export const ingotCopper = new Ingot({
   cost: new ItemCost({ baseCost: 60, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_CopperIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { mDmg: 1 },
+    tags: ["conductive", "soft", "common"],
+  }),
 });
 
 export const ingotTin = new Ingot({
@@ -35,6 +40,9 @@ export const ingotTin = new Ingot({
   cost: new ItemCost({ baseCost: 80, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_TinIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    tags: ["soft", "alloy-base"],
+  }),
 });
 
 export const ingotIron = new Ingot({
@@ -50,6 +58,10 @@ export const ingotIron = new Ingot({
   cost: new ItemCost({ baseCost: 120, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_IronIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 1 },
+    tags: ["durable", "sharp", "common"],
+  }),
 });
 
 export const ingotSilver = new Ingot({
@@ -65,6 +77,10 @@ export const ingotSilver = new Ingot({
   cost: new ItemCost({ baseCost: 350, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_SilverIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { mDmg: 2 },
+    tags: ["holy", "conductive", "anti-undead"],
+  }),
 });
 
 export const ingotGold = new Ingot({
@@ -80,6 +96,10 @@ export const ingotGold = new Ingot({
   cost: new ItemCost({ baseCost: 1200, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_GoldIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { mDmg: 3 },
+    tags: ["noble", "soft", "high-magic-conductivity"],
+  }),
 });
 
 /**
@@ -98,6 +118,10 @@ export const ingotBronze = new Ingot({
   cost: new ItemCost({ baseCost: 250, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_BronzeIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 1 },
+    tags: ["balanced", "alloy", "durable"],
+  }),
 });
 
 export const ingotSteel = new Ingot({
@@ -113,6 +137,10 @@ export const ingotSteel = new Ingot({
   cost: new ItemCost({ baseCost: 750, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_SteelIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 2 },
+    tags: ["strong", "tempered", "martial"],
+  }),
 });
 
 export const ingotElectrum = new Ingot({
@@ -128,6 +156,10 @@ export const ingotElectrum = new Ingot({
   cost: new ItemCost({ baseCost: 2500, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_ElectrumIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 1, mDmg: 3 },
+    tags: ["hybrid", "arcane-conductor", "rare"],
+  }),
 });
 
 /**
@@ -146,6 +178,10 @@ export const ingotAethersteel = new Ingot({
   cost: new ItemCost({ baseCost: 9000, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Infusion_AethersteelIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 2, mDmg: 2 },
+    tags: ["planar-infused", "balanced", "epic"],
+  }),
 });
 
 export const ingotVoidforged = new Ingot({
@@ -158,7 +194,11 @@ export const ingotVoidforged = new Ingot({
   image: "ingotVoidforged",
   weight: 14,
   tier: TierEnum.legendary,
-  cost: new ItemCost({ baseCost: 25000, bonusCost: 0 }),
+  cost: new ItemCost({ baseCost: 2500000, bonusCost: 0 }),
   isCraftable: true,
   blueprintId: BlueprintId.Infusion_VoidforgedIngot,
+  equipmentCraftingAttributes: createEquipmentCraftingAttributes({
+    damage: { pDmg: 3, mDmg: 3 },
+    tags: ["void", "lifedrain", "legendary"],
+  }),
 });

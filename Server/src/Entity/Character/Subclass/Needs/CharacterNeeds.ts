@@ -4,11 +4,17 @@ export class CharacterNeeds {
   mood: number;
   energy: number;
   satiety: number;
+  moodBonus: number = 0;
+  energyBonus: number = 0;
+  satietyBonus: number = 0;
 
   constructor(data: Partial<CharacterNeeds> = {}) {
     this.mood = data.mood ?? 50;
     this.energy = data.energy ?? 50;
     this.satiety = data.satiety ?? 50;
+    this.moodBonus = data.moodBonus ?? 0;
+    this.energyBonus = data.energyBonus ?? 0;
+    this.satietyBonus = data.satietyBonus ?? 0;
   }
 
   set(partial: Partial<Pick<CharacterNeeds, "mood" | "energy" | "satiety">>) {

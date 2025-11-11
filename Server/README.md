@@ -49,5 +49,6 @@ In production the scheduler performs an initial catch-up run on startup and repl
 ## Notes
 
 - The scheduler computes in-game time from the real clock each run; no persistent game-time state is stored between restarts.
+- Loop metrics track total/success/failure counts, consecutive failures, and last error; phase failures emit a warning after three consecutive errors and are reset on the next success.
 - At the start of each in-game day (`hour === 1`), the server snapshots game state, market data, resource tracking, and news archives back into Postgres.
 - This project was created using `bun init` in bun v1.2.12. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

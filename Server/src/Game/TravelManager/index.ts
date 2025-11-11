@@ -18,8 +18,6 @@ import Report from "../../Utils/Reporter";
 import { statMod } from "../../Utils/statMod";
 import { TravelingParty } from "./TravelingParty";
 import { TravelMethodEnum } from "./TravelMethod";
-import { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
-import { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import { L10NWithEntities } from "../../InterFacesEnumsAndTypes/L10N";
 
 class TravelManager {

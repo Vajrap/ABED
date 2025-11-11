@@ -4,6 +4,7 @@ import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import type { ItemId } from "./type";
 import { BlueprintId } from "../Blueprint/enum";
 import type { ResourceType } from "src/InterFacesEnumsAndTypes/ResourceTypes";
+import type { EquipmentCraftingAttributes } from "./Misc/Resource/EquipmentCraftingAttributes";
 
 export type ItemCategoryType =
   | "ingot" // Accepts any IngotId
@@ -35,6 +36,7 @@ export interface ItemDefinition {
   isCraftable?: boolean;
   blueprintId?: BlueprintReference;
   primaryResource?: ResourceType | null;
+  equipmentCraftingAttributes?: EquipmentCraftingAttributes;
 }
 
 export class Item {
@@ -48,6 +50,7 @@ export class Item {
   isCraftable: boolean;
   blueprintId?: BlueprintReference;
   primaryResource?: ResourceType | null;
+  equipmentCraftingAttributes?: EquipmentCraftingAttributes;
 
   constructor(data: ItemDefinition) {
     this.id = data.id;
@@ -61,5 +64,6 @@ export class Item {
     this.isCraftable = data.isCraftable ?? false;
     this.blueprintId = data.blueprintId;
     this.primaryResource = data.primaryResource ?? null;
+    this.equipmentCraftingAttributes = data.equipmentCraftingAttributes;
   }
 }

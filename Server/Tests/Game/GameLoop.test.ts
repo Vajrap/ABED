@@ -69,11 +69,12 @@ jest.mock("../../src/Database/persistence", () => ({
   saveDailyState: saveDailyStateMock,
 }));
 
-import { runGameLoop } from "../../src/Game/GameLoop";
+import { runGameLoop, getGameLoopMetrics } from "../../src/Game/GameLoop";
 import { GameTime } from "../../src/Game/GameTime/GameTime";
 import { gameState } from "../../src/Game/GameState";
 import { persistLastProcessedPhase } from "../../src/Database/gameStateStore";
 import { saveDailyState } from "../../src/Database/persistence";
+import { locationManager } from "../../src/Entity/Location/Manager/LocationManager";
 
 describe("GameLoop", () => {
   beforeEach(() => {
@@ -100,6 +101,41 @@ describe("GameLoop", () => {
 
     const saveDailyMock = saveDailyState as jest.Mock;
     expect(saveDailyMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("tracks consecutive failures and resets after a success", async () => {
+    const epoch = new Date("2025-01-01T00:00:00.000Z");
+    const msPerPhase = 1000;
+    GameTime.setLastProcessedPhaseIndex(0);
+    (gameState as any).lastProcessedPhaseIndex = 0;
+
+    const failure = new Error("encounter failure");
+    (locationManager.processEncounters as jest.Mock).mockImplementationOnce(
+      async () => {
+        throw failure;
+      },
+    );
+
+    await expect(
+      runGameLoop({ now: new Date(epoch.getTime() + 1 * msPerPhase), label: "test-failure" }),
+    ).rejects.toThrow(failure);
+
+    const metricsAfterFailure = getGameLoopMetrics();
+    expect(metricsAfterFailure.consecutiveFailedRuns).toBe(1);
+    expect(metricsAfterFailure.lastError?.message).toBe("encounter failure");
+
+    (locationManager.processEncounters as jest.Mock).mockResolvedValue(
+      createNewsDistribution(),
+    );
+
+    await runGameLoop({
+      now: new Date(epoch.getTime() + 2 * msPerPhase),
+      label: "test-success",
+    });
+
+    const metricsAfterSuccess = getGameLoopMetrics();
+    expect(metricsAfterSuccess.consecutiveFailedRuns).toBe(0);
+    expect(metricsAfterSuccess.lastError).toBeNull();
   });
 });
 

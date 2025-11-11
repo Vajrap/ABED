@@ -1,20 +1,23 @@
 import { gold } from "./Gold";
+import type { ItemMisc } from "./Misc";
 import {
   BoneId,
+  ClothId,
   GemId,
   GoldId,
   IngotId,
   LeatherId,
   OreId,
   PlankId,
+  RawGemId,
   SkinId,
   ThreadId,
   WoodId,
   type MiscItemId,
 } from "./index";
-import type { ItemMisc } from "./Misc";
-import { boneCommon, boneFang, boneHorn } from "./Resource/Bone/definition";
-import { gemCut, gemRough } from "./Resource/Gem/definition";
+import { boneItems } from "./Resource/Bone/definition";
+import { clothItems } from "./Resource/Cloth/definition";
+import { gemItems } from "./Resource/Gem/definition";
 import {
   ingotAethersteel,
   ingotBronze,
@@ -27,11 +30,7 @@ import {
   ingotTin,
   ingotVoidforged,
 } from "./Resource/Ingot/definition";
-import {
-  leatherBasic,
-  leatherFine,
-  leatherScaled,
-} from "./Resource/Leather/definition";
+import { leatherItems } from "./Resource/Leather/definition";
 import {
   oreCopper,
   oreErebite,
@@ -47,12 +46,9 @@ import {
   plankOak,
   plankPine,
 } from "./Resource/Plank/definition";
-import { skinFur, skinHide, skinScale } from "./Resource/Skin/definition";
-import {
-  threadLinen,
-  threadSilk,
-  threadWool,
-} from "./Resource/Thread/definition";
+import { rawGemItems } from "./Resource/RawGem/definition";
+import { skinItems } from "./Resource/Skin/definition";
+import { threadItems } from "./Resource/Thread/definition";
 import {
   woodIronwood,
   woodMaple,
@@ -62,43 +58,41 @@ import {
 
 export const miscRepository: Record<MiscItemId, ItemMisc> = {
   [GoldId.gold]: gold,
+
   [WoodId.Oak]: woodOak,
   [WoodId.Pine]: woodPine,
   [WoodId.Maple]: woodMaple,
   [WoodId.Ironwood]: woodIronwood,
-  [SkinId.Hide]: skinHide,
-  [SkinId.Fur]: skinFur,
-  [SkinId.Scale]: skinScale,
-  [BoneId.Bone]: boneCommon,
-  [BoneId.Fang]: boneFang,
-  [BoneId.Horn]: boneHorn,
+
   [OreId.CopperOre]: oreCopper,
+  [OreId.TinOre]: oreTin,
   [OreId.IronOre]: oreIron,
   [OreId.SilverOre]: oreSilver,
   [OreId.GoldOre]: oreGold,
+  [OreId.PlanariteOre]: orePlanarite,
+  [OreId.ErebiteOre]: oreErebite,
+
   [IngotId.CopperIngot]: ingotCopper,
+  [IngotId.TinIngot]: ingotTin,
+  [IngotId.BronzeIngot]: ingotBronze,
   [IngotId.IronIngot]: ingotIron,
+  [IngotId.SteelIngot]: ingotSteel,
   [IngotId.SilverIngot]: ingotSilver,
   [IngotId.GoldIngot]: ingotGold,
+  [IngotId.ElectrumIngot]: ingotElectrum,
+  [IngotId.AethersteelIngot]: ingotAethersteel,
+  [IngotId.VoidforgedIngot]: ingotVoidforged,
+
   [PlankId.OakPlank]: plankOak,
   [PlankId.PinePlank]: plankPine,
   [PlankId.MaplePlank]: plankMaple,
   [PlankId.IronwoodPlank]: plankIronwood,
-  [LeatherId.Leather]: leatherBasic,
-  [LeatherId.FineLeather]: leatherFine,
-  [LeatherId.ScaledLeather]: leatherScaled,
-  [ThreadId.WoolThread]: threadWool,
-  [ThreadId.SilkThread]: threadSilk,
-  [ThreadId.LinenThread]: threadLinen,
-  [GemId.RoughGem]: gemRough,
-  [GemId.CutGem]: gemCut,
-  [OreId.TinOre]: oreTin,
-  [OreId.PlanariteOre]: orePlanarite,
-  [OreId.ErebiteOre]: oreErebite,
-  [IngotId.TinIngot]: ingotTin,
-  [IngotId.BronzeIngot]: ingotBronze,
-  [IngotId.SteelIngot]: ingotSteel,
-  [IngotId.ElectrumIngot]: ingotElectrum,
-  [IngotId.AethersteelIngot]: ingotAethersteel,
-  [IngotId.VoidforgedIngot]: ingotVoidforged,
-};
+
+  ...(skinItems as Record<SkinId, ItemMisc>),
+  ...(boneItems as Record<BoneId, ItemMisc>),
+  ...(leatherItems as Record<LeatherId, ItemMisc>),
+  ...(threadItems as Record<ThreadId, ItemMisc>),
+  ...(clothItems as Record<ClothId, ItemMisc>),
+  ...(gemItems as Record<GemId, ItemMisc>),
+  ...(rawGemItems as Record<RawGemId, ItemMisc>),
+}

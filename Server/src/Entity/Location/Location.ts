@@ -51,6 +51,9 @@ import { GameTime } from "../../Game/GameTime/GameTime";
 import type { ResourceType } from "src/InterFacesEnumsAndTypes/ResourceTypes";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N";
 import { subregionRepository } from "./SubRegion/repository";
+import {
+  RailStationEnum,
+} from "../../InterFacesEnumsAndTypes/Enums/RailStation";
 
 export type UserInputAction = {
   type: ActionInput;
@@ -127,6 +130,7 @@ export class Location {
   weatherScale: number;
   volatility: WeatherVolatility;
   resourceGeneration: ResourceGenerationConfig;
+  trainStationId: RailStationEnum | null;
 
   /*
     We need a list of all possible event with dice face number.
@@ -175,6 +179,7 @@ export class Location {
     this.weatherScale = weatherScale ?? getStartingWeatherScale(volatility);
     this.resourceGeneration =
       resourceGeneration ?? this.getDefaultResourceGeneration();
+    this.trainStationId = null;
   }
 
   getRandomEventFor(
@@ -208,6 +213,14 @@ export class Location {
     const handler = sub[Math.floor(Math.random() * sub.length)];
 
     return handler ?? null;
+  }
+
+  hasTrainStation(): boolean {
+    return this.trainStationId !== null;
+  }
+
+  setTrainStation(stationId: RailStationEnum) {
+    this.trainStationId = stationId;
   }
 
   getDistanceTo(location: Location): number | undefined {
@@ -270,7 +283,11 @@ export class Location {
     for (const party of this.parties) {
       const action = party.actionSequence[day][phase];
 
-      if (action === ActionInput.Travel || specialActions.includes(action))
+      if (
+        action === ActionInput.Travel ||
+        action === ActionInput.RailTravel ||
+        specialActions.includes(action)
+      )
         continue;
 
       const context = buildNewsContext(this, party);
