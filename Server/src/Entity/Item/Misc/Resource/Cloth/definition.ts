@@ -3,6 +3,7 @@ import { ClothId } from "../..";
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
 import { createEquipmentCraftingAttributes } from "src/Entity/Item/Misc/Resource/EquipmentCraftingAttributes";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 type ClothDefinition = {
   name: string;
@@ -21,7 +22,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     weight: 4,
     baseCost: 140,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-      // Mundane cloth, no bonuses
+      needs: { moodBonus: 1 },
     }),
   },
   [ClothId.CottonCloth]: {
@@ -31,7 +32,7 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
     weight: 4,
     baseCost: 150,
     equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-      // Mundane cloth, no bonuses
+      attributes: { charisma: 1 },
     }),
   },
   [ClothId.WoolCloth]: {
@@ -164,6 +165,23 @@ const CLOTH_DATA: Record<ClothId, ClothDefinition> = {
   },
 };
 
+const CLOTH_BLUEPRINT: Record<ClothId, BlueprintId> = {
+  [ClothId.LinenCloth]: BlueprintId.Weave_Cloth_Linen,
+  [ClothId.CottonCloth]: BlueprintId.Weave_Cloth_Cotton,
+  [ClothId.WoolCloth]: BlueprintId.Weave_Cloth_Wool,
+  [ClothId.SilkCloth]: BlueprintId.Weave_Cloth_Silk,
+  [ClothId.SpiderSilkCloth]: BlueprintId.Weave_Cloth_SpiderSilk,
+  [ClothId.YetiCloth]: BlueprintId.Weave_Cloth_Yeti,
+  [ClothId.PhoenixCloth]: BlueprintId.Weave_Cloth_Phoenix,
+  [ClothId.SpiritCloth]: BlueprintId.Weave_Cloth_Spirit,
+  [ClothId.Aetherweave]: BlueprintId.Weave_Cloth_Aether,
+  [ClothId.Fiendcloth]: BlueprintId.Weave_Cloth_Fiend,
+  [ClothId.FluxweaveCloth]: BlueprintId.Weave_Cloth_Fluxweave,
+  [ClothId.DragonskinWeave]: BlueprintId.Weave_Cloth_Dragonskin,
+  [ClothId.LeviathanLining]: BlueprintId.Weave_Cloth_LeviathanLining,
+  [ClothId.HydraWeave]: BlueprintId.Weave_Cloth_Hydra,
+};
+
 export const clothItems: Record<ClothId, Cloth> = Object.fromEntries(
   Object.entries(CLOTH_DATA).map(([id, data]) => [
     id,
@@ -175,6 +193,7 @@ export const clothItems: Record<ClothId, Cloth> = Object.fromEntries(
       weight: data.weight,
       cost: new ItemCost({ baseCost: data.baseCost }),
       isCraftable: true,
+      blueprintId: CLOTH_BLUEPRINT[id as ClothId],
       equipmentCraftingAttributes: data.equipmentCraftingAttributes,
     }),
   ]),

@@ -3,7 +3,7 @@
 // =================================================
 
 import { BlueprintId } from "src/Entity/Blueprint/enum";
-import { ItemId } from "src/Entity/Item";
+import type { ItemId } from "src/Entity/Item";
 
 /*
   How should a character determine what to craft?

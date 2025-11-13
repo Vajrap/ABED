@@ -4,10 +4,10 @@ export const blueprintWeaponLongestStaff = new WeaponBlueprint(
   {
     handle: {
       resource: [MaterialType.Plank],
-      amount: 3,
+      amount: 6,
     },
   },
-  "woodworking",
+  "carpentry",
   10,
   0,
 );

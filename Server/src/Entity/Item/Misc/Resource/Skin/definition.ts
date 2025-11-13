@@ -20,7 +20,10 @@ const SKIN_DATA: Record<SkinId, SkinDefinition> = {
     tier: TierEnum.common,
     weight: 6,
     baseCost: 80,
-    craftingAttributes: createEquipmentCraftingAttributes(),
+    craftingAttributes: createEquipmentCraftingAttributes({
+      dodge: 1,
+      needs: { energyBonus: 1 },
+    }),
   },
   [SkinId.DirewolfPelt]: {
     name: "Direwolf Pelt",

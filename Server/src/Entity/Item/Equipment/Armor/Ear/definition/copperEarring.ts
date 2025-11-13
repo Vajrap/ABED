@@ -3,6 +3,7 @@ import { EarId } from "../../type";
 import { Ear } from "../Ear";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 export const copperEarring = new Ear(
   {
@@ -17,7 +18,7 @@ export const copperEarring = new Ear(
     image: "copperEarring",
     isCraftable: true,
     weight: 1,
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Jewelry_Earring_Copper,
   },
   {},
   { armorClass: ArmorClass.Cloth },

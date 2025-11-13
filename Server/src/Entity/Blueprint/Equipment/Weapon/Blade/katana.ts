@@ -4,7 +4,7 @@ export const blueprintWeaponKatana = new WeaponBlueprint(
   {
     blade: {
       resource: [MaterialType.Ingot],
-      amount: 5,
+      amount: 4,
     },
     handle: {
       resource: [MaterialType.Plank],

@@ -2,9 +2,9 @@ import { WeaponBlueprint, MaterialType } from "../../../Blueprint";
 
 export const blueprintWeaponHammer = new WeaponBlueprint(
   {
-    blade: {
+    core: {
       resource: [MaterialType.Ingot],
-      amount: 3,
+      amount: 4,
     },
     handle: {
       resource: [MaterialType.Plank],

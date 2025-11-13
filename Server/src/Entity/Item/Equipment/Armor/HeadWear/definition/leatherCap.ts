@@ -3,6 +3,7 @@ import { HeadWearId } from "../../type";
 import { HeadWear } from "../HeadWear";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 export const leatherCap = new HeadWear(
   {
@@ -17,7 +18,7 @@ export const leatherCap = new HeadWear(
     image: "leatherCap",
     isCraftable: true,
     weight: 5,
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Armor_Head_LeatherCap,
   },
   {},
   {

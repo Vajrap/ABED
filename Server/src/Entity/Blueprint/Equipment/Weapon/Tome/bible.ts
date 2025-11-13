@@ -7,7 +7,7 @@ export const blueprintWeaponBible = new WeaponBlueprint(
       amount: 1,
     },
   },
-  "woodworking",
+  "carpentry",
   8,
   0,
 );

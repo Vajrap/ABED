@@ -3,6 +3,7 @@ import { LegId } from "../../type";
 import { Leg } from "../Leg";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 // 🩳 Cloth
 export const linenPants = new Leg(
@@ -18,7 +19,7 @@ export const linenPants = new Leg(
     image: "linenPants",
     isCraftable: true,
     weight: 4, // 0.4 kg
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Armor_Leg_LinenPants,
   },
   {},
   {

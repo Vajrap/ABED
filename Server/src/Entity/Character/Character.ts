@@ -106,6 +106,7 @@ export class Character {
 
   inventorySize: { base: number; bonus: number } = { base: 20, bonus: 0 };
   inventory: Map<ItemId, number> = new Map();
+  itemInstances: Map<string, ItemId> = new Map();
   equipments: {
     headWear: HeadWearId | null;
     body: BodyId | null;
@@ -244,11 +245,19 @@ export class Character {
     this.inventory.set(item, (this.inventory.get(item) ?? 0) + quantity);
   }
 
+  addItemInstance(instanceId: string, baseItemId: ItemId) {
+    this.itemInstances.set(instanceId, baseItemId);
+  }
+
   removeItemFromInventory(item: ItemId, quantity: number) {
     this.inventory.set(item, (this.inventory.get(item) ?? 0) - quantity);
     if (this.inventory.get(item) === 0) {
       this.inventory.delete(item);
     }
+  }
+
+  removeItemInstance(instanceId: string) {
+    this.itemInstances.delete(instanceId);
   }
 
   addEpithet(epithet: CharacterEpithetEnum) {

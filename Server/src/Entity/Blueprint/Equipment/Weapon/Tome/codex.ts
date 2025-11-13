@@ -7,7 +7,7 @@ export const blueprintWeaponCodex = new WeaponBlueprint(
       amount: 1,
     },
   },
-  "woodworking",
+  "carpentry",
   8,
   0,
 );

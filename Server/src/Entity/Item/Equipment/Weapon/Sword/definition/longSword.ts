@@ -31,7 +31,7 @@ export const longSword = new Sword(
         [SeasonEnum.LongDark]: 0,
       },
     },
-    image: "rustedIronSword",
+    image: SwordId.LongSword,
     isCraftable: true,
     weight: 15,
     blueprintId: BlueprintId.Weapon_LongSword,

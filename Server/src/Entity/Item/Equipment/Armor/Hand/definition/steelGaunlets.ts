@@ -3,6 +3,7 @@ import { HandId } from "../../type";
 import { Hand } from "../Hand";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 export const steelGauntlets = new Hand(
   {
@@ -17,7 +18,7 @@ export const steelGauntlets = new Hand(
     image: "steelGauntlets",
     isCraftable: true,
     weight: 10, // 1.0 kg
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Armor_Hand_SteelGauntlets,
   },
   {},
   {

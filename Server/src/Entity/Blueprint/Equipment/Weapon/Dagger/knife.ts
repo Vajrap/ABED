@@ -4,7 +4,7 @@ export const blueprintWeaponKnife = new WeaponBlueprint(
   {
     blade: {
       resource: [MaterialType.Ingot],
-      amount: 1,
+      amount: 2,
     },
     handle: {
       resource: [MaterialType.Plank],

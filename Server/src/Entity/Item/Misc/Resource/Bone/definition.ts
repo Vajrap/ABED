@@ -61,6 +61,10 @@ const BONE_DATA: Record<BoneId, BoneDefinition> = {
     tier: TierEnum.common,
     weight: 5,
     baseCost: 50,
+    craftingAttributes: createEquipmentCraftingAttributes({
+      saves: { vitality: 1 },
+      planarAttunement: 1,
+    }),
   },
   [BoneId.Fang]: {
     name: "Predator Fang",

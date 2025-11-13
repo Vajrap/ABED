@@ -4,7 +4,7 @@ export const blueprintWeaponStiletto = new WeaponBlueprint(
   {
     blade: {
       resource: [MaterialType.Ingot],
-      amount: 2,
+      amount: 1,
     },
     handle: {
       resource: [MaterialType.Plank],

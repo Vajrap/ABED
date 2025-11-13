@@ -23,6 +23,7 @@ export type WeaponData<
   weaponType: T;
   preferredPosition: P;
   handle: 1 | 2;
+  gemSlots?: number;
   damage: DamageData;
 };
 

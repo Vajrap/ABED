@@ -7,7 +7,7 @@ export const blueprintWeaponTowerShield = new WeaponBlueprint(
       amount: 3,
     },
   },
-  "woodworking",
+  "carpentry",
   10,
   0,
 );

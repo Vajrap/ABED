@@ -1,4 +1,4 @@
-import { PotionId } from "../..";
+import { PotionId } from "../index";
 import { Potion } from "./Potion";
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { Character } from "src/Entity/Character/Character";

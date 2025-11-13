@@ -3,6 +3,7 @@ import { FootId } from "../../type";
 import { Foot } from "../Foot";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 // 🩰 Cloth
 export const clothShoes = new Foot(
@@ -18,7 +19,7 @@ export const clothShoes = new Foot(
     image: "clothShoes",
     isCraftable: true,
     weight: 2, // 0.2 kg
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Armor_Foot_ClothShoes,
   },
   {},
   {

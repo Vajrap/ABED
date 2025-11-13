@@ -2,6 +2,15 @@ import { Weapon } from "../Weapon/Weapon";
 import { Armor } from "../Armor/Armor";
 import type { ItemInstance } from "../../../../Database/Schema/item_instances";
 import Report from "../../../../Utils/Reporter";
+import { getEquipment } from "../repository";
+import {
+  cloneArmorInstance,
+  cloneWeaponInstance,
+} from "src/Event/Craft/equipmentCraftingUtils";
+import {
+  deserializeEquipmentModifier,
+  deserializeItemCost,
+} from "src/Event/Craft/itemInstancePersistence";
 
 /**
  * Item Instance Repository
@@ -15,46 +24,60 @@ export const itemInstanceRepository: Map<string, Weapon | Armor> = new Map();
  */
 export function loadItemInstance(dbInstance: ItemInstance): Weapon | Armor | null {
   try {
-    if (dbInstance.itemType === "weapon") {
-      // Construct Weapon from stored data
-      const weapon = new Weapon(
-        {
-          id: dbInstance.baseItemId as any,
-          name: { en: "", th: "" }, // Will be loaded from base item
-          description: { en: "", th: "" },
-          image: "",
-          weight: 0,
-          tier: "common" as any,
-          cost: {} as any,
-          isCraftable: true,
-          blueprintId: dbInstance.blueprintId as any,
-        },
-        dbInstance.modifiers as any,
-        dbInstance.itemData as any,
+    const baseEquipment = getEquipment(dbInstance.baseItemId);
+    if (!baseEquipment) {
+      Report.error("Failed to load item instance: base equipment not found", {
+        itemInstanceId: dbInstance.id,
+        baseItemId: dbInstance.baseItemId,
+      });
+      return null;
+    }
+
+    if (dbInstance.itemType === "weapon" && baseEquipment instanceof Weapon) {
+      const weapon = cloneWeaponInstance(baseEquipment);
+      const payload = dbInstance.itemData as Record<string, unknown>;
+      if (payload?.weaponData) {
+        weapon.weaponData = payload.weaponData as Weapon["weaponData"];
+      }
+      if (payload?.cost) {
+        weapon.cost = deserializeItemCost(payload.cost as Record<string, unknown>);
+      }
+      if (typeof payload?.weight === "number") {
+        weapon.weight = payload.weight as number;
+      }
+      weapon.modifier = deserializeEquipmentModifier(
+        dbInstance.modifiers as Record<string, unknown>,
       );
+      weapon.setInstanceId(dbInstance.id);
       itemInstanceRepository.set(dbInstance.id, weapon);
       return weapon;
-    } else if (dbInstance.itemType === "armor") {
-      // Construct Armor from stored data
-      const armor = new Armor(
-        {
-          id: dbInstance.baseItemId as any,
-          name: { en: "", th: "" }, // Will be loaded from base item
-          description: { en: "", th: "" },
-          image: "",
-          weight: 0,
-          tier: "common" as any,
-          cost: {} as any,
-          isCraftable: true,
-          blueprintId: dbInstance.blueprintId as any,
-        },
-        "body" as any, // Slot from itemData
-        dbInstance.modifiers as any,
-        dbInstance.itemData as any,
+    }
+
+    if (dbInstance.itemType === "armor" && baseEquipment instanceof Armor) {
+      const armor = cloneArmorInstance(baseEquipment);
+      const payload = dbInstance.itemData as Record<string, unknown>;
+      if (payload?.armorData) {
+        armor.armorData = payload.armorData as Armor["armorData"];
+      }
+      if (payload?.cost) {
+        armor.cost = deserializeItemCost(payload.cost as Record<string, unknown>);
+      }
+      if (typeof payload?.weight === "number") {
+        armor.weight = payload.weight as number;
+      }
+      armor.modifier = deserializeEquipmentModifier(
+        dbInstance.modifiers as Record<string, unknown>,
       );
+      armor.setInstanceId(dbInstance.id);
       itemInstanceRepository.set(dbInstance.id, armor);
       return armor;
     }
+
+    Report.error("Unexpected item instance type or base mismatch", {
+      itemInstanceId: dbInstance.id,
+      baseItemId: dbInstance.baseItemId,
+      itemType: dbInstance.itemType,
+    });
     return null;
   } catch (error) {
     Report.error("Failed to load item instance", {

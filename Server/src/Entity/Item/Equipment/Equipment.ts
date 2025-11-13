@@ -9,6 +9,7 @@ import { type EquipmentModifier } from "./type";
 export class Equipment extends Item {
   declare id: EquipmentId;
 
+  instanceId: string | null = null;
   slot: EquipmentSlot;
   modifier: EquipmentModifier;
 
@@ -20,6 +21,10 @@ export class Equipment extends Item {
     super(data);
     this.slot = slot;
     this.modifier = modifier;
+  }
+
+  setInstanceId(id: string): void {
+    this.instanceId = id;
   }
 }
 

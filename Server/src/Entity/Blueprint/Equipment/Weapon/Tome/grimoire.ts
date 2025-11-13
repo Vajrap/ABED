@@ -7,7 +7,7 @@ export const blueprintWeaponGrimoire = new WeaponBlueprint(
       amount: 1,
     },
   },
-  "woodworking",
+  "carpentry",
   9,
   0,
 );

@@ -3,6 +3,7 @@ import { BodyId } from "../../type";
 import { Body } from "../Body";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 export const splintMail = new Body(
   {
@@ -14,7 +15,7 @@ export const splintMail = new Body(
     image: "splintMail",
     isCraftable: true,
     weight: 60,
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Armor_Body_SplintMail,
   },
   {},
   {

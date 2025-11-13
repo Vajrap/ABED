@@ -7,7 +7,7 @@ export const blueprintWeaponQuarterStaff = new WeaponBlueprint(
       amount: 2,
     },
   },
-  "woodworking",
+  "carpentry",
   9,
   0,
 );

@@ -3,6 +3,7 @@ import { ItemMisc } from "../../Misc";
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
 import { createEquipmentCraftingAttributes } from "src/Entity/Item/Misc/Resource/EquipmentCraftingAttributes";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 type LeatherDefinition = {
   name: string;
@@ -20,7 +21,10 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
     tier: TierEnum.common,
     weight: 8,
     baseCost: 140,
-    craftingAttributes: createEquipmentCraftingAttributes(),
+    craftingAttributes: createEquipmentCraftingAttributes({
+      defense: { pDef: 1 },
+      dodge: 1,
+    }),
   },
   [LeatherId.FineLeather]: {
     name: "Fine Leather",
@@ -138,6 +142,24 @@ const LEATHER_DATA: Record<LeatherId, LeatherDefinition> = {
   },
 };
 
+const LEATHER_BLUEPRINT: Record<LeatherId, BlueprintId> = {
+  [LeatherId.Leather]: BlueprintId.Refine_Leather_Leather,
+  [LeatherId.FineLeather]: BlueprintId.Refine_Leather_Fine,
+  [LeatherId.ThickLeather]: BlueprintId.Refine_Leather_Thick,
+  [LeatherId.RuggedLeather]: BlueprintId.Refine_Leather_Rugged,
+  [LeatherId.ScaledLeather]: BlueprintId.Refine_Leather_Scaled,
+  [LeatherId.WyvernLeather]: BlueprintId.Refine_Leather_Wyvern,
+  [LeatherId.DrakeLeather]: BlueprintId.Refine_Leather_Drake,
+  [LeatherId.HydraLeather]: BlueprintId.Refine_Leather_Hydra,
+  [LeatherId.LeviathanLeather]: BlueprintId.Refine_Leather_Leviathan,
+  [LeatherId.FiendLeather]: BlueprintId.Refine_Leather_Fiend,
+  [LeatherId.AetherLeather]: BlueprintId.Refine_Leather_Aether,
+  [LeatherId.SpiritLeather]: BlueprintId.Refine_Leather_Spirit,
+  [LeatherId.YetiLeather]: BlueprintId.Refine_Leather_Yeti,
+  [LeatherId.SalamanderLeather]: BlueprintId.Refine_Leather_Salamander,
+  [LeatherId.ManticoreLeather]: BlueprintId.Refine_Leather_Manticore,
+};
+
 export const leatherItems: Record<LeatherId, ItemMisc> = Object.fromEntries(
   Object.entries(LEATHER_DATA).map(([id, data]) => [
     id,
@@ -149,6 +171,7 @@ export const leatherItems: Record<LeatherId, ItemMisc> = Object.fromEntries(
       weight: data.weight,
       cost: new ItemCost({ baseCost: data.baseCost }),
       isCraftable: true,
+      blueprintId: LEATHER_BLUEPRINT[id as LeatherId],
       equipmentCraftingAttributes: data.craftingAttributes || createEquipmentCraftingAttributes(),
     }),
   ]),

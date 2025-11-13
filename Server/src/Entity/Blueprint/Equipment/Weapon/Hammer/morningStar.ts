@@ -2,7 +2,7 @@ import { WeaponBlueprint, MaterialType } from "../../../Blueprint";
 
 export const blueprintWeaponMorningStar = new WeaponBlueprint(
   {
-    blade: {
+    core: {
       resource: [MaterialType.Ingot],
       amount: 3,
     },

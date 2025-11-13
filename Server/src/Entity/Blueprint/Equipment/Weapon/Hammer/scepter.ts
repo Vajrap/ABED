@@ -2,9 +2,9 @@ import { WeaponBlueprint, MaterialType } from "../../../Blueprint";
 
 export const blueprintWeaponScepter = new WeaponBlueprint(
   {
-    blade: {
+    core: {
       resource: [MaterialType.Ingot],
-      amount: 2,
+      amount: 3,
     },
     handle: {
       resource: [MaterialType.Plank],

@@ -4,7 +4,7 @@ export const blueprintWeaponHalberd = new WeaponBlueprint(
   {
     blade: {
       resource: [MaterialType.Ingot],
-      amount: 4,
+      amount: 6,
     },
     handle: {
       resource: [MaterialType.Plank],

@@ -3,6 +3,7 @@ import { HeadWearId } from "../../type";
 import { HeadWear } from "../HeadWear";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 export const chainCoif = new HeadWear(
   {
@@ -17,7 +18,7 @@ export const chainCoif = new HeadWear(
     image: "chainCoif",
     isCraftable: true,
     weight: 8,
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Armor_Head_ChainCoif,
   },
   {},
   {

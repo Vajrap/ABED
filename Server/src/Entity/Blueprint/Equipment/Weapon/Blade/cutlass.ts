@@ -4,7 +4,7 @@ export const blueprintWeaponCutlass = new WeaponBlueprint(
   {
     blade: {
       resource: [MaterialType.Ingot],
-      amount: 4,
+      amount: 2,
     },
     handle: {
       resource: [MaterialType.Plank],

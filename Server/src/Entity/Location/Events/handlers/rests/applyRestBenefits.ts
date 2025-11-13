@@ -24,6 +24,6 @@ export function applyRestBenefits(
         character.attribute.getStat("vitality").total / 2) *
         restFactor,
     );
-    character.needs.increase("mood", addedMood);
-    character.needs.increase("energy", addedEnergy);
+    character.needs.incMood(addedMood);
+    character.needs.incEnergy(addedEnergy);
 }

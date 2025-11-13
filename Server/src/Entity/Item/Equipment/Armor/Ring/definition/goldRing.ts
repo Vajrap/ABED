@@ -3,6 +3,7 @@ import { RingId } from "../../type";
 import { Ring } from "../Ring";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 export const goldRing = new Ring(
   {
@@ -17,7 +18,7 @@ export const goldRing = new Ring(
     image: "goldRing",
     isCraftable: true,
     weight: 1,
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Jewelry_Ring_Gold,
   },
   {},
   { armorClass: ArmorClass.Cloth },

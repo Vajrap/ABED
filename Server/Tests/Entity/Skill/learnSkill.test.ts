@@ -11,13 +11,6 @@ import { SkillId } from "../../../src/Entity/Skill/enums";
 import { TierEnum } from "../../../src/InterFacesEnumsAndTypes/Tiers";
 import { tryTolearnSkill } from "../../../src/Entity/Skill/learnSkill";
 import { TraitEnum } from "../../../src/Entity/Trait.ts/enum";
-import {
-  ELEMENT_KEYS,
-} from "../../../src/InterFacesEnumsAndTypes/Enums";
-import { ElementKey } from "../../../src/InterFacesEnumsAndTypes/Enums";
-import { CharacterAttributes } from "../../../src/Entity/Character/Subclass/Stats/CharacterAttributes";
-import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
-import { TurnResult } from "src/Entity/Skill/types";
 
 jest.mock("../../../src/Utils/Dice", () => ({
   roll: jest.fn((amount: number) => ({

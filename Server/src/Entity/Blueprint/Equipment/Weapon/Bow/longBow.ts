@@ -4,10 +4,10 @@ export const blueprintWeaponLongBow = new WeaponBlueprint(
   {
     handle: {
       resource: [MaterialType.Plank],
-      amount: 2,
+      amount: 3,
     },
   },
-  "woodworking",
+  "carpentry",
   10,
   0,
 );

@@ -3,6 +3,7 @@ import { FootId } from "../../type";
 import { Foot } from "../Foot";
 import { ArmorClass } from "../../Armor";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
+import { BlueprintId } from "src/Entity/Blueprint/enum";
 
 // 🦿 Heavy
 export const plateSabatons = new Foot(
@@ -18,7 +19,7 @@ export const plateSabatons = new Foot(
     image: "plateSabatons",
     isCraftable: true,
     weight: 12, // 1.2 kg
-    blueprintId: undefined,
+    blueprintId: BlueprintId.Armor_Foot_PlateSabatons,
   },
   {},
   {

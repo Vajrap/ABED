@@ -4,10 +4,10 @@ export const blueprintWeaponWand = new WeaponBlueprint(
   {
     handle: {
       resource: [MaterialType.Plank],
-      amount: 1,
+      amount: 2,
     },
   },
-  "woodworking",
+  "carpentry",
   8,
   0,
 );

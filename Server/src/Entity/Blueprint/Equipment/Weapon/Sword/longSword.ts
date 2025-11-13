@@ -4,7 +4,7 @@ export const blueprintWeaponLongSword = new WeaponBlueprint(
   {
     blade: {
       resource: [MaterialType.Ingot],
-      amount: 4,
+      amount: 3,
     },
     handle: {
       resource: [MaterialType.Plank],

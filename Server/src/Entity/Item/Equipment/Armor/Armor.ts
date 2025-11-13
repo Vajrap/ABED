@@ -29,6 +29,7 @@ export class Armor extends Equipment {
 
 export interface ArmorData {
   armorClass: ArmorClass;
+  gemSlots?: number;
   requirement?: Partial<Record<AttributeKey, number>>;
   pDef?: {
     slash: number;

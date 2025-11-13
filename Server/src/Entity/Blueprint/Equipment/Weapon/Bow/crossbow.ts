@@ -4,7 +4,7 @@ export const blueprintWeaponCrossbow = new WeaponBlueprint(
   {
     blade: {
       resource: [MaterialType.Ingot],
-      amount: 1,
+      amount: 3,
     },
     handle: {
       resource: [MaterialType.Plank],

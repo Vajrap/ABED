@@ -11,7 +11,7 @@ import { consumableRepository } from "../Item/Consumable/repository";
  *
  * This repository merges equipment, weapon, and misc registries.
  */
-export const itemRepository: Record<ItemId, Item | undefined> = {
+export const itemRepository: Record<ItemId, Item> = {
   ...equipmentRepository,
   ...weaponRepository,
   ...miscRepository,

@@ -22,7 +22,6 @@ export const ingotCopper = new Ingot({
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_CopperIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-    damage: { mDmg: 1 },
     tags: ["conductive", "soft", "common"],
   }),
 });
@@ -59,7 +58,7 @@ export const ingotIron = new Ingot({
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_IronIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-    damage: { pDmg: 1 },
+    damage: { pDmg: 0 },
     tags: ["durable", "sharp", "common"],
   }),
 });
@@ -78,7 +77,7 @@ export const ingotSilver = new Ingot({
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_SilverIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-    damage: { mDmg: 2 },
+    damage: { mDmg: 1 },
     tags: ["holy", "conductive", "anti-undead"],
   }),
 });
@@ -97,7 +96,7 @@ export const ingotGold = new Ingot({
   isCraftable: true,
   blueprintId: BlueprintId.Smelting_GoldIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-    damage: { mDmg: 3 },
+    damage: { mDmg: 2 },
     tags: ["noble", "soft", "high-magic-conductivity"],
   }),
 });
@@ -119,7 +118,7 @@ export const ingotBronze = new Ingot({
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_BronzeIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-    damage: { pDmg: 1 },
+    damage: { pDmg: 0 },
     tags: ["balanced", "alloy", "durable"],
   }),
 });
@@ -138,7 +137,7 @@ export const ingotSteel = new Ingot({
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_SteelIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-    damage: { pDmg: 2 },
+    damage: { pDmg: 1 },
     tags: ["strong", "tempered", "martial"],
   }),
 });
@@ -157,7 +156,7 @@ export const ingotElectrum = new Ingot({
   isCraftable: true,
   blueprintId: BlueprintId.Alloy_ElectrumIngot,
   equipmentCraftingAttributes: createEquipmentCraftingAttributes({
-    damage: { pDmg: 1, mDmg: 3 },
+    damage: { pDmg: 1, mDmg: 2 },
     tags: ["hybrid", "arcane-conductor", "rare"],
   }),
 });
