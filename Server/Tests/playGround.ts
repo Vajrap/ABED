@@ -1,88 +1,153 @@
 import { Battle } from "src/Entity/Battle/Battle";
 import { BattleType } from "src/Entity/Battle/types";
-import { MOBs } from "src/Entity/Character/MOBs/enums";
 import {
   goblinCleric,
   goblinMage,
   goblinScout,
   goblinWarrior,
+  goblinCaptain,
 } from "src/Entity/Character/MOBs/goblins";
+import {
+  humanWarrior,
+  humanMage,
+  humanRanger,
+} from "src/Entity/Character/MOBs/Humanoid/humans";
+import {
+  elvenWarrior,
+  elvenMage,
+} from "src/Entity/Character/MOBs/Humanoid/elves";
+import {
+  orcWarrior,
+  orcBarbarian,
+} from "src/Entity/Character/MOBs/Humanoid/orcs";
+import {
+  halflingRogue,
+  halflingCleric,
+} from "src/Entity/Character/MOBs/Humanoid/halflings";
+import {
+  dwarfPaladin,
+  dwarfWarrior,
+} from "src/Entity/Character/MOBs/Humanoid/dwarfs";
 import { activeCharacterRegistry } from "src/Entity/Character/repository";
+import type { Character } from "src/Entity/Character/Character";
 import { locationRepository } from "src/Entity/Location/Location/repository";
 import { Party } from "src/Entity/Party/Party";
 import { PartyBehavior } from "src/Entity/Party/PartyBehavior";
 import { GameTime } from "src/Game/GameTime/GameTime";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import {
-  SwordId,
-  DaggerId,
-  HammerId,
-  ShieldId,
-} from "src/Entity/Item/Equipment/Weapon/type";
-import { BodyId, HeadWearId } from "src/Entity/Item/Equipment/Armor/type";
 
-// Party A: Team with Warrior (with rusted gear) and Mage
-const warrior_A = goblinWarrior(3);
-warrior_A.name = { en: "Warrior A", th: "Warrior A" };
-warrior_A.equipments.rightHand = SwordId.LongSword;
-warrior_A.equipments.leftHand = ShieldId.Buckler;
-warrior_A.equipments.body = BodyId.LeatherArmor;
-warrior_A.equipments.headWear = HeadWearId.ScoutHood;
-warrior_A.position = 1;
+// Party A: All Goblins
+const goblinCaptain_A = goblinCaptain(3);
+goblinCaptain_A.name = { en: "Goblin Captain", th: "ก๊อปลินกัปตัน" };
+goblinCaptain_A.position = 0;
 
-const mage_A = goblinMage(3);
-mage_A.name = { en: "Mage A", th: "Mage A" };
-mage_A.equipments.body = BodyId.Robe;
-mage_A.position = 4;
+const goblinWarrior_A = goblinWarrior(3);
+goblinWarrior_A.name = { en: "Goblin Warrior A", th: "ก๊อปลินนักรบ" };
+goblinWarrior_A.position = 1;
+
+const goblinWarrior_B = goblinWarrior(3);
+goblinWarrior_B.name = { en: "Goblin Warrior B", th: "ก๊อปลินนักรบ" };
+goblinWarrior_B.position = 2;
+
+const goblinScout_A = goblinScout(3);
+goblinScout_A.name = { en: "Goblin Scout", th: "ก๊อปลินสายลับ" };
+goblinScout_A.position = 3;
+
+const goblinMage_A = goblinMage(3);
+goblinMage_A.name = { en: "Goblin Mage", th: "ก๊อปลินนักเวทย์" };
+goblinMage_A.position = 4;
+
+const goblinCleric_A = goblinCleric(3);
+goblinCleric_A.name = { en: "Goblin Cleric", th: "ก๊อปลินนักบวช" };
+goblinCleric_A.position = 5;
 
 const partyA = new Party({
-  leader: warrior_A,
-  leaderId: warrior_A.id,
+  leader: goblinCaptain_A,
+  leaderId: goblinCaptain_A.id,
   behavior: new PartyBehavior(),
-  characters: [warrior_A, mage_A],
+  characters: [
+    goblinCaptain_A,
+    goblinWarrior_A,
+    goblinWarrior_B,
+    goblinScout_A,
+    goblinMage_A,
+    goblinCleric_A
+  ],
   location: LocationsEnum.WaywardInn,
 });
 
-// Party B: Team with Scout and Cleric (both with rusted gear)
-const scout_B = goblinScout(3);
-scout_B.name = { en: "Scout B", th: "Scout B" };
-scout_B.equipments.rightHand = DaggerId.Stiletto;
-scout_B.equipments.body = BodyId.Robe;
-scout_B.position = 2;
+// Party B: Mixed Humanoid Races
+const humanWarrior_B = humanWarrior(3);
+humanWarrior_B.name = { en: "Human Warrior", th: "นักรบมนุษย์" };
+humanWarrior_B.position = 0;
 
-const cleric_B = goblinCleric(3);
-cleric_B.name = { en: "Cleric B", th: "Cleric B" };
-cleric_B.equipments.rightHand = HammerId.MorningStar;
-cleric_B.equipments.body = BodyId.LeatherArmor;
-cleric_B.equipments.headWear = HeadWearId.ScholarCap;
-cleric_B.position = 3;
+const orcBarbarian_B = orcBarbarian(3);
+orcBarbarian_B.name = { en: "Orc Barbarian", th: "นักรบป่าเถื่อนออร์ค" };
+orcBarbarian_B.position = 1;
+
+const dwarfPaladin_B = dwarfPaladin(3);
+dwarfPaladin_B.name = { en: "Dwarf Paladin", th: "พาลาดินคนแคระ" };
+dwarfPaladin_B.position = 2;
+
+const elvenMage_B = elvenMage(3);
+elvenMage_B.name = { en: "Elven Mage", th: "นักเวทย์เอลฟ์" };
+elvenMage_B.position = 3;
+
+const halflingRogue_B = halflingRogue(3);
+halflingRogue_B.name = { en: "Halfling Rogue", th: "โจรฮาล์ฟลิ่ง" };
+halflingRogue_B.position = 4;
+
+const humanRanger_B = humanRanger(3);
+humanRanger_B.name = { en: "Human Ranger", th: "นักล่ามนุษย์" };
+humanRanger_B.position = 5;
 
 const partyB = new Party({
-  leader: scout_B,
-  leaderId: scout_B.id,
+  leader: humanWarrior_B,
+  leaderId: humanWarrior_B.id,
   behavior: new PartyBehavior(),
-  characters: [scout_B, cleric_B],
+  characters: [
+    humanWarrior_B,
+    elvenMage_B,
+    orcBarbarian_B,
+    halflingRogue_B,
+    dwarfPaladin_B,
+    humanRanger_B,
+  ],
   location: LocationsEnum.WaywardInn,
 });
 
-// Register all characters in the active registry so they can be found during battle
-// (This handles MOBs and other characters that aren't NPCs or players)
-activeCharacterRegistry[warrior_A.id] = warrior_A;
-activeCharacterRegistry[mage_A.id] = mage_A;
-activeCharacterRegistry[scout_B.id] = scout_B;
-activeCharacterRegistry[cleric_B.id] = cleric_B;
+// Verify equipment is equipped (all humanoid MOBs should have equipment via equipMOB)
+// This is just for verification - equipMOB should have already equipped items
+const verifyEquipment = (char: Character, name: string) => {
+  const weapon = char.getWeapon();
+  const armor = char.equipments.body;
+  if (!weapon || weapon.weaponType === "bareHand") {
+    console.warn(`⚠️  ${name} has no weapon equipped (or bareHand)`);
+  } else {
+    console.log(`✅ ${name} equipped: ${weapon.name.en}`);
+  }
+  if (!armor) {
+    console.warn(`⚠️  ${name} has no armor equipped`);
+  } else {
+    console.log(`✅ ${name} armored: ${armor}`);
+  }
+};
 
-console.log("Setting up battle: Warrior & Mage vs Scout & Cleric");
-console.log(
-  `${warrior_A.name.en} equipped with Rusted Iron Sword, Shield & Leather Armor!`,
-);
-console.log(`${mage_A.name.en} equipped with Tattered Clothes`);
-console.log(
-  `${scout_B.name.en} equipped with Rusted Iron Dagger & Tattered Clothes!`,
-);
-console.log(
-  `${cleric_B.name.en} equipped with Rusted Iron Mace, Leather Armor & Cap!`,
-);
+
+// Register all characters in the active registry so they can be found during battle
+activeCharacterRegistry[goblinCaptain_A.id] = goblinCaptain_A;
+activeCharacterRegistry[goblinWarrior_A.id] = goblinWarrior_A;
+activeCharacterRegistry[goblinWarrior_B.id] = goblinWarrior_B;
+activeCharacterRegistry[goblinScout_A.id] = goblinScout_A;
+activeCharacterRegistry[goblinMage_A.id] = goblinMage_A;
+activeCharacterRegistry[goblinCleric_A.id] = goblinCleric_A;
+
+activeCharacterRegistry[humanWarrior_B.id] = humanWarrior_B;
+activeCharacterRegistry[elvenMage_B.id] = elvenMage_B;
+activeCharacterRegistry[orcBarbarian_B.id] = orcBarbarian_B;
+activeCharacterRegistry[halflingRogue_B.id] = halflingRogue_B;
+activeCharacterRegistry[dwarfPaladin_B.id] = dwarfPaladin_B;
+activeCharacterRegistry[humanRanger_B.id] = humanRanger_B;
 
 const battle = new Battle(
   partyA,
@@ -93,3 +158,26 @@ const battle = new Battle(
 );
 
 await battle.startBattle();
+
+// Access and display battle statistics
+console.log("\n" + "=".repeat(50));
+console.log("BATTLE STATISTICS SUMMARY");
+console.log("=".repeat(50));
+console.log(battle.battleStatistics.getSummary());
+console.log("=".repeat(50) + "\n");
+
+// // Verify Party A equipment
+// verifyEquipment(goblinCaptain_A, "Goblin Captain");
+// verifyEquipment(goblinWarrior_A, "Goblin Warrior A");
+// verifyEquipment(goblinWarrior_B, "Goblin Warrior B");
+// verifyEquipment(goblinScout_A, "Goblin Scout");
+// verifyEquipment(goblinMage_A, "Goblin Mage");
+// verifyEquipment(goblinCleric_A, "Goblin Cleric");
+
+// // Verify Party B equipment
+// verifyEquipment(humanWarrior_B, "Human Warrior");
+// verifyEquipment(elvenMage_B, "Elven Mage");
+// verifyEquipment(orcBarbarian_B, "Orc Barbarian");
+// verifyEquipment(halflingRogue_B, "Halfling Rogue");
+// verifyEquipment(dwarfPaladin_B, "Dwarf Paladin");
+// verifyEquipment(humanRanger_B, "Human Ranger");

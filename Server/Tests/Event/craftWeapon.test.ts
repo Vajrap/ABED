@@ -44,7 +44,10 @@ describe("craftWeapon()", () => {
     expect("item" in result).toBe(true);
     if ("item" in result) {
       const crafted = result.item as Weapon;
-      expect(crafted.id).toBe(SwordId.LongSword);
+      // ID should be unique instance ID, not base ID
+      expect(crafted.id).not.toBe(SwordId.LongSword);
+      expect(typeof crafted.id).toBe("string");
+      expect(crafted.baseItemId).toBe(SwordId.LongSword);
       expect(crafted.weaponData.damage.physicalDamageDice).toEqual({ dice: 1, face: 8 });
       expect(crafted.weight).toBe(26); // base weight 15 + blueprint modifier 11
       expect(crafted.cost.baseCost).toBe(790); // (3*180 + 1*150) + 100 fee
@@ -52,7 +55,8 @@ describe("craftWeapon()", () => {
       expect(crafted.modifier.battleStatus?.pATK ?? 0).toBe(0);
       expect(actor.inventory.has(IngotId.IronIngot)).toBe(false);
       expect(actor.inventory.has(PlankId.OakPlank)).toBe(false);
-      expect(actor.inventory.get(SwordId.LongSword)).toBe(1);
+      // Inventory should use the unique instance ID
+      expect(actor.inventory.get(crafted.id)).toBe(1);
       expect(result.amount).toBe(1);
     }
   });
@@ -77,7 +81,8 @@ describe("craftWeapon()", () => {
       expect(crafted.modifier.battleStatus?.pATK).toBe(1);
       expect(actor.inventory.has(IngotId.SteelIngot)).toBe(false);
       expect(actor.inventory.has(PlankId.OakPlank)).toBe(false);
-      expect(actor.inventory.get(SwordId.LongSword)).toBe(1);
+      // Inventory should use the unique instance ID
+      expect(actor.inventory.get(crafted.id)).toBe(1);
     }
   });
 
@@ -96,18 +101,23 @@ describe("craftWeapon()", () => {
     expect("item" in result).toBe(true);
     if ("item" in result) {
       const crafted = result.item as Weapon;
-      expect(crafted.instanceId).toBeTruthy();
-      expect(crafted.instanceId).toContain(actor.id);
-      expect(crafted.instanceId).toContain("weaponLongSword");
+      // ID should be the unique instance ID (UUID)
+      expect(crafted.id).toBeTruthy();
+      expect(typeof crafted.id).toBe("string");
+      expect(crafted.id).toContain(actor.id);
+      expect(crafted.id).toContain("weaponLongSword");
+      
+      // baseItemId should point to the base item
+      expect(crafted.baseItemId).toBe(SwordId.LongSword);
       
       // Verify it's registered in the repository
-      const instance = itemInstanceRepository.get(crafted.instanceId!);
+      const instance = itemInstanceRepository.get(crafted.id);
       expect(instance).toBeTruthy();
-      expect(instance?.id).toBe(SwordId.LongSword);
+      expect(instance?.baseItemId).toBe(SwordId.LongSword);
       
       // Verify actor has the instance tracked
-      expect(actor.itemInstances.has(crafted.instanceId!)).toBe(true);
-      expect(actor.itemInstances.get(crafted.instanceId!)).toBe(SwordId.LongSword);
+      expect(actor.itemInstances.has(crafted.id)).toBe(true);
+      expect(actor.itemInstances.get(crafted.id)).toBe(SwordId.LongSword);
     }
   });
 
@@ -133,9 +143,13 @@ describe("craftWeapon()", () => {
     if ("item" in result1 && "item" in result2) {
       const crafted1 = result1.item as Weapon;
       const crafted2 = result2.item as Weapon;
-      expect(crafted1.instanceId).not.toBe(crafted2.instanceId);
-      expect(crafted1.instanceId).toBeTruthy();
-      expect(crafted2.instanceId).toBeTruthy();
+      // Each crafted weapon should have a unique ID
+      expect(crafted1.id).not.toBe(crafted2.id);
+      expect(crafted1.id).toBeTruthy();
+      expect(crafted2.id).toBeTruthy();
+      // But they should have the same baseItemId
+      expect(crafted1.baseItemId).toBe(SwordId.LongSword);
+      expect(crafted2.baseItemId).toBe(SwordId.LongSword);
     }
   });
 
