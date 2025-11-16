@@ -78,7 +78,12 @@ export const basicAttack = new Skill({
 
     damageOutput.damage = damageOutput.damage * positionMidifier;
 
-    const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
+    const totalDamage = resolveDamage(
+      actor.id,
+      target.id,
+      damageOutput,
+      location,
+    );
 
     let turnResult: TurnResult = {
       content: buildCombatMessage(

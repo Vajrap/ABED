@@ -7,7 +7,7 @@ import { characters } from "./character";
  * Pre-defined items (from repository) don't need instances
  */
 export const itemInstances = pgTable("item_instances", {
-  id: uuid("id").primaryKey().defaultRandom().notNull(),
+  id: varchar("id", { length: 255 }).primaryKey().notNull(),
   
   // Item type and base info
   itemType: varchar("item_type", { length: 20 }).notNull(), // "weapon" | "armor"

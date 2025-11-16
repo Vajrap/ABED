@@ -6,6 +6,7 @@ import type { TurnResult } from "../types";
 import { ActorEffect, TargetEffect } from "../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { roll } from "src/Utils/Dice";
+import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const spiritRattle = new Skill({
   id: SkillId.SpiritRattle,
@@ -14,8 +15,8 @@ export const spiritRattle = new Skill({
     th: "กระดิ่งผี",
   },
   description: {
-    en: "Shake a bone charm, summoning erratic ghostly aid. Grants random allies (n) a spirit rattle buff, add +2 Control for Math.min(1+(skillLevel * 0.5)) turn. Number of targets based on 1 + 1d(skillLevel)",
-    th: "เขย่ากระดิ่งแห่งวิญญาณ เรียกความช่วยเหลือจากผีแบบไม่เสถียร ให้บัฟ Spirit Rattle แก่เพื่อนร่วมทีมแบบสุ่ม (n) เพิ่ม Control +2 เป็นเวลา Math.min(1+(skillLevel * 0.5)) เทิร์น จำนวนเป้าหมายขึ้นอยู่กับ 1 + 1d(skillLevel)",
+    en: "Shake a bone charm, summoning erratic ghostly aid. Grants random allies (n) a spirit rattle buff for 1 + (0.5 * skillLevel) turns. Number of targets based on 1 + 1d(skillLevel): Character with Spirit Rattle buff automatically heals for 1d4 + willpower mod when take turn",
+    th: "เขย่ากระดิ่งแห่งวิญญาณ เรียกความช่วยเหลือจากผีแบบไม่เสถียร ให้บัฟ Spirit Rattle แก่เพื่อนร่วมทีมแบบสุ่ม (n) เป็นเวลา 1 + (0.5 * เลเวลสกิล) เทิร์น จำนวนเป้าหมายขึ้นอยู่กับ 1 + 1d(skillLevel): ผู้ที่มีบัพกระดิ่งวิญญาณจะรักษาตัวเอง 1d4 + will power mod เมื่อเข้าเทิร์น",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -37,7 +38,7 @@ export const spiritRattle = new Skill({
     sp: 0,
     elements: [
       {
-        element: "order",
+        element: 'order',
         min: 1,
         max: 1,
       },
@@ -51,7 +52,7 @@ export const spiritRattle = new Skill({
     location: LocationsEnum,
   ) => {
     // Calculate number of targets: 1 + 1d(skillLevel)
-    const numTargets = 1 + roll(1).d(skillLevel).total;
+    let numTargets = 1 + roll(1).d(skillLevel).total;
     const duration = Math.min(1 + Math.floor(skillLevel * 0.5), skillLevel);
     
     // Select random allies (excluding self)
@@ -72,6 +73,10 @@ export const spiritRattle = new Skill({
         },
         targets: [],
       };
+    }
+
+    for (const target of actualTargets) {
+      buffsAndDebuffsRepository.spiritRattle.appender(target, duration, false, 0);
     }
 
     // Apply buff to targets (TODO: implement control buff)

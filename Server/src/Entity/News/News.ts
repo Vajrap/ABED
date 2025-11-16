@@ -63,6 +63,8 @@ enum NewsTag {
   Next, since in the game, it's possible for character to exchange news with other character,
   So... I think, News should also have 'Secret Tier' which tells if it is something secret or not,
   think of catrastophic event like Regional flood, even if it's Huge and legendary in scale, But it's not secret,
+
+  TO create news instance, use createNews()
 */
 export interface News {
   id: string;

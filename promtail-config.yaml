@@ -18,46 +18,31 @@ scrape_configs:
           job: abed_server
           service: server
           component: backend
+          log_type: file
           __path__: /var/log/app/*.log
-
-  # Docker logs with minimal config
-  - job_name: abed_docker
-    docker_sd_configs:
-      - host: unix:///var/run/docker.sock
-        refresh_interval: 15s
-    relabel_configs:
-      # Only collect logs from ABED containers
-      - source_labels: [__meta_docker_container_name]
-        regex: .*(ABED_SERVER|ABED_POSTGRES).*
-        action: keep
-
-      # Add required job label
-      - target_label: job
-        replacement: abed_docker
-
-      # Add service label based on container
-      - source_labels: [__meta_docker_container_name]
-        regex: .*ABED_SERVER.*
-        target_label: service
-        replacement: server
-
-      - source_labels: [__meta_docker_container_name]
-        regex: .*ABED_POSTGRES.*
-        target_label: service
-        replacement: postgres
-
-      # Set component label
-      - target_label: component
-        replacement: container
-
     pipeline_stages:
+      # Try to parse JSON logs first
       - json:
           expressions:
             level: level
             timestamp: ts
             message: msg
+          drop_malformed: false
+      # Extract level label if present
       - labels:
           level:
+      # Parse timestamp if available
       - timestamp:
           source: timestamp
           format: RFC3339
+          fallback_formats:
+            - RFC3339Nano
+            - Unix
+      # Output the parsed message or fallback to raw line
+      - output:
+          source: message
+      - output:
+          source: msg
+      - output:
+          source: output
+

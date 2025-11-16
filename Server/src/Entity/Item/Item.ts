@@ -26,7 +26,7 @@ export type BlueprintRequirement = {
 export type BlueprintReference = BlueprintId | BlueprintRequirement;
 
 export interface ItemDefinition {
-  id: ItemId;
+  id: ItemId | string; // Can be base ItemId or unique instance ID (UUID) for crafted items
   name?: L10N;
   description?: L10N;
   image?: string;
@@ -40,7 +40,7 @@ export interface ItemDefinition {
 }
 
 export class Item {
-  id: ItemId;
+  id: ItemId | string; // Can be base ItemId or unique instance ID (UUID) for crafted items
   name: L10N;
   description: L10N;
   image: string;

@@ -34,7 +34,7 @@ const LoginPaper = styled(Paper)(({ theme }) => ({
   width: "100%",
   textAlign: "center",
   background: theme.palette.background.default,
-  backdropFilter: 'blur(10px)',
+  backdropFilter: "blur(10px)",
   border: `2px solid ${theme.palette.primary.main}40`,
   borderRadius: 20,
   boxShadow: `var(--shadow-arcane)`,
@@ -78,7 +78,6 @@ const ButtonGroup = styled(Box)(({ theme }) => ({
   margin: "0 auto",
 }));
 
-
 export const LoginView: React.FC = () => {
   const navigate = useNavigate();
   const [viewState, setViewState] = useState(loginViewModel.getState());
@@ -94,7 +93,6 @@ export const LoginView: React.FC = () => {
       setViewState(loginViewModel.getState());
     });
 
-
     // Cleanup subscription on unmount
     return unsubscribe;
   }, []);
@@ -109,19 +107,21 @@ export const LoginView: React.FC = () => {
     console.log("Login button clicked");
     const result = await loginViewModel.login();
     console.log("Login result:", result);
-    
+
     if (result.success) {
       console.log("Login successful! hasCharacter:", result.hasCharacter);
-      
+
       // Navigate based on whether user has a character
       if (result.hasCharacter) {
         // User has a character, go to game page
         console.log("User has character, redirecting to game...");
-        navigate('/game');
+        navigate("/game");
       } else {
         // User doesn't have a character, go to character creation
-        console.log("User has no character, redirecting to character creation...");
-        navigate('/character-creation');
+        console.log(
+          "User has no character, redirecting to character creation...",
+        );
+        navigate("/character-creation");
       }
     }
   };
@@ -146,7 +146,6 @@ export const LoginView: React.FC = () => {
     setResetMessage("");
   };
 
-
   const handleCloseForgotPassword = () => {
     setForgotPasswordOpen(false);
     setResetEmail("");
@@ -155,10 +154,10 @@ export const LoginView: React.FC = () => {
 
   const handleResetPassword = async () => {
     if (!resetEmail.trim()) return;
-    
+
     setIsSubmittingReset(true);
     setResetMessage("");
-    
+
     // Simulate API call - replace with actual implementation later
     setTimeout(() => {
       setIsSubmittingReset(false);
@@ -226,7 +225,12 @@ export const LoginView: React.FC = () => {
             }}
           />
 
-          <Box display="flex" justifyContent="flex-end" mt={1} sx={{ maxWidth: "40%", margin: "0 auto" }}>
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            mt={1}
+            sx={{ maxWidth: "40%", margin: "0 auto" }}
+          >
             <Typography
               variant="body2"
               onClick={handleForgotPasswordClick}
@@ -246,7 +250,6 @@ export const LoginView: React.FC = () => {
               {t(L10N.loginPage.forgotPassword)}
             </Typography>
           </Box>
-
         </FormBox>
 
         <ButtonGroup>
@@ -291,7 +294,10 @@ export const LoginView: React.FC = () => {
           </Button>
         </ButtonGroup>
 
-        <Box mt={3} sx={{ maxWidth: "40%", margin: "0 auto", paddingTop: "20px" }}>
+        <Box
+          mt={3}
+          sx={{ maxWidth: "40%", margin: "0 auto", paddingTop: "20px" }}
+        >
           <Typography variant="body2" color="text.secondary">
             {t(L10N.loginPage.newToRealm)}{" "}
             <Typography
@@ -313,7 +319,6 @@ export const LoginView: React.FC = () => {
               {t(L10N.loginPage.createAccount)}
             </Typography>
           </Typography>
-
         </Box>
       </LoginPaper>
 
@@ -326,7 +331,6 @@ export const LoginView: React.FC = () => {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            background: "var(--gradient-background)",
             border: "2px solid",
             borderColor: "primary.main",
           },
@@ -337,12 +341,17 @@ export const LoginView: React.FC = () => {
             {t(L10N.loginPage.forgotPasswordModal.title)}
           </Typography>
         </DialogTitle>
-        
+
         <DialogContent sx={{ py: 3 }}>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3, textAlign: "center" }}>
-            Enter your email address and we'll send you a link to reset your password.
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 3, textAlign: "center" }}
+          >
+            Enter your email address and we'll send you a link to reset your
+            password.
           </Typography>
-          
+
           <TextField
             fullWidth
             label={t(L10N.loginPage.forgotPasswordModal.emailLabel)}
@@ -357,9 +366,8 @@ export const LoginView: React.FC = () => {
               },
             }}
           />
-          
         </DialogContent>
-        
+
         <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
           <Button
             onClick={handleCloseForgotPassword}
@@ -369,7 +377,7 @@ export const LoginView: React.FC = () => {
           >
             {t(L10N.loginPage.forgotPasswordModal.cancelButton)}
           </Button>
-          
+
           <Button
             onClick={handleResetPassword}
             disabled={!resetEmail.trim() || isSubmittingReset}
@@ -393,7 +401,11 @@ export const LoginView: React.FC = () => {
         open={!!viewState.error}
         onClose={() => setViewState({ ...viewState, error: null })}
         title={t(L10N.common.error)}
-        message={typeof viewState.error === "string" ? viewState.error : t(viewState.error || L10N.loginPage.loginError)}
+        message={
+          typeof viewState.error === "string"
+            ? viewState.error
+            : t(viewState.error || L10N.loginPage.loginError)
+        }
         severity="error"
       />
 

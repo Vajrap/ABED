@@ -10,6 +10,10 @@ import { defenseUp } from "./definitions/defenseUp";
 import { burn } from "./definitions/burn";
 import { arcaneShield } from "./definitions/arcaneShield";
 import { retreat } from "./definitions/retreat";
+import { hexed } from "./definitions/hexed";
+import { spiritRattle } from "./definitions/spiritRattle";
+import { slaveDriver } from "./definitions/slaveDriver";
+import { cowardlyCharge } from "./definitions/cowardlyCharge";
 
 export const buffsAndDebuffsRepository: Record<
   BuffsAndDebuffsEnum,
@@ -25,4 +29,8 @@ export const buffsAndDebuffsRepository: Record<
   [BuffsAndDebuffsEnum.burn]: burn,
   [BuffsAndDebuffsEnum.arcaneShield]: arcaneShield,
   [BuffsAndDebuffsEnum.retreat]: retreat,
+  [BuffsAndDebuffsEnum.hexed]: hexed,
+  [BuffsAndDebuffsEnum.spiritRattle]: spiritRattle,
+  [BuffsAndDebuffsEnum.slaveDriver]: slaveDriver,
+  [BuffsAndDebuffsEnum.cowardlyCharge]: cowardlyCharge,
 };

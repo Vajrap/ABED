@@ -7,9 +7,12 @@ import type { EquipmentId } from "./types";
 import { type EquipmentModifier } from "./type";
 
 export class Equipment extends Item {
-  declare id: EquipmentId;
+  // id is inherited from Item (ItemId | string)
+  // For base items: id is EquipmentId (which is part of ItemId)
+  // For crafted items: id is unique instance ID (UUID string)
 
-  instanceId: string | null = null;
+  baseItemId: EquipmentId | null = null; // Points to base item (e.g., SwordId.LongSword) for crafted items
+  instanceId: string | null = null; // Deprecated: kept for backwards compatibility, use id instead
   slot: EquipmentSlot;
   modifier: EquipmentModifier;
 
@@ -25,6 +28,12 @@ export class Equipment extends Item {
 
   setInstanceId(id: string): void {
     this.instanceId = id;
+    // For crafted items, the id should be the unique instance ID
+    this.id = id;
+  }
+
+  setBaseItemId(baseId: EquipmentId): void {
+    this.baseItemId = baseId;
   }
 }
 

@@ -4,7 +4,7 @@ import { rollTwenty } from "src/Utils/Dice";
 import { validateResources } from "./validations";
 import { consumeResources } from "./consume";
 import { statMod } from "src/Utils/statMod";
-import { GemId } from "src/Entity/Item";
+import { Gem, GemId } from "src/Entity/Item";
 import { itemRepository } from "src/Entity/Item/repository";
 
 export function craftGem(
@@ -41,7 +41,7 @@ export function craftGem(
   
     const gemId = (GemId as any)[gemQuality + gemFamily] as GemId;
   
-    return { item: itemRepository[gemId], amount: 1 };
+    return { item: itemRepository[gemId] as Gem, amount: 1 };
   }
   
   const gemFamilyPools = [

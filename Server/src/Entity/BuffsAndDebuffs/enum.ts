@@ -9,4 +9,8 @@ export enum BuffsAndDebuffsEnum {
   burn = "burn",
   arcaneShield = "arcaneShield",
   retreat = "retreat",
+  hexed = "hexed",
+  spiritRattle = "spiritRattle",
+  slaveDriver = "slaveDriver",
+  cowardlyCharge = "cowardlyCharge",
 }

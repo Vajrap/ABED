@@ -1,12 +1,13 @@
 import { IngotBlueprint } from "src/Entity/Blueprint/Blueprint";
 import { Character } from "src/Entity/Character/Character";
-import { itemRepository } from "src/Entity/Repository/Item";
-import type { CraftSuccess, CraftFail } from "./types";
+import type { CraftFail } from "./types";
 import { rollTwenty } from "src/Utils/Dice";
 import { difficultyTable } from "./difficultyTable";
 import { validateResources } from "./validations";
+import { itemRepository } from "src/Entity/Item/repository";
+import { Ingot } from "src/Entity/Item";
 
-export function craftIngot(actor: Character, blueprint: IngotBlueprint): CraftSuccess | CraftFail {
+export function craftIngot(actor: Character, blueprint: IngotBlueprint): {item: Ingot, amount: number} | CraftFail {
     if (!validateResources(actor, blueprint)) {
         return { reason: "Not enough resources" };
     }
@@ -30,13 +31,13 @@ export function craftIngot(actor: Character, blueprint: IngotBlueprint): CraftSu
     }
 
     if (diceRoll === 20) {
-        return { item: resultItem, amount: 2 };
+        return { item: resultItem as Ingot, amount: 2 };
     }
 
     if (diceWithModifier < difficultyTable[blueprint.tier]) {
         return { reason: "Craft attempt failed" };
     }
 
-    return { item: resultItem, amount: 1 };
+    return { item: resultItem as Ingot, amount: 1 };
 }
 

@@ -98,7 +98,7 @@ const mutReqSkills: [string, Skill][] = [
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},
-      requirement: { reqCharacterTrait: [TraitEnum.Test] },
+      requirement: { reqCharacterTrait: [TraitEnum.GoblinCunning] },
       equipmentNeeded: [],
       consume: {
         hp: 0,
@@ -352,8 +352,9 @@ describe("learn skill", () => {
       .withProficiencies(prof)
       .withElements(element)
       .build();
-    char.traits.set(TraitEnum.Test, 1);
-    char.traits.set(TraitEnum.Test2, 1);
+    char.traits.set(TraitEnum.GoblinCunning, 1);
+    char.traits.set(TraitEnum.ScrapSurvivalist, 1);
+    char.traits.set(TraitEnum.PackInstinct, 1);
     
     // Add prerequisite skill for skill prerequisite test
     if (skill.requirement.reqSkillId) {

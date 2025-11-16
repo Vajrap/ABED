@@ -41,11 +41,14 @@ services:
 
   promtail:
     image: grafana/promtail:2.9.0
+    ports:
+      - "9080:9080"
     volumes:
       - ./promtail-config.yaml:/etc/promtail/config.yaml
+      - ./logs:/var/log/app:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    command: -config.file=/etc/promtail/config.yaml
+    command: -config.file=/etc/promtail/config.yaml -log.level=debug
 
   grafana:
     image: grafana/grafana:10.4.0

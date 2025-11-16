@@ -515,7 +515,10 @@ type CharacterGroups = {
   tavern: Character[];
   artisanActions: ArtisanAction[];
   reading: Character[];
-  crafting: Character[];
+  crafting: {
+      mainCharacter: Character | undefined;
+      otherCharacters: Character[];
+  };
 };
 
 function groupCharacterActions(
@@ -535,7 +538,10 @@ function groupCharacterActions(
     tavern: [],
     artisanActions: [],
     reading: [],
-    crafting: [],
+    crafting: {
+        mainCharacter: undefined,
+        otherCharacters: []
+    },
   };
 
   for (const character of party.characters.filter((c) => c !== "none")) {
@@ -594,7 +600,15 @@ function groupCharacterActions(
         break;
 
       case ActionInput.Craft:
-        groups.crafting.push(character);
+          if (!character.isPlayer) {
+              groups.crafting.otherCharacters.push(character)
+          } else {
+              if (groups.crafting.mainCharacter === undefined) {
+                  groups.crafting.otherCharacters.push(character)
+              } else {
+                  groups.crafting.mainCharacter = character
+              }
+          }
         break;
 
       case ActionInput.Mining:
@@ -783,10 +797,12 @@ function processCharacterGroups(
     allNews.push(...result);
   });
 
-  groups.crafting.forEach((c) => {
-    const result = handleCraftAction(c, context);
-    if (result) allNews.push(...result);
-  });
+  // TODO: Check the grouping
+  if (groups.crafting.mainCharacter) {
+      const craftNews = handleCraftAction(groups.crafting.mainCharacter, groups.crafting.otherCharacters, context)
+      if (craftNews) {allNews.push(craftNews)}
+  }
+
 
   for (const { character, skillId } of groups.learnSkill) {
     const result = resolveGroupRandomEvent([character], events.learn, () =>

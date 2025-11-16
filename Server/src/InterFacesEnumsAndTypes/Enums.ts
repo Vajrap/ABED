@@ -280,3 +280,12 @@ export enum CharacterEquipmentSlot {
 }
 
 export enum RelationStatusEnum {}
+
+export enum RaceEnum {
+  Human = "Human",
+  Elven = "Elven",
+  Orc = "Orc",
+  Dwarf = "Dwarf",
+  Halfling = "Halfling",
+  Goblin = "Goblin",
+}

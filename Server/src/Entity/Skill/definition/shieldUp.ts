@@ -17,7 +17,7 @@ export const shieldUp = new Skill({
     th: "ยกโล่ขึ้นและเตรียมรับการโจมตี ใช้ 2 Earth ได้ 1 None เพิ่มบัฟป้องกัน (รอการพัฒนาต่อ)",
   },
   requirement: {},
-  equipmentNeeded: [],
+  equipmentNeeded: ["shield"],
   tier: TierEnum.common,
   consume: {
     hp: 0,

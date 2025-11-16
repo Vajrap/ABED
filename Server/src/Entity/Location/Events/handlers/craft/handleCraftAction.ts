@@ -1,22 +1,24 @@
-import type { Character } from "../../../../Character/Character";
-import type { NewsContext, News } from "../../../../News/News";
+import type {Character} from "../../../../Character/Character";
+import {createNews, News, NewsContext} from "../../../../News/News";
+import {processCharacterCraftingPreferences} from "src/Event/Craft";
+import {NewsPropagation, NewsSignificance} from "src/InterFacesEnumsAndTypes/NewsEnums.ts";
+import {itemRepository} from "src/Entity/Item/repository.ts";
 
-export function handleCraftAction(character: Character, context: NewsContext): News[] | null {
-    // TODO
-    const news: News[] = [];
-    let isCrafted = false;
-    const a = character.behavior.craftingPreference.craftingList
-    if (a[1].bluePrintID) {
-        // Handle crafting for blueprint 1
-    }
-    if (a[2].bluePrintID) {
-        // Handle crafting for blueprint 2
-    }
-    if (a[3].bluePrintID) {
-        // Handle crafting for blueprint 3
-    }
-    if (a[4].bluePrintID) {
-        // Handle crafting for blueprint 4
-    }
-    return news;
+export function handleCraftAction(mainCharacter: Character, otherCharacters: Character[], context: NewsContext): News | null {
+    if (!mainCharacter.isPlayer) return null; // Guard for only player character
+    // TODO:
+    const result = processCharacterCraftingPreferences(mainCharacter, otherCharacters)
+    return createNews({
+        scope: {kind: "partyScope", partyId: mainCharacter.partyID ?? ""},
+        content: {
+            en: `${mainCharacter.name.en} has crafted ${result.entries().map(([itemId, amount]) => {
+                return `${amount} ${itemRepository[itemId]?.name ?? ""}`
+            })}`,
+            th: ""
+        },
+        origin: {system: "craft"},
+        context,
+        significance: NewsSignificance.TRIVIAL,
+        propagation: NewsPropagation.SECRET,
+    })
 }

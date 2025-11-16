@@ -20,8 +20,8 @@ export const bash = new Skill({
     th: "ทุบสุดแรง",
   },
   description: {
-    en: "Swing with your full strength, smashing the enemy with a crushing blow. Deals 1.4× (+0.05 per skill level) of weapon damage plus your Strength modifier.",
-    th: "เหวี่ยงอาวุธอย่างสุดแรง ทุบใส่ศัตรูด้วยพลังทำลายล้างสูง สร้างความเสียหาย 1.4 เท่า (+0.05 ต่อเลเวลสกิล) ของความเสียหายอาวุธ รวมค่าสถานะ STR",
+    en: "Swing with your full strength, smashing the enemy with a crushing blow. [Melee attack] Deals 1.4× (+0.05 per skill level) of weapon damage plus your Strength modifier.",
+    th: "เหวี่ยงอาวุธอย่างสุดแรง ทุบใส่ศัตรูด้วยพลังทำลายล้างสูง [การโจมตีระยะประชิด] สร้างความเสียหาย 1.4 เท่า (+0.05 ต่อเลเวลสกิล) ของความเสียหายอาวุธ รวมค่าสถานะ STR",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -32,7 +32,7 @@ export const bash = new Skill({
     sp: 5,
     elements: [
       {
-        element: "neutral",
+        element: "fire",
         value: 2,
       },
     ],

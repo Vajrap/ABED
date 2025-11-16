@@ -20,6 +20,10 @@ import {mendSpirit} from "./definition/mendSpirit";
 import {hexOfRot} from "./definition/hexOfRot";
 import {spiritRattle} from "./definition/spiritRattle";
 import {chaoticBlessing} from "./definition/chaoticBlessing";
+import { arcaneBolt } from "./definition/arcaneBolt";
+import { worksYouMaggots } from "./definition/worksYouMaggots";
+import { commanderScream } from "./definition/commanderScream";
+import { whip } from "./definition/whip";
 
 export const skillRepository: Record<SkillId, Skill> = {
     [SkillId.Basic]: basicAttack,
@@ -42,4 +46,8 @@ export const skillRepository: Record<SkillId, Skill> = {
     [SkillId.HexOfRot]: hexOfRot,
     [SkillId.SpiritRattle]: spiritRattle,
     [SkillId.ChaoticBlessing]: chaoticBlessing,
+    [SkillId.ArcaneBolt]: arcaneBolt,
+    [SkillId.WorksYouMaggots]: worksYouMaggots,
+    [SkillId.CommanderScream]: commanderScream,
+    [SkillId.Whip]: whip
 };

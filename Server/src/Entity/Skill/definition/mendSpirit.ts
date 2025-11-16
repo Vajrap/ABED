@@ -14,8 +14,8 @@ export const mendSpirit = new Skill({
     th: "ช่อมจิตวิญญาณ",
   },
   description: {
-    en: "Patch up an ally's life force with unstable spiritual energy. Heals a random injured ally for 1d3 + willpower mod + 0.5*skill level, with a 30% chance to generate 1 Chaos for them instead of full healing, and a 30% chance for heal to be halved.",
-    th: "ช่อมจิตวิญญาณของเพื่อนร่วมทีมด้วยพลังจิตที่ไม่เสถียร รักษาเพื่อนร่วมทีมที่บาดเจ็บแบบสุ่ม 1d3 + ค่า willpower + 0.5*เลเวลสกิล แต่มี 30% โอกาสที่จะได้ 1 Chaos แทนการรักษาเต็มจำนวน และ 30% โอกาสที่การรักษาจะถูกแบ่งครึ่ง",
+    en: "Patch up an ally's life force with unstable spiritual energy. Heals a random injured ally for 1d4 + willpower mod + 0.5*skill level, but if the user roll 1D20 and result in 11+, generate 1 Chaos for them instead of full healing and the heal is halved.",
+    th: "ช่อมจิตวิญญาณของเพื่อนร่วมทีมด้วยพลังจิตที่ไม่เสถียร รักษาเพื่อนร่วมทีมที่บาดเจ็บแบบสุ่ม 1d4 + ค่า willpower + 0.5*เลเวลสกิล แต่ถ้าผู้ใช้ทอย 1D20 และผลลัพธ์ออกมาเป็น 11+ ให้เพิ่ม 1 Chaos แทนการรักษาเต็มจำนวน และการรักษาจะถูกลดลงครึ่งหนึ่ง",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -33,7 +33,7 @@ export const mendSpirit = new Skill({
     elements: [
       {
         element: "chaos",
-        min: 0,
+        min: 1,
         max: 1,
       },
     ],
@@ -75,21 +75,18 @@ export const mendSpirit = new Skill({
     let message = "";
     let healAmount = 0;
 
-    if (sideEffect <= 6) {
-      // 30% chance: Generate Chaos instead of healing
-      target.resources.chaos += 1;
-      message = `${target.name.en} received 1 Chaos energy instead of healing!`;
-    } else if (sideEffect <= 12) {
-      // 30% chance: Heal is halved
-      const baseHeal = roll(1).d(3).total + statMod(actor.attribute.getTotal("willpower")) + 0.5 * skillLevel;
-      healAmount = Math.floor(baseHeal / 2);
+    const baseHeal = roll(1).d(4).total + statMod(actor.attribute.getTotal("willpower")) + 0.5 * skillLevel;
+
+    if (sideEffect <= 11) {
+      // Full healing
       target.vitals.incHp(healAmount);
-      message = `${target.name.en} healed for ${healAmount} HP (halved by unstable energy)!`;
+      message = `${target.name.en} healed for ${healAmount} HP.`;
     } else {
-      // 40% chance: Normal healing
-      healAmount = roll(1).d(3).total + statMod(actor.attribute.getTotal("willpower")) + 0.5 * skillLevel;
-      target.vitals.incHp(Math.floor(healAmount));
-      message = `${target.name.en} healed for ${Math.floor(healAmount)} HP!`;
+      // Heal is halved, + 1 chaos
+      healAmount = Math.floor(baseHeal / 2);
+      target.resources.chaos += 1;
+      target.vitals.incHp(healAmount);
+      message = `${target.name.en} healed for ${healAmount} HP and received 1 Chaos energy.`;
     }
 
     return {

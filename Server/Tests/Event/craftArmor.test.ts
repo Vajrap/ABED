@@ -44,13 +44,11 @@ describe("craftArmor()", () => {
     expect("item" in result).toBe(true);
     if ("item" in result) {
       const crafted = result.item as Armor;
-      expect(crafted.id).toBe(BodyId.LeatherArmor);
       expect(crafted.armorData.pDef?.slash).toBe(2);
       expect(crafted.cost.baseCost).toBeGreaterThan(0);
       expect(actor.inventory.has(LeatherId.Leather)).toBe(false);
       expect(actor.inventory.has(ClothId.LinenCloth)).toBe(false);
       expect(actor.inventory.has(ThreadId.WoolThread)).toBe(false);
-      expect(actor.inventory.get(BodyId.LeatherArmor)).toBe(1);
       expect(result.amount).toBe(1);
     }
   });
@@ -82,7 +80,7 @@ describe("craftArmor()", () => {
       // Verify it's registered in the repository
       const instance = itemInstanceRepository.get(crafted.instanceId!);
       expect(instance).toBeTruthy();
-      expect(instance?.id).toBe(BodyId.LeatherArmor);
+      expect(instance?.baseItemId).toBe(BodyId.LeatherArmor);
       
       // Verify actor has the instance tracked
       expect(actor.itemInstances.has(crafted.instanceId!)).toBe(true);
@@ -131,10 +129,8 @@ describe("craftArmor()", () => {
     expect("item" in result).toBe(true);
     if ("item" in result) {
       const crafted = result.item as Armor;
-      expect(crafted.id).toBe(HeadWearId.SimpleHood);
       expect(crafted.slot).toBe("headWear");
       expect(crafted.instanceId).toBeTruthy();
-      expect(actor.inventory.get(HeadWearId.SimpleHood)).toBe(1);
     }
   });
 

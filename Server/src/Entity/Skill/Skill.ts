@@ -10,6 +10,7 @@ import type {
 } from "./types";
 import type { ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
+import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
 
 export class Skill {
   id: SkillId;
@@ -20,6 +21,8 @@ export class Skill {
   equipmentNeeded: ProficiencyKey[];
   consume: SkillConsume;
   produce: SkillProduce;
+  existBuffDebuffs?: BuffsAndDebuffsEnum[];
+  notExistBuffDebuffs?: BuffsAndDebuffsEnum[];
   exec: (
     user: Character,
     userParty: Character[],
@@ -36,10 +39,12 @@ export class Skill {
     equipmentNeeded: ProficiencyKey[];
     consume: SkillConsume;
     produce: SkillProduce;
+    existBuffDebuffs?: BuffsAndDebuffsEnum[];
+    notExistBuffDebuffs?: BuffsAndDebuffsEnum[];
     exec: (
       user: Character,
       userParty: Character[],
-      targetParty: Character[],      
+      targetParty: Character[],
       skillLevel: number,
       location: LocationsEnum,
     ) => TurnResult;
@@ -53,5 +58,7 @@ export class Skill {
     this.consume = data.consume;
     this.produce = data.produce;
     this.exec = data.exec;
+    this.existBuffDebuffs = data.existBuffDebuffs;
+    this.notExistBuffDebuffs = data.notExistBuffDebuffs;
   }
 }

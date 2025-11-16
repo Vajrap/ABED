@@ -31,7 +31,7 @@ export function getWeaponDamageOutput(
 
   const rollStat = (statType: "Damage" | "Hit" | "Crit") => {
     const diceRoll = statType === "Damage"
-      ? roll(weaponDamage[`${type}DamageDice`].face).d(weaponDamage[`${type}DamageDice`].dice).total
+      ? roll(weaponDamage[`${type}DamageDice`].dice).d(weaponDamage[`${type}DamageDice`].face).total
       : rollTwenty().total;
     const attrBonus = getAttributeBonus(weaponDamage[`${type}${statType}Stat`]);
     const profBonus = statType === "Damage" ? 0 : proficiencyBonus; // Only add proficiency to hit, not damage

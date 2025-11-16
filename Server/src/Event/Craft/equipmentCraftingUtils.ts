@@ -7,8 +7,8 @@ import {
   ELEMENT_KEYS,
 } from "src/InterFacesEnumsAndTypes/Enums";
 import type { EquipmentModifier } from "src/Entity/Item/Equipment/type";
+import type { EquipmentId } from "src/Entity/Item/Equipment/types";
 import type { ItemId } from "src/Entity/Item/type";
-import { itemRepository } from "src/Entity/Repository/Item";
 import { Equipment } from "src/Entity/Item/Equipment/Equipment";
 import { Weapon } from "src/Entity/Item/Equipment/Weapon/Weapon";
 import { Armor } from "src/Entity/Item/Equipment/Armor/Armor";
@@ -24,6 +24,9 @@ import { necklaceRepository } from "src/Entity/Item/Equipment/Armor/Neck/reposit
 import { ringRepository } from "src/Entity/Item/Equipment/Armor/Ring/repository";
 import { utilRepository } from "src/Entity/Item/Equipment/Armor/Util/repository";
 import { itemInstanceRepository } from "src/Entity/Item/Equipment/ItemInstance/repository";
+import { consumableRepository } from "src/Entity/Item/Consumable/repository";
+import { miscRepository } from "src/Entity/Item/Misc/repository";
+import { equipmentRepository } from "src/Entity/Item/Equipment/repository";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
 import type { EquipmentCraftingAttributes } from "src/Entity/Item/Misc/Resource/EquipmentCraftingAttributes";
 import { roll } from "src/Utils/Dice";
@@ -168,9 +171,13 @@ export function mergeEquipmentModifiers(
 }
 
 export function computeMaterialCost(materialUsage: Map<ItemId, number>): number {
+  // Use individual repositories to avoid circular dependency with Item/repository.ts
   let total = 0;
   for (const [itemId, quantity] of materialUsage.entries()) {
-    const item = itemRepository[itemId];
+    const item = 
+      equipmentRepository[itemId as keyof typeof equipmentRepository] ||
+      miscRepository[itemId as keyof typeof miscRepository] ||
+      consumableRepository[itemId as keyof typeof consumableRepository];
     if (!item) continue;
     total += (item.cost.baseCost ?? 0) * quantity;
   }
@@ -282,7 +289,10 @@ export function generateEquipmentInstanceId(
   return `${prefix}${blueprintId}-${randomUUID()}`;
 }
 
-export function registerCraftedEquipment(instanceId: string, equipment: Equipment): void {
+export function registerCraftedEquipment(instanceId: string, equipment: Equipment, baseItemId: EquipmentId): void {
+  // Store the original base item ID before changing the id to the unique instance ID
+  equipment.setBaseItemId(baseItemId);
+  // Set the unique instance ID as the main id
   equipment.setInstanceId(instanceId);
   itemInstanceRepository.set(instanceId, equipment as Weapon | Armor);
 }

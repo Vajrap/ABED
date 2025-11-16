@@ -12,6 +12,9 @@ export enum ActorEffect {
   PierceThree = "ActPierceThree",
 
   // Elemental Attacks
+  ArcaneOne = "ActArcaneOne",
+  ArcaneTwo = "ActArcaneTwo",
+  ArcaneThree = "ActArcaneThree",
   FireOne = "ActFireOne",
   FireTwo = "ActFireTwo",
   FireThree = "ActFireThree",
@@ -58,6 +61,9 @@ export enum TargetEffect {
   PierceThree = "TarPierceThree",
 
   // Elemental Attacks
+  ArcaneOne = "TarArcaneOne",
+  ArcaneTwo = "TarArcaneTwo",
+  ArcaneThree = "TarArcaneThree",
   FireOne = "TarFireOne",
   FireTwo = "TarFireTwo",
   FireThree = "TarFireThree",

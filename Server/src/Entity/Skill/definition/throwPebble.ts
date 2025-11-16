@@ -20,8 +20,8 @@ export const throwPebble = new Skill({
     th: "ขว้างก้อนหิน",
   },
   description: {
-    en: "A simple ranged attack with a pebble. Deals 1d6 blunt damage. If hit, roll 1D20 (+self STR mod) VS. DC15 (+target END mod) to daze the target.",
-    th: "การโจมตีระยะไกลด้วยก้อนหิน สร้างความเสียหาย blunt 1d6 หน่วย หากโจมตีถูกเป้าหมาย ทอย 1D20 (+self STR mod) VS. DC15 (+target END mod) ถ้าสำเร็จจะทำให้เป้าหมายสับสน",
+    en: "A simple ranged attack with a pebble. Deals 1d6 blunt damage. If hit, target must roll DC10 endurance saves or dazed.",
+    th: "การโจมตีระยะไกลด้วยก้อนหิน สร้างความเสียหาย blunt 1d6 หน่วย หากโจมตีถูก เป้าหมายจะต้องทอย DC10 endurance saves หรือติดสถานะสับสน",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -107,10 +107,9 @@ export const throwPebble = new Skill({
 
     let dazedHit = false;
     if (isHit) {
-      const roll = rollTwenty().total;
+      const saved = (rollTwenty().total + statMod(target.saveRolls.getStat("endurance").total)) >= 10
       if (
-        roll + statMod(actor.attribute.getTotal("strength")) >=
-        15 + statMod(target.attribute.getTotal("endurance"))
+        !saved
       ) {
         dazedHit = true;
         buffsAndDebuffsRepository.dazed.appender(target, 1, false, 0);

@@ -6,6 +6,9 @@ import { statMod } from "src/Utils/statMod";
 import Report from "src/Utils/Reporter";
 import { locationRepository } from "src/Entity/Location/Location/repository.ts";
 import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
+import { getBattleStatistics } from "./BattleContext";
+import type { BattleStatistics } from "./BattleStatistics";
+import {traitRepository} from "src/Entity/Trait.ts/repository.ts";
 
 export interface DamageResult {
   actualDamage: number;
@@ -19,9 +22,11 @@ export interface DamageInput {
   hit: number;
   crit: number;
   type: DamageType;
+  isMagic?: boolean;
+  trueDamage?: boolean;
 }
 
-const NEUTRAL_AC = 10;
+const NEUTRAL_AC = 8;
 
 export function resolveDamage(
   attackerId: string,
@@ -29,8 +34,10 @@ export function resolveDamage(
   damageOutput: DamageInput,
   location: LocationsEnum,
   critModifier: number = 1.5,
-  isMagic: boolean = false,
+  battleStatistics?: BattleStatistics, // Optional parameter for explicit passing
 ): DamageResult {
+  // Use provided battleStatistics or get from context
+  const stats = battleStatistics || getBattleStatistics();
   const attacker = getCharacter(attackerId);
   const target = getCharacter(targetId);
 
@@ -48,10 +55,21 @@ export function resolveDamage(
   }
 
   Report.debug(`      Damage Calculation:`);
-  Report.debug(`        Base Damage: ${damageOutput.damage} | Hit: ${damageOutput.hit} | Crit: ${damageOutput.crit} | Type: ${damageOutput.type}`);
+  Report.debug(
+    `        Base Damage: ${damageOutput.damage} | Hit: ${damageOutput.hit} | Crit: ${damageOutput.crit} | Type: ${damageOutput.type} | IsMagic: ${damageOutput.isMagic ?? false}`,
+  );
 
   // Apply breathing skill effects before damage calculation, might change something
   resolveBreathingSkillInBattle(attackerId, targetId, damageOutput);
+
+  for (const [traitEnum, value] of attacker.traits) {
+    traitRepository[traitEnum].config.onAttack?.(
+        attacker,
+        target,
+        damageOutput,
+        value
+    )
+  }
 
   // --- HIT / DODGE ---
   // If you mean "nat 20 can't be dodged", you need a raw die or a boolean flag.
@@ -66,11 +84,25 @@ export function resolveDamage(
   const critDefense = statMod(target.attribute.getTotal("endurance"));
   const autoHitByCrit = damageOutput.crit >= 20 + critDefense; // ideally: damageOutput.isNat20 === true
 
-  Report.debug(`        Hit Check: Hit(${damageOutput.hit}) vs Dodge(${dodgeChance})`);
+  Report.debug(
+    `        Hit Check: Hit(${damageOutput.hit}) vs Dodge(${dodgeChance})`,
+  );
 
   // not auto hit and dodge > hit ==> miss
   if (!autoHitByCrit && dodgeChance >= damageOutput.hit) {
     Report.debug(`        ❌ MISSED!`);
+
+    // Record miss in statistics
+    if (stats) {
+      stats.recordDamageDealt(
+        attackerId,
+        targetId,
+        0,
+        false,
+        false, // isHit is false
+      );
+    }
+
     return {
       actualDamage: 0,
       damageType: damageOutput.type,
@@ -82,38 +114,48 @@ export function resolveDamage(
   Report.debug(`        ✅ HIT!`);
 
   // Aptitude
-  if (isMagic) {
+  if (damageOutput.isMagic) {
     damageOutput.damage =
       damageOutput.damage *
       target.planarAptitude.getSpellEffectivenessAptitude();
   }
 
   // --- MITIGATION ---
-  const { baseMitigation, ifMagicAptitudeMultiplier } = !isMagic
-    ? {
-        baseMitigation:
-          target.battleStats.getTotal("pDEF") +
-          statMod(target.attribute.getTotal("endurance")),
-        ifMagicAptitudeMultiplier: 1,
-      }
-    : {
-        baseMitigation:
-          target.battleStats.getTotal("mDEF") +
-          statMod(target.attribute.getTotal("planar")),
-        ifMagicAptitudeMultiplier:
-          target.planarAptitude.getMagicResistanceAptitude(),
-      };
+  let damage: number;
+  if (damageOutput.trueDamage) {
+    // True damage bypasses all mitigation
+    damage = damageOutput.damage;
+    Report.debug(`        True Damage: ${damage} (no mitigation applied)`);
+  } else {
+    const { baseMitigation, ifMagicAptitudeMultiplier } = !damageOutput.isMagic
+      ? {
+          baseMitigation:
+            target.battleStats.getTotal("pDEF") +
+            statMod(target.attribute.getTotal("endurance")),
+          ifMagicAptitudeMultiplier: 1,
+        }
+      : {
+          baseMitigation:
+            target.battleStats.getTotal("mDEF") +
+            statMod(target.attribute.getTotal("planar")),
+          ifMagicAptitudeMultiplier:
+            target.planarAptitude.getMagicResistanceAptitude(),
+        };
 
-  const effectiveMitigation = Math.max(baseMitigation, 0);
-  Report.debug(`        Mitigation: ${baseMitigation} (pDEF: ${target.battleStats.getTotal("pDEF")} + Endurance: ${statMod(target.attribute.getTotal("endurance"))}) = effective ${effectiveMitigation}`);
+    const effectiveMitigation = Math.max(baseMitigation, 0);
+    Report.debug(
+      `        Mitigation: ${effectiveMitigation} (baseMitigation: ${baseMitigation} ifMagicAptitudeMultiplier: ${ifMagicAptitudeMultiplier})`,
+    );
 
-  let damage = Math.max(
-    damageOutput.damage / ifMagicAptitudeMultiplier -
-      effectiveMitigation,
-    0,
-  );
+    damage = Math.max(
+      (damageOutput.damage / ifMagicAptitudeMultiplier) - effectiveMitigation,
+      0,
+    );
 
-  Report.debug(`        Damage after mitigation: ${damage.toFixed(1)} (${damageOutput.damage} - ${effectiveMitigation})`);
+    Report.debug(
+      `        Damage after mitigation: ${damage.toFixed(1)} (${damageOutput.damage} - ${effectiveMitigation})`,
+    );
+  }
 
   // --- CRIT CHECK ---
   // Keep stat usage consistent: use statMod(endurance) if dodge used statMod(agility)
@@ -128,6 +170,7 @@ export function resolveDamage(
   const taunt = target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt);
   if (taunt) {
     if (taunt.value > 0) {
+      console.log(`${target.name.en} got 1 fire resource from taunt`);
       target.resources.fire += 1;
     }
   }
@@ -152,10 +195,29 @@ export function resolveDamage(
 
   // --- ROUND & APPLY ---
   const finalDamage = Math.max(Math.floor(damage), 0);
-  
-  Report.debug(`        Final Damage: ${finalDamage} (${damage.toFixed(1)} rounded down)`);
-  
+
+  Report.debug(
+    `        Final Damage: ${finalDamage} (${damage.toFixed(1)} rounded down)`,
+  );
+
+
+  for (const [traitEnum, value] of target.traits) {
+      traitRepository[traitEnum].config.onTakingDamage?.(target, attacker, damageOutput, value, finalDamage)
+  }
+
   target.vitals.decHp(finalDamage);
+
+
+  // Record statistics if tracker is provided
+  if (stats) {
+    stats.recordDamageDealt(
+      attackerId,
+      targetId,
+      finalDamage,
+      isCrit,
+      true, // isHit is true if we got here
+    );
+  }
 
   return {
     actualDamage: finalDamage,

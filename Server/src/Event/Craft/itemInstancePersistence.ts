@@ -44,6 +44,16 @@ export async function persistCraftedItemInstance({
   const selection = sanitizeMaterialSelection(materialSelection);
   const baseItemIdString: string = String(baseItemId);
 
+  // Only set crafterId if it's a valid UUID (player characters)
+  // MOBs/NPCs have IDs like "goblinWarrior_..." which are not valid UUIDs
+  const isValidUUID = (str: string | null | undefined): boolean => {
+    if (!str) return false;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(str);
+  };
+  
+  const validCrafterId = crafterId && isValidUUID(crafterId) ? crafterId : null;
+
   try {
     await db
       .insert(itemInstances)
@@ -51,18 +61,59 @@ export async function persistCraftedItemInstance({
         id: instanceId,
         itemType,
         baseItemId: baseItemIdString,
-        crafterId: crafterId ?? null,
+        crafterId: validCrafterId,
         blueprintId,
         materialSelection: selection,
         itemData,
         modifiers,
       })
       .onConflictDoNothing();
-  } catch (error) {
-    Report.error("❌ Failed to persist crafted item instance", {
-      instanceId,
-      error,
-    });
+  } catch (error: unknown) {
+    // Check if it's a connection error
+    // The error might be nested or have different structures depending on the database driver
+    const errorObj = error as Record<string, unknown>;
+    const nestedError = errorObj?.error as Record<string, unknown> | undefined;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorCode = errorObj?.code || nestedError?.code;
+    const errorErrno = errorObj?.errno || nestedError?.errno;
+    // PostgreSQL error code (e.g., "22P02" for invalid input syntax)
+    const pgCode = errorCode || nestedError?.code;
+    
+    const isConnectionError = 
+      errorCode === 'ECONNREFUSED' ||
+      errorErrno === 53 ||
+      errorMessage.includes('Failed to connect') ||
+      errorMessage.includes('ECONNREFUSED') ||
+      (errorObj?.error && typeof errorObj.error === 'object' && 
+       'code' in errorObj.error && errorObj.error.code === 'ECONNREFUSED');
+    
+    // Check if it's a schema/type mismatch error (e.g., invalid UUID format)
+    const isSchemaError = 
+      pgCode === '22P02' || // Invalid input syntax
+      errorMessage.includes('invalid input syntax') ||
+      errorMessage.includes('string_to_uuid');
+    
+    if (isConnectionError) {
+      // Database is not available - this is expected in some environments (e.g., tests, playground)
+      // Log at warning level to indicate it's expected but still noteworthy
+      Report.error("⚠️ Database not available - skipping item instance persistence", {
+        instanceId,
+        hint: "Database connection refused. Item will still be available in memory.",
+      });
+    } else if (isSchemaError) {
+      // Schema mismatch - likely the database table still has UUID type instead of varchar
+      Report.error("❌ Schema mismatch - item instance ID format incompatible with database", {
+        instanceId,
+        hint: "The database schema may need to be updated. The id field should be varchar(255), not uuid.",
+        error: errorMessage,
+      });
+    } else {
+      // Other database errors (constraint violations, etc.)
+      Report.error("❌ Failed to persist crafted item instance", {
+        instanceId,
+        error,
+      });
+    }
   }
 }
 

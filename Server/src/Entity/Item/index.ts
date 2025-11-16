@@ -5,6 +5,7 @@
 // Base
 export * from "./Item";
 export * from "./type";
+export * from "./repository";
 
 // Subclass
 export * from "./Subclass/ItemCost";

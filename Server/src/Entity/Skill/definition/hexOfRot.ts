@@ -9,8 +9,8 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
-import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
+import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const hexOfRot = new Skill({
   id: SkillId.HexOfRot,
@@ -91,14 +91,19 @@ export const hexOfRot = new Skill({
     if (willpowerSave < 10 + statMod(target.attribute.getTotal("willpower"))) {
       // Target fails save - reduce endurance (TODO: implement endurance debuff)
       hexMessage = ` ${target.name.en} was hexed! Endurance reduced by 2 (not yet implemented)`;
+      buffsAndDebuffsRepository.hexed.appender(target, 1, false, 0);
     } else {
       hexMessage = ` ${target.name.en} resisted the hex!`;
     }
 
+    const damageText = damageResult.isHit
+      ? `dealing ${damageResult.actualDamage} ${damageResult.damageType} damage`
+      : "but it was resisted";
+
     return {
       content: {
-        en: `${buildCombatMessage(actor, target, { en: "Hex of Rot", th: "คำสาปเน่าเปื่อย" }, damageResult).en}${hexMessage}`,
-        th: `${buildCombatMessage(actor, target, { en: "Hex of Rot", th: "คำสาปเน่าเปื่อย" }, damageResult).th}${hexMessage}`,
+        en: `${actor.name.en} cast Hex of Rot on ${target.name.en}, ${damageText}.${hexMessage}`,
+        th: `${actor.name.th} ใช้คำสาปเน่าเปื่อยกับ ${target.name.th}, ${damageResult.isHit ? `สร้างความเสียหาย ${damageResult.actualDamage} หน่วย` : "แต่ถูกต้านทาน"}.${hexMessage}`,
       },
       actor: {
         actorId: actor.id,

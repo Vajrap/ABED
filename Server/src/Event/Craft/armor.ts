@@ -10,8 +10,8 @@ import {
   SkinId,
   GemId,
 } from "src/Entity/Item/Misc";
-import { itemRepository } from "src/Entity/Repository/Item";
 import type { ItemId } from "src/Entity/Item/type";
+import type { EquipmentId } from "src/Entity/Item/Equipment/types";
 import type { CraftMaterialSelection, CraftResult } from "./types";
 import {
   appendUnique,
@@ -39,6 +39,7 @@ import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ARMOR_SLOT_BONUS_PROFILE } from "./armorBonusConfig";
 import { persistCraftedItemInstance } from "./itemInstancePersistence";
 import Report from "src/Utils/Reporter";
+import { itemRepository } from "src/Entity/Item/repository";
 
 const armorComponentOrder = ["primary", "secondary", "tertiary", "accent"] as const;
 
@@ -185,16 +186,23 @@ function startArmorCraftingCalculation(
     seasonalDeviation: craftedArmor.cost.seasonalDeviation,
   });
 
+  // Store the base item ID before we change the id to the unique instance ID
+  const baseItemId = craftedArmor.id as EquipmentId;
   const instanceId = generateEquipmentInstanceId(blueprintId, actor.id);
-  registerCraftedEquipment(instanceId, craftedArmor);
-  actor.addItemInstance(instanceId, craftedArmor.id);
-  actor.addItemToInventory(craftedArmor.id, 1);
+  
+  // Register the crafted equipment (this sets id = instanceId and baseItemId = baseItemId)
+  registerCraftedEquipment(instanceId, craftedArmor, baseItemId);
+  
+  // Use the unique instance ID for inventory and tracking
+  // addItemInstance maps instanceId -> baseItemId for lookup
+  actor.addItemInstance(instanceId, baseItemId);
+  actor.addItemToInventory(instanceId, 1);
 
   if (process.env.NODE_ENV !== "test") {
     void persistCraftedItemInstance({
       instanceId,
       blueprintId,
-      baseItemId: craftedArmor.id,
+      baseItemId: baseItemId,
       equipment: craftedArmor,
       crafterId: actor.id,
       materialSelection,

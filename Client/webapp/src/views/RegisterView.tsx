@@ -46,8 +46,9 @@ const RegisterPaper = styled(Paper)(({ theme }) => ({
   maxWidth: 600,
   width: "100%",
   textAlign: "center",
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
-  backdropFilter: 'blur(10px)',
+  background:
+    "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)",
+  backdropFilter: "blur(10px)",
   border: `2px solid ${theme.palette.secondary.main}40`,
   borderRadius: 20,
   boxShadow: `var(--shadow-electric)`,
@@ -138,7 +139,6 @@ export const RegisterView: React.FC = () => {
     const unsubscribe = registerViewModel.subscribe(() => {
       setViewState(registerViewModel.getState());
     });
-
 
     // Cleanup subscription on unmount
     return unsubscribe;
@@ -436,7 +436,6 @@ export const RegisterView: React.FC = () => {
                     {t(L10N.registerPage.passwordRequirements)}
                   </Typography>
                 </Box>
-
               </FormBox>
 
               <ButtonGroup>
@@ -504,7 +503,6 @@ export const RegisterView: React.FC = () => {
         PaperProps={{
           sx: {
             maxHeight: "80vh",
-            background: "var(--gradient-background)",
             border: `2px solid var(--color-mystical-violet)40`,
           },
         }}
@@ -553,7 +551,11 @@ export const RegisterView: React.FC = () => {
         open={!!viewState.error}
         onClose={() => setViewState({ ...viewState, error: null })}
         title={t(L10N.common.error)}
-        message={typeof viewState.error === "string" ? viewState.error : t(viewState.error || L10N.registerPage.registrationError)}
+        message={
+          typeof viewState.error === "string"
+            ? viewState.error
+            : t(viewState.error || L10N.registerPage.registrationError)
+        }
         severity="error"
       />
     </>

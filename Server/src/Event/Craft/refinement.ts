@@ -2,9 +2,9 @@ import {
   RefinementBlueprint,
 } from "src/Entity/Blueprint/Blueprint";
 import { Character } from "src/Entity/Character/Character";
-import { itemRepository } from "src/Entity/Repository/Item";
 import { rollTwenty } from "src/Utils/Dice";
 import type { CraftResult } from "./types";
+import { itemRepository } from "src/Entity/Item/repository";
 
 function validateResources(
   actor: Character,

@@ -11,11 +11,11 @@ describe("CharacterAttributes", () => {
 
       ATTRIBUTE_KEYS.forEach((key) => {
         const stat = attributes.getStat(key);
-        expect(stat.base).toBe(0);
+        expect(stat.base).toBe(6);
         expect(stat.bonus).toBe(0);
         expect(stat.battle).toBe(0);
         expect(stat.exp).toBe(0);
-        expect(stat.total).toBe(0);
+        expect(stat.total).toBe(6);
       });
     });
 
@@ -43,14 +43,14 @@ describe("CharacterAttributes", () => {
       expect(attributes.getStat("agility").total).toBe(13); // 12 + 0 + 1
 
       // Intelligence should have custom exp
-      expect(attributes.getStat("intelligence").base).toBe(0); // default
+      expect(attributes.getStat("intelligence").base).toBe(6); // default
       expect(attributes.getStat("intelligence").bonus).toBe(0); // default
       expect(attributes.getStat("intelligence").battle).toBe(0); // default
       expect(attributes.getStat("intelligence").exp).toBe(50);
-      expect(attributes.getStat("intelligence").total).toBe(0); // 0 + 0 + 0
+      expect(attributes.getStat("intelligence").total).toBe(6); // 0 + 0 + 0
 
       // Other attributes should have defaults
-      expect(attributes.getStat("charisma").total).toBe(0);
+      expect(attributes.getStat("charisma").total).toBe(6);
     });
 
     test("should handle all attribute keys", () => {
@@ -262,7 +262,7 @@ describe("CharacterAttributes", () => {
 
     test("should handle zero values", () => {
       const attributes = new CharacterAttributes();
-      expect(attributes.getTotal("charisma")).toBe(0);
+      expect(attributes.getTotal("charisma")).toBe(6);
     });
   });
 
@@ -300,7 +300,7 @@ describe("CharacterAttributes", () => {
       expect(attributes.getTotal("agility")).toBe(15); // 14 + 1 + 0
 
       // Unspecified attributes should have defaults
-      expect(attributes.getTotal("intelligence")).toBe(0);
+      expect(attributes.getTotal("intelligence")).toBe(6);
     });
   });
 

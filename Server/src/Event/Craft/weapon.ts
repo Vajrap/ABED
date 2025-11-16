@@ -1,51 +1,36 @@
-import { WeaponBlueprint, MaterialType } from "src/Entity/Blueprint/Blueprint";
-import { Character } from "src/Entity/Character/Character";
+import {MaterialType, WeaponBlueprint} from "src/Entity/Blueprint/Blueprint";
+import {Character} from "src/Entity/Character/Character";
+import {BoneId, ClothId, GemId, IngotId, LeatherId, PlankId, SkinId, ThreadId,} from "src/Entity/Item/Misc";
+import type {ItemId} from "src/Entity/Item/type";
+import type {EquipmentId} from "src/Entity/Item/Equipment/types";
+import type {CraftMaterialSelection, CraftResult} from "./types";
+import {itemRepository} from "src/Entity/Item/repository";
+import {statMod} from "src/Utils/statMod";
 import {
-  IngotId,
-  PlankId,
-  BoneId,
-  LeatherId,
-  ThreadId,
-  ClothId,
-  SkinId,
-  GemId,
-} from "src/Entity/Item/Misc";
-import type { ItemId } from "src/Entity/Item/type";
-import type { CraftMaterialSelection, CraftResult } from "./types";
-import { itemRepository } from "src/Entity/Item/repository";
-import type { Weapon } from "src/Entity/Item/Equipment/Weapon/Weapon";
-import { statMod } from "src/Utils/statMod";
-import {
-  createEquipmentCraftingAttributes,
-  type EquipmentCraftingAttributes,
+    createEquipmentCraftingAttributes,
+    type EquipmentCraftingAttributes,
 } from "src/Entity/Item/Misc/Resource/EquipmentCraftingAttributes";
+import {type AttributeKey, ELEMENT_KEYS, type ElementKey, EquipmentSlot,} from "src/InterFacesEnumsAndTypes/Enums";
+import {TierEnum} from "src/InterFacesEnumsAndTypes/Tiers";
 import {
-  ATTRIBUTE_KEYS,
-  ELEMENT_KEYS,
-  type AttributeKey,
-  type ElementKey,
-  EquipmentSlot,
-} from "src/InterFacesEnumsAndTypes/Enums";
-import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import {
-  appendUnique,
-  applyDamageDiceSteps,
-  calculateMaterialSuccess,
-  cloneWeaponInstance,
-  computeCraftingFee,
-  computeMaterialCost,
-  convertCraftingAttributesToModifier,
-  determineGemSlots,
-  generateEquipmentInstanceId,
-  mergeEquipmentAttributes,
-  mergeEquipmentModifiers,
-  registerCraftedEquipment,
-  resolveBlueprintId,
-  resolveWeaponByBlueprint,
+    appendUnique,
+    applyDamageDiceSteps,
+    calculateMaterialSuccess,
+    cloneWeaponInstance,
+    computeCraftingFee,
+    computeMaterialCost,
+    convertCraftingAttributesToModifier,
+    determineGemSlots,
+    generateEquipmentInstanceId,
+    mergeEquipmentAttributes,
+    mergeEquipmentModifiers,
+    registerCraftedEquipment,
+    resolveBlueprintId,
+    resolveWeaponByBlueprint,
 } from "./equipmentCraftingUtils";
-import { ARMOR_SLOT_BONUS_PROFILE } from "./armorBonusConfig";
-import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
-import { persistCraftedItemInstance } from "./itemInstancePersistence";
+import {ARMOR_SLOT_BONUS_PROFILE} from "./armorBonusConfig";
+import {ItemCost} from "src/Entity/Item/Subclass/ItemCost";
+import {persistCraftedItemInstance} from "./itemInstancePersistence";
 import Report from "src/Utils/Reporter";
 
 const weaponComponentOrder = ["blade", "handle", "grip", "guard", "core"] as const;
@@ -286,16 +271,15 @@ function startWeaponCraftingCalculation(
   const smithingFee = computeCraftingFee(blueprint.tier);
   const newBaseCost = materialCost + smithingFee;
   const existingBonusCost = craftedWeapon.cost.bonusCost ?? 0;
-  const computedCost = new ItemCost({
-    baseCost: newBaseCost,
-    bonusCost: existingBonusCost,
-    cost: newBaseCost + existingBonusCost,
-    marketCost: Math.round((newBaseCost + existingBonusCost) * 1.1),
-    numberOfSellThisWeek: craftedWeapon.cost.numberOfSellThisWeek,
-    possibleDeviation: craftedWeapon.cost.possibleDeviation,
-    seasonalDeviation: craftedWeapon.cost.seasonalDeviation,
+    craftedWeapon.cost = new ItemCost({
+      baseCost: newBaseCost,
+      bonusCost: existingBonusCost,
+      cost: newBaseCost + existingBonusCost,
+      marketCost: Math.round((newBaseCost + existingBonusCost) * 1.1),
+      numberOfSellThisWeek: craftedWeapon.cost.numberOfSellThisWeek,
+      possibleDeviation: craftedWeapon.cost.possibleDeviation,
+      seasonalDeviation: craftedWeapon.cost.seasonalDeviation,
   });
-  craftedWeapon.cost = computedCost;
 
   const gemProfile = ARMOR_SLOT_BONUS_PROFILE[EquipmentSlot.weapon]?.gemSlot;
   const updatedGemSlots = determineGemSlots(
@@ -308,16 +292,23 @@ function startWeaponCraftingCalculation(
     gemSlots: updatedGemSlots,
   };
 
+  // Store the base item ID before we change the id to the unique instance ID
+  const baseItemId = craftedWeapon.id as EquipmentId;
   const instanceId = generateEquipmentInstanceId(blueprintId, actor.id);
-  registerCraftedEquipment(instanceId, craftedWeapon);
-  actor.addItemInstance(instanceId, craftedWeapon.id);
-  actor.addItemToInventory(craftedWeapon.id, 1);
+  
+  // Register the crafted equipment (this sets id = instanceId and baseItemId = baseItemId)
+  registerCraftedEquipment(instanceId, craftedWeapon, baseItemId);
+  
+  // Use the unique instance ID for inventory and tracking
+  // addItemInstance maps instanceId -> baseItemId for lookup
+  actor.addItemInstance(instanceId, baseItemId);
+  actor.addItemToInventory(instanceId, 1);
 
   if (process.env.NODE_ENV !== "test") {
     void persistCraftedItemInstance({
       instanceId,
       blueprintId,
-      baseItemId: craftedWeapon.id,
+      baseItemId: baseItemId,
       equipment: craftedWeapon,
       crafterId: actor.id,
       materialSelection,

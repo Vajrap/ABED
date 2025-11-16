@@ -13,6 +13,8 @@ import { craftWeapon } from "./weapon";
 import { craftArmor } from "./armor";
 import { craftRefinement } from "./refinement";
 import { craftGem } from "./gem";
+import { itemRepository } from "src/Entity/Item/repository";
+import { getItem } from "src/Entity/Item";
 
 /**
  * Determines how many items to craft based on strategy and available materials
@@ -66,14 +68,16 @@ function determineCraftQuantity(
  * Returns a map of item ids and the amount of items crafted
 */
 // TODO: Actually, we have multiple characters helping each other craft, so we need to handle that. Should be helping in like... each character roll their own dice and use the highest + mod
-export function processCharacterCraftingPreferences(actor: Character): Map<ItemId, number> {
+export function processCharacterCraftingPreferences(mainActor: Character, otherCharacters: Character[]): Map<ItemId | string, number> {
+    // TODO: Deal with other characters
+    void otherCharacters
   // Only player characters craft (NPCs skip to avoid calculation overhead)
-  if (!actor.userId) {
+  if (!mainActor.userId) {
     return new Map();
   }
 
-  const craftingList = actor.behavior.craftingPreference.craftingList;
-  let totalCrafted:Map<ItemId, number> = new Map();
+  const craftingList = mainActor.behavior.craftingPreference.craftingList;
+  let totalCrafted:Map<ItemId | string, number> = new Map();
 
   // Loop through slots 1-4 in order
   for (const slotNumber of [1, 2, 3, 4] as const) {
@@ -87,7 +91,7 @@ export function processCharacterCraftingPreferences(actor: Character): Map<ItemI
     if (blueprint instanceof IngotBlueprint || blueprint instanceof RefinementBlueprint) {
       const craftQuantity = determineCraftQuantity(
         blueprint,
-        actor,
+        mainActor,
         slot.strategy,
         slot.quantityLow,
         slot.quantityHigh,
@@ -97,15 +101,19 @@ export function processCharacterCraftingPreferences(actor: Character): Map<ItemI
       }
       for (let i = 0; i < craftQuantity; i++) {
         if (blueprint instanceof IngotBlueprint) {
-          const result = craftIngot(actor, blueprint);
+          const result = craftIngot(mainActor, blueprint);
           if ("item" in result) {
             const existing = totalCrafted.get(result.item.id) || 0;
             totalCrafted.set(result.item.id, existing + result.amount);
           }
         } else {
-          const result = craftRefinement(actor, blueprint);
+          const result = craftRefinement(mainActor, blueprint);
           if ("item" in result) {
-            const existing = totalCrafted.get(result.item.id) || 0;
+            const item = getItem(result.item.id)
+            if (!item) {
+              continue;
+            }
+            const existing = totalCrafted.get(item.id) || 0;
             totalCrafted.set(result.item.id, existing + result.amount);
           }
         }
@@ -114,7 +122,7 @@ export function processCharacterCraftingPreferences(actor: Character): Map<ItemI
     }
 
     if (blueprint instanceof GemCuttingBlueprint) {
-      const result = craftGem(actor, blueprint);
+      const result = craftGem(mainActor, blueprint);
       if (result.item) {
         const existing = totalCrafted.get(result.item.id) || 0;
         totalCrafted.set(result.item.id, existing + result.amount);
@@ -128,7 +136,7 @@ export function processCharacterCraftingPreferences(actor: Character): Map<ItemI
         continue;
       }
 
-      const result = craftWeapon(actor, blueprint, slot.materialSelection);
+      const result = craftWeapon(mainActor, blueprint, slot.materialSelection);
       if ("item" in result) {
         const existing = totalCrafted.get(result.item.id) || 0;
         totalCrafted.set(result.item.id, existing + result.amount);
@@ -143,7 +151,7 @@ export function processCharacterCraftingPreferences(actor: Character): Map<ItemI
         continue;
       }
 
-      const result = craftArmor(actor, blueprint, slot.materialSelection);
+      const result = craftArmor(mainActor, blueprint, slot.materialSelection);
       if ("item" in result) {
         const existing = totalCrafted.get(result.item.id) || 0;
         totalCrafted.set(result.item.id, existing + result.amount);

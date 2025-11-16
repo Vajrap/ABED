@@ -13,6 +13,9 @@ import { getPlayableSkill } from "./getPlayableSkill";
 import { battleTypeConfig, type BattleType } from "./types";
 import { activateBreathingSkillTurnPassive } from "../BreathingSkill/activeBreathingSkill";
 import Report from "../../Utils/Reporter";
+import { BattleStatistics } from "./BattleStatistics";
+import { setBattleStatistics } from "./BattleContext";
+import {traitRepository} from "src/Entity/Trait.ts/repository.ts";
 
 export class Battle {
   id: string;
@@ -24,6 +27,7 @@ export class Battle {
   gameTime: GameTimeInterface;
   battleType: BattleType;
   allParticipants: Character[];
+  battleStatistics: BattleStatistics;
   constructor(
     partyA: Party,
     partyB: Party,
@@ -52,16 +56,39 @@ export class Battle {
         (char): char is Character => char !== "none" && !char.vitals.isDead,
       ),
     ];
+    // Initialize battle statistics
+    this.battleStatistics = new BattleStatistics();
+    for (const character of this.allParticipants) {
+      this.battleStatistics.initializeCharacter(character);
+    }
   }
 
   async startBattle() {
     // Battle Loop should return Result of the Battle along with TurnReport[]
     Report.debug("\n========== BATTLE STARTED ==========");
-    Report.debug(`Party A: ${this.partyA.characters.filter(c => c !== "none").map(c => c.name.en).join(", ")}`);
-    Report.debug(`Party B: ${this.partyB.characters.filter(c => c !== "none").map(c => c.name.en).join(", ")}`);
+    Report.debug(
+      `Party A: ${this.partyA.characters
+        .filter((c) => c !== "none")
+        .map((c) => c.name.en)
+        .join(", ")}`,
+    );
+    Report.debug(
+      `Party B: ${this.partyB.characters
+        .filter((c) => c !== "none")
+        .map((c) => c.name.en)
+        .join(", ")}`,
+    );
     Report.debug("=====================================\n");
 
-    await this.battleLoop();
+    // Set battle statistics in context for resolveDamage to access
+    setBattleStatistics(this.battleStatistics);
+
+    try {
+      await this.battleLoop();
+    } finally {
+      // Clear battle statistics from context when battle ends
+      setBattleStatistics(null);
+    }
   }
 
   private async battleLoop() {
@@ -72,17 +99,25 @@ export class Battle {
     let turnCount = 0;
 
     while (this.isOngoing) {
-      if (turnCount >= 100) {
+      if (turnCount >= 200) {
         this.isOngoing = false;
-        Report.debug(`\n--- Battle ended due to turn limit (100 turns) ---`);
+        Report.debug(`\n--- Battle ended due to turn limit (200 turns) ---`);
         Report.debug(`Party A survivors:`);
-        this.partyA.characters.filter(c => c !== "none").forEach(c => {
-          Report.debug(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
-        });
+        this.partyA.characters
+          .filter((c) => c !== "none")
+          .forEach((c) => {
+            Report.debug(
+              `  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? " (DEAD)" : ""}`,
+            );
+          });
         Report.debug(`Party B survivors:`);
-        this.partyB.characters.filter(c => c !== "none").forEach(c => {
-          Report.debug(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
-        });
+        this.partyB.characters
+          .filter((c) => c !== "none")
+          .forEach((c) => {
+            Report.debug(
+              `  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? " (DEAD)" : ""}`,
+            );
+          });
         break;
       }
 
@@ -94,11 +129,91 @@ export class Battle {
         if (updateAbGaugeAndDecideTurnTaking(actor)) {
           turnCount++;
           Report.debug(`\n--- Turn ${turnCount} ---`);
-          Report.debug(`${actor.name.en} (HP: ${actor.vitals.hp.current}/${actor.vitals.hp.max}) takes turn`);
+          Report.debug(
+            `${actor.name.en} (HP: ${actor.vitals.hp.current}/${actor.vitals.hp.max}) takes turn`,
+          );
+
+          const alliesParty = this.partyA.characters.includes(actor) ? this.partyA : this.partyB;
+          const enemiesParty = alliesParty === this.partyA ? this.partyB : this.partyA;
+          const allies = alliesParty.characters.map((c) => {return c})
+          const enemies = enemiesParty.characters.map((e) => {return e})
+
+          for (const [trait, amount] of actor.traits) {
+              traitRepository[trait].config.beforeTurn?.(
+                  actor,
+                  amount,
+                  allies,
+                  enemies,
+              )
+          }
 
           const canTakeTurn = resolveBuffAndDebuff(actor);
           if (canTakeTurn.ableToTakesTurn) {
+            const traitContext = new Map();
+            for (const [trait, value] of actor.traits) {
+                traitRepository[trait].config.onTurn?.(
+                    actor,
+                    value,
+                    allies,
+                    enemies,
+                    traitContext,
+                );
+            }
+            // Record HP before turn for all characters (to track healing to others)
+            const hpBeforeTurn = new Map<string, number>();
+            for (const char of this.allParticipants) {
+              if (!char.vitals.isDead) {
+                hpBeforeTurn.set(char.id, char.vitals.hp.current);
+                this.battleStatistics.recordHpBeforeTurn(char);
+              }
+            }
+
             const actorTurnResult = this.startActorTurn(actor);
+
+
+            for (const [trait, value] of actor.traits) {
+                traitRepository[trait].config.onEndTurn?.(
+                    actor,
+                    value,
+                    allies,
+                    enemies,
+                    traitContext,
+                );
+            }
+
+            // Record HP after turn and calculate healing for all characters
+            for (const char of this.allParticipants) {
+              if (!char.vitals.isDead) {
+                const beforeHp =
+                  hpBeforeTurn.get(char.id) ?? char.vitals.hp.current;
+                const afterHp = char.vitals.hp.current;
+                const hpChange = afterHp - beforeHp;
+
+                if (hpChange > 0) {
+                  // Healing received
+                  this.battleStatistics.recordHpAfterTurn(char);
+
+                  // If this character is the actor and healed themselves, record as healing done
+                  if (char.id === actor.id) {
+                    const stats = this.battleStatistics.getCharacterStats(
+                      actor.id,
+                    );
+                    if (stats) {
+                      stats.healingDone += hpChange;
+                    }
+                  } else {
+                    // Healing done to others by the actor
+                    this.battleStatistics.recordHealingDone(
+                      actor.id,
+                      char.id,
+                      hpChange,
+                    );
+                  }
+                }
+              }
+            }
+
+
             Report.debug(`→ ${actorTurnResult.content.en}`);
             this.battleReport.addTurnResult(actorTurnResult);
 
@@ -113,10 +228,10 @@ export class Battle {
               },
               actor: {
                 actorId: actor.id,
-                effect: []
+                effect: [],
               },
-              targets: []
-            }
+              targets: [],
+            };
             Report.debug(`→ ${turnResult.content.en}`);
             this.battleReport.addTurnResult(turnResult);
           }
@@ -126,31 +241,47 @@ export class Battle {
             battleStatus.status === BattleStatus.END ||
             battleStatus.status === BattleStatus.DRAW_END
           ) {
-            this.isOngoing = false;
+              this.isOngoing = false;
 
-            // Log remaining HP for all characters
-            Report.debug(`\n--- Battle End ---`);
-            Report.debug(`Party A survivors:`);
-            this.partyA.characters.filter(c => c !== "none").forEach(c => {
-              Report.debug(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
-            });
-            Report.debug(`Party B survivors:`);
-            this.partyB.characters.filter(c => c !== "none").forEach(c => {
-              Report.debug(`  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? ' (DEAD)' : ''}`);
-            });
-            Report.debug(`Winning party: ${battleStatus.winner?.leader.name.en}'s party`);
+              // Log remaining HP for all characters
+              Report.debug(`\n--- Battle End ---`);
+              Report.debug(`Party A survivors:`);
+              this.partyA.characters
+                  .filter((c) => c !== "none")
+                  .forEach((c) => {
+                      Report.debug(
+                          `  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? " (DEAD)" : ""}`,
+                      );
+                  });
+              Report.debug(`Party B survivors:`);
+              this.partyB.characters
+                  .filter((c) => c !== "none")
+                  .forEach((c) => {
+                      Report.debug(
+                          `  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? " (DEAD)" : ""}`,
+                      );
+                  });
+              Report.debug(
+                  `Winning party: ${battleStatus.winner?.leader.name.en}'s party`,
+              );
 
-            this.handleBattleEnd(battleStatus);
-            this.battleReport.setOutcome(
-              battleStatus.winner ? battleStatus.winner.partyID : "",
-              {
-                en: battleStatus.status === BattleStatus.DRAW_END ? "A battle ended in a draw" : `${battleStatus.winner?.leader.name.en} 's party win the battle!`,
-                th: battleStatus.status === BattleStatus.DRAW_END ? "การต่อสู้จบลงด้วยการเสมอกัน" : `ปาร์ตี้ของ ${battleStatus.winner?.leader.name.th} ชนะในการต่อสู้!`
-              },
-              // TODO: Rewards calculation placeholder
-              {},
-            )
-            break;
+              this.handleBattleEnd(battleStatus);
+              this.battleReport.setOutcome(
+                  battleStatus.winner ? battleStatus.winner.partyID : "",
+                  {
+                      en:
+                          battleStatus.status === BattleStatus.DRAW_END
+                              ? "A battle ended in a draw"
+                              : `${battleStatus.winner?.leader.name.en} 's party win the battle!`,
+                      th:
+                          battleStatus.status === BattleStatus.DRAW_END
+                              ? "การต่อสู้จบลงด้วยการเสมอกัน"
+                              : `ปาร์ตี้ของ ${battleStatus.winner?.leader.name.th} ชนะในการต่อสู้!`,
+                  },
+                  // TODO: Rewards calculation placeholder
+                  {},
+              );
+              break;
           }
         }
       }
@@ -167,27 +298,33 @@ export class Battle {
     actor.replenishResource();
 
     // Log current resources
-    Report.debug(`  Resources: HP ${actor.vitals.hp.current}/${actor.vitals.hp.max} | MP ${actor.vitals.mp.current}/${actor.vitals.mp.max} | SP ${actor.vitals.sp.current}/${actor.vitals.sp.max}`);
+    Report.debug(
+      `  Resources: HP ${actor.vitals.hp.current}/${actor.vitals.hp.max} | MP ${actor.vitals.mp.current}/${actor.vitals.mp.max} | SP ${actor.vitals.sp.current}/${actor.vitals.sp.max}`,
+    );
     const elementResources = Object.entries(actor.resources)
       .filter(([_, value]) => value > 0)
       .map(([key, value]) => `${key}=${value}`)
-      .join(' ');
-    if (elementResources) Report.debug(`  Elemental Resources: ${elementResources}`);
+      .join(" ");
+    if (elementResources)
+      Report.debug(`  Elemental Resources: ${elementResources}`);
 
     // Determine which party the actor belongs to (needed for conditional deck check)
     const isPartyA = this.partyA.characters.includes(actor);
     const actorParty = isPartyA ? this.partyA : this.partyB;
 
     // Check: If a character can play any cards
-    const {skill, skillLevel} = getPlayableSkill(actor, actorParty);
+    const { skill, skillLevel } = getPlayableSkill(actor, actorParty);
     Report.debug(`  Selected Skill: ${skill.name.en} (Level ${skillLevel})`);
+
+    // Record turn and skill used
+    this.battleStatistics.recordTurn(actor.id, skill.id);
     // Consume Resource
     for (const consume of skill.consume.elements) {
       actor.resources[consume.element] -= consume.value;
     }
-    skill.consume.hp && (actor.vitals.decHp(skill.consume.hp));
-    skill.consume.mp && (actor.vitals.decMp(skill.consume.mp));
-    skill.consume.sp && (actor.vitals.decSp(skill.consume.sp));
+    skill.consume.hp && actor.vitals.decHp(skill.consume.hp);
+    skill.consume.mp && actor.vitals.decMp(skill.consume.mp);
+    skill.consume.sp && actor.vitals.decSp(skill.consume.sp);
 
     // Execute
     const userParty = isPartyA
@@ -205,12 +342,19 @@ export class Battle {
           (char): char is Character => char !== "none",
         );
 
-    const turnResult = skill.exec(actor, userParty, targetParty, skillLevel, this.location.id);
+    const turnResult = skill.exec(
+      actor,
+      userParty,
+      targetParty,
+      skillLevel,
+      this.location.id,
+    );
     // Produce Resource
 
     for (const produce of skill.produce.elements) {
       const amountProduced =
-        Math.floor(Math.random() * (produce.max - produce.min + 1)) + produce.min;
+        Math.floor(Math.random() * (produce.max - produce.min + 1)) +
+        produce.min;
       actor.resources[produce.element] += amountProduced;
     }
     skill.produce.hp && actor.vitals.incHp(skill.produce.hp);
@@ -326,15 +470,17 @@ export class Battle {
     );
 
     const trainCharacters = (party: Party, exp: number) => {
-      for (const character of party.characters.filter((c) => c !== undefined && c !== "none") as Character[]) {
+      for (const character of party.characters.filter(
+        (c) => c !== undefined && c !== "none",
+      ) as Character[]) {
         for (let i = 0; i < timesOfTraining; i++) {
           let trainedAttribute =
             possibleAttributesToBeTrained[
               Math.floor(Math.random() * possibleAttributesToBeTrained.length)
             ];
-            if (trainedAttribute) {
-              trainAttribute(character, trainedAttribute, exp);
-            }
+          if (trainedAttribute) {
+            trainAttribute(character, trainedAttribute, exp);
+          }
         }
       }
     };
@@ -419,7 +565,7 @@ function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
 
   actor.abGauge += abGaugeIncrement;
 
-  if (actor.abGauge >= 10) {
+  if (actor.abGauge >= 100) {
     actor.abGauge = 0;
     return true;
   }
@@ -453,4 +599,3 @@ function resolveBuffAndDebuff(actor: Character): {
     reason,
   };
 }
-

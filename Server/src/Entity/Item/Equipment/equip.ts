@@ -11,7 +11,7 @@ import { WeaponId } from "./Weapon";
 
 export function equip(
   character: Character,
-  equipmentId: EquipmentId,
+  equipmentId: EquipmentId | string, // Can be base EquipmentId or unique instance ID (UUID)
   slot: CharacterEquipmentSlot,
 ): boolean {
   // 1. check if the item exist in inventory
@@ -86,7 +86,7 @@ function modifyTraits(character: Character, equipment: Equipment) {
   }
 }
 
-function putIntoSlot(character: Character, equipmentId: EquipmentId, slot: CharacterEquipmentSlot) {
+function putIntoSlot(character: Character, equipmentId: EquipmentId | string, slot: CharacterEquipmentSlot) {
   switch (slot) {
     case CharacterEquipmentSlot.headWear:
       character.equipments.headWear = equipmentId as HeadWearId;

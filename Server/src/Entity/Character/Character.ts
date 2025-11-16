@@ -34,11 +34,11 @@ import type { CharacterEpithetEnum } from "./Subclass/Title/Epithet/enum";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N.ts";
 import { roll, rollTwenty } from "src/Utils/Dice.ts";
 import { statMod } from "src/Utils/statMod.ts";
-import type { Weapon } from "src/Entity/Item";
+import { Weapon } from "src/Entity/Item";
 import type { ItemId } from "../Item/type.ts";
 import {
   ArmorClass,
-  getWeaponFromRepository,
+  getEquipment,
   type WeaponId,
   BodyId,
   LegId,
@@ -52,6 +52,7 @@ import {
 } from "../Item/index.ts";
 import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
 import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
+import { RaceEnum } from "../../InterFacesEnumsAndTypes/Enums";
 
 export class Character {
   id: string = "";
@@ -60,7 +61,7 @@ export class Character {
 
   name: L10N;
   gender: "MALE" | "FEMALE" | "NONE" = "NONE";
-  race: string = "";
+  race: RaceEnum | string = ""; // Allow string for backwards compatibility, but prefer RaceEnum
   type: CharacterType = CharacterType.humanoid;
   level: number = 1;
   portrait: string | null = null;
@@ -105,7 +106,7 @@ export class Character {
   traits: Map<TraitEnum, number> = new Map();
 
   inventorySize: { base: number; bonus: number } = { base: 20, bonus: 0 };
-  inventory: Map<ItemId, number> = new Map();
+  inventory: Map<ItemId | string, number> = new Map(); // Can be base ItemId or unique instance ID (UUID) for crafted items
   itemInstances: Map<string, ItemId> = new Map();
   equipments: {
     headWear: HeadWearId | null;
@@ -241,7 +242,8 @@ export class Character {
     return this;
   }
 
-  addItemToInventory(item: ItemId, quantity: number) {
+  addItemToInventory(item: ItemId | string, quantity: number) {
+    // Can be base ItemId or unique instance ID (UUID) for crafted items
     this.inventory.set(item, (this.inventory.get(item) ?? 0) + quantity);
   }
 
@@ -249,7 +251,8 @@ export class Character {
     this.itemInstances.set(instanceId, baseItemId);
   }
 
-  removeItemFromInventory(item: ItemId, quantity: number) {
+  removeItemFromInventory(item: ItemId | string, quantity: number) {
+    // Can be base ItemId or unique instance ID (UUID) for crafted items
     this.inventory.set(item, (this.inventory.get(item) ?? 0) - quantity);
     if (this.inventory.get(item) === 0) {
       this.inventory.delete(item);
@@ -320,12 +323,15 @@ export class Character {
   }
 
   getWeapon(expectedShield: boolean = false): Weapon {
-    const rWeaponId = this.equipments.rightHand as WeaponId;
-    const lWeaponId = this.equipments.leftHand as WeaponId;
+    const rWeaponId = this.equipments.rightHand as WeaponId | string | null;
+    const lWeaponId = this.equipments.leftHand as WeaponId | string | null;
+    
     // Right hand first
     if (rWeaponId) {
-      const weapon = getWeaponFromRepository(rWeaponId);
-      if (weapon) {
+      // Use getEquipment which handles both base EquipmentId and instance IDs (strings)
+      const equipment = getEquipment(rWeaponId);
+      if (equipment && equipment instanceof Weapon) {
+        const weapon = equipment;
         if (expectedShield && weapon.weaponType === "shield") return weapon;
         if (!expectedShield && weapon.weaponType !== "shield") return weapon;
       }
@@ -333,8 +339,10 @@ export class Character {
 
     // If right hand yields no result
     if (lWeaponId) {
-      const weapon = getWeaponFromRepository(lWeaponId);
-      if (weapon) {
+      // Use getEquipment which handles both base EquipmentId and instance IDs (strings)
+      const equipment = getEquipment(lWeaponId);
+      if (equipment && equipment instanceof Weapon) {
+        const weapon = equipment;
         if (expectedShield && weapon.weaponType === "shield") return weapon;
         if (!expectedShield && weapon.weaponType !== "shield") return weapon;
       }
