@@ -1,10 +1,10 @@
 import {TierEnum} from "src/InterFacesEnumsAndTypes/Tiers";
-import {SkillId} from "../enums";
-import {Skill} from "../Skill";
+import {MobSkillId} from "../../../enums";
+import {Skill} from "../../../Skill";
 import type {Character} from "src/Entity/Character/Character";
-import type {TurnResult} from "../types";
+import type {TurnResult} from "../../../types";
 import {getTarget} from "src/Entity/Battle/getTarget";
-import {ActorEffect, TargetEffect} from "../effects";
+import {ActorEffect, TargetEffect} from "../../../effects";
 import {rollTwenty} from "src/Utils/Dice";
 import {statMod} from "src/Utils/statMod.ts";
 import {buffsAndDebuffsRepository} from "src/Entity/BuffsAndDebuffs/repository.ts";
@@ -12,7 +12,7 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const shriek = new Skill({
-  id: SkillId.Shriek,
+  id: MobSkillId.Shriek,
   name: {
     en: "Shriek",
     th: "กรีดร้อง",

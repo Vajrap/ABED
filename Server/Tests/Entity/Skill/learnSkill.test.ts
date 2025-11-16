@@ -7,7 +7,7 @@ import {
   CharacterProficienciesFactory,
 } from "../../Helper/Character";
 import { Skill } from "../../../src/Entity/Skill/Skill";
-import { SkillId } from "../../../src/Entity/Skill/enums";
+import { BasicSkillId, MobSkillId, SkillId } from "../../../src/Entity/Skill/enums";
 import { TierEnum } from "../../../src/InterFacesEnumsAndTypes/Tiers";
 import { tryTolearnSkill } from "../../../src/Entity/Skill/learnSkill";
 import { TraitEnum } from "../../../src/Entity/Trait.ts/enum";
@@ -27,7 +27,7 @@ jest.mock("../../../src/Utils/Dice", () => ({
 }));
 
 let skill = new Skill({
-  id: SkillId.Basic,
+  id: BasicSkillId.Basic,
   name: {en: "Test", th: "ทดสอบ"},
   tier: TierEnum.common,
   description: {en: "Testing skill", th: "ทดสอบทักษะ"},
@@ -61,7 +61,7 @@ const mutReqSkills: [string, Skill][] = [
   [
     "character level",
     new Skill({
-      id: SkillId.Basic,
+      id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},
@@ -94,7 +94,7 @@ const mutReqSkills: [string, Skill][] = [
   [
     "trait",
     new Skill({
-      id: SkillId.Basic,
+      id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},
@@ -127,11 +127,11 @@ const mutReqSkills: [string, Skill][] = [
   [
     "skill prerequisite",
     new Skill({
-      id: SkillId.ThrowPebble,
+      id: MobSkillId.ThrowPebble,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},
-      requirement: { reqSkillId: [SkillId.Basic] },
+      requirement: { reqSkillId: [BasicSkillId.Basic] },
       equipmentNeeded: [],
       consume: {
         hp: 0,
@@ -160,7 +160,7 @@ const mutReqSkills: [string, Skill][] = [
   [
     "element value",
     new Skill({
-      id: SkillId.Basic,
+      id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},
@@ -193,7 +193,7 @@ const mutReqSkills: [string, Skill][] = [
   [
     "attribute",
     new Skill({
-      id: SkillId.Basic,
+      id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},
@@ -226,7 +226,7 @@ const mutReqSkills: [string, Skill][] = [
   [
     "artisan",
     new Skill({
-      id: SkillId.Basic,
+      id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},  
@@ -259,7 +259,7 @@ const mutReqSkills: [string, Skill][] = [
   [
     "proficiency",
     new Skill({
-      id: SkillId.Basic,
+      id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
       description: {en: "Testing skill", th: "ทดสอบทักษะ"},
@@ -295,35 +295,35 @@ describe("learn skill", () => {
   it("should tick progression", () => {
     const char = CharacterFactory.create().build();
     const result = tryTolearnSkill(char, skill);
-    const progress = char.skillLearningProgress.get(SkillId.Basic);
+    const progress = char.skillLearningProgress.get(BasicSkillId.Basic);
     expect(result.success).toBe(true);
     if (result.success) expect(result.learned).toBe(false);
     expect(progress).not.toBeUndefined();
-    expect(char.skills.has(SkillId.Basic)).toBe(false);
+    expect(char.skills.has(BasicSkillId.Basic)).toBe(false);
   });
 
   it("should learn if progression surpassed 100", () => {
     const char = CharacterFactory.create().build();
-    char.skillLearningProgress.set(SkillId.Basic, 99);
+    char.skillLearningProgress.set(BasicSkillId.Basic, 99);
     const result = tryTolearnSkill(char, skill);
-    const progress = char.skillLearningProgress.get(SkillId.Basic);
+    const progress = char.skillLearningProgress.get(BasicSkillId.Basic);
     expect(result.success).toBe(true);
     if (result.success) expect(result.learned).toBe(true);
     expect(progress).toBeUndefined();
-    expect(char.skills.has(SkillId.Basic)).toBe(true);
+    expect(char.skills.has(BasicSkillId.Basic)).toBe(true);
   });
 
   it("should not learn if already learned", () => {
     const char = CharacterFactory.create().build();
-    char.skills.set(SkillId.Basic, { id: SkillId.Basic, level: 1, exp: 0 });
+    char.skills.set(BasicSkillId.Basic, { id: BasicSkillId.Basic, level: 1, exp: 0 });
     const result = tryTolearnSkill(char, skill);
-    const progress = char.skillLearningProgress.get(SkillId.Basic);
+    const progress = char.skillLearningProgress.get(BasicSkillId.Basic);
     expect(result.success).toBe(false);
     if (!result.success) {
       expect((result as { success: false; reason: string }).reason).toBe("already_known");
     }
     expect(progress).toBeUndefined();
-    expect(char.skills.has(SkillId.Basic)).toBe(true);
+    expect(char.skills.has(BasicSkillId.Basic)).toBe(true);
   });
 
   it.each(mutReqSkills)("should not learn if missing %s", (_: string, skill: Skill) => {
@@ -332,7 +332,7 @@ describe("learn skill", () => {
     const progress = char.skillLearningProgress.get(skill.id);
     expect(result.success).toBe(false);
     expect(progress).toBeUndefined();
-    expect(char.skills.has(SkillId.Basic)).toBe(false);
+    expect(char.skills.has(BasicSkillId.Basic)).toBe(false);
   });
 
   it.each(mutReqSkills)("should learn if surpassed %s", (_: string, skill: Skill) => {
@@ -358,7 +358,7 @@ describe("learn skill", () => {
     
     // Add prerequisite skill for skill prerequisite test
     if (skill.requirement.reqSkillId) {
-      char.skills.set(SkillId.Basic, { id: SkillId.Basic, level: 1, exp: 0 });
+      char.skills.set(BasicSkillId.Basic, { id: BasicSkillId.Basic, level: 1, exp: 0 });
     }
 
     const result = tryTolearnSkill(char, skill);

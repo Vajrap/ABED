@@ -1,17 +1,17 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { WarriorSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
-import type { TurnResult } from "../types";
+import type { TurnResult } from "../../../types";
 import { getTarget } from "src/Entity/Battle/getTarget";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 
 export const cleave = new Skill({
-  id: SkillId.Cleave,
+  id: WarriorSkillId.Cleave,
   name: {
     en: "Cleave",
     th: "ฟันกวาด",

@@ -1,9 +1,9 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { MobSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { getTarget } from "src/Entity/Battle/getTarget";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
@@ -12,7 +12,7 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const whip = new Skill({
-  id: SkillId.Whip,
+  id: MobSkillId.Whip,
   name: { en: "Whip!", th: "แส้!" },
   description: {
     en: "Attack one enemy deal 1d6 damage + all (Slave Drive) stacks*2 * (1+(skillLevel*0.1)), after attack, remove slave driver stacks",

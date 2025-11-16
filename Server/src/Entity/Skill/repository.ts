@@ -1,53 +1,53 @@
 import { basicAttack } from "./definition/basicAttack";
-import { SkillId } from "./enums";
+import { BasicSkillId, GuardianSkillId, MageSkillId, MobSkillId, RogueSkillId, ShamanSkillId, SkillId, WarriorSkillId, WitchSkillId } from "./enums";
 import type { Skill } from "./Skill";
-import {shriek} from "src/Entity/Skill/definition/shriek.ts";
-import {throwPebble} from "src/Entity/Skill/definition/throwPebble.ts";
-import {backstab} from "src/Entity/Skill/definition/backstab.ts";
-import {panicSlash} from "src/Entity/Skill/definition/panicSlash.ts";
-import {retreatDash} from "src/Entity/Skill/definition/retreatDash.ts";
-import {bash} from "./definition/bash";
-import {tauntSkill} from "./definition/taunt";
-import {cleave} from "./definition/cleave";
-import {herosPose} from "./definition/herosPose";
-import {shieldUp} from "./definition/shieldUp";
-import {fireBolt} from "./definition/fireBolt";
-import {burningHand} from "./definition/burningHand";
-import {fireBall} from "./definition/fireBall";
-import {arcaneShield} from "./definition/arcaneShield";
-import {backdraft} from "./definition/backdraft";
-import {mendSpirit} from "./definition/mendSpirit";
-import {hexOfRot} from "./definition/hexOfRot";
-import {spiritRattle} from "./definition/spiritRattle";
-import {chaoticBlessing} from "./definition/chaoticBlessing";
-import { arcaneBolt } from "./definition/arcaneBolt";
-import { worksYouMaggots } from "./definition/worksYouMaggots";
-import { commanderScream } from "./definition/commanderScream";
-import { whip } from "./definition/whip";
+import {shriek} from "src/Entity/Skill/definition/MOBs/Goblin/shriek.ts";
+import {throwPebble} from "src/Entity/Skill/definition/MOBs/Goblin/throwPebble.ts";
+import {panicSlash} from "src/Entity/Skill/definition/MOBs/Goblin/panicSlash.ts";
+import {herosPose} from "./definition/Classes/Guardian/herosPose";
+import {arcaneShield} from "./definition/Classes/Mage/arcaneShield";
+import { backstab } from "./definition/Classes/Rogue/backstab";
+import { retreatDash } from "./definition/Classes/Rogue/retreatDash";
+import { bash } from "./definition/Classes/Warrior/bash";
+import { taunt } from "./definition/Classes/Guardian/taunt";
+import { cleave } from "./definition/Classes/Warrior/cleave";
+import { shieldUp } from "./definition/Classes/Guardian/shieldUp";
+import { fireBolt } from "./definition/Classes/Mage/fireBolt";
+import { burningHand } from "./definition/Classes/Mage/burningHand";
+import { fireBall } from "./definition/Classes/Mage/fireBall";
+import { backdraft } from "./definition/Classes/Mage/backdraft";
+import { mendSpirit } from "./definition/Classes/Shaman/mendSpirit";
+import { hexOfRot } from "./definition/Classes/Shaman/hexOfRot";
+import { spiritRattle } from "./definition/Classes/Witch/spiritRattle";
+import { chaoticBlessing } from "./definition/Classes/Shaman/chaoticBlessing";
+import { arcaneBolt } from "./definition/Classes/Mage/arcaneBolt";
+import { worksYouMaggots } from "./definition/MOBs/Goblin/worksYouMaggots";
+import { commanderScream } from "./definition/MOBs/Goblin/commanderScream";
+import { whip } from "./definition/MOBs/Goblin/whip";
 
 export const skillRepository: Record<SkillId, Skill> = {
-    [SkillId.Basic]: basicAttack,
-    [SkillId.Shriek]: shriek,
-    [SkillId.ThrowPebble]: throwPebble,
-    [SkillId.Backstab]: backstab,
-    [SkillId.PanicSlash]: panicSlash,
-    [SkillId.RetreatDash]: retreatDash,
-    [SkillId.Bash]: bash,
-    [SkillId.Taunt]: tauntSkill,
-    [SkillId.Cleave]: cleave,
-    [SkillId.HerosPose]: herosPose,
-    [SkillId.ShieldUp]: shieldUp,
-    [SkillId.FireBolt]: fireBolt,
-    [SkillId.BurningHand]: burningHand,
-    [SkillId.FireBall]: fireBall,
-    [SkillId.ArcaneShield]: arcaneShield,
-    [SkillId.Backdraft]: backdraft,
-    [SkillId.MendSpirit]: mendSpirit,
-    [SkillId.HexOfRot]: hexOfRot,
-    [SkillId.SpiritRattle]: spiritRattle,
-    [SkillId.ChaoticBlessing]: chaoticBlessing,
-    [SkillId.ArcaneBolt]: arcaneBolt,
-    [SkillId.WorksYouMaggots]: worksYouMaggots,
-    [SkillId.CommanderScream]: commanderScream,
-    [SkillId.Whip]: whip
+    [BasicSkillId.Basic]: basicAttack,
+    [RogueSkillId.RetreatDash]: retreatDash,
+    [RogueSkillId.Backstab]: backstab,
+    [WarriorSkillId.Bash]: bash,
+    [WarriorSkillId.Cleave]: cleave,
+    [GuardianSkillId.Taunt]: taunt,
+    [GuardianSkillId.HerosPose]: herosPose,
+    [GuardianSkillId.ShieldUp]: shieldUp,
+    [WitchSkillId.SpiritRattle]: spiritRattle,
+    [WitchSkillId.ChaoticBlessing]: chaoticBlessing,
+    [ShamanSkillId.MendSpirit]: mendSpirit,
+    [ShamanSkillId.HexOfRot]: hexOfRot,
+    [MageSkillId.ArcaneBolt]: arcaneBolt,
+    [MageSkillId.ArcaneShield]: arcaneShield,
+    [MageSkillId.Backdraft]: backdraft,
+    [MageSkillId.FireBolt]: fireBolt,
+    [MageSkillId.FireBall]: fireBall,
+    [MageSkillId.BurningHand]: burningHand,
+    [MobSkillId.WorksYouMaggots]: worksYouMaggots,
+    [MobSkillId.CommanderScream]: commanderScream,
+    [MobSkillId.Whip]: whip,
+    [MobSkillId.ThrowPebble]: throwPebble,
+    [MobSkillId.PanicSlash]: panicSlash,
+    [MobSkillId.Shriek]: shriek
 };

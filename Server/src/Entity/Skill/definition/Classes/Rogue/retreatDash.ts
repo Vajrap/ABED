@@ -1,16 +1,16 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { RogueSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
-import { ActorEffect, TargetEffect } from "../effects";
+import type { TurnResult } from "../../../types";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const retreatDash = new Skill({
-  id: SkillId.RetreatDash,
+  id: RogueSkillId.RetreatDash,
   name: {
     en: "Retreat Dash",
     th: "วิ่งหนี",

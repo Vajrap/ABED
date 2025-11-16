@@ -1,13 +1,13 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { GuardianSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import { ActorEffect } from "../effects";
+import { ActorEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const shieldUp = new Skill({
-  id: SkillId.ShieldUp,
+  id: GuardianSkillId.ShieldUp,
   name: {
     en: "Shield Up",
     th: "ยกโล่ขึ้น",

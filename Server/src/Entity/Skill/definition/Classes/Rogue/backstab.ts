@@ -1,12 +1,12 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { RogueSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
-import type { TurnResult } from "../types";
+import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
@@ -14,7 +14,7 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 
 export const backstab = new Skill({
-  id: SkillId.Backstab,
+  id: RogueSkillId.Backstab,
   name: {
     en: "Backstab",
     th: "แทงข้างหลัง",

@@ -1,14 +1,14 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { GuardianSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
-import { ActorEffect } from "../effects";
+import type { TurnResult } from "../../../types";
+import { ActorEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
-export const tauntSkill = new Skill({
-  id: SkillId.Taunt,
+export const taunt = new Skill({
+  id: GuardianSkillId.Taunt,
   name: {
     en: "Taunt",
     th: "ยั่วยุ",

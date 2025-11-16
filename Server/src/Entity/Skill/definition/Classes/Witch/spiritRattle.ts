@@ -1,15 +1,14 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { WitchSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { roll } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const spiritRattle = new Skill({
-  id: SkillId.SpiritRattle,
+  id: WitchSkillId.SpiritRattle,
   name: {
     en: "Spirit Rattle",
     th: "กระดิ่งผี",

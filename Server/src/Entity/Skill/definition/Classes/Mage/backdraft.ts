@@ -1,10 +1,10 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { MageSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
+import type { TurnResult } from "../../../types";
 import { getTarget } from "src/Entity/Battle/getTarget";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
@@ -13,7 +13,7 @@ import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { roll } from "src/Utils/Dice";
 
 export const backdraft = new Skill({
-  id: SkillId.Backdraft,
+  id: MageSkillId.Backdraft,
   name: {
     en: "Backdraft",
     th: "ไฟย้อนกลับ",

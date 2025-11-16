@@ -1,15 +1,15 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { MobSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const commanderScream = new Skill({
-  id: SkillId.CommanderScream,
+  id: MobSkillId.CommanderScream,
   name: { en: "Commander Scream!", th: "คำสั่งกรีดร้อง!" },
   description: {
     en: "Target all allies, each rolls DC15 willpower; on fail gain Fear 2t and Cowardly Charge 2t: consume 2 chaos, 2 sp: produce 1 earth",

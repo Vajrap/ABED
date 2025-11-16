@@ -1,8 +1,8 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { MobSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
@@ -11,7 +11,7 @@ import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository
 import { RaceEnum } from "src/InterFacesEnumsAndTypes/Enums";
 
 export const worksYouMaggots = new Skill({
-  id: SkillId.WorksYouMaggots,
+  id: MobSkillId.WorksYouMaggots,
   name: { en: "Work You Maggots!", th: "ทำงานไอ้หนอน!" },
   description: {
     en: "Target one ally 'Goblin' deal 1d3 true damage and add a Buff: Slave Driver to self equal to damage dealt; target get abGauge += 5 + skill level: consume 2 sp : produce 1 chaos",

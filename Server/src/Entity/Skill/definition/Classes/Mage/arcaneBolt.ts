@@ -1,10 +1,10 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { MageSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
+import type { TurnResult } from "../../../types";
 import { getTarget } from "src/Entity/Battle/getTarget";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
@@ -14,7 +14,7 @@ import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const arcaneBolt = new Skill({
-  id: SkillId.ArcaneBolt,
+  id: MageSkillId.ArcaneBolt,
   name: { en: "Arcane Bolt", th: "ลูกเวทมนตร์" },
   description: {
     en: "Unleash a focused spark of fire toward an enemy. Deals 1d6 + Planar modifier * (1 + Skill Level * 0.1) as Magic damage.",

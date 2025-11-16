@@ -1,20 +1,20 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
-import { Skill } from "../Skill";
+import { MobSkillId } from "../../../enums";
+import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
-import type { TurnResult } from "../types";
+import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { rollTwenty } from "src/Utils/Dice";
 import { getDamageOutput } from "src/Utils/getDamgeOutput";
 import { statMod } from "src/Utils/statMod";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { ActorEffect, TargetEffect } from "../effects";
+import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 
 export const throwPebble = new Skill({
-  id: SkillId.ThrowPebble,
+  id: MobSkillId.ThrowPebble,
   name: {
     en: "Throw Pebble",
     th: "ขว้างก้อนหิน",
