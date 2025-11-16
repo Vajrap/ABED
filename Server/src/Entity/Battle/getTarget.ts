@@ -8,7 +8,7 @@ import type { Character } from "../Character/Character";
 import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
 import { rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
-import { TraitEnum } from "../Trait.ts/enum";
+import { TraitEnum } from "../Trait/enum";
 
 export function getTarget(
   actor: Character,

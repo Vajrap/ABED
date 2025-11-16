@@ -10,13 +10,12 @@ import {CharacterFame} from "../Subclass/Fame/CharacterFame";
 import {defaultActionSequence} from "../Subclass/Action/CharacterAction";
 import {CharacterAlignment} from "../Subclass/Alignment/CharacterAlignment";
 import {CharacterArtisans} from "../Subclass/Stats/CharacterArtisans";
-import {SkillId} from "src/Entity/Skill/enums";
+import {RogueSkillId, MobSkillId, WarriorSkillId, GuardianSkillId, MageSkillId, ShamanSkillId, WitchSkillId} from "src/Entity/Skill/enums";
 import {DeckCondition} from "../Subclass/DeckCondition/DeckCondition";
 import {defaultSaveRoll} from "src/Utils/CharacterDefaultSaveRoll";
-import {equipMOB} from "./equipmentHelpers";
 import {equipDirect} from "src/Entity/Item/Equipment/equipDirect";
 import {BladeId, BodyId, BookWId, HeadWearId, ShieldId, StaffId, SwordId, WandId} from "src/Entity/Item";
-import {TraitEnum} from "src/Entity/Trait.ts/enum.ts";
+import {TraitEnum} from "src/Entity/Trait/enum.ts";
 import { rollTwenty } from "src/Utils/Dice";
 
 const goblinTraits: Map<TraitEnum, number> = new Map([
@@ -94,7 +93,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.activeSkills = [
     {
-      id: SkillId.Backstab,
+      id: RogueSkillId.Backstab,
       level: Math.min(
         Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
         5,
@@ -102,7 +101,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
       exp: 0,
     },
     {
-      id: SkillId.PanicSlash,
+      id: MobSkillId.PanicSlash,
       level: Math.min(
         Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
         5,
@@ -110,7 +109,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
       exp: 0,
     },
     {
-      id: SkillId.Shriek,
+      id: MobSkillId.Shriek,
       level: Math.min(
         Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
         5,
@@ -118,7 +117,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
       exp: 0,
     },
     {
-      id: SkillId.ThrowPebble,
+      id: MobSkillId.ThrowPebble,
       level: Math.min(
         Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
         5,
@@ -129,7 +128,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.conditionalSkills = [
     {
-      id: SkillId.RetreatDash,
+      id: RogueSkillId.RetreatDash,
       level: Math.min(
         Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
         5,
@@ -137,7 +136,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
       exp: 0,
     },
     {
-      id: SkillId.ThrowPebble,
+      id: MobSkillId.ThrowPebble,
       level: Math.min(
         Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
         5,
@@ -232,17 +231,17 @@ export function goblinWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
   character.race = RaceEnum.Goblin;
 
 
-  const lastSkill = Math.random() < 0.5 ? SkillId.Bash : SkillId.Cleave;
+  const lastSkill = Math.random() < 0.5 ? WarriorSkillId.Bash : WarriorSkillId.Cleave;
 
   character.activeSkills = [
     { id: lastSkill, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: SkillId.ShieldUp, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: SkillId.Taunt, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: GuardianSkillId.ShieldUp, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: GuardianSkillId.Taunt, level: randomSkillLevel(difficulty), exp: 0 },
   ];
 
   character.conditionalSkills = [
-    { id: SkillId.ShieldUp, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: SkillId.HerosPose, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: GuardianSkillId.ShieldUp, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: GuardianSkillId.HerosPose, level: randomSkillLevel(difficulty), exp: 0 },
   ];
 
   character.conditionalSkillsCondition = new DeckCondition({
@@ -336,14 +335,14 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
   character.race = RaceEnum.Goblin;
 
   character.activeSkills = [
-    { id: rollTwenty().total >= 10 ? SkillId.FireBall : SkillId.Backdraft, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: SkillId.BurningHand, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: SkillId.FireBolt, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: rollTwenty().total >= 10 ? MageSkillId.FireBall : MageSkillId.Backdraft, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: MageSkillId.BurningHand, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: MageSkillId.FireBolt, level: randomSkillLevel(difficulty), exp: 0 },
   ];
 
   character.conditionalSkills = [
-    { id: SkillId.ArcaneShield, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: SkillId.ArcaneBolt, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: MageSkillId.ArcaneShield, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: MageSkillId.ArcaneBolt, level: randomSkillLevel(difficulty), exp: 0 },
   ];
 
   character.conditionalSkillsCondition = new DeckCondition({
@@ -434,13 +433,13 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Goblin Cleric skills - MendSpirit first (no cost, can always use to generate resources)
   character.activeSkills = [
     {
-      id: SkillId.ChaoticBlessing,
+      id: ShamanSkillId.ChaoticBlessing,
       level: randomSkillLevel(difficulty),
       exp: 0,
     },
-    { id: SkillId.SpiritRattle, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: SkillId.HexOfRot, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: SkillId.MendSpirit, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: WitchSkillId.SpiritRattle, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: ShamanSkillId.HexOfRot, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: ShamanSkillId.MendSpirit, level: randomSkillLevel(difficulty), exp: 0 },
   ];
 
   // Equip weapon and armor based on difficulty
@@ -515,17 +514,17 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.activeSkills = [
     {
-      id: SkillId.Whip,
+      id: MobSkillId.Whip,
       level: randomSkillLevel(difficulty),
       exp: 0,
     },
     {
-      id: SkillId.CommanderScream,
+      id: MobSkillId.CommanderScream,
       level: randomSkillLevel(difficulty),
       exp: 0,
     },
     {
-      id: SkillId.WorksYouMaggots,
+      id: MobSkillId.WorksYouMaggots,
       level: randomSkillLevel(difficulty),
       exp: 0,
     },

@@ -1,5 +1,5 @@
-import {Trait} from "src/Entity/Trait.ts";
-import {TraitEnum} from "src/Entity/Trait.ts/enum.ts";
+import {Trait} from "src/Entity/Trait/index";
+import {TraitEnum} from "src/Entity/Trait/enum";
 
 export const traitScrapSurvivalist = new Trait({
     id: TraitEnum.ScrapSurvivalist,

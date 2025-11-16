@@ -289,3 +289,24 @@ export enum RaceEnum {
   Halfling = "Halfling",
   Goblin = "Goblin",
 }
+
+export enum ClassEnum {
+  Cleric = "Cleric",
+  Scholar = "Scholar",
+  Mage = "Mage",
+  Mystic = "Mystic",
+  Rogue = "Rogue",
+  SpellBlade = "SpellBlade",
+  Shaman = "Shaman",
+  Barbarian = "Barbarian",
+  Warrior = "Warrior",
+  Knight = "Knight",
+  Guardian = "Guardian",
+  Paladin = "Paladin",
+  Druid = "Druid",
+  Monk = "Monk",
+  Warlock = "Warlock",
+  Ranger = "Ranger",
+  Witch = "Witch",
+  Inquisitor = "Inquisitor",
+}

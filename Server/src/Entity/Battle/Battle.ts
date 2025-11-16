@@ -15,7 +15,7 @@ import { activateBreathingSkillTurnPassive } from "../BreathingSkill/activeBreat
 import Report from "../../Utils/Reporter";
 import { BattleStatistics } from "./BattleStatistics";
 import { setBattleStatistics } from "./BattleContext";
-import {traitRepository} from "src/Entity/Trait.ts/repository.ts";
+import {traitRepository} from "src/Entity/Trait/repository";
 
 export class Battle {
   id: string;

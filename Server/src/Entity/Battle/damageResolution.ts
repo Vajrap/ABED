@@ -8,7 +8,7 @@ import { locationRepository } from "src/Entity/Location/Location/repository.ts";
 import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
 import { getBattleStatistics } from "./BattleContext";
 import type { BattleStatistics } from "./BattleStatistics";
-import {traitRepository} from "src/Entity/Trait.ts/repository.ts";
+import {traitRepository} from "src/Entity/Trait/repository";
 
 export interface DamageResult {
   actualDamage: number;

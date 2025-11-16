@@ -1,4 +1,3 @@
-import type { CharacterInterface } from "src/InterFacesEnumsAndTypes/CharacterInterface";
 import type {
   ArtisanKey,
   AttributeKey,
@@ -6,7 +5,7 @@ import type {
   ElementResourceKey,
   ProficiencyKey,
 } from "../../InterFacesEnumsAndTypes/Enums";
-import type { TraitEnum } from "../Trait.ts/enum";
+import type { TraitEnum } from "../Trait/enum";
 import type { SkillId } from "./enums";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import type { ActorEffect, TargetEffect } from "./effects";

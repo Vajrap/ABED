@@ -18,7 +18,7 @@ import { defaultSaveRoll } from "src/Utils/CharacterDefaultSaveRoll";
 import { RaceEnum } from "src/InterFacesEnumsAndTypes/Enums";
 import { RACE_ATTRIBUTES } from "../../RaceAttributes";
 import { equipMOB } from "../equipmentHelpers";
-import { SkillId } from "src/Entity/Skill/enums";
+import { GuardianSkillId } from "src/Entity/Skill/enums";
 
 // Base Human attributes
 const baseHumanAttrs = RACE_ATTRIBUTES[RaceEnum.Human].attributes;
@@ -87,7 +87,7 @@ export function humanWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
   // - Taunt: Forces enemies to target this character for 2 turns
   // - Bash: Heavy strike, deals 1d10+STR damage, chance to stun
   character.activeSkills = [
-    {id: SkillId.Taunt, level: 1, exp: 0} 
+    {id: GuardianSkillId.Taunt, level: 1, exp: 0} 
   ];
 
   // TODO: Conditional skills (when HP < 30%)

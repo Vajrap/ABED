@@ -16,7 +16,7 @@ import { CharacterFame } from "./Subclass/Fame/CharacterFame";
 import { CharacterPlanarAptitude } from "./Subclass/PlanarAptitude/CharacterPlanarAptitude";
 import type { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
 import type { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
-import type { TraitEnum } from "../Trait.ts/enum";
+import type { TraitEnum } from "../Trait/enum";
 import { DeckCondition } from "./Subclass/DeckCondition/DeckCondition";
 import type { SkillId } from "../Skill/enums";
 import type { BreathingSkillId } from "../BreathingSkill/enum";

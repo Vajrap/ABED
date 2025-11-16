@@ -1,6 +1,6 @@
-import {TraitEnum} from "src/Entity/Trait.ts/enum.ts";
-import {Trait} from "src/Entity/Trait.ts";
-import {rollTwenty} from "src/Utils/Dice.ts";
+import {TraitEnum} from "src/Entity/Trait/enum";
+import {Trait} from "src/Entity/Trait/index";
+import {rollTwenty} from "src/Utils/Dice";
 
 export const traitGoblinCunning = new Trait({
     id: TraitEnum.GoblinCunning,

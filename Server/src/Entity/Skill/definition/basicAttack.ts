@@ -1,5 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SkillId } from "../enums";
+import { BasicSkillId } from "../enums";
 import { Skill } from "../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
@@ -13,7 +13,7 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 
 export const basicAttack = new Skill({
-  id: SkillId.Basic,
+  id: BasicSkillId.Basic,
   name: {
     en: "Basic Attack",
     th: "โจมตีปกติ",
