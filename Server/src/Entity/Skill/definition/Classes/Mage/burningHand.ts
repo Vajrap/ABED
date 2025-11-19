@@ -1,6 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { MageSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { getTarget } from "src/Entity/Battle/getTarget";
@@ -12,16 +11,17 @@ import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { MageSkill } from "./index";
 
-export const burningHand = new Skill({
+export const burningHand = new MageSkill({
   id: MageSkillId.BurningHand,
   name: {
     en: "Burning Hand",
     th: "มือไฟแผดเผา",
   },
   description: {
-    en: "Project waves of searing flame from your hand, engulfing all enemies in the front most row. Deals 1d6 (1d8 at Skill Level 5) + Planar modifier + 0.5× Skill Level as Fire damage. On hit, roll DC 13 to apply 1–2 Burn stacks to each enemy. When skill reaches level 5, the damage increases to 1d8 and the DC decreases to 10 with small possibility to deal damage to one more target from another row if the attack lands on the front row.",
-    th: "ปล่อยคลื่นเปลวไฟจากฝ่ามือ โอบล้อมศัตรูทั้งหมดในแถวหน้าสุด สร้างความเสียหาย 1d6 (1d8 ที่เลเวล 5) + ค่าพลังเวท (Planar) + 0.5×เลเวลสกิล เป็นความเสียหายประเภทไฟ หลังโจมตีโดน ทอย DC 13 เพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่ศัตรูแต่ละตัว. เมื่อเลเวลสกิลถึง 5 ความเสียหายเพิ่มเป็น 1d8 และ DC ลดลงเป็น 10 มีโอกาสเล็กน้อยที่จะสร้างความเสียหายให้ศัตรูอีกหนึ่งตัวจากแถวอื่น ถ้าการโจมตีสำเร็จบนแถวหน้า",
+    en: "Project waves of searing flame from your hand, engulfing all enemies in the front most row. Deals 1d6 (1d8 at Skill Level 5) + Planar modifier + 0.5× Skill Level as Fire damage. On hit, roll DC10(+user planar mod) endurance save to apply 1–2 Burn stacks to each enemy. When skill reaches level 5, the damage increases to 1d8 with small possibility to deal damage to one more target from another row if the attack lands on the front row.",
+    th: "ปล่อยคลื่นเปลวไฟจากฝ่ามือ โอบล้อมศัตรูทั้งหมดในแถวหน้าสุด สร้างความเสียหาย 1d6 (1d8 ที่เลเวล 5) + ค่าพลังเวท (Planar) + 0.5×เลเวลสกิล เป็นความเสียหายประเภทไฟ หลังโจมตีโดน ทอย DC10(+ค่าพลังเวทของผู้ใช้) ค่าความทนทานจนต้องทอยค่าความทนทานเพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่ศัตรูแต่ละตัว. เมื่อเลเวลสกิลถึง 5 ความเสียหายเพิ่มเป็น 1d8 มีโอกาสเล็กน้อยที่จะสร้างความเสียหายให้ศัตรูอีกหนึ่งตัวจากแถวอื่น ถ้าการโจมตีสำเร็จบนแถวหน้า",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -78,18 +78,18 @@ export const burningHand = new Skill({
         targets.push(additionalTarget);
       }
     }
-
-    // --- SHIFT CHECK ---
-    const isShifted = skillLevel >= 5;
-    const diceSides = isShifted ? 8 : 6;
-    const burnDC = isShifted ? 11 : 13;
-    const minBurnStacks = isShifted ? 2 : 1;
-    const maxBurnStacks = isShifted ? 3 : 2;
-
     // Attribute modifiers
     const planarMod = statMod(actor.attribute.getTotal("planar"));
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const luckMod = statMod(actor.attribute.getTotal("luck"));
+
+    // --- SHIFT CHECK ---
+    const isShifted = skillLevel >= 5;
+    const diceSides = isShifted ? 8 : 6;
+    const burnDC = 10 + planarMod;
+    const minBurnStacks = isShifted ? 2 : 1;
+    const maxBurnStacks = isShifted ? 3 : 2;
+
 
     // Process all targets
     const targetEffects: { actorId: string; effect: TargetEffect[] }[] = [];
@@ -117,8 +117,8 @@ export const burningHand = new Skill({
       // Burn application roll (user rolls; lower DC = easier success)
       let burnMessage = "";
       if (totalDamageResult.isHit) {
-        const burnRoll = rollTwenty().total;
-        if (burnRoll >= burnDC) {
+        const burnSave = target.rollSave('endurance')
+        if (burnSave < burnDC) {
           const burnStacks = roll(maxBurnStacks).d(1).total;
           const finalBurnStacks = Math.max(burnStacks, minBurnStacks);
           // Actually apply the burn debuff

@@ -10,19 +10,22 @@ import type {
 } from "./types";
 import type { ClassEnum, ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
+import { BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
 
 export class Skill {
   id: SkillId;
   name: L10N;
   tier: TierEnum;
+  maxLevel: number;
   description: L10N;
   requirement: SkillLearningRequirement;
   equipmentNeeded: ProficiencyKey[];
   consume: SkillConsume;
   produce: SkillProduce;
-  existBuffDebuffs?: BuffsAndDebuffsEnum[];
-  notExistBuffDebuffs?: BuffsAndDebuffsEnum[];
+  existBuff?: BuffEnum[];
+  existDebuff?: DebuffEnum[];
+  notExistBuff?: BuffEnum[];
+  notExistDebuff?: DebuffEnum[];
   class?: ClassEnum;
   exec: (
     user: Character,
@@ -40,8 +43,10 @@ export class Skill {
     equipmentNeeded: ProficiencyKey[];
     consume: SkillConsume;
     produce: SkillProduce;
-    existBuffDebuffs?: BuffsAndDebuffsEnum[];
-    notExistBuffDebuffs?: BuffsAndDebuffsEnum[];
+    existBuff?: BuffEnum[];
+    existDebuff?: DebuffEnum[];
+    notExistBuff?: BuffEnum[];
+    notExistDebuff?: DebuffEnum[];
     class?: ClassEnum;
     exec: (
       user: Character,
@@ -54,6 +59,7 @@ export class Skill {
     this.id = data.id;
     this.name = data.name;
     this.tier = data.tier;
+    this.maxLevel = getTierMaxLevel(data.tier);
     this.description = data.description;
     this.requirement = data.requirement;
     this.equipmentNeeded = data.equipmentNeeded;
@@ -61,7 +67,28 @@ export class Skill {
     this.produce = data.produce;
     this.class = data.class;
     this.exec = data.exec;
-    this.existBuffDebuffs = data.existBuffDebuffs;
-    this.notExistBuffDebuffs = data.notExistBuffDebuffs;
+    this.existBuff = data.existBuff;
+    this.existDebuff = data.existDebuff;
+    this.notExistBuff = data.notExistBuff;
+    this.notExistDebuff = data.notExistDebuff;
+  }
+}
+
+function getTierMaxLevel(tier: TierEnum): number {
+  switch (tier) {
+    case TierEnum.common:
+    case TierEnum.uncommon:
+      return 5;
+    case TierEnum.rare:
+    case TierEnum.epic:
+      return 7;
+    case TierEnum.legendary:
+    case TierEnum.unique:
+      return 10;
+    case TierEnum.divine:
+    case TierEnum.primordial:
+      return 15;
+    default:
+      return 5;
   }
 }

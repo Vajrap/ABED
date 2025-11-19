@@ -1,6 +1,10 @@
 import { Skill } from "src/Entity/Skill/Skill";
 import { ClassEnum } from "src/InterFacesEnumsAndTypes/Enums";
 
+type SkillConfig = ConstructorParameters<typeof Skill>[0];
+
 export class WarriorSkill extends Skill {
-    class?: ClassEnum = ClassEnum.Warrior
+  constructor(data: SkillConfig) {
+    super({ ...data, class: ClassEnum.Warrior });
+  }
 }

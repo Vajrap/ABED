@@ -1,13 +1,13 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ShamanSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
+import { ShamanSkill } from "./index";
 
-export const mendSpirit = new Skill({
+export const mendSpirit = new ShamanSkill({
   id: ShamanSkillId.MendSpirit,
   name: {
     en: "Mend Spirit",

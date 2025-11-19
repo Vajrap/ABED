@@ -5,7 +5,7 @@ import {
   type ElementKey,
 } from "src/InterFacesEnumsAndTypes/Enums";
 import type { Character } from "../Character/Character";
-import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
+import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
 import { rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { TraitEnum } from "../Trait/enum";
@@ -25,7 +25,7 @@ class TargetSelector {
   rowPreference: "front" | "back" | "equal" = "front"; // Weight preference when both rows available
   type: {
     direction: "least" | "most";
-    target: "currentHP" | "currentMP" | "currentSP" | AttributeKey | ElementKey;
+    target: "currentHP" | "currentMP" | "currentSP" | "currentHPPercentage" | "currentMPPercentage" | "currentSPPercentage" | AttributeKey | ElementKey;
   } = {
     direction: "least",
     target: "currentHP",
@@ -68,16 +68,24 @@ class TargetSelector {
 
   with(
     sort: "least" | "most",
-    target: "currentHP" | "currentMP" | "currentSP" | AttributeKey | ElementKey,
+    target: "currentHP" | "currentMP" | "currentSP" | "currentHPPercentage" | "currentMPPercentage" | "currentSPPercentage" | AttributeKey | ElementKey,
   ) {
     this.type.direction = sort;
     this.type.target = target;
     return this;
   }
 
-  witBuff(buffOrDebuff: BuffsAndDebuffsEnum) {
+  witBuff(buff: BuffEnum) {
     this.possibleTargets = this.possibleTargets.filter((target) => {
-      const entry = target.buffsAndDebuffs.entry.get(buffOrDebuff);
+      const entry = target.buffsAndDebuffs.buffs.entry.get(buff);
+      return entry !== undefined;
+    });
+    return this;
+  }
+
+  withDebuff(debuff: DebuffEnum) {
+    this.possibleTargets = this.possibleTargets.filter((target) => {
+      const entry = target.buffsAndDebuffs.debuffs.entry.get(debuff);
       return entry !== undefined;
     });
     return this;
@@ -140,7 +148,7 @@ class TargetSelector {
     if (this.tauntCount) {
       const tauntingTargets = filtered.filter((target) => {
         return (
-          target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !==
+          target.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt) !==
           undefined
         );
       });
@@ -171,7 +179,7 @@ class TargetSelector {
     if (this.tauntCount) {
       const tauntingTargets = filtered.filter((target) => {
         return (
-          target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !==
+          target.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt) !==
           undefined
         );
       });
@@ -181,7 +189,7 @@ class TargetSelector {
         const remainingSlots = Math.max(0, maxCount - tauntingTargets.length);
         const nonTauntingTargets = filtered.filter((target) => {
           return (
-            target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) ===
+            target.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt) ===
             undefined
           );
         });
@@ -219,7 +227,7 @@ class TargetSelector {
     if (this.tauntCount && filtered.length > 0) {
       const tauntingTargets = filtered.filter((target) => {
         return (
-          target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !==
+          target.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt) !==
           undefined
         );
       });
@@ -227,7 +235,7 @@ class TargetSelector {
       if (tauntingTargets.length > 0) {
         const nonTauntingTargets = filtered.filter((target) => {
           return (
-            target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) ===
+            target.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt) ===
             undefined
           );
         });
@@ -348,7 +356,7 @@ class TargetSelector {
     if (this.tauntCount) {
       tauntingTargets = targets.filter((target) => {
         return (
-          target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !==
+          target.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt) !==
           undefined
         );
       });
@@ -403,6 +411,15 @@ class TargetSelector {
       } else if (this.type.target === "currentSP") {
         valueA = a.vitals.sp.current;
         valueB = b.vitals.sp.current;
+      } else if (this.type.target === "currentHPPercentage") {
+        valueA = a.vitals.hp.current / a.vitals.hp.max;
+        valueB = b.vitals.hp.current / b.vitals.hp.max;
+      } else if (this.type.target === "currentMPPercentage") {
+        valueA = a.vitals.mp.current / a.vitals.mp.max;
+        valueB = b.vitals.mp.current / b.vitals.mp.max;
+      } else if (this.type.target === "currentSPPercentage") {
+        valueA = a.vitals.sp.current / a.vitals.sp.max;
+        valueB = b.vitals.sp.current / b.vitals.sp.max;
       } else if (ATTRIBUTE_KEYS.includes(this.type.target as AttributeKey)) {
         valueA = a.attribute.getTotal(this.type.target as AttributeKey);
         valueB = b.attribute.getTotal(this.type.target as AttributeKey);
@@ -475,15 +492,15 @@ class TargetSelector {
   private canPerceive(target: Character): boolean {
     if (this.skipHiding) return true;
 
-    const hiding = target.buffsAndDebuffs.entry.get(
-      BuffsAndDebuffsEnum.hiding,
+    const hiding = target.buffsAndDebuffs.buffs.entry.get(
+      BuffEnum.hiding,
     )?.value;
 
     if (!hiding || hiding <= 0) return true;
 
     // Check if target has taunt - taunt overrides hiding
     if (
-      target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt) !== undefined
+      target.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt) !== undefined
     ) {
       return true;
     }

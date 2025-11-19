@@ -1,16 +1,32 @@
-export enum BuffsAndDebuffsEnum {
+export type BuffAndDebuffEnum = BuffEnum | DebuffEnum;
+
+export enum BuffEnum {
   haste = "haste",
-  slow = "slow",
   hiding = "hiding",
   taunt = "taunt",
-  dazed = "dazed",
-  fear = "fear",
   defenseUp = "defenseUp",
-  burn = "burn",
   arcaneShield = "arcaneShield",
   retreat = "retreat",
-  hexed = "hexed",
   spiritRattle = "spiritRattle",
   slaveDriver = "slaveDriver",
   cowardlyCharge = "cowardlyCharge",
+  bless = "bless",
+  planarAbsorption = "planarAbsorption",
+  reversalPalm = "reversalPalm",
+  innerVeil = "innerVeil",
+  warCry = "warCry",
+  edgeCharge = "edgeCharge",
+  spellParry = "spellParry",
+}
+
+export enum DebuffEnum {
+  slow = "slow",
+  dazed = "dazed",
+  fear = "fear",
+  burn = "burn",
+  hexed = "hexed",
+  cursed = "cursed",
+  exposed = "exposed",
+  bleed = "bleed",
+  stun = "stun",
 }

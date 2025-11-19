@@ -55,25 +55,41 @@ export function getPlayableSkill(actor: Character, actorParty: Party, i: number 
 
 
   // Buff/Debuff requirement check
-  if (skillRep.existBuffDebuffs && skillRep.existBuffDebuffs.length > 0) {
-    for (const buff of skillRep.existBuffDebuffs) {
-      if (!actor.buffsAndDebuffs.entry.has(buff)) {
+  if (skillRep.existBuff && skillRep.existBuff.length > 0) {
+    for (const buff of skillRep.existBuff) {
+      if (!actor.buffsAndDebuffs.buffs.entry.has(buff)) {
         Report.debug(`      ❌ Skipped: Buff/Debuff ${buff} must exist`);
+        return getPlayableSkill(actor, actorParty, i + 1);
+      }
+    }
+  }
+  if (skillRep.existDebuff && skillRep.existDebuff.length > 0) {
+    for (const debuff of skillRep.existDebuff) {
+      if (!actor.buffsAndDebuffs.debuffs.entry.has(debuff)) {
+        Report.debug(`      ❌ Skipped: Buff/Debuff ${debuff} must exist`);
         return getPlayableSkill(actor, actorParty, i + 1);
       }
     }
   }
 
   // Buff/Debuff requirement check
-  if (skillRep.notExistBuffDebuffs && skillRep.notExistBuffDebuffs.length > 0) {
-    for (const buff of skillRep.notExistBuffDebuffs) {
-      if (actor.buffsAndDebuffs.entry.has(buff)) {
+  if (skillRep.notExistBuff && skillRep.notExistBuff.length > 0) {
+    for (const buff of skillRep.notExistBuff) {
+      if (actor.buffsAndDebuffs.buffs.entry.has(buff)) {
         Report.debug(`      ❌ Skipped: Buff/Debuff ${buff} must not exist`);
         return getPlayableSkill(actor, actorParty, i + 1);
       }
     }
   }
-
+  if (skillRep.notExistDebuff && skillRep.notExistDebuff.length > 0) {
+    for (const debuff of skillRep.notExistDebuff) {
+      if (actor.buffsAndDebuffs.debuffs.entry.has(debuff)) {
+        Report.debug(`      ❌ Skipped: Buff/Debuff ${debuff} must not exist`);
+        return getPlayableSkill(actor, actorParty, i + 1);
+      }
+    }
+  }
+  
   // Equipment requirement check
   // If equipmentNeeded is empty [], allow any weapon. Otherwise, check if weapon is in the list.
   const weapon = actor.getWeapon();

@@ -292,7 +292,7 @@ export enum RaceEnum {
 
 export enum ClassEnum {
   Cleric = "Cleric",
-  Scholar = "Scholar",
+  Seer = "Seer",
   Mage = "Mage",
   Mystic = "Mystic",
   Rogue = "Rogue",
@@ -309,4 +309,7 @@ export enum ClassEnum {
   Ranger = "Ranger",
   Witch = "Witch",
   Inquisitor = "Inquisitor",
+  Scholar = "Scholar",
+  Engineer = "Engineer",
+  Nomad = "Nomad",
 }

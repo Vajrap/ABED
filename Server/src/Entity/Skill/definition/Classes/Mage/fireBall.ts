@@ -1,6 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { MageSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { getTarget } from "src/Entity/Battle/getTarget";
@@ -13,16 +12,17 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { roll, rollTwenty } from "src/Utils/Dice";
+import { MageSkill } from "./index";
 
-export const fireBall = new Skill({
+export const fireBall = new MageSkill({
   id: MageSkillId.FireBall,
   name: {
     en: "Fireball",
     th: "ลูกไฟระเบิด",
   },
   description: {
-    en: "Unleash a blazing sphere of fire that explodes upon impact, engulfing 1–6 enemies (weighted toward fewer targets). Deals 1d10 (+0.5× Skill Level) + Planar modifier as Fire damage, increasing to 1d12 at Skill Level 5. On hit, roll DC 13 to apply 1–2 Burn stacks to each target.",
-    th: "ปลดปล่อยลูกไฟทรงพลังที่ระเบิดกลางสนาม โอบล้อมศัตรู 1–6 ตัว (โอกาสสูงที่จะโจมตีเป้าหมายน้อยกว่า) สร้างความเสียหายไฟ 1d10 (+0.5×เลเวลสกิล) + ค่าพลังเวท (Planar) และเพิ่มเป็น 1d12 ที่เลเวล 5 หลังโจมตีโดน ทอย DC 13 เพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่แต่ละเป้าหมาย",
+    en: "Unleash a blazing sphere of fire that explodes upon impact, engulfing 1–6 enemies (weighted toward fewer targets). Deals 1d10 (+0.5× Skill Level) + Planar modifier as Fire damage, increasing to 1d12 at Skill Level 5. On hit, target must roll DC 10 (+user planar mod) endurance save or get 1–2 Burn stacks.",
+    th: "ปลดปล่อยลูกไฟทรงพลังที่ระเบิดกลางสนาม โอบล้อมศัตรู 1–6 ตัว (โอกาสสูงที่จะโจมตีเป้าหมายน้อยกว่า) สร้างความเสียหายไฟ 1d10 (+0.5×เลเวลสกิล) + ค่าพลังเวท (Planar) และเพิ่มเป็น 1d12 ที่เลเวล 5 หลังโจมตีโดน ทอย DC10(+ค่าพลังเวทของผู้ใช้) endurance save, หรือถูกเผาไหม้ (1–2 สแตค)",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -82,6 +82,8 @@ export const fireBall = new Skill({
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const luckMod = statMod(actor.attribute.getTotal("luck"));
 
+    const burnDC = 10 + planarMod;
+
     // Process all targets
     const targetEffects: { actorId: string; effect: TargetEffect[] }[] = [];
     let combinedMessage = "";
@@ -116,12 +118,12 @@ export const fireBall = new Skill({
         location,
       );
 
-      // Check for burn application (DC 13, no saves, no bonus)
+      // Check for burn application (DC 13)
       let burnMessage = "";
       if (totalDamageResult.isHit) {
-        const burnRoll = rollTwenty().total;
-        if (burnRoll <= 13) {
-          const burnStacks = roll(2).d(1).total; // 1-2 stacks
+        const burnSave = target.rollSave('endurance')
+        if (burnSave < burnDC) {
+          const burnStacks = roll(2).d(1).total;
           // Actually apply the burn debuff
           const burnResult = buffsAndDebuffsRepository.burn.appender(target, burnStacks, false, 0);
           burnMessage = burnResult.en;

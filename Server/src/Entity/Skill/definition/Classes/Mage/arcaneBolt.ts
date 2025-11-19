@@ -1,6 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { MageSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { getTarget } from "src/Entity/Battle/getTarget";
@@ -11,9 +10,10 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
-import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
+import { MageSkill } from "./index";
 
-export const arcaneBolt = new Skill({
+export const arcaneBolt = new MageSkill({
   id: MageSkillId.ArcaneBolt,
   name: { en: "Arcane Bolt", th: "ลูกเวทมนตร์" },
   description: {
@@ -41,8 +41,10 @@ export const arcaneBolt = new Skill({
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const luckMod = statMod(actor.attribute.getTotal("luck"));
     const baseDiceDamage = roll(1).d(skillLevel === 5 ? 8 : 6).total;
-    const skillLevelMultiplier = 1 + skillLevel * 0.1;
-    const totalDamage = Math.max(0, (baseDiceDamage + planarMod) * skillLevelMultiplier);
+    const totalDamage = Math.max(
+      0,
+      (baseDiceDamage + planarMod) * skillLevelMultiplier(skillLevel),
+    );
     const hitBonus = controlMod;
     const critBonus = luckMod;
     const damageOutput = {

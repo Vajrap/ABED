@@ -1,26 +1,26 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { RogueSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ActorEffect, TargetEffect } from "../../../effects";
-import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
+import { RogueSkill } from "./index";
 
-export const backstab = new Skill({
+export const backstab = new RogueSkill({
   id: RogueSkillId.Backstab,
   name: {
     en: "Backstab",
     th: "แทงข้างหลัง",
   },
   description: {
-    en: "Slip into your enemy’s blind spot and drive your blade deep. Deals 1.3× (+0.1 per skill level) of weapon piercing damage. If hidden, damage increases by +0.5×. Gains +4 critical roll if the target is Frightened or Dazed. If skill level reached 5 the base damage went up to 1.5 times weapon damage and critical roll + 5.",
+    en: "Slip into your enemy’s blind spot and drive your blade deep. The user must be in hiding state, Deals 1.3× weapon damage + Dexterity mod * (+0.1 per skill level). Gains +4 critical roll if the target is Frightened or Dazed. If skill level reached 5 the base damage went up to 1.5 times weapon damage and critical roll + 5.",
     th: "เคลื่อนไหวจากเงามืด แทงทะลุจุดอ่อนของศัตรูสร้างความเสียหายแบบแทงทะลุ (Piercing) 1.3 เท่า (+0.1 ต่อเลเวลสกิล) ของความเสียหายอาวุธหากอยู่ในสถานะเร้นกาย ความเสียหายจะเพิ่มขึ้นอีก 0.5 เท่าและ critical roll เพิ่มขึ้น 4 หน่วย หากเป้าหมายอยู่ในสถานะ “หวาดกลัว” หรือ “มึนงง. เมื่อเลเวลสกิลถึง 5 ความเสียหายเพิ่มเป็น 1.5 เท่าและ critical roll 5 หน่วย”",
   },
   requirement: {},
@@ -89,7 +89,7 @@ export const backstab = new Skill({
     const baseTimes = skillLevel >= 5 ? 1.5 : 1.3;
     const baseMultiplier = baseTimes + 0.1 * skillLevel;
 
-    if (actor.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.hiding)) {
+    if (actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.hiding)) {
       damageOutput.damage =
         damageOutput.damage * (baseMultiplier + 0.5) * positionModifierValue;
     } else {
@@ -99,8 +99,8 @@ export const backstab = new Skill({
 
     const additionCrit = skillLevel >= 5 ? 5 : 4;
     const hasFearOrDaze =
-      !!target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.fear) ||
-      !!target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.dazed);
+      !!target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.fear) ||
+      !!target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.dazed);
 
     const totalDamage = resolveDamage(
       actor.id,

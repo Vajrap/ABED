@@ -9,6 +9,8 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { WarriorSkill } from ".";
+import { statMod } from "src/Utils/statMod";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const cleave = new WarriorSkill({
   id: WarriorSkillId.Cleave,
@@ -17,8 +19,8 @@ export const cleave = new WarriorSkill({
     th: "ฟันกวาด",
   },
   description: {
-    en: "A sweeping attack deals 1.0× weapon damage to all enemies in the front most row. At level 5 damage increase to 1.2× weapon damage",
-    th: "การโจมตีแบบกว้าง สร้างความเสียหาย 1.0 เท่าให้ศัตรูทั้งหมดในแถวหน้าสุด. เมื่อเลเวล 5 ความเสียหายเพิ่มเป็น 1.2 เท่า",
+    en: "Deal 1x weapon damage + Strength mod * skillScalar * positionModifier to all enemies in the front most row. At level 5 damage increases to 1.2x weapon damage.",
+    th: "สร้างความเสียหาย 1 เท่าของอาวุธ + Strength mod * skillScalar * positionModifier ให้ศัตรูทั้งหมดในแถวหน้าสุด เมื่อเลเวล 5 ความเสียหายเพิ่มเป็น 1.2 เท่า",
   },
   requirement: {},
   equipmentNeeded: [
@@ -26,14 +28,14 @@ export const cleave = new WarriorSkill({
     "axe",
     "blade",
   ], // Slash weapons
-  tier: TierEnum.uncommon,
+  tier: TierEnum.common,
   consume: {
     hp: 0,
     mp: 0,
-    sp: 6,
+    sp: 0,
     elements: [
       {
-        element: "fire",
+        element: "neutral",
         value: 2,
       },
     ],
@@ -44,8 +46,8 @@ export const cleave = new WarriorSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
-        min: 0,
+        element: "wind",
+        min: 1,
         max: 1,
       },
     ],
@@ -89,12 +91,14 @@ export const cleave = new WarriorSkill({
         weapon,
       );
 
-      // Cleave deals 1x weapon damage
-      const baseTimes = skillLevel >= 5 ? 1.0 : 1.2;
+      // Cleave deals 1x weapon damage (1.2x at level 5) + str mod
+      const baseTimes = skillLevel >= 5 ? 1.2 : 1.0;
+      const strMod = statMod(actor.attribute.getTotal("strength"));
+      const levelScalar = skillLevelMultiplier(skillLevel);
 
       damageOutput.damage =
-        damageOutput.damage *
-        (baseTimes + skillLevel * 0.1) *
+        (damageOutput.damage * baseTimes + strMod) *
+        levelScalar *
         positionModifierValue;
 
       const totalDamage = resolveDamage(

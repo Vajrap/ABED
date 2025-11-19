@@ -39,65 +39,20 @@ export enum ClericSkillId {
   // Revive = "Revive", // Bring fallen ally back with 25% HP
   Radiance = "Radiance", // Attack enemy with holy damage
   Bless = "Bless", // Grant saving throw advantage
-  Barrier = "Barrier", // Create a barrier reduce incoming damage
-  // TurnUndead = "TurnUndead", // Turn undead deal 9999 damage,
+  TurnUndead = "TurnUndead", // Turn undead deal 9999 damage,
   // HolyWater = "HolyWater", // Buff weapon with holy damage,
   // Passive
   // HealingMastery = "HealingMastery", // Increase healing amount
   
 }
 
-export enum ScholarSkillId {
-  Analyze = "Analyze",
-  // Study a target and reveal its hidden stats, defense types, and weaknesses.
-  // Often applies a debuff: target takes slightly more damage for X turns.
-  // Purpose: Information + light damage amplification.
+export enum SeerSkillId {
 
-  MagicSeal = "MagicSeal",
-  // Temporarily disable an enemy’s ability to cast spells.
-  // Could silence them, increase their cooldowns, or block one chosen ability.
-  // Purpose: Anti-mage control, Scholar specialty.
-
-  WeakpointMark = "WeakpointMark",
-  // Mark a vulnerable spot on the enemy. For a few turns, the marked enemy
-  // takes increased CRIT or PENETRATION damage from all sources.
-  // Purpose: Tactical damage setup.
-
-  BarrierScript = "BarrierScript",
-  // Create a small protective barrier around an ally using arcane script.
-  // Reduces incoming damage or converts a portion of it into non-lethal damage.
-  // Purpose: Supportive shielding without being a healer.
-
-  TacticalReposition = "TacticalReposition",
-  // Move an ally or yourself into an optimal position.
-  // Could grant extra dodge or give an ally an immediate mini-action (like pivot).
-  // Purpose: Strategic battlefield manipulation (ultimate-level utility).
-
-  // =======================
-  // Passives
-  // =======================
-
-  Insight = "Insight",
-  // When hitting a studied/marked target, Scholar gains bonus accuracy or crit chance.
-  // Purpose: Rewards using Analyze/WeakpointMark.
-
-  MentalDiscipline = "MentalDiscipline",
-  // Reduces cooldowns of Scholar skills when Scholar takes no damage in a turn.
-  // Purpose: Encourages playing carefully and planning ahead.
 }
 
 export enum MageSkillId {
   ArcaneBolt = "ArcaneBolt",
   ArcaneShield = "ArcaneShield",
-  ArcanePulse = "ArcanePulse",      
-  // Short-range AoE burst of raw arcane force. 
-  // Deals moderate damage and may stagger enemies.
-  // Purpose: "Get off me" spell, Mage’s defensive AoE.
-
-  ManaTwist = "ManaTwist",
-  // Disrupt enemy concentration: apply silence, increase their cooldown,
-  // OR reduce their resource gain for a few turns.
-  // Purpose: Arcane interference / control skill.
 
   Backdraft = "Backdraft",
   FireBolt = "FireBolt",
@@ -115,30 +70,27 @@ export enum MageSkillId {
 
 export enum MysticSkillId {
   MistStep = "MistStep",
-  // Dash to a nearby position. Gain temporary evasion and remove slow/immobilize.
-  // Role: reposition + self-cleanse + defensive mobility.
-  // Mystic signature skill: fluid movement and mist-like evasion.
+  // “Shift like mist to a safer position. Move to the backline if you are in the front row; if already in the back row, gain evasion instead. Remove Slow or Bind if present. Gain +3 dodge roll for 1 turn (increases to 2 turns at skill level 5).”
 
-  BreathFocus = "BreathFocus",
-  // Enter a breathing stance. Increase next skill’s potency (damage, healing, or control)
-  // OR reduce its resource cost depending on tier.
-  // Role: setup move for empowered effects.
+  PlanarAbsorption = "PlanarAbsorption",
+  // Gain 'Planar Absorption' buff for 2d3 stacks + intelligence mod + 0.01 times per skill level, If Attacked by a magic spell, absorb damage up to the stacks of planar absoprtion buff,
+  // Every 4 damage of each type that is absorbed turned into 1 resource of that element type.
 
   InnerVeil = "InnerVeil",
-  // Create a faint veil around self or ally, making them harder to target or hit.
+  // Cast a veil on one frontline ally, make them harder to target or hit.
   // (Minor concealment / dodge / accuracy debuff to enemy)
   // Role: soft-support defensive buff.
 
   ReversalPalm = "ReversalPalm",
-  // Melee strike that reflects a portion of the next incoming attack back to the attacker.
-  // Role: “redirect force” flavor — Mystic’s version of a counter.
+  // After using, give self a buff 'Reverse Palm' for 1 turn:
+  // Reverse Palm: when attacked, roll a d20 willpower save, if passed, deal 1d6 blunt damage + dex mod *(1 + 0.1 * skill level) to the attacker and negate that attack, Then remove the buff, if fail, remove the buff and take damage normally.
+  // (The redirection might needed to be implemented in the damage calculation function)
 
-  FlowingForm = "FlowingForm",
-  // Adopt a temporary flowing stance: 
-  // - increased evasion  
-  // - slight regen  
-  // - attacks become weaker but much harder to interrupt  
-  // Role: ultimate-like self-sustain + stability stance.
+  // FlowingForm = "FlowingForm", // Later Implementation for Passive skills
+  // Passive
+  // PASSIVE — Each successful dodge grants 1 Flow Buff (max 3). 
+  // Each Flow: +1 dodge roll & restore 1 MP at end of turn. 
+  // Lose all Flow when hit. 
 
   // =======================
   // Passives
@@ -158,68 +110,65 @@ export enum RogueSkillId {
   Backstab = "Backstab", 
 
   BleedingCut = "BleedingCut",
-  // Fast melee strike that applies bleed for several turns.
-  // Purpose: sustained DPS tool that rewards hit-and-run.
+  // Uncommon
+  // require sword dagger or blade
+  // Deal weapons damage + Dex mod * (1 + 0.1 * skill level) slash
+  // Must be front - front to deal full damage (see skills that have positionMultiplier)
+  // target must roll DC10 (DC12 at lvl 5) Endurance save. or get 1d3 bleed stacks (debuff)
+  // Bleed: takes 1d3 damage per turn for 3 turns.
 
-  ShadowFeint = "ShadowFeint",
-  // Make a deceptive strike. Deals moderate damage and lowers the target’s accuracy.
-  // Purpose: debuff + safer melee presence.
 
   ThrowingKnives = "ThrowingKnives",
-  // Ranged attack hitting 2–3 targets OR same target multiple times.
-  // Purpose: gives Rogue a mid-range option; good opener.
+  // Common
+  // Any range
+  // Throw knives at 2 targets, each deals 1d4 + Dex mod * (1 + 0.1 * skill level) pierce damage.
+  // target can be repeat, (so just get random again and again, no thing special here)
+  // at level 5, add 2 more knives to the throw
 
-  SmokeBomb = "SmokeBomb",
-  // Create a smoke field. Enemies inside have reduced accuracy; Rogue gains stealth.
-  // May reset enemy targeting or force misses for a turn.
-  // Purpose: battlefield control + stealth re-entry tool (ultimate-ish).
 
-  // =======================
-  // Passives
-  // =======================
-
-  Cunning = "Cunning",
-  // Deal increased damage to enemies suffering from any debuff.
-  // Encourages synergy with bleed, feint, smoke, etc.
-
-  Lightfoot = "Lightfoot",
-  // Gain bonus initiative and movement distance.
-  // Purpose: Rogue moves first and moves far.
+  Hiding = "Hiding",
+  // Uncommon
+  // Try to get hiding, roll D20 + dex mod, against 10 + (higest enemy int mod) + ( row === 'front' ? 5 : 0)
+  // if passed get hiding buff for 2 turns,
+  // at level 5, base DC = 8, front row penalty = 3
 }
 
 export enum SpellBladeSkillId {
 
   PlanarEdge = "PlanarEdge",
-  // PASSIVE — Core identity of the SpellBlade.
-  // Conjure a blade of pure planar energy. 
-  // Always counts as armed. Basic attacks deal magical melee damage 
-  // and generate "Edge Charge". Some abilities consume or empower the Edge.
+  // Cantrip, auto attack, core idea for spell blade
+  // Dealing arcane damage, melee (see positionModifier)
+  // must equip sword, blade, dagger or barehand(no weapon)
+  // If weapon exist, deal weapon damage + planar mod + edge charge stacks * (1 + 0.1 * skill level) arcane damage.
+  // If no weapon, damage dice based on skill Level, 1d6, 1d6, 1d8, 1d8 and 2d4 (level 1-5) + planar mod + edge charge stacks * (1 + 0.1 * skill level) arcane damage.
+  // and generate "Edge Charge". Buff
+  // Edge Charge buff maximum 5 stacks, no limit on duration.
+  // produce 1 wind
 
-  ArcaneSlash = "ArcaneSlash",
-  // ACTIVE — Hybrid melee + magic strike using the Planar Edge.
-  // Deals melee damage + small arcane bonus.
-  // If you have at least 1 Edge Charge, consumes 1 to release a short arc wave.
+  WindSlash = "WindSlash",
+  // Uncommon
+  // Any range
+  // Deal (Planar edge-like damage) * (1 + 0.1 * skill level) arcane damage.
+  // consume 1 wind, produce natural
+  // Target roll DC7 + (user planar mod) endurance save or get bleed for 1d2 turn.
+  // At level 5, if edge charge stacks > 0 deal additional 0.5 damage per stack, round down.
 
-  EdgeInfusion = "EdgeInfusion",
-  // ACTIVE — Empower the Planar Edge temporarily.
-  // Increases magic damage on melee attacks and boosts Edge Charge generation 
-  // for several turns. Core buff of the SpellBlade rotation.
-
-  BladeWard = "BladeWard",
-  // ACTIVE — Coat the planar blade in a defensive aura.
-  // Gain temporary armor + magic resistance.
-  // Enemies that hit you in melee take minor arcane retaliation.
 
   SpellParry = "SpellParry",
-  // ACTIVE — Enter a parry stance against magic.
-  // The next enemy spell targeting you is weakened or negated.
-  // Successful parry grants 1 Edge Charge and empowers your next ArcaneSlash.
+  // rare
+  // Get Spell Parry buff for 1 turn.
+  // Spell Parry: reduce next spell’s damage by (5 + Int mod).
+  // If attacked by a spell, gain 1 Edge Charge (2 if 0 damage taken). 
+  // At level 5 also produce 1 Edge Charge when used.
+  // Comsume 1 wind, produce 1 chaos
 
-  ElementalBurst = "ElementalBurst",
-  // ACTIVE — Finisher / ultimate-like ability.
-  // Consume ALL Edge Charges to deliver a devastating melee strike 
-  // followed by a small magic explosion (AOE).
-  // Damage scales heavily with the number of Edge Charges consumed.
+  EdgeBurst = "EdgeBurst",
+  // rare
+  // Consume ALL Edge Charges (min 1). 
+  // Close range, melee (see positionModifier)
+  // must equip sword, blade, dagger or barehand(no weapon)
+  // Strike target for weapon dmg(or the same as Planar Edge) + Planar mod + (1d2 per edge charge stacks) * (1 + 0.1 * skill level) arcane damage.
+  // consume 2 chaos produce nothing
 }
 
 export enum ShamanSkillId {
@@ -227,16 +176,6 @@ export enum ShamanSkillId {
   HexOfRot = "HexOfRot",
   SpiritRattle = "SpiritRattle",
   ChaoticBlessing = "ChaoticBlessing",
-  TotemStrike = "TotemStrike",
-  // ACTIVE — Summon a small spirit totem for a single hit.
-  // Deals magic damage with a secondary effect 
-  // (slow, minor stun chance, or resource drain). 
-  // Unstable, but reliable enough to use in combat.
-
-  SpiritChannel = "SpiritChannel",
-  // PASSIVE — When the Shaman applies a debuff or DOT, gain a small self-buff.
-  // Could be: +resistance, +attack, or +regen for 1 turn.
-  // Rewards continuous curse/hex application.
 }
 
 export enum BarbarianSkillId {
@@ -274,27 +213,25 @@ export enum BarbarianSkillId {
 
 export enum WarriorSkillId {
   Bash = "Bash",
+  // common
+  // consume 2 neutral, produce 1 earth
+  // Deal weapon damage, + str mod, target roll DC8 + (user str mod) endurance save or get stun for 1 turn.
   Cleave = "Cleave",
+  // common
+  // consume 2 neutral, produce 1 wind
+  // Deal 1x weapon damage ((at level 5 = 1.2x), + str mod) * (skillScalar) * (positionModifier) attacking enemy to the 'front most row' (so the skill scalar must know which row we're attacking)
 
   PowerStrike = "PowerStrike",
+  // Common
+  // consume 2 neutral, produce 1 fire
   // ACTIVE — Strong single-target melee attack.
-  // Higher damage than Bash, no control.
+  // Higher may be (1.3 and 1.5 at level 5 + str mod) * (skillScalar) * (posotionModifier)
   // Bread-and-butter offensive skill.
 
-  ShieldBreak = "ShieldBreak",
-  // ACTIVE — Heavy strike aimed at breaking defense.
-  // Reduces the target’s armor or guard for several turns.
-  // Excellent for supporting party DPS.
-
   WarCry = "WarCry",
+  // Uncommon
   // ACTIVE — Battle shout that boosts self or team morale.
-  // Increases attack or action speed for a few turns.
-  // Simple, effective self-buff with team value.
-
-  WeaponMastery = "WeaponMastery",
-  // PASSIVE — Warrior deals increased damage with melee weapons
-  // OR gains reduced cooldown on weapon skills.
-  // Reinforces Warrior’s identity as the "pure weapon user".
+  // Increases attack or action speed for a few turns.(+2 agi +2 str), 2 turns, 3 turns when level 5
 }
 
 export enum KnightSkillId {
@@ -607,4 +544,32 @@ export enum InquisitorSkillId {
   // PASSIVE — When the Inquisitor attacks or debuffs an enemy,
   // gain a small stacking buff to damage or accuracy for the next turn.
   // Encourages relentless offensive pressure.
+}
+
+export enum ScholarSkillId {
+  Analyze = "Analyze",
+  // Uncommon
+  // Mark a vulnerable spot on the enemy. For 2 turns, the marked enemy get Exposed debuff
+  // Exposed: takes additional 1d3 damage from all sources.
+  // if skill level is 5, the exposed enemy also gain -2 to critical defense
+  // We can use the 'perm' value in buff to acheive the -2 to critical defense
+
+  DisruptPattern = "DisruptPattern",
+  // Cantrip
+  // Force DC10 (DC12 at lvl 5) Will save. 
+  // Fail: target is Dazed 1 turn. 
+  // Success: reduce target's next initiative by 20 (30 at lvl 5).
+
+  CognitiveOverload = "CognitiveOverload",
+  // Uncommon
+  // Deal 1d4 (1d6 at lvl 5) + INT mod * (1 + 0.1 * skill level) true arcane damage. Refresh 1 random debuff on the target.
+  // If target has ≥3 debuffs, damage becomes 1d6 (1d8 at lvl 5).
+}
+
+export enum EngineerSkillId {
+
+}
+
+export enum NomadSkillId {
+
 }

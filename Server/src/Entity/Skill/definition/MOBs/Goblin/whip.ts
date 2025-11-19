@@ -9,7 +9,8 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { roll } from "src/Utils/Dice";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const whip = new Skill({
   id: MobSkillId.Whip,
@@ -38,12 +39,13 @@ export const whip = new Skill({
         targets: [],
       };
     }
-    const entry = actor.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.slaveDriver);
+    const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.slaveDriver);
     const stacks = entry?.value || 0;
-    const baseDamage = (roll(1).d(6).total + stacks * 2) * (1 + skillLevel * 0.1);
+    const baseDamage =
+      (roll(1).d(6).total + stacks * 2) * skillLevelMultiplier(skillLevel);
     const damageOutput = { damage: baseDamage, hit: 999, crit: 0, type: DamageType.blunt, trueDamage: true };
     const result = resolveDamage(actor.id, target.id, damageOutput, location);
-    if (entry) actor.buffsAndDebuffs.entry.delete(BuffsAndDebuffsEnum.slaveDriver);
+    if (entry) actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.slaveDriver);
     return {
       content: buildCombatMessage(actor, target, { en: "Whip!", th: "แส้!" }, result),
       actor: { actorId: actor.id, effect: [ActorEffect.TestSkill] },

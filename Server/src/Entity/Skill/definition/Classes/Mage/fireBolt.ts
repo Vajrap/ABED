@@ -1,6 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { MageSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { getTarget } from "src/Entity/Battle/getTarget";
@@ -12,15 +11,16 @@ import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { MageSkill } from "./index";
 
-export const fireBolt = new Skill({
+export const fireBolt = new MageSkill({
   id: MageSkillId.FireBolt,
   name: {
     en: "Fire Bolt",
     th: "ลูกไฟ",
   },
   description: {
-    en: "Unleash a focused spark of fire toward an enemy. Deals 1d6 + Planar modifier + 0.5× Skill Level as Fire damage. On hit, roll DC 13 to apply 1–2 Burn stacks to enemy.",
+    en: "Unleash a focused spark of fire toward an enemy. Deals 1d6 + Planar modifier + 0.5× Skill Level as Fire damage. On hit, target must roll DC 8 (+user planar mod) endurance save, if fail, get 1–2 Burn stacks to enemy.",
     th: "ปล่อยประกายไฟพุ่งใส่ศัตรู สร้างความเสียหาย 1d6 + ค่าพลังเวท (Planar) + 0.5×เลเวลสกิล เป็นความเสียหายประเภทไฟ หลังโจมตีโดน ทอย DC 13 เพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่ศัตรู",
   },
   requirement: {},
@@ -72,6 +72,8 @@ export const fireBolt = new Skill({
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const luckMod = statMod(actor.attribute.getTotal("luck"));
 
+    const burnDC = 8 + planarMod;
+
     // Calculate base damage
     const baseDiceDamage = roll(1).d(6).total;
     const skillLevelBonus = 0.5 * skillLevel;
@@ -101,14 +103,12 @@ export const fireBolt = new Skill({
       location,
     );
 
-    // Check for burn application (DC 13, no saves, no bonus)
+    // Check for burn application (DC 13)
     let burnMessage = "";
     if (totalDamageResult.isHit) {
-      // Roll DC 13 check for burn
-      const burnRoll = rollTwenty().total;
-      if (burnRoll <= 13) {
-        const burnStacks = roll(2).d(1).total; // 1-2 stacks
-        // Actually apply the burn debuff
+      const burnSave = target.rollSave('endurance')
+      if (burnSave < burnDC) {
+        const burnStacks = roll(2).d(1).total;
         const burnResult = buffsAndDebuffsRepository.burn.appender(
           target,
           burnStacks,

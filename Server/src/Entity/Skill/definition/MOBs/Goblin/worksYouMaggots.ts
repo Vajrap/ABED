@@ -7,7 +7,7 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { roll } from "src/Utils/Dice";
-import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { RaceEnum } from "src/InterFacesEnumsAndTypes/Enums";
 
 export const worksYouMaggots = new Skill({
@@ -38,7 +38,7 @@ export const worksYouMaggots = new Skill({
     const damage = roll(1).d(3).total;
     const damageOutput = { damage, hit: 999, crit: 0, type: DamageType.blunt, trueDamage: true };
     const result = resolveDamage(actor.id, target.id, damageOutput, location);
-    buffsAndDebuffsRepository.slaveDriver.appender(actor, damage, false, 0);
+    buffsRepository.slaveDriver.appender(actor, damage, false, 0);
     target.abGauge += 5 + skillLevel;
     return {
       content: {

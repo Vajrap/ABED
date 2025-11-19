@@ -90,6 +90,7 @@ export enum TargetEffect {
   Haste = "TarHaste",
   Slow = "TarSlow",
   Hiding = "TarHiding",
+  Bless = "TarBless",
 
   // Special Effects
   Evasion = "TarEvasion",

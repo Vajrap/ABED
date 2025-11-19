@@ -1,6 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ShamanSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
@@ -9,8 +8,10 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
+import { ShamanSkill } from "./index";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
-export const chaoticBlessing = new Skill({
+export const chaoticBlessing = new ShamanSkill({
   id: ShamanSkillId.ChaoticBlessing,
   name: {
     en: "Chaotic Blessing",
@@ -54,13 +55,19 @@ export const chaoticBlessing = new Skill({
     // 50/50 chance to damage or heal
     const isDamage = rollTwenty().total <= 10;
     
-    const additionalDamage = (statMod(actor.attribute.getTotal("planar")) + statMod(actor.attribute.getTotal("willpower")) ) / 2;
+    const additionalDamage =
+      (statMod(actor.attribute.getTotal("planar")) +
+        statMod(actor.attribute.getTotal("willpower"))) /
+      2;
+    const levelScalar = skillLevelMultiplier(skillLevel);
     
     let messages: string[] = [];
 
     if (isDamage) {
       for (const target of targetParty) {
-        const total = roll(1).d(skillLevel >= 5 ? 8 : 6).total + additionalDamage * (1 + (0.1 * skillLevel));
+        const total =
+          roll(1).d(skillLevel >= 5 ? 8 : 6).total +
+          additionalDamage * levelScalar;
         const damageOutput = {
           damage: Math.floor(total),
           hit: 999,
@@ -86,7 +93,9 @@ export const chaoticBlessing = new Skill({
       // Heal whole team
       for (const ally of actorParty) {
         if (!ally.vitals.isDead) {
-          const total = roll(1).d(skillLevel >= 5 ? 8 : 6).total + additionalDamage * (1 + (0.1 * skillLevel));
+          const total =
+            roll(1).d(skillLevel >= 5 ? 8 : 6).total +
+            additionalDamage * levelScalar;
           ally.vitals.incHp(Math.floor(total));
           const getChaos = rollTwenty().total;
           let msg = `${ally.name.en} healed for ${total} HP!`;

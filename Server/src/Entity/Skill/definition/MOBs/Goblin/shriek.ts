@@ -9,7 +9,7 @@ import {rollTwenty} from "src/Utils/Dice";
 import {statMod} from "src/Utils/statMod.ts";
 import {buffsAndDebuffsRepository} from "src/Entity/BuffsAndDebuffs/repository.ts";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const shriek = new Skill({
   id: MobSkillId.Shriek,
@@ -96,11 +96,11 @@ export const shriek = new Skill({
 
     const tauntSuccess = rollTwenty().total >= 15
     if (tauntSuccess) {
-      const existingTaunt = actor.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.taunt);
+      const existingTaunt = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt);
       if (existingTaunt) {
         existingTaunt.value += 1;
       } else {
-        actor.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.taunt, {
+        actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
           value: 1,
           isPerm: false,
           permValue: 0,

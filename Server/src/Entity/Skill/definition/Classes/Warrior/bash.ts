@@ -12,6 +12,8 @@ import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { statMod } from "src/Utils/statMod";
 import { WarriorSkill } from ".";
+import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const bash = new WarriorSkill({
   id: WarriorSkillId.Bash,
@@ -20,8 +22,8 @@ export const bash = new WarriorSkill({
     th: "ทุบสุดแรง",
   },
   description: {
-    en: "Swing with your full strength, smashing the enemy with a crushing blow. [Melee attack] Deals 1.4× (+0.05 per skill level) of weapon damage plus your Strength modifier.",
-    th: "เหวี่ยงอาวุธอย่างสุดแรง ทุบใส่ศัตรูด้วยพลังทำลายล้างสูง [การโจมตีระยะประชิด] สร้างความเสียหาย 1.4 เท่า (+0.05 ต่อเลเวลสกิล) ของความเสียหายอาวุธ รวมค่าสถานะ STR",
+    en: "Deal weapon damage + Strength modifier. Target must roll DC8 + (user Strength mod) Endurance save or get stunned for 1 turn.",
+    th: "สร้างความเสียหายอาวุธ + Strength modifier เป้าหมายต้องทอย Endurance save DC8 + (Strength mod ของผู้ใช้) หรือถูกทำให้มึนงง 1 เทิร์น",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -29,10 +31,10 @@ export const bash = new WarriorSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 5,
+    sp: 0,
     elements: [
       {
-        element: "fire",
+        element: "neutral",
         value: 2,
       },
     ],
@@ -44,7 +46,7 @@ export const bash = new WarriorSkill({
     elements: [
       {
         element: "earth",
-        min: 0,
+        min: 1,
         max: 1,
       },
     ],
@@ -76,8 +78,6 @@ export const bash = new WarriorSkill({
     const damageType = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, damageType);
 
-    const multiplier = 1.4 + 0.05 * skillLevel;
-
     // Add strength modifier
     const strengthMod = statMod(actor.attribute.getTotal("strength"));
 
@@ -87,8 +87,7 @@ export const bash = new WarriorSkill({
       weapon,
     );
 
-    damageOutput.damage =
-      (damageOutput.damage * multiplier + strengthMod) * positionModifierValue;
+    damageOutput.damage = (damageOutput.damage + strengthMod) * positionModifierValue;
 
     const totalDamage = resolveDamage(
       actor.id,
@@ -97,13 +96,25 @@ export const bash = new WarriorSkill({
       location,
     );
 
-    let turnResult: TurnResult = {
-      content: buildCombatMessage(
-        actor,
-        target,
-        { en: `Bash`, th: `ทุบสุดแรง` },
-        totalDamage,
-      ),
+    // Check for stun application
+    const actorStrMod = statMod(actor.attribute.getTotal("strength"));
+    const dc = 8 + actorStrMod;
+    const saveRoll = target.rollSave("endurance");
+    let stunMessage = "";
+
+    if (saveRoll < dc) {
+      // Save failed: apply stun
+      debuffsRepository.stun.appender(target, 1, false, 0);
+      stunMessage = ` ${target.name.en} failed the save and is stunned!`;
+    }
+
+    const combatMsg = buildCombatMessage(actor, target, { en: "Bash", th: "ทุบสุดแรง" }, totalDamage);
+
+    return {
+      content: {
+        en: `${combatMsg.en}${stunMessage}`,
+        th: `${combatMsg.th}${stunMessage ? ` ${target.name.th} ล้มเหลวในการทดสอบและถูกทำให้มึนงง!` : ""}`,
+      },
       actor: {
         actorId: actor.id,
         effect: [ActorEffect.TestSkill],
@@ -115,7 +126,5 @@ export const bash = new WarriorSkill({
         },
       ],
     };
-
-    return turnResult;
   },
 });

@@ -19,7 +19,7 @@ import {
   DayOfWeek,
   TimeOfDay,
 } from "../../../src/InterFacesEnumsAndTypes/Time";
-import { BuffsAndDebuffsEnum } from "../../../src/Entity/BuffsAndDebuffs/enum";
+import { BuffAndDebuffEnum } from "../../../src/Entity/BuffsAndDebuffs/enum";
 
 describe("Character", () => {
   describe("Constructor", () => {
@@ -286,13 +286,13 @@ describe("Character", () => {
 
     it("should remove non-permanent buffs with positive values", () => {
       // Add non-permanent buffs
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.haste, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.haste, {
         value: 3,
         isPerm: false,
         permValue: 0,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.slow, {
         value: 2,
         isPerm: false,
         permValue: 0,
@@ -308,13 +308,13 @@ describe("Character", () => {
 
     it("should zero out kinetic values but keep permanent buffs", () => {
       // Add permanent buffs
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.haste, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.haste, {
         value: 3,
         isPerm: true,
         permValue: 1,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.slow, {
         value: 2,
         isPerm: true,
         permValue: 5,
@@ -327,14 +327,14 @@ describe("Character", () => {
       expect(character.buffsAndDebuffs.entry.size).toBe(2); // kept
 
       const hasteEntry = character.buffsAndDebuffs.entry.get(
-        BuffsAndDebuffsEnum.haste,
+        BuffAndDebuffEnum.haste,
       );
       expect(hasteEntry?.value).toBe(0); // kinetic value cleared
       expect(hasteEntry?.isPerm).toBe(true); // permanent flag kept
       expect(hasteEntry?.permValue).toBe(1); // permanent value kept
 
       const timeWarpEntry = character.buffsAndDebuffs.entry.get(
-        BuffsAndDebuffsEnum.slow,
+        BuffAndDebuffEnum.slow,
       );
       expect(timeWarpEntry?.value).toBe(0);
       expect(timeWarpEntry?.isPerm).toBe(true);
@@ -343,19 +343,19 @@ describe("Character", () => {
 
     it("should handle mixed permanent and non-permanent buffs", () => {
       // Mix of permanent and non-permanent
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.haste, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.haste, {
         value: 3,
         isPerm: false,
         permValue: 0,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.slow, {
         value: 2,
         isPerm: true,
         permValue: 1,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.haste, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.haste, {
         value: 1,
         isPerm: true,
         permValue: 1,
@@ -368,7 +368,7 @@ describe("Character", () => {
       expect(character.buffsAndDebuffs.entry.size).toBe(2); // both permanent buffs remain
 
       const slowEntry = character.buffsAndDebuffs.entry.get(
-        BuffsAndDebuffsEnum.slow,
+        BuffAndDebuffEnum.slow,
       );
       expect(slowEntry?.value).toBe(0);
       expect(slowEntry?.isPerm).toBe(true);
@@ -376,27 +376,27 @@ describe("Character", () => {
 
       // Both permanent buffs should remain
       expect(
-        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.haste),
+        character.buffsAndDebuffs.entry.has(BuffAndDebuffEnum.haste),
       ).toBe(true);
       expect(
-        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.slow),
+        character.buffsAndDebuffs.entry.has(BuffAndDebuffEnum.slow),
       ).toBe(true);
     });
 
     it("should ignore buffs with zero or negative values", () => {
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.haste, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.haste, {
         value: 0,
         isPerm: false,
         permValue: 0,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.slow, {
         value: -1,
         isPerm: false,
         permValue: 0,
       });
 
-      character.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.slow, {
+      character.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.slow, {
         value: 3,
         isPerm: false,
         permValue: 0,
@@ -409,10 +409,10 @@ describe("Character", () => {
       // Only the positive value buff should be removed
       expect(character.buffsAndDebuffs.entry.size).toBe(1);
       expect(
-        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.haste),
+        character.buffsAndDebuffs.entry.has(BuffAndDebuffEnum.haste),
       ).toBe(true);
       expect(
-        character.buffsAndDebuffs.entry.has(BuffsAndDebuffsEnum.slow),
+        character.buffsAndDebuffs.entry.has(BuffAndDebuffEnum.slow),
       ).toBe(false);
     });
 

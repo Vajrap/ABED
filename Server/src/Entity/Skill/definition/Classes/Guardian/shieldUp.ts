@@ -1,20 +1,20 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { GuardianSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { GuardianSkill } from ".";
 
-export const shieldUp = new Skill({
+export const shieldUp = new GuardianSkill({
   id: GuardianSkillId.ShieldUp,
   name: {
     en: "Shield Up",
     th: "ยกโล่ขึ้น",
   },
   description: {
-    en: "Raise your shield and prepare for incoming attacks. Consumes 2 Earth and produces 1 None. Adds a defense buff (to be implemented).",
-    th: "ยกโล่ขึ้นและเตรียมรับการโจมตี ใช้ 2 Earth ได้ 1 None เพิ่มบัฟป้องกัน (รอการพัฒนาต่อ)",
+    en: "Raise your shield and prepare for incoming attacks. Adds a defense up buff to self for 1 turn, at level 5 the buff lasts for 2 turns. \n Defense up: pDEF and mDEF goes up by 2 effect don't stack.",
+    th: "ยกโล่ขึ้นและเตรียมรับการโจมตี เพิ่มบัฟป้องกัน (เพิ่มพลังป้องกัน) ตัวเอง 1 เทิร์น เมื่อเลเวล 5 จะรักษาได้ 2 เทิร์น บัฟไม่ซ้อนทับ",
   },
   requirement: {},
   equipmentNeeded: ["shield"],
@@ -23,12 +23,7 @@ export const shieldUp = new Skill({
     hp: 0,
     mp: 0,
     sp: 3,
-    elements: [
-      {
-        element: "earth",
-        value: 2,
-      },
-    ],
+    elements: [],
   },
   produce: {
     hp: 0,
@@ -50,7 +45,7 @@ export const shieldUp = new Skill({
     location: LocationsEnum,
   ) => {
     // TODO: Implement defense buff logic when defenseUp buff is added
-    buffsAndDebuffsRepository.defenseUp.appender(actor, 1, false, 0);
+    buffsAndDebuffsRepository.defenseUp.appender(actor, skillLevel >= 5 ? 2 : 1, false, 0);
 
     return {
       content: {

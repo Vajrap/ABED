@@ -2,7 +2,7 @@ import { expect, describe, it, beforeEach } from "@jest/globals";
 import { getTarget } from "../../../src/Entity/Battle/getTarget";
 import { Character } from "../../../src/Entity/Character/Character";
 import { CharacterFactory } from "../../Helper/Character";
-import { BuffsAndDebuffsEnum } from "../../../src/Entity/BuffsAndDebuffs/enum";
+import { BuffAndDebuffEnum } from "../../../src/Entity/BuffsAndDebuffs/enum";
 import { CharacterVitals } from "../../../src/Entity/Character/Subclass/Vitals/CharacterVitals";
 
 class Vital {
@@ -299,7 +299,7 @@ describe("getTarget", () => {
 
   describe("Taunt Mechanics", () => {
     it("should prioritize taunting targets", () => {
-      target2.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.taunt, {
+      target2.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.taunt, {
         value: 1,
         isPerm: false,
         permValue: 0,
@@ -313,7 +313,7 @@ describe("getTarget", () => {
     });
 
     it("should bypass taunt when byPassTaunt() is called", () => {
-      target1.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.taunt, {
+      target1.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.taunt, {
         value: 1,
         isPerm: false,
         permValue: 0,
@@ -330,7 +330,7 @@ describe("getTarget", () => {
 
   describe("Hiding Mechanics", () => {
     it("should bypass hiding when byPassHiding() is called", () => {
-      target4.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.hiding, {
+      target4.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.hiding, {
         value: 1,
         isPerm: false,
         permValue: 0,
@@ -396,7 +396,7 @@ describe("getTarget", () => {
     });
 
     it("should combine row preference with taunt", () => {
-      target3.buffsAndDebuffs.entry.set(BuffsAndDebuffsEnum.taunt, {
+      target3.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.taunt, {
         value: 1,
         isPerm: false,
         permValue: 0,

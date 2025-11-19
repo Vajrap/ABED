@@ -1,0 +1,60 @@
+import type { Character } from "src/Entity/Character/Character";
+import { BuffDef } from "../../type";
+import { BuffEnum } from "../../enum";
+import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
+import { statMod } from "src/Utils/statMod";
+
+export const spellParry = new BuffDef({
+  name: {
+    en: "Spell Parry",
+    th: "ปัดเวท",
+  },
+  appender: function (
+    actor: Character,
+    value: number,
+    isPerm: boolean,
+    permValue: number,
+  ): L10N {
+    const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.spellParry);
+    if (!entry) {
+      const intMod = statMod(actor.attribute.getTotal("intelligence"));
+      const reduction = 5 + intMod;
+      actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.spellParry, {
+        value: value,
+        isPerm: isPerm,
+        permValue: permValue, // Store reduction amount in permValue
+      });
+      return {
+        en: `${actor.name.en} prepares Spell Parry! Next spell damage reduced by ${reduction}`,
+        th: `${actor.name.th} เตรียมปัดเวท! ความเสียหายเวทครั้งถัดไปลดลง ${reduction}`,
+      };
+    } else {
+      // Refresh duration
+      entry.value = value;
+      return {
+        en: `${actor.name.en} refreshes Spell Parry`,
+        th: `${actor.name.th} รีเฟรชปัดเวท`,
+      };
+    }
+  },
+
+  resolver: function (actor: Character): { canAct: boolean; content: L10N } {
+    const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.spellParry);
+    if (entry) {
+      if (entry.value > 0) {
+        entry.value -= 1;
+      } else if (entry.value === 0 && entry.permValue === 0) {
+        actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.spellParry);
+      }
+    }
+
+    return {
+      canAct: true,
+      content: {
+        en: `${actor.name.en} Spell Parry duration decreased`,
+        th: `${actor.name.th} "ปัดเวท" ลดลง`,
+      },
+    };
+  },
+});
+

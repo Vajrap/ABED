@@ -4,7 +4,7 @@ import type {
   BattleStatKey,
   ProficiencyKey,
 } from "../../../InterFacesEnumsAndTypes/Enums";
-import type { BuffsAndDebuffsEnum } from "../../BuffsAndDebuffs/enum";
+import type { BuffAndDebuffEnum } from "../../BuffsAndDebuffs/enum";
 import type { TraitEnum } from "../../Trait.ts/enum";
 
 /**
@@ -17,6 +17,6 @@ export type EquipmentModifier = {
   battleStatus?: Partial<Record<BattleStatKey, number>>;
   saves?: Partial<Record<AttributeKey, number>>;
   vitals?: { hp?: number; mp?: number; sp?: number };
-  buffsAndDebuffs?: Map<BuffsAndDebuffsEnum, number>;
+  buffsAndDebuffs?: Map<BuffAndDebuffEnum, number>;
   traits?: TraitEnum[];
 };

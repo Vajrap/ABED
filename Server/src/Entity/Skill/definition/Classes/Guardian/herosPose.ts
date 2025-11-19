@@ -1,13 +1,13 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { GuardianSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
+import { GuardianSkill } from ".";
 
-export const herosPose = new Skill({
+export const herosPose = new GuardianSkill({
   id: GuardianSkillId.HerosPose,
   name: {
     en: "Hero's Pose",

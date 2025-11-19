@@ -15,7 +15,7 @@ import { CharacterVitals } from "./Subclass/Vitals/CharacterVitals";
 import { CharacterFame } from "./Subclass/Fame/CharacterFame";
 import { CharacterPlanarAptitude } from "./Subclass/PlanarAptitude/CharacterPlanarAptitude";
 import type { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
-import type { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
+import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
 import type { TraitEnum } from "../Trait/enum";
 import { DeckCondition } from "./Subclass/DeckCondition/DeckCondition";
 import type { SkillId } from "../Skill/enums";
@@ -138,7 +138,10 @@ export class Character {
     leftHand: null,
   };
 
-  buffsAndDebuffs: CharacterBuffsAndDebuffs = { entry: new Map() };
+  buffsAndDebuffs: CharacterBuffsAndDebuffs = { 
+    buffs: { entry: new Map() }, 
+    debuffs: { entry: new Map() } 
+  };
 
   statTracker: number;
   abGauge = 0;
@@ -228,13 +231,20 @@ export class Character {
   }
 
   clearBuffAndDebuff(): Character {
-    for (const [key, value] of this.buffsAndDebuffs.entry) {
+    for (const [key, value] of this.buffsAndDebuffs.debuffs.entry) {
       if (value.value > 0) {
         if (!value.isPerm) {
-          // If not permanent, it means we should just remove it
-          this.buffsAndDebuffs.entry.delete(key);
+          this.buffsAndDebuffs.debuffs.entry.delete(key);
         } else {
-          // If permanent, only remove the kinetic value
+          value.value = 0;
+        }
+      }
+    }
+    for (const [key, value] of this.buffsAndDebuffs.buffs.entry) {
+      if (value.value > 0) {
+        if (!value.isPerm) {
+          this.buffsAndDebuffs.buffs.entry.delete(key);
+        } else {
           value.value = 0;
         }
       }
@@ -366,9 +376,22 @@ export class Character {
   }
 
   rollSave(stat: AttributeKey, mode: "norm" | "adv" | "dis" = "norm") {
+    const hasBless = this.buffsAndDebuffs.buffs.entry.has(BuffEnum.bless);
+    const hasCursed = this.buffsAndDebuffs.debuffs.entry.has(DebuffEnum.cursed);
+  
     let rollRes = rollTwenty();
+  
+    if (mode === "norm") {
+      if (hasBless && !hasCursed) {
+        rollRes = rollRes.adv();
+      } else if (!hasBless && hasCursed) {
+        rollRes = rollRes.dis();
+      }
+    }
+  
     if (mode === "adv") rollRes = rollRes.adv();
     if (mode === "dis") rollRes = rollRes.dis();
+  
     return statMod(this.attribute.getTotal(stat)) + rollRes.total;
   }
 }
@@ -393,5 +416,14 @@ type BuffAndDebuffRecord = {
 };
 
 type CharacterBuffsAndDebuffs = {
-  entry: Map<BuffsAndDebuffsEnum, BuffAndDebuffRecord>;
+  buffs: CharacterBuffs;
+  debuffs: CharacterDebuffs;
+};
+
+type CharacterBuffs = {
+  entry: Map<BuffEnum, BuffAndDebuffRecord>;
+};
+
+type CharacterDebuffs = {
+  entry: Map<DebuffEnum, BuffAndDebuffRecord>;
 };

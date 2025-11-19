@@ -1,8 +1,8 @@
 import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums";
 import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 import { statMod } from "../../Utils/statMod";
-import { BuffsAndDebuffsEnum } from "../BuffsAndDebuffs/enum";
-import { buffsAndDebuffsRepository } from "../BuffsAndDebuffs/repository";
+import { BuffAndDebuffEnum } from "../BuffsAndDebuffs/enum";
+import { buffsAndDebuffsRepository, buffsRepository, debuffsRepository } from "../BuffsAndDebuffs/repository";
 import type { Character } from "../Character/Character";
 import { trainAttribute } from "../Character/Subclass/Stats/train";
 import type { Location } from "../Location/Location";
@@ -575,22 +575,38 @@ function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
 
 function resolveBuffAndDebuff(actor: Character): {
   ableToTakesTurn: boolean;
-  reason: BuffsAndDebuffsEnum | undefined;
+  reason: BuffAndDebuffEnum | undefined;
 } {
   let ableToTakesTurn = true;
   let reason;
 
-  for (const [buffsOrDebuffs, entry] of actor.buffsAndDebuffs.entry) {
+  // Loop twice, separate buffs and debuffs, shouldn't be a problem since two maps and one map might not be so differ in this aspoect
+  for (const [buffsOrDebuffs, entry] of actor.buffsAndDebuffs.buffs.entry) {
     if (entry.value === 0 && entry.permValue === 0) {
       return { ableToTakesTurn, reason };
     }
 
     if (
-      !buffsAndDebuffsRepository[buffsOrDebuffs].resolver(actor) &&
+      !buffsRepository[buffsOrDebuffs].resolver(actor) &&
       ableToTakesTurn
     ) {
       ableToTakesTurn = false;
       reason = buffsOrDebuffs;
+    }
+  }
+
+  for (const [debuffs, entry] of actor.buffsAndDebuffs.debuffs.entry) {
+
+    if (entry.value === 0 && entry.permValue === 0) {
+      return { ableToTakesTurn, reason };
+    }
+
+    if (
+      !debuffsRepository[debuffs].resolver(actor) &&
+      ableToTakesTurn
+    ) {
+      ableToTakesTurn = false;
+      reason = debuffs;
     }
   }
 

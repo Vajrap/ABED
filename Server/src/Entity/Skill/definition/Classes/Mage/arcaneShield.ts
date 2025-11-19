@@ -1,6 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { MageSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { ActorEffect } from "../../../effects";
@@ -8,8 +7,9 @@ import { statMod } from "src/Utils/statMod";
 import { roll } from "src/Utils/Dice";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { MageSkill } from "./index";
 
-export const arcaneShield = new Skill({
+export const arcaneShield = new MageSkill({
   id: MageSkillId.ArcaneShield,
   name: {
     en: "Arcane Shield",

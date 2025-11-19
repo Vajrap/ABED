@@ -1,6 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { MageSkillId } from "../../../enums";
-import { Skill } from "../../../Skill";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { getTarget } from "src/Entity/Battle/getTarget";
@@ -9,17 +8,18 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { roll } from "src/Utils/Dice";
+import { MageSkill } from "./index";
 
-export const backdraft = new Skill({
+export const backdraft = new MageSkill({
   id: MageSkillId.Backdraft,
   name: {
     en: "Backdraft",
     th: "ไฟย้อนกลับ",
   },
   description: {
-    en: "Targets all enemies with burn status. Deals damage equal to their burn stacks, removes all burn stacks, then heals yourself for total removed stacks × 10% per skill level. Damage dealth and Healing amount increased by 1d2 at skill level 5",
+    en: "Targets all enemies with burn status. Deals damage equal to their burn stacks, removes all burn stacks * (1 + 0.1 * skill level), then heals yourself for total equal to all damages did. Damage dealth and Healing amount increased to 1d2 per stack instead of 1 at skill level 5",
     th: "โจมตีศัตรูทั้งหมดที่มีสถานะเผาไหม้ สร้างความเสียหายเท่ากับจำนวนชั้นของเผาไหม้ที่แต่ละเป้าหมายมีและลบเผาไหม้ทั้งหมดออก จากนั้นฟื้นฟูตัวเองเท่ากับจำนวนชั้นของเผ้าไหม้ทั้งหมด x 10% ต่อเลเวลสกิล. ความเสียหายและการฟื้นฟูเพิ่มขึ้นพิเศษ 1d2 เมื่อสกิลเลเวล 5",
   },
   requirement: {},
@@ -46,7 +46,7 @@ export const backdraft = new Skill({
   ) => {
     // Find all targets with burn debuff
     const targetsWithBurn = getTarget(actor, targetParty)
-      .witBuff(BuffsAndDebuffsEnum.burn)
+      .withDebuff(DebuffEnum.burn)
       .all();
 
     if (targetsWithBurn.length === 0) {
@@ -69,7 +69,7 @@ export const backdraft = new Skill({
 
     for (const target of targetsWithBurn) {
       const burnStacks =
-        target.buffsAndDebuffs.entry.get(BuffsAndDebuffsEnum.burn)?.value ?? 0;
+        target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.burn)?.value ?? 0;
 
       if (burnStacks > 0) {
         totalBurnStacks += burnStacks;
@@ -97,7 +97,7 @@ export const backdraft = new Skill({
             totalDamageResult,
           ).en + " ";
 
-        target.buffsAndDebuffs.entry.delete(BuffsAndDebuffsEnum.burn);
+        target.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.burn);
 
         targetEffects.push({
           actorId: target.id,

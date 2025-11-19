@@ -1,5 +1,5 @@
 import { TraitEnum } from "src/Entity/Trait.ts/enum";
-import { BuffsAndDebuffsEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { BuffAndDebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import {
   ATTRIBUTE_KEYS,
   ELEMENT_KEYS,
@@ -54,7 +54,7 @@ export type EquipmentCraftingAttributes = {
   };
   planarAttunement: number;
   traits: TraitEnum[];
-  buffsAndDebuffs: BuffsAndDebuffsEnum[];
+  buffsAndDebuffs: BuffAndDebuffEnum[];
   tags: string[];
 };
 

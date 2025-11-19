@@ -10,7 +10,7 @@ import {CharacterFame} from "../Subclass/Fame/CharacterFame";
 import {defaultActionSequence} from "../Subclass/Action/CharacterAction";
 import {CharacterAlignment} from "../Subclass/Alignment/CharacterAlignment";
 import {CharacterArtisans} from "../Subclass/Stats/CharacterArtisans";
-import {RogueSkillId, MobSkillId, WarriorSkillId, GuardianSkillId, MageSkillId, ShamanSkillId, WitchSkillId} from "src/Entity/Skill/enums";
+import {RogueSkillId, MobSkillId, WarriorSkillId, GuardianSkillId, MageSkillId, ShamanSkillId } from "src/Entity/Skill/enums";
 import {DeckCondition} from "../Subclass/DeckCondition/DeckCondition";
 import {defaultSaveRoll} from "src/Utils/CharacterDefaultSaveRoll";
 import {equipDirect} from "src/Entity/Item/Equipment/equipDirect";
@@ -437,7 +437,7 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
       level: randomSkillLevel(difficulty),
       exp: 0,
     },
-    { id: WitchSkillId.SpiritRattle, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: ShamanSkillId.SpiritRattle, level: randomSkillLevel(difficulty), exp: 0 },
     { id: ShamanSkillId.HexOfRot, level: randomSkillLevel(difficulty), exp: 0 },
     { id: ShamanSkillId.MendSpirit, level: randomSkillLevel(difficulty), exp: 0 },
   ];
