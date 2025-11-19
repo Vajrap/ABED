@@ -4,7 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
-} from "react-router-dom";
+} src/components/MusicPlayer/components/SongList.tsx:7:3from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { arcaneTheme } from "@/theme";
 import { AppGlobalStyles } from "@/styles/global";
