@@ -1,5 +1,5 @@
 import { basicAttack } from "./definition/basicAttack";
-import { BarbarianSkillId, BasicSkillId, ClericSkillId, GuardianSkillId, KnightSkillId, MageSkillId, MobSkillId, MysticSkillId, RogueSkillId, ScholarSkillId, ShamanSkillId, SkillId, SpellBladeSkillId, WarriorSkillId, WitchSkillId } from "./enums";
+import { BarbarianSkillId, BasicSkillId, ClericSkillId, GuardianSkillId, KnightSkillId, MageSkillId, MobSkillId, MysticSkillId, PaladinSkillId, RogueSkillId, ScholarSkillId, ShamanSkillId, SkillId, SpellBladeSkillId, WarriorSkillId, WitchSkillId } from "./enums";
 import type { Skill } from "./Skill";
 import {shriek} from "src/Entity/Skill/definition/MOBs/Goblin/shriek.ts";
 import {throwPebble} from "src/Entity/Skill/definition/MOBs/Goblin/throwPebble.ts";
@@ -45,6 +45,9 @@ import { planarEdge } from "./definition/Classes/SpellBlade/planarEdge";
 import { windSlash } from "./definition/Classes/SpellBlade/windSlash";
 import { spellParry } from "./definition/Classes/SpellBlade/spellParry";
 import { edgeBurst } from "./definition/Classes/SpellBlade/edgeBurst";
+import { rage } from "./definition/Classes/Barbarian/rage";
+import { recklessSwing } from "./definition/Classes/Barbarian/recklessSwing";
+import { earthshatter } from "./definition/Classes/Barbarian/earthshatter";
 
 export const skillRepository: Record<SkillId, Skill> = {
     [BasicSkillId.Basic]: basicAttack,
@@ -92,12 +95,9 @@ export const skillRepository: Record<SkillId, Skill> = {
     [SpellBladeSkillId.WindSlash]: windSlash,
     [SpellBladeSkillId.SpellParry]: spellParry,
     [SpellBladeSkillId.EdgeBurst]: edgeBurst,
-    [BarbarianSkillId.Rage]: undefined,
-    [BarbarianSkillId.WildSwing]: undefined,
-    [BarbarianSkillId.CrushingBlow]: undefined,
-    [BarbarianSkillId.BloodRoar]: undefined,
-    [BarbarianSkillId.Rampage]: undefined,
-    [BarbarianSkillId.UnboundFury]: undefined,
+    [BarbarianSkillId.Rage]: rage,
+    [BarbarianSkillId.RecklessSwing]: recklessSwing,
+    [BarbarianSkillId.Earthshatter]: earthshatter,
     [KnightSkillId.GuardStance]: undefined,
     [KnightSkillId.ShieldBash]: undefined,
     [KnightSkillId.PrecisionThrust]: undefined,

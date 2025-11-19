@@ -25,6 +25,7 @@ import { stun } from "./definitions/debuffs/stun";
 import { warCry } from "./definitions/buffs/warCry";
 import { edgeCharge } from "./definitions/buffs/edgeCharge";
 import { spellParry } from "./definitions/buffs/spellParry";
+import { rage } from "./definitions/buffs/rage";
 
 export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.haste]: haste,
@@ -43,6 +44,7 @@ export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.warCry]: warCry,
   [BuffEnum.edgeCharge]: edgeCharge,
   [BuffEnum.spellParry]: spellParry,
+  [BuffEnum.rage]: rage,
 };
 
 export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {

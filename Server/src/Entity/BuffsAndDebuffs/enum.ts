@@ -17,6 +17,7 @@ export enum BuffEnum {
   warCry = "warCry",
   edgeCharge = "edgeCharge",
   spellParry = "spellParry",
+  rage = "rage",
 }
 
 export enum DebuffEnum {

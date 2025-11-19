@@ -179,36 +179,27 @@ export enum ShamanSkillId {
 }
 
 export enum BarbarianSkillId {
+
   Rage = "Rage",
-  // ACTIVE — Enter a frenzied state for several turns.
-  // Gain increased attack power and action speed,
-  // but reduced defense. Core Barbarian mechanic.
+  // Cantrip,
+  // Common
+  // Can't have Rage Buff
+  // Gain Rage for 3 turns (pAtk + 2, pDef and mDef - 2). At lvl5: 4 turns
+  // consume 3 SP, produce 1 fire.
 
-  WildSwing = "WildSwing",
-  // ACTIVE — Heavy, reckless melee strike.
-  // Hits a random nearby enemy or deals splash damage.
-  // High damage but lower accuracy.
+  RecklessSwing = "RecklessSwing",
+  // Common
+  // Multi-hit melee.
+  // must have sword axe blade hammer spear barehand
+  // 2 hits (3 hits at lvl5), each (0.7×weapon + STR mod) * (1 + 0.1 * skill level) * (positionModifier) damage = weapon damage type , -3 hit roll. 
+  // consume 4 SP 1 fire, produce 1 neutral
 
-  CrushingBlow = "CrushingBlow",
-  // ACTIVE — Single-target smash attack.
-  // Deals bonus damage if the Barbarian is enraged.
-  // Can break armor or stagger the target.
-
-  BloodRoar = "BloodRoar",
-  // ACTIVE — Ferocious shout.
-  // Increases Barbarian’s offense and may intimidate enemies,
-  // reducing their attack or chance to hit.
-
-  Rampage = "Rampage",
-  // ACTIVE — Ultimate-like burst.
-  // Temporarily gain extra attacks or deal multi-hit strikes.
-  // Stronger the lower the Barbarian’s HP is.
-  // Pure reckless offense.
-
-  UnboundFury = "UnboundFury",
-  // PASSIVE — Barbarian deals increased damage when below HP threshold
-  // OR when affected by Rage.
-  // Rewards risky high-aggression playstyle.
+  Earthshatter = "Earthshatter",
+  // Uncommon
+  // AoE front row. 
+  // 1d8 + STR mod (1d10 at lvl5). 
+  // Enemies roll DC10 (DC12 lvl5) Fort save or Dazed 1 turn.  
+  // consume 5 SP 1 fire, produce 1 earth.
 }
 
 export enum WarriorSkillId {
@@ -235,39 +226,13 @@ export enum WarriorSkillId {
 }
 
 export enum KnightSkillId {
-
-  GuardStance = "GuardStance",
-  // ACTIVE — Enter a disciplined defensive stance.
-  // Reduce incoming damage significantly for 1–2 turns.
-  // Next melee attack deals bonus retaliation damage.
-  // Purpose: defensive timing, not passive tanking (unlike Guardian).
-
-  ShieldBash = "ShieldBash",
-  // ACTIVE — Slam the target with shield.
-  // Deals moderate damage and briefly stuns or staggers the enemy.
-  // More accurate and controlled than Warrior's Bash.
-
   PrecisionThrust = "PrecisionThrust",
-  // ACTIVE — Focused melee strike targeting a weak point.
-  // High accuracy, moderate damage, bonus crit chance.
-  // Knight’s signature disciplined offense.
-
-  RallyingCall = "RallyingCall",
-  // ACTIVE — Inspire nearby allies with a disciplined shout.
-  // Small buff to attack or defense for 2–3 turns.
-  // Not as strong as WarCry, but more reliable and defensive.
-
-  IronAdvance = "IronAdvance",
-  // ACTIVE — Ultimate-ish.
-  // Knight marches forward through enemies with unstoppable momentum.
-  // Cannot be interrupted; takes reduced damage during movement;
-  // knocks back or disrupts enemies in path.
-  // Perfect for frontline initiation or breaking clusters.
-
-  ArmoredMastery = "ArmoredMastery",
-  // PASSIVE — Knight takes reduced damage from physical hits
-  // AND gains small offense when wearing heavy armor.
-  // Reinforces the Knight’s bruiser identity: durable + damaging.
+  // Uncommon
+  // Require sword, spear
+  // target one frontfirst
+  // Thrust the sword or spear right at one enemy dealing ((weapon damage + Str mod) * (1 + 0.1 * skill level)) * (positionModifier) pierce damage. with addtional +3 hit roll
+  // If enemy has any debuff, crit change + 2 (4 at level 5).
+  // consume 2 neutral, produce fire 
 }
 
 export enum GuardianSkillId {
