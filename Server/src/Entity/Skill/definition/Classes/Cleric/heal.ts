@@ -66,7 +66,7 @@ export const heal = new ClericSkill({
     }
 
     // Prefer injured allies, but can target any ally
-    const target = getTarget(actor, actorParty).with('least', 'currentHPPercentage').one();
+    const target = getTarget(actor, actorParty, targetParty, "ally").with('least', 'currentHPPercentage').one();
     if (!target) {
       return {
         content: {

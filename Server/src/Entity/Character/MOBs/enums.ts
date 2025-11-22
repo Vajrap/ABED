@@ -8,7 +8,6 @@ export enum MOBs {
   
   // Humans
   humanWarrior = "humanWarrior",
-  humanRanger = "humanRanger",
   humanMage = "humanMage",
   humanCleric = "humanCleric",
   humanPaladin = "humanPaladin",
@@ -17,6 +16,7 @@ export enum MOBs {
   humanSorcerer = "humanSorcerer",
   humanRogue = "humanRogue",
   humanDruid = "humanDruid",
+  
   
   // Elves
   elvenWarrior = "elvenWarrior",

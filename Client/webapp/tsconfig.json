@@ -19,6 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "types": ["bun-types"],
 
     /* Path mapping for clean imports */
     "baseUrl": "./src",
@@ -34,6 +35,6 @@
       "@/types/*": ["types/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "server.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

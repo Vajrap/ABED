@@ -18,8 +18,8 @@ export const hexOfRot = new ShamanSkill({
     th: "คำสาปเน่าเปื่อย",
   },
   description: {
-    en: "Calls upon restless spirits to curse a foe. Deals 1d4 Chaos damage + planar mod + 0.5 * skill level. Target hit must roll DC10 willpower saves or get hexed: Endurance reduced by 2 points for 2 turns.",
-    th: "เรียกวิญญาณที่ไม่สงบมาสาปแช่งศัตรู สร้างความเสียหาย Chaos 1d4 + ค่า planar + 0.5 * เลเวลสกิล เป้าหมายที่โดนต้องทอย DC10 willpower saves หรือจะถูกสาป: Endurance ลดลง 2 หน่วยเป็นเวลา 2 เทิร์น",
+    en: "Calls upon restless spirits to curse a foe. Deals 1d4 Chaos damage + planar mod + 0.5 * skill level. Target hit must roll DC10 + control mod willpower saves or get hexed: Endurance reduced by 2 points for 2 turns.",
+    th: "เรียกวิญญาณที่ไม่สงบมาสาปแช่งศัตรู สร้างความเสียหาย Chaos 1d4 + ค่า planar + 0.5 * เลเวลสกิล เป้าหมายที่โดนต้องทอย DC10 + control mod willpower saves หรือจะถูกสาป: Endurance ลดลง 2 หน่วยเป็นเวลา 2 เทิร์น",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -54,7 +54,7 @@ export const hexOfRot = new ShamanSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const target = getTarget(actor, targetParty).one();
+    const target = getTarget(actor, actorParty, targetParty, "enemy").one();
 
     if (!target) {
       return {
@@ -72,6 +72,7 @@ export const hexOfRot = new ShamanSkill({
 
     // Calculate damage
     const planarMod = statMod(actor.attribute.getTotal("planar"));
+    const controlMod = statMod(actor.attribute.getTotal("control"));
     const damageRoll = roll(1).d(4).total;
     const totalDamage = damageRoll + planarMod + 0.5 * skillLevel;
 
@@ -80,14 +81,16 @@ export const hexOfRot = new ShamanSkill({
       hit: 999, // Auto-hit spell
       crit: 0,
       type: DamageType.chaos,
+      isMagic: true,
     };
 
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
 
-    // Check for hex debuff (DC 10 willpower save)
+    // Check for hex debuff (DC10 + control mod willpower save)
     let hexMessage = "";
+    const hexDC = 10 + controlMod;
     const willpowerSave = rollTwenty().total;
-    if (willpowerSave < 10 + statMod(target.attribute.getTotal("willpower"))) {
+    if (willpowerSave < hexDC + statMod(target.attribute.getTotal("willpower"))) {
       // Target fails save - reduce endurance (TODO: implement endurance debuff)
       hexMessage = ` ${target.name.en} was hexed! Endurance reduced by 2 (not yet implemented)`;
       buffsAndDebuffsRepository.hexed.appender(target, 1, false, 0);

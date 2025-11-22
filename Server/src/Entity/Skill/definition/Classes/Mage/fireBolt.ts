@@ -51,7 +51,7 @@ export const fireBolt = new MageSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const target = getTarget(actor, targetParty).one();
+    const target = getTarget(actor, actorParty, targetParty, "enemy").one();
 
     if (!target) {
       return {
@@ -94,6 +94,7 @@ export const fireBolt = new MageSkill({
       hit: rollTwenty().total + hitBonus, // DC 13 base
       crit: rollTwenty().total + critBonus,
       type: DamageType.fire,
+      isMagic: true,
     };
 
     const totalDamageResult = resolveDamage(

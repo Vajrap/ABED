@@ -60,7 +60,7 @@ export const cleave = new WarriorSkill({
     location: LocationsEnum,
   ) => {
     // Get all targets in front row (front prefer)
-    const targets = getTarget(actor, targetParty).from("frontFirst").all();
+    const targets = getTarget(actor, actorParty, targetParty, "enemy").from("frontFirst").all();
 
     if (!targets || targets.length === 0) {
       return {

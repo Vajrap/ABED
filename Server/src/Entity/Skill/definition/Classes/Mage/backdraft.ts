@@ -45,7 +45,7 @@ export const backdraft = new MageSkill({
     location: LocationsEnum,
   ) => {
     // Find all targets with burn debuff
-    const targetsWithBurn = getTarget(actor, targetParty)
+    const targetsWithBurn = getTarget(actor, actorParty, targetParty, "enemy")
       .withDebuff(DebuffEnum.burn)
       .all();
 
@@ -80,6 +80,7 @@ export const backdraft = new MageSkill({
           hit: 999,
           crit: 0,
           type: DamageType.fire,
+          isMagic: true,
         };
 
         const totalDamageResult = resolveDamage(

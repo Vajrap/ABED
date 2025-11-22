@@ -286,7 +286,7 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     attribute: makeAttribute({
       charisma: scaleByDifficulty(4, difficulty),
       luck: scaleByDifficulty(6, difficulty),
-      intelligence: scaleByDifficulty(8, difficulty),
+      intelligence: scaleByDifficulty(10, difficulty),
       leadership: scaleByDifficulty(3, difficulty),
       vitality: scaleByDifficulty(5, difficulty),
       willpower: scaleByDifficulty(7, difficulty),

@@ -45,7 +45,7 @@ export const earthshatter = new BarbarianSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    const targets = getTarget(actor, targetParty).from("frontFirst").all();
+    const targets = getTarget(actor, actorParty, targetParty, "enemy").from("frontFirst").all();
 
     if (!targets || targets.length === 0) {
       return {

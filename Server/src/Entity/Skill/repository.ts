@@ -1,5 +1,5 @@
 import { basicAttack } from "./definition/basicAttack";
-import { BarbarianSkillId, BasicSkillId, ClericSkillId, GuardianSkillId, KnightSkillId, MageSkillId, MobSkillId, MysticSkillId, PaladinSkillId, RogueSkillId, ScholarSkillId, ShamanSkillId, SkillId, SpellBladeSkillId, WarriorSkillId, WitchSkillId } from "./enums";
+import { BarbarianSkillId, BasicSkillId, ClericSkillId, GuardianSkillId, KnightSkillId, MageSkillId, MobSkillId, MysticSkillId, PaladinSkillId, DruidSkillId, MonkSkillId, RogueSkillId, ScholarSkillId, ShamanSkillId, SkillId, SpellBladeSkillId, WarriorSkillId, WitchSkillId, WarlockSkillId, DuelistSkillId, InquisitorSkillId } from "./enums";
 import type { Skill } from "./Skill";
 import {shriek} from "src/Entity/Skill/definition/MOBs/Goblin/shriek.ts";
 import {throwPebble} from "src/Entity/Skill/definition/MOBs/Goblin/throwPebble.ts";
@@ -48,6 +48,33 @@ import { edgeBurst } from "./definition/Classes/SpellBlade/edgeBurst";
 import { rage } from "./definition/Classes/Barbarian/rage";
 import { recklessSwing } from "./definition/Classes/Barbarian/recklessSwing";
 import { earthshatter } from "./definition/Classes/Barbarian/earthshatter";
+import { precisionThrust } from "./definition/Classes/Knight/precisionThrust";
+import { advancingPaceSkill } from "./definition/Classes/Knight/advancingPace";
+import { divineStrike } from "./definition/Classes/Paladin/divineStrike";
+import { aegisPulse } from "./definition/Classes/Paladin/aegisPulse";
+import { aegisShield } from "./definition/Classes/Paladin/aegisShield";
+import { vineWhip } from "./definition/Classes/Druid/vineWhip";
+import { throwSpear } from "./definition/Classes/Druid/throwSpear";
+import { rejuvenatingMist } from "./definition/Classes/Druid/rejuvenatingMist";
+import { palmStrike } from "./definition/Classes/Monk/palmStrike";
+import { meditation } from "./definition/Classes/Monk/meditation";
+import { flurryOfBlows } from "./definition/Classes/Monk/flurryOfBlows";
+import { shadowBolt } from "./definition/Classes/Warlock/shadowBolt";
+import { lifeDrain } from "./definition/Classes/Warlock/lifeDrain";
+import { darkPact } from "./definition/Classes/Warlock/darkPact";
+import { corruption } from "./definition/Classes/Warlock/corruption";
+import { preciseStrike } from "./definition/Classes/Duelist/preciseStrike";
+import { parryRiposte } from "./definition/Classes/Duelist/parryRiposte";
+import { bladeFlurry } from "./definition/Classes/Duelist/bladeFlurry";
+import { duelingStance } from "./definition/Classes/Duelist/duelingStance";
+import { curseBolt } from "./definition/Classes/Witch/curseBolt";
+import { curseMark } from "./definition/Classes/Witch/curseMark";
+import { hexDoll } from "./definition/Classes/Witch/hexDoll";
+import { bewitch } from "./definition/Classes/Witch/bewitch";
+import { radiantSmite } from "./definition/Classes/Inquisitor/radiantSmite";
+import { exposeWeakness } from "./definition/Classes/Inquisitor/exposeWeakness";
+import { judgmentDay } from "./definition/Classes/Inquisitor/judgmentDay";
+import { purgeMagic } from "./definition/Classes/Inquisitor/purgeMagic";
 
 export const skillRepository: Record<SkillId, Skill> = {
     [BasicSkillId.Basic]: basicAttack,
@@ -91,6 +118,8 @@ export const skillRepository: Record<SkillId, Skill> = {
     [MysticSkillId.PlanarAbsorption]: planarAbsorption,
     [MysticSkillId.InnerVeil]: innerVeil,
     [MysticSkillId.ReversalPalm]: reversalPalm,
+    [MysticSkillId.Serenity]: undefined as any,
+    [MysticSkillId.FluidMotion]: undefined as any,
     [SpellBladeSkillId.PlanarEdge]: planarEdge,
     [SpellBladeSkillId.WindSlash]: windSlash,
     [SpellBladeSkillId.SpellParry]: spellParry,
@@ -98,55 +127,33 @@ export const skillRepository: Record<SkillId, Skill> = {
     [BarbarianSkillId.Rage]: rage,
     [BarbarianSkillId.RecklessSwing]: recklessSwing,
     [BarbarianSkillId.Earthshatter]: earthshatter,
-    [KnightSkillId.GuardStance]: undefined,
-    [KnightSkillId.ShieldBash]: undefined,
-    [KnightSkillId.PrecisionThrust]: undefined,
-    [KnightSkillId.RallyingCall]: undefined,
-    [KnightSkillId.IronAdvance]: undefined,
-    [KnightSkillId.ArmoredMastery]: undefined,
-    [GuardianSkillId.IronWall]: undefined,
-    [GuardianSkillId.ProtectAlly]: undefined,
-    [GuardianSkillId.Sentinel]: undefined,
-    [PaladinSkillId.DivineStrike]: undefined,
-    [PaladinSkillId.HolyAegis]: undefined,
-    [PaladinSkillId.Judgment]: undefined,
-    [PaladinSkillId.PurifyingWave]: undefined,
-    [PaladinSkillId.RadiantCharge]: undefined,
-    [PaladinSkillId.RighteousGuard]: undefined,
-    [DruidSkillId.VineWhip]: undefined,
-    [DruidSkillId.Regrowth]: undefined,
-    [DruidSkillId.EntanglingRoots]: undefined,
-    [DruidSkillId.ThornShield]: undefined,
-    [DruidSkillId.WildShape]: undefined,
-    [DruidSkillId.NatureBond]: undefined,
-    [MonkSkillId.PalmStrike]: undefined,
-    [MonkSkillId.Meditation]: undefined,
-    [MonkSkillId.CounterStance]: undefined,
-    [MonkSkillId.ChiBurst]: undefined,
-    [MonkSkillId.InnerHarmony]: undefined,
-    [MonkSkillId.MartialDiscipline]: undefined,
-    [WarlockSkillId.ShadowBolt]: undefined,
-    [WarlockSkillId.LifeDrain]: undefined,
-    [WarlockSkillId.SoulTether]: undefined,
-    [WarlockSkillId.GloomField]: undefined,
-    [WarlockSkillId.DarkPact]: undefined,
-    [WarlockSkillId.ForbiddenKnowledge]: undefined,
-    [RangerSkillId.AimedShot]: undefined,
-    [RangerSkillId.TwinArrows]: undefined,
-    [RangerSkillId.TripwireTrap]: undefined,
-    [RangerSkillId.HunterMark]: undefined,
-    [RangerSkillId.VolleyRain]: undefined,
-    [RangerSkillId.TrackerInstinct]: undefined,
-    [WitchSkillId.CurseMark]: undefined,
-    [WitchSkillId.PoisonMist]: undefined,
-    [WitchSkillId.HexDoll]: undefined,
-    [WitchSkillId.Bewitch]: undefined,
-    [WitchSkillId.RitualCircle]: undefined,
-    [WitchSkillId.Malice]: undefined,
-    [InquisitorSkillId.RadiantSmite]: undefined,
-    [InquisitorSkillId.ExposeWeakness]: undefined,
-    [InquisitorSkillId.PurgeMagic]: undefined,
-    [InquisitorSkillId.TruthSentence]: undefined,
-    [InquisitorSkillId.JudgmentDay]: undefined,
-    [InquisitorSkillId.Zeal]: undefined
+    [KnightSkillId.PrecisionThrust]: precisionThrust,
+    [KnightSkillId.AdvancingPace]: advancingPaceSkill,
+    [PaladinSkillId.DivineStrike]: divineStrike,
+    [PaladinSkillId.AegisPulse]: aegisPulse,
+    [PaladinSkillId.AegisShield]: aegisShield,
+    [DruidSkillId.VineWhip]: vineWhip,
+    [DruidSkillId.ThrowSpear]: throwSpear,
+    [DruidSkillId.RejuvenatingMist]: rejuvenatingMist,
+    [MonkSkillId.PalmStrike]: palmStrike,
+    [MonkSkillId.Meditation]: meditation,
+    [MonkSkillId.FlurryOfBlows]: flurryOfBlows,
+    [WarlockSkillId.ShadowBolt]: shadowBolt,
+    [WarlockSkillId.LifeDrain]: lifeDrain,
+    [WarlockSkillId.Corruption]: corruption,
+    [WarlockSkillId.DarkPact]: darkPact,
+    [DuelistSkillId.PreciseStrike]: preciseStrike,
+    [DuelistSkillId.ParryRiposte]: parryRiposte,
+    [DuelistSkillId.BladeFlurry]: bladeFlurry,
+    [DuelistSkillId.DuelingStance]: duelingStance,
+    [WitchSkillId.CurseBolt]: curseBolt,
+    [WitchSkillId.CurseMark]: curseMark,
+    [WitchSkillId.HexDoll]: hexDoll,
+    [WitchSkillId.Bewitch]: bewitch,
+    [InquisitorSkillId.RadiantSmite]: radiantSmite,
+    [InquisitorSkillId.ExposeWeakness]: exposeWeakness,
+    [InquisitorSkillId.PurgeMagic]: purgeMagic,
+    [InquisitorSkillId.JudgmentDay]: judgmentDay,
 };
+
+// TODO: Seer, Nomad, Engineer

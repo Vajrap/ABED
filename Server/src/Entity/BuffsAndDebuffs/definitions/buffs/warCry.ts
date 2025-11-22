@@ -2,6 +2,7 @@ import type { Character } from "src/Entity/Character/Character";
 import { BuffDef } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
+import { statMod } from "src/Utils/statMod";
 
 export const warCry = new BuffDef({
   name: {
@@ -20,23 +21,37 @@ export const warCry = new BuffDef({
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.warCry, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
+        permValue: permValue, // permValue stores buff strength (2 + leadership mod/2)
       });
-      // War Cry gives +2 agility and +2 strength
-      actor.attribute.mutateBattle("agility", 2);
-      actor.attribute.mutateBattle("strength", 2);
+      // War Cry gives +agility and +strength based on permValue (buff strength)
+      const buffStrength = permValue > 0 ? permValue : 2; // Default to 2 if not set
+      actor.attribute.mutateBattle("agility", buffStrength);
+      actor.attribute.mutateBattle("strength", buffStrength);
       isFirst = true;
     } else {
       if (!entry.isPerm && isPerm) {
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue += permValue;
+      // Keep the highest permValue (buff strength) when stacking
+      if (permValue > entry.permValue) {
+        const oldStrength = entry.permValue > 0 ? entry.permValue : 2;
+        const newStrength = permValue;
+        // Adjust stat bonuses if strength changed: remove old, add new
+        if (newStrength !== oldStrength) {
+          actor.attribute.mutateBattle("agility", -oldStrength); // Remove old
+          actor.attribute.mutateBattle("strength", -oldStrength);
+          actor.attribute.mutateBattle("agility", newStrength); // Add new
+          actor.attribute.mutateBattle("strength", newStrength);
+        }
+        entry.permValue = permValue;
+      }
     }
 
+    const buffStrength = permValue > 0 ? permValue : 2;
     return {
-      en: `${actor.name.en} is emboldened by War Cry! +2 agility, +2 strength`,
-      th: `${actor.name.th} ได้รับกำลังใจจากเสียงร้องศึก! +2 agility, +2 strength`,
+      en: `${actor.name.en} is emboldened by War Cry! +${buffStrength} agility, +${buffStrength} strength`,
+      th: `${actor.name.th} ได้รับกำลังใจจากเสียงร้องศึก! +${buffStrength} agility, +${buffStrength} strength`,
     };
   },
 
@@ -46,10 +61,13 @@ export const warCry = new BuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
-        // Remove stat bonuses
-        actor.attribute.mutateBattle("agility", -2);
-        actor.attribute.mutateBattle("strength", -2);
+      }
+      // When duration expires, remove stat bonuses and delete buff
+      if (entry.value === 0) {
+        // Remove stat bonuses based on the buff strength stored in permValue
+        const buffStrength = entry.permValue > 0 ? entry.permValue : 2;
+        actor.attribute.mutateBattle("agility", -buffStrength);
+        actor.attribute.mutateBattle("strength", -buffStrength);
         actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.warCry);
         isRemoved = true;
       }

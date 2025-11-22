@@ -5,6 +5,7 @@ import { authRoutes } from "./auth";
 import { characterRoutes } from "./character";
 import { partyRoutes } from "./party";
 import { networkTestRoutes } from "./networkTest";
+import { playgroundRoutes } from "../playground/api";
 
 // Main API router that combines all API routes
 export const apiRoutes = express.Router();
@@ -16,3 +17,4 @@ apiRoutes.use("/auth", authRoutes);
 apiRoutes.use("/character", characterRoutes);
 apiRoutes.use("/party", partyRoutes);
 apiRoutes.use("/network-test", networkTestRoutes);
+apiRoutes.use("/playground", playgroundRoutes);

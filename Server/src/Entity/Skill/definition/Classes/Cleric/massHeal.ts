@@ -14,8 +14,8 @@ export const massHeal = new ClericSkill({
     th: "รักษาหมู่",
   },
   description: {
-    en: "Restore all living allies for 1d6 + willpower modifier + skill level HP. At level 4+, also removes one random debuff from each healed ally.",
-    th: "ฟื้นฟูเพื่อนร่วมทีมทุกคนที่ยังมีชีวิต 1d6 + ค่าต้านทานจิต (willpower) + เลเวลสกิล และเมื่อเลเวลสกิล 4 ขึ้นไปจะชำระล้างดีบัฟแบบสุ่ม 1 ชนิดต่อพันธมิตรที่รักษาได้",
+    en: "Restore all living allies for 1d6 + (willpower modifier + charisma modifier)/2 + skill level HP. At level 4+, also removes one random debuff from each healed ally.",
+    th: "ฟื้นฟูเพื่อนร่วมทีมทุกคนที่ยังมีชีวิต 1d6 + ค่าต้านทานจิต (willpower) + charisma + เลเวลสกิล และเมื่อเลเวลสกิล 4 ขึ้นไปจะชำระล้างดีบัฟแบบสุ่ม 1 ชนิดต่อพันธมิตรที่รักษาได้",
   },
   requirement: {},
   equipmentNeeded: [],
@@ -59,13 +59,16 @@ export const massHeal = new ClericSkill({
     }
 
     const willpowerMod = statMod(actor.attribute.getTotal("willpower"));
+    const charismaMod = statMod(actor.attribute.getTotal("charisma"));
+    const totalMod = (willpowerMod + charismaMod)/2;
     const removedDebuffMessages: string[] = [];
     const targetEffects: { actorId: string; effect: TargetEffect[] }[] = [];
 
     for (const ally of livingAllies) {
+      // Healing effectiveness enhanced by charisma (inspiring presence)
       const healAmount = Math.max(
         1,
-        roll(1).d(6).total + willpowerMod + skillLevel,
+        roll(1).d(6).total + totalMod + skillLevel,
       );
       const before = ally.vitals.hp.current;
       ally.vitals.incHp(healAmount);

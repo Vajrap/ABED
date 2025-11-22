@@ -29,7 +29,7 @@ export const arcaneBolt = new MageSkill({
     elements: [{ element: "neutral", min: 1, max: 1 }],
   },
   exec: (actor: Character, _ally: Character[], enemies: Character[], skillLevel: number, location: LocationsEnum) => {
-    const target = getTarget(actor, enemies).one();
+    const target = getTarget(actor, _ally, enemies, "enemy").one();
     if (!target) {
       return {
         content: { en: `${actor.name.en} tried to cast Arcane Bolt but has no target`, th: `${actor.name.th} พยายามใช้ลูกเวทมนตร์แต่ไม่พบเป้าหมาย` },

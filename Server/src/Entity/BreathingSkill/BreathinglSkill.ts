@@ -41,6 +41,7 @@ export class BreathingSkill {
         selfId: string,
         attackerId: string,
         skillLevel: number,
+        damageObj: {damage: number, hit: number, crit: number}
       ) => void;
       takingTurn: (selfId: string, skillLevel: number) => void;
     };

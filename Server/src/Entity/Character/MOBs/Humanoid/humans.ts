@@ -1,7 +1,7 @@
 import { Character } from "src/Entity/Character/Character.ts";
 import { MOBs } from "src/Entity/Character/MOBs/enums.ts";
 import { CharacterNeeds } from "src/Entity/Character/Subclass/Needs/CharacterNeeds.ts";
-import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums.ts";
+import { CharacterEquipmentSlot, CharacterType } from "src/InterFacesEnumsAndTypes/Enums.ts";
 import {
   CharacterVitals,
   Vital,
@@ -18,7 +18,9 @@ import { defaultSaveRoll } from "src/Utils/CharacterDefaultSaveRoll";
 import { RaceEnum } from "src/InterFacesEnumsAndTypes/Enums";
 import { RACE_ATTRIBUTES } from "../../RaceAttributes";
 import { equipMOB } from "../equipmentHelpers";
-import { GuardianSkillId } from "src/Entity/Skill/enums";
+import { BarbarianSkillId, ClericSkillId, DruidSkillId, DuelistSkillId, GuardianSkillId, PaladinSkillId, WarlockSkillId, WarriorSkillId } from "src/Entity/Skill/enums";
+import { equipDirect } from "src/Entity/Item/Equipment/equipDirect";
+import { BladeId, BodyId, HammerId, ShieldId, SpearId } from "src/Entity/Item";
 
 // Base Human attributes
 const baseHumanAttrs = RACE_ATTRIBUTES[RaceEnum.Human].attributes;
@@ -82,137 +84,15 @@ export function humanWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.race = RaceEnum.Human;
 
-  // TODO: Active skills
-  // - Cleave: Wide area melee attack, deals 1d8+STR to all enemies in front
-  // - Taunt: Forces enemies to target this character for 2 turns
-  // - Bash: Heavy strike, deals 1d10+STR damage, chance to stun
   character.activeSkills = [
-    {id: GuardianSkillId.Taunt, level: 1, exp: 0} 
+    {id: WarriorSkillId.WarCry, level: 1, exp: 0},
+    {id: WarriorSkillId.PowerStrike, level: 1, exp: 0},
   ];
-
-  // TODO: Conditional skills (when HP < 30%)
-  // - Shield Up: Raises defense significantly for 3 turns
-  // - Last Stand: When near death, gains damage reduction and counter-attack
-  character.conditionalSkills = [];
-
-  character.conditionalSkillsCondition = new DeckCondition({
-    selectedCondition: "SELF",
-    self: {
-      hp: {
-        min: 0,
-        max: character.vitals.hp.max * 0.3,
-      },
-      mp: {
-        min: 0,
-        max: character.vitals.mp.max,
-      },
-      sp: {
-        min: 0,
-        max: character.vitals.sp.max,
-      },
-    },
-  });
 
   character.race = RaceEnum.Human;
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
-
-  return character;
-}
-
-export function humanRanger(difficulty: 1 | 2 | 3 | 4 | 5) {
-  const hp = scaleByDifficulty(18, difficulty);
-  const mp = scaleByDifficulty(8, difficulty);
-  const sp = scaleByDifficulty(30, difficulty);
-
-  const character = new Character({
-    actionSequence: defaultActionSequence(),
-    alignment: new CharacterAlignment({}),
-    artisans: new CharacterArtisans({}),
-    attribute: makeAttribute({
-      charisma: scaleByDifficulty(baseHumanAttrs.charisma, difficulty),
-      luck: scaleByDifficulty(baseHumanAttrs.luck + 2, difficulty),
-      intelligence: scaleByDifficulty(baseHumanAttrs.intelligence + 1, difficulty),
-      leadership: scaleByDifficulty(baseHumanAttrs.leadership, difficulty),
-      vitality: scaleByDifficulty(baseHumanAttrs.vitality + 1, difficulty),
-      willpower: scaleByDifficulty(baseHumanAttrs.willpower, difficulty),
-      planar: scaleByDifficulty(baseHumanAttrs.planar, difficulty),
-      control: scaleByDifficulty(baseHumanAttrs.control + 1, difficulty),
-      dexterity: scaleByDifficulty(baseHumanAttrs.dexterity + 3, difficulty),
-      agility: scaleByDifficulty(baseHumanAttrs.agility + 2, difficulty),
-      strength: scaleByDifficulty(baseHumanAttrs.strength + 1, difficulty),
-      endurance: scaleByDifficulty(baseHumanAttrs.endurance + 1, difficulty),
-    }),
-    battleStats: new CharacterBattleStats(),
-    elements: new CharacterElements(),
-    fame: new CharacterFame(),
-    id: `${MOBs.humanRanger}_${Bun.randomUUIDv7()}`,
-    level: difficulty,
-    name: {
-      en: "Human Ranger",
-      th: "นักล่ามนุษย์",
-    },
-    needs: new CharacterNeeds(),
-    proficiencies: makeProficiencies({
-      bareHand: scaleByDifficulty(4, difficulty),
-      dagger: scaleByDifficulty(8, difficulty),
-      sword: scaleByDifficulty(7, difficulty),
-      blade: scaleByDifficulty(6, difficulty),
-      axe: scaleByDifficulty(5, difficulty),
-      hammer: scaleByDifficulty(3, difficulty),
-      spear: scaleByDifficulty(6, difficulty),
-      bow: scaleByDifficulty(10, difficulty),
-      wand: scaleByDifficulty(2, difficulty),
-      staff: scaleByDifficulty(3, difficulty),
-      book: scaleByDifficulty(2, difficulty),
-      orb: scaleByDifficulty(2, difficulty),
-      shield: scaleByDifficulty(5, difficulty),
-    }),
-    saveRolls: defaultSaveRoll,
-    type: CharacterType.humanoid,
-    vitals: new CharacterVitals({
-      hp: new Vital({ base: hp }),
-      mp: new Vital({ base: mp }),
-      sp: new Vital({ base: sp }),
-    }),
-  });
-
-  character.race = RaceEnum.Human;
-
-  // TODO: Active skills
-  // - Multi-Shot: Fires multiple arrows, deals 1d6+DEX to 2-3 random enemies
-  // - Tracking Shot: Marks target, next attack has increased crit chance
-  // - Nature's Call: Summons animal companion for 3 turns
-  character.activeSkills = [];
-
-  // TODO: Conditional skills (when enemy HP < 50%)
-  // - Finish Shot: High damage single target, deals 2d8+DEX
-  // - Escape: Disengages and moves to backline
-  character.conditionalSkills = [];
-
-  character.conditionalSkillsCondition = new DeckCondition({
-    selectedCondition: "ENEMY",
-    enemy: {
-      hp: {
-        min: 0,
-        max: 100,
-      },
-      mp: {
-        min: 0,
-        max: 100,
-      },
-      sp: {
-        min: 0,
-        max: 100,
-      },
-    },
-  });
-
-  character.race = RaceEnum.Human;
-
-  // Equip weapon and armor based on difficulty
-  equipMOB(character, "Ranger", difficulty);
 
   return character;
 }
@@ -376,33 +256,10 @@ export function humanCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
   // - Heal: Restores 2d6+WIL HP to target ally
   // - Bless: Grants +2 to all stats for 3 turns to party
   // - Smite: Deals 1d8+WIL holy damage to enemy
-  character.activeSkills = [];
-
-  // TODO: Conditional skills (when ally HP < 50%)
-  // - Mass Heal: Restores HP to all allies
-  // - Revive: Brings fallen ally back with 25% HP
-  character.conditionalSkills = [];
-
-  character.conditionalSkillsCondition = new DeckCondition({
-    selectedCondition: "TEAMMATE",
-    teammate: {
-      position: [0, 1, 2, 3, 4, 5],
-      vital: {
-        hp: {
-          min: 0,
-          max: 100,
-        },
-        mp: {
-          min: 0,
-          max: 100,
-        },
-        sp: {
-          min: 0,
-          max: 100,
-        },
-      },
-    },
-  });
+  character.activeSkills = [
+    {id: ClericSkillId.Bless, level: 1, exp: 0},
+    {id: ClericSkillId.Heal, level: 1, exp: 0},
+  ];
 
   character.race = RaceEnum.Human;
 
@@ -475,35 +332,17 @@ export function humanPaladin(difficulty: 1 | 2 | 3 | 4 | 5) {
   // - Holy Strike: Deals 1d10+STR+WIL holy damage, heals self for 50% of damage
   // - Aura of Protection: Grants damage reduction to all allies for 3 turns
   // - Lay on Hands: Heals target ally for 2d8+WIL HP
-  character.activeSkills = [];
-
-  // TODO: Conditional skills (when HP < 40%)
-  // - Divine Shield: Becomes invulnerable for 1 turn
-  // - Retribution: Counter-attacks when hit, deals holy damage
-  character.conditionalSkills = [];
-
-  character.conditionalSkillsCondition = new DeckCondition({
-    selectedCondition: "SELF",
-    self: {
-      hp: {
-        min: 0,
-        max: character.vitals.hp.max * 0.4,
-      },
-      mp: {
-        min: 0,
-        max: character.vitals.mp.max,
-      },
-      sp: {
-        min: 0,
-        max: character.vitals.sp.max,
-      },
-    },
-  });
+  character.activeSkills = [
+    {id: PaladinSkillId.AegisPulse, level: 1, exp: 0},
+    {id: PaladinSkillId.AegisShield, level: 1, exp: 0},
+    {id: ClericSkillId.Radiance, level: 1, exp: 0},
+  ];
 
   character.race = RaceEnum.Human;
 
   // Equip weapon and armor based on difficulty
-  equipMOB(character, "Paladin", difficulty);
+  equipDirect(character, HammerId.Scepter, CharacterEquipmentSlot.rightHand);
+  equipDirect(character, BodyId.ChainShirt, CharacterEquipmentSlot.body);
 
   return character;
 }
@@ -667,30 +506,10 @@ export function humanBarbarian(difficulty: 1 | 2 | 3 | 4 | 5) {
   // - Rage: Increases damage by 50% and reduces defense by 25% for 3 turns
   // - Reckless Attack: Deals 2d8+STR damage but takes 1d4 damage in return
   // - Intimidating Shout: Reduces enemy attack by 2 for 2 turns
-  character.activeSkills = [];
-
-  // TODO: Conditional skills (when HP < 50%)
-  // - Berserker Rage: When enraged, deals 3d6+STR damage, ignores pain
-  // - Last Breath: When near death, gains massive damage boost for 1 turn
-  character.conditionalSkills = [];
-
-  character.conditionalSkillsCondition = new DeckCondition({
-    selectedCondition: "SELF",
-    self: {
-      hp: {
-        min: 0,
-        max: character.vitals.hp.max * 0.5,
-      },
-      mp: {
-        min: 0,
-        max: character.vitals.mp.max,
-      },
-      sp: {
-        min: 0,
-        max: character.vitals.sp.max,
-      },
-    },
-  });
+  character.activeSkills = [
+    {id: BarbarianSkillId.RecklessSwing, level: 1, exp: 0},
+    {id: BarbarianSkillId.Rage, level: 1, exp: 0},
+  ];  
 
   character.race = RaceEnum.Human;
 
@@ -951,43 +770,162 @@ export function humanDruid(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.race = RaceEnum.Human;
 
-  // TODO: Active skills
-  // - Entangle: Roots enemy in place for 2 turns, deals 1d6 nature damage
-  // - Healing Bloom: Restores 1d8+WIL HP to all allies over 3 turns
-  // - Wild Shape: Transforms into bear, gains +3 STR and +2 END for 4 turns
-  character.activeSkills = [];
-
-  // TODO: Conditional skills (when ally HP < 50%)
-  // - Nature's Embrace: Massive heal to lowest HP ally, 3d10+WIL
-  // - Call of the Wild: Summons 2-3 animal companions to fight
-  character.conditionalSkills = [];
-
-  character.conditionalSkillsCondition = new DeckCondition({
-    selectedCondition: "TEAMMATE",
-    teammate: {
-      position: [0, 1, 2, 3, 4, 5],
-      vital: {
-        hp: {
-          min: 0,
-          max: 100,
-        },
-        mp: {
-          min: 0,
-          max: 100,
-        },
-        sp: {
-          min: 0,
-          max: 100,
-        },
-      },
-    },
-  });
+  character.activeSkills = [
+    {id: DruidSkillId.ThrowSpear, level: 1, exp: 0},
+    {id: DruidSkillId.VineWhip, level: 1, exp: 0},
+  ];
 
   character.race = RaceEnum.Human;
 
   // Equip weapon and armor based on difficulty
-  equipMOB(character, "Druid", difficulty);
-
+  equipDirect(character, SpearId.Javelin, CharacterEquipmentSlot.rightHand);
+  equipDirect(character, BodyId.PaddedArmor, CharacterEquipmentSlot.body);
   return character;
 }
 
+export function humanDuelist(difficulty: 1 | 2 | 3 | 4 | 5) {
+  const hp = scaleByDifficulty(16, difficulty);
+  const mp = scaleByDifficulty(6, difficulty);
+  const sp = scaleByDifficulty(32, difficulty);
+
+  const character = new Character({
+    actionSequence: defaultActionSequence(),
+    alignment: new CharacterAlignment({}),
+    artisans: new CharacterArtisans({}),
+    attribute: makeAttribute({
+      charisma: scaleByDifficulty(baseHumanAttrs.charisma + 1, difficulty),
+      luck: scaleByDifficulty(baseHumanAttrs.luck + 1, difficulty),
+      intelligence: scaleByDifficulty(baseHumanAttrs.intelligence + 2, difficulty),
+      leadership: scaleByDifficulty(baseHumanAttrs.leadership, difficulty),
+      vitality: scaleByDifficulty(baseHumanAttrs.vitality + 2, difficulty),
+      willpower: scaleByDifficulty(baseHumanAttrs.willpower + 2, difficulty),
+      planar: scaleByDifficulty(baseHumanAttrs.planar + 2, difficulty),
+      control: scaleByDifficulty(baseHumanAttrs.control + 2, difficulty),
+      dexterity: scaleByDifficulty(baseHumanAttrs.dexterity + 1, difficulty),
+      agility: scaleByDifficulty(baseHumanAttrs.agility + 1, difficulty),
+      strength: scaleByDifficulty(baseHumanAttrs.strength, difficulty),
+      endurance: scaleByDifficulty(baseHumanAttrs.endurance + 1, difficulty),
+    }),
+    battleStats: new CharacterBattleStats(),
+    elements: new CharacterElements(),
+    fame: new CharacterFame(),
+    id: `_${Bun.randomUUIDv7()}`,
+    level: difficulty,
+    name: {
+      en: "Human Duelist",
+      th: "ดิลิจอินมนุษย์",
+    },
+    needs: new CharacterNeeds(),
+    proficiencies: makeProficiencies({
+      bareHand: scaleByDifficulty(5, difficulty),
+      dagger: scaleByDifficulty(5, difficulty),
+      sword: scaleByDifficulty(4, difficulty),
+      blade: scaleByDifficulty(10, difficulty),
+      axe: scaleByDifficulty(6, difficulty),
+      hammer: scaleByDifficulty(5, difficulty),
+      spear: scaleByDifficulty(6, difficulty),
+      bow: scaleByDifficulty(7, difficulty),
+      wand: scaleByDifficulty(7, difficulty),
+      staff: scaleByDifficulty(9, difficulty),
+      book: scaleByDifficulty(6, difficulty),
+      orb: scaleByDifficulty(6, difficulty),
+      shield: scaleByDifficulty(5, difficulty),
+    }),
+    saveRolls: defaultSaveRoll,
+    type: CharacterType.humanoid,
+    vitals: new CharacterVitals({
+      hp: new Vital({ base: hp }),
+      mp: new Vital({ base: mp }),
+      sp: new Vital({ base: sp }),
+    }),
+  });
+
+  character.race = RaceEnum.Human;
+
+  character.activeSkills = [
+    {id: DuelistSkillId.BladeFlurry, level: 1, exp: 0},
+    {id: DuelistSkillId.ParryRiposte, level: 1, exp: 0},
+    {id: DuelistSkillId.PreciseStrike, level: 1, exp: 0},
+  ];
+
+  character.race = RaceEnum.Human;
+
+  // Equip weapon and armor based on difficulty
+  equipDirect(character, BladeId.Katana, CharacterEquipmentSlot.rightHand);
+  equipDirect(character, BodyId.PaddedArmor, CharacterEquipmentSlot.body);
+  return character;
+}
+
+export function humanGuardian(difficulty: 1 | 2 | 3 | 4 | 5) {
+  const hp = scaleByDifficulty(20, difficulty);
+  const mp = scaleByDifficulty(6, difficulty);
+  const sp = scaleByDifficulty(30, difficulty);
+
+  const character = new Character({
+    actionSequence: defaultActionSequence(),
+    alignment: new CharacterAlignment({}),
+    artisans: new CharacterArtisans({}),
+    attribute: makeAttribute({
+      charisma: scaleByDifficulty(baseHumanAttrs.charisma + 1, difficulty),
+      luck: scaleByDifficulty(baseHumanAttrs.luck + 1, difficulty),
+      intelligence: scaleByDifficulty(baseHumanAttrs.intelligence + 2, difficulty),
+      leadership: scaleByDifficulty(baseHumanAttrs.leadership, difficulty),
+      vitality: scaleByDifficulty(baseHumanAttrs.vitality + 3, difficulty),
+      willpower: scaleByDifficulty(baseHumanAttrs.willpower + 1, difficulty),
+      planar: scaleByDifficulty(baseHumanAttrs.planar + 2, difficulty),
+      control: scaleByDifficulty(baseHumanAttrs.control + 1, difficulty),
+      dexterity: scaleByDifficulty(baseHumanAttrs.dexterity, difficulty),
+      agility: scaleByDifficulty(baseHumanAttrs.agility + 2, difficulty),
+      strength: scaleByDifficulty(baseHumanAttrs.strength + 2, difficulty),
+      endurance: scaleByDifficulty(baseHumanAttrs.endurance + 3, difficulty),
+    }),
+    battleStats: new CharacterBattleStats(),
+    elements: new CharacterElements(),
+    fame: new CharacterFame(),
+    id: `_${Bun.randomUUIDv7()}`,
+    level: difficulty,
+    name: {
+      en: "Human Guardian",
+      th: "ผู้พิทักษ์มนุษย์",
+    },
+    needs: new CharacterNeeds(),
+    proficiencies: makeProficiencies({
+      bareHand: scaleByDifficulty(5, difficulty),
+      dagger: scaleByDifficulty(5, difficulty),
+      sword: scaleByDifficulty(4, difficulty),
+      blade: scaleByDifficulty(10, difficulty),
+      axe: scaleByDifficulty(6, difficulty),
+      hammer: scaleByDifficulty(5, difficulty),
+      spear: scaleByDifficulty(6, difficulty),
+      bow: scaleByDifficulty(7, difficulty),
+      wand: scaleByDifficulty(7, difficulty),
+      staff: scaleByDifficulty(9, difficulty),
+      book: scaleByDifficulty(6, difficulty),
+      orb: scaleByDifficulty(6, difficulty),
+      shield: scaleByDifficulty(5, difficulty),
+    }),
+    saveRolls: defaultSaveRoll,
+    type: CharacterType.humanoid,
+    vitals: new CharacterVitals({
+      hp: new Vital({ base: hp }),
+      mp: new Vital({ base: mp }),
+      sp: new Vital({ base: sp }),
+    }),
+  });
+
+  character.race = RaceEnum.Human;
+
+  character.activeSkills = [
+    {id: WarriorSkillId.Bash, level: 1, exp: 0},
+    {id: GuardianSkillId.ShieldUp, level: 1, exp: 0},
+    {id: GuardianSkillId.Taunt, level: 1, exp: 0},
+  ];
+
+  character.race = RaceEnum.Human;
+
+  // Equip weapon and armor based on difficulty
+  equipDirect(character, ShieldId.Buckler, CharacterEquipmentSlot.leftHand);
+  equipDirect(character, HammerId.Scepter, CharacterEquipmentSlot.rightHand);
+  equipDirect(character, BodyId.ChainShirt, CharacterEquipmentSlot.body);
+  return character;
+}

@@ -31,7 +31,7 @@ export const whip = new Skill({
     elements: [{ element: "chaos", min: 1, max: 1 }],
   },
   exec: (actor: Character, _ally: Character[], enemies: Character[], skillLevel: number, location: LocationsEnum) => {
-    const target = getTarget(actor, enemies).one();
+    const target = getTarget(actor, _ally, enemies, "enemy").one();
     if (!target) {
       return {
         content: { en: `${actor.name.en} tried to whip but has no target`, th: `${actor.name.th} พยายามใช้แส้แต่ไม่พบเป้าหมาย` },

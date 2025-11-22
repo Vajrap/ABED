@@ -36,8 +36,6 @@ export const planarAbsorption = new BuffDef({
   },
 
   resolver: function (actor: Character): { canAct: boolean; content: L10N } {
-    // Planar Absorption doesn't decrease over time, it's consumed when absorbing damage
-    // The damage absorption logic needs to be implemented in damageResolution.ts
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.planarAbsorption);
     if (entry && entry.value === 0 && entry.permValue === 0) {
       actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.planarAbsorption);

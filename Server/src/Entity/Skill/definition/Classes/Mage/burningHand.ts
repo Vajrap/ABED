@@ -56,7 +56,7 @@ export const burningHand = new MageSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const targets = getTarget(actor, targetParty)
+    const targets = getTarget(actor, actorParty, targetParty, "enemy")
       .from("frontFirst")
       .all();
 
@@ -73,7 +73,7 @@ export const burningHand = new MageSkill({
 
     // additional target if skill level is 5 or higher
     if (skillLevel >= 5) {
-      const additionalTarget = getTarget(actor, targetParty).except(targets).one();
+      const additionalTarget = getTarget(actor, actorParty, targetParty, "enemy").except(targets).one();
       if (additionalTarget) {
         targets.push(additionalTarget);
       }
@@ -110,6 +110,7 @@ export const burningHand = new MageSkill({
         hit: rollTwenty().total + hitBonus,
         crit: rollTwenty().total + critBonus,
         type: DamageType.fire,
+        isMagic: true,
       };
 
       const totalDamageResult = resolveDamage(actor.id, target.id, damageOutput, location);

@@ -3,7 +3,6 @@ import { Character } from "src/Entity/Character/Character.ts";
 import { goblinScout, goblinWarrior, goblinMage, goblinCaptain, goblinCleric } from "./goblins";
 import {
   humanWarrior,
-  humanRanger,
   humanMage,
   humanCleric,
   humanPaladin,
@@ -75,7 +74,6 @@ export const mobRepository: Record<
   
   // Humans
   humanWarrior: humanWarrior,
-  humanRanger: humanRanger,
   humanMage: humanMage,
   humanCleric: humanCleric,
   humanPaladin: humanPaladin,

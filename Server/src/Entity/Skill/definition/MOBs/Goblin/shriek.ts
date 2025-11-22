@@ -54,7 +54,7 @@ export const shriek = new Skill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const targets = getTarget(actor, targetParty).all();
+    const targets = getTarget(actor, actorParty, targetParty, "enemy").all();
 
     if (!targets || targets.length === 0) {
       return {

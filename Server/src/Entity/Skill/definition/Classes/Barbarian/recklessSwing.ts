@@ -50,7 +50,7 @@ export const recklessSwing = new BarbarianSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    const target = getTarget(actor, targetParty).from("frontFirst").one();
+    const target = getTarget(actor, actorParty, targetParty, "enemy").from("frontFirst").one();
 
     if (!target) {
       return {

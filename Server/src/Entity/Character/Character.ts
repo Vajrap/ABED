@@ -392,7 +392,17 @@ export class Character {
     if (mode === "adv") rollRes = rollRes.adv();
     if (mode === "dis") rollRes = rollRes.dis();
   
-    return statMod(this.attribute.getTotal(stat)) + rollRes.total;
+    // Luck "lucky break" mechanic: roll d20 + luck mod first, if > 15 add luck mod/2 to save
+    const luckMod = statMod(this.attribute.getTotal("luck"));
+    let luckBonus = 0;
+    if (luckMod > 0) {
+      const luckCheck = rollTwenty().total + luckMod;
+      if (luckCheck > 15) {
+        luckBonus = Math.floor(luckMod / 2);
+      }
+    }
+  
+    return statMod(this.attribute.getTotal(stat)) + rollRes.total + luckBonus;
   }
 }
 

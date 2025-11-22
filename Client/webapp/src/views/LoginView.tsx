@@ -234,7 +234,6 @@ export const LoginView: React.FC = () => {
             <Typography
               variant="body2"
               onClick={handleForgotPasswordClick}
-              disabled={viewState.isLoading}
               sx={{
                 background: "none",
                 border: "none",
@@ -303,7 +302,6 @@ export const LoginView: React.FC = () => {
             <Typography
               variant="body2"
               onClick={handleRegisterClick}
-              disabled={viewState.isLoading}
               sx={{
                 background: "none",
                 border: "none",

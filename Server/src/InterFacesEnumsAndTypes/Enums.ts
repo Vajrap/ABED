@@ -306,7 +306,7 @@ export enum ClassEnum {
   Druid = "Druid",
   Monk = "Monk",
   Warlock = "Warlock",
-  Ranger = "Ranger",
+  Duelist = "Duelist",
   Witch = "Witch",
   Inquisitor = "Inquisitor",
   Scholar = "Scholar",

@@ -58,31 +58,73 @@ export class GameState {
       this.reshuffleRegionEventCardDeck();
     }
 
-    const card = this.regionEventCardDeck.pop()!;
-    Report.debug(`Get Card: ${card.name}`);
+    const card = this.regionEventCardDeck.pop();
+    if (!card) {
+      Report.error('No card available in region event card deck');
+      return null;
+    }
+    
+    // Check if card has onDraw method (might be missing after DB deserialization)
+    if (typeof card.onDraw !== 'function') {
+      Report.warn(`Region card "${card.name?.en || card.id || 'Unknown'}" missing onDraw method, re-initializing deck`);
+      // Re-initialize the deck with fresh card instances
+      this.regionEventCardDeck = [...regionEventCardDeck];
+      if (this.regionEventCardDeck.length === 0) {
+        Report.error('Region event card deck is empty after re-initialization');
+        return null;
+      }
+      const newCard = this.regionEventCardDeck.pop()!;
+      this.completedRegionEventCards.push(newCard);
+      
+      const cardScale = newCard.globalEventScale ?? 0;
+      this.globalEventScale = Math.min(250, this.globalEventScale + cardScale);
+      
+      return newCard.onDraw?.() ?? null;
+    }
+    
+    Report.debug(`Get Card: ${typeof card.name === 'object' ? card.name?.en : card.name || 'Unknown'}`);
     this.completedRegionEventCards.push(card);
 
     // Update global event scale
+    const cardScale = card.globalEventScale ?? 0;
     this.globalEventScale = Math.min(
       250,
-      this.globalEventScale + card.globalEventScale,
+      this.globalEventScale + cardScale,
     );
 
-    // Execute card effect
-    return card.onDraw();
+    // Execute card effect - use optional chaining as safety
+    return card.onDraw?.() ?? null;
   }
 
   private reshuffleGlobalEventCardDeck() {
-    this.globalEventCardDeck = this.completedGlobalEventCards.sort(
-      () => Math.random() - 0.5,
-    );
+    // Filter out any invalid cards
+    const validCards = this.completedGlobalEventCards.filter(card => card != null);
+    
+    // If cards are missing onDraw (deserialized from DB), re-instantiate from original deck
+    if (validCards.length > 0 && typeof validCards[0]?.onDraw !== 'function' && validCards[0]?.onDraw !== undefined) {
+      Report.warn('Global cards may be missing onDraw after deserialization, re-initializing deck');
+      this.globalEventCardDeck = [...globalEventCardDeck];
+      this.completedGlobalEventCards = [];
+      return;
+    }
+    
+    this.globalEventCardDeck = validCards.sort(() => Math.random() - 0.5);
     this.completedGlobalEventCards = [];
   }
 
   private reshuffleRegionEventCardDeck() {
-    this.regionEventCardDeck = this.completedRegionEventCards.sort(
-      () => Math.random() - 0.5,
-    );
+    // Filter out any invalid cards (e.g., from deserialization) and re-instantiate if needed
+    const validCards = this.completedRegionEventCards.filter(card => card != null);
+    
+    // If cards are missing onDraw (deserialized from DB), re-instantiate from original deck
+    if (validCards.length > 0 && typeof validCards[0]?.onDraw !== 'function') {
+      Report.warn('Region cards missing onDraw after deserialization, re-initializing deck');
+      this.regionEventCardDeck = [...regionEventCardDeck];
+      this.completedRegionEventCards = [];
+      return;
+    }
+    
+    this.regionEventCardDeck = validCards.sort(() => Math.random() - 0.5);
     this.completedRegionEventCards = [];
   }
 }

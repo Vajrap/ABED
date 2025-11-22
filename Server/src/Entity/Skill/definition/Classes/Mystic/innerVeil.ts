@@ -44,7 +44,7 @@ export const innerVeil = new MysticSkill({
     location: LocationsEnum,
   ): TurnResult => {
     // Target a frontline ally
-    const target = getTarget(actor, actorParty)
+    const target = getTarget(actor, actorParty, targetParty, "ally")
       .from("frontOnly").with('least', 'currentHPPercentage')
       .one();
 

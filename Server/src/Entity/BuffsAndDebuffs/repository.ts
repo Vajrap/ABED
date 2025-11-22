@@ -26,6 +26,17 @@ import { warCry } from "./definitions/buffs/warCry";
 import { edgeCharge } from "./definitions/buffs/edgeCharge";
 import { spellParry } from "./definitions/buffs/spellParry";
 import { rage } from "./definitions/buffs/rage";
+import { advancingPace } from "./definitions/buffs/advancingPace";
+import { aegisShield } from "./definitions/buffs/aegisShield";
+import { aegisPulse } from "./definitions/buffs/aegisPulse";
+import { regen } from "./definitions/buffs/regen";
+import { parry } from "./definitions/buffs/parry";
+import { duelingStance } from "./definitions/buffs/duelingStance";
+import { curseMarkActive } from "./definitions/buffs/curseMarkActive";
+import { charm } from "./definitions/buffs/charm";
+import { exposeWeaknessActive } from "./definitions/buffs/exposeWeaknessActive";
+import { entangled } from "./definitions/debuffs/entangled";
+import { hexMark } from "./definitions/debuffs/hexMark";
 
 export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.haste]: haste,
@@ -41,10 +52,19 @@ export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.planarAbsorption]: planarAbsorption,
   [BuffEnum.reversalPalm]: reversalPalm,
   [BuffEnum.innerVeil]: innerVeil,
+  [BuffEnum.advancingPace]: advancingPace,
   [BuffEnum.warCry]: warCry,
   [BuffEnum.edgeCharge]: edgeCharge,
   [BuffEnum.spellParry]: spellParry,
   [BuffEnum.rage]: rage,
+  [BuffEnum.aegisShield]: aegisShield,
+  [BuffEnum.aegisPulse]: aegisPulse,
+  [BuffEnum.regen]: regen,
+  [BuffEnum.parry]: parry,
+  [BuffEnum.duelingStance]: duelingStance,
+  [BuffEnum.curseMarkActive]: curseMarkActive,
+  [BuffEnum.charm]: charm,
+  [BuffEnum.exposeWeaknessActive]: exposeWeaknessActive,
 };
 
 export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
@@ -57,6 +77,8 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   [DebuffEnum.exposed]: exposed,
   [DebuffEnum.bleed]: bleed,
   [DebuffEnum.stun]: stun,
+  [DebuffEnum.entangled]: entangled,
+  [DebuffEnum.hexMark]: hexMark,
 };
 
 export const buffsAndDebuffsRepository = {

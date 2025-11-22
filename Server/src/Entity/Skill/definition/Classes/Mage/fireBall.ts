@@ -61,7 +61,7 @@ export const fireBall = new MageSkill({
       numTargets = Math.min(6, roll1 + roll2); // 2-6 targets
     }
 
-    const targets = getTarget(actor, targetParty).many(numTargets);
+    const targets = getTarget(actor, actorParty, targetParty, "enemy").many(numTargets);
 
     if (!targets || targets.length === 0) {
       return {
@@ -109,6 +109,7 @@ export const fireBall = new MageSkill({
         hit: rollTwenty().total - 3 + hitBonus,
         crit: rollTwenty().total + critBonus,
         type: DamageType.fire,
+        isMagic: true,
       };
 
       const totalDamageResult = resolveDamage(

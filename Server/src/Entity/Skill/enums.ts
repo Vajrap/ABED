@@ -2,6 +2,7 @@ export type SkillId =
   | BasicSkillId
   | MobSkillId
   | ClericSkillId
+  | SeerSkillId
   | ScholarSkillId
   | MageSkillId
   | MysticSkillId
@@ -16,14 +17,17 @@ export type SkillId =
   | DruidSkillId
   | MonkSkillId
   | WarlockSkillId
-  | RangerSkillId
+  | DuelistSkillId
   | WitchSkillId
   | InquisitorSkillId
+  | EngineerSkillId
+  | NomadSkillId
 
 
 export enum BasicSkillId {
   Basic = "Basic",
 }
+
 export enum MobSkillId {
   WorksYouMaggots = "WorksYouMaggots",
   CommanderScream = "CommanderScream",
@@ -232,139 +236,106 @@ export enum KnightSkillId {
   // target one frontfirst
   // Thrust the sword or spear right at one enemy dealing ((weapon damage + Str mod) * (1 + 0.1 * skill level)) * (positionModifier) pierce damage. with addtional +3 hit roll
   // If enemy has any debuff, crit change + 2 (4 at level 5).
-  // consume 2 neutral, produce fire 
+  // consume 2 fire, produce 1 earth
+
+  AdvancingPace = "AdvancingPace",
+  // Rare
+  // must not already be under Advancing Pace
+  // The knight channels planar force into disciplined movement.
+  // Gain AdvancingPace buff for 3 turns.
+  //
+  // AdvancingPace:
+  // - AB gauge increases with 1d4 more
+  // - +2 Strength
+  // - -1 Defense (the knight overextends to maintain the pace)
+  // At level 5: AB speed becomes +35% and the DEF penalty is removed.
+  //
+  // consume: 4 SP, 3 MP, 3 natural
+  // produce: 1 fire
 }
 
 export enum GuardianSkillId {
   Taunt = "Taunt",
   HerosPose = "HerosPose",
   ShieldUp = "ShieldUp",
-
-  IronWall = "IronWall",
-  // ACTIVE — Plant feet firmly into the ground.
-  // Become immune to knockback, stun, or displacement for several turns.
-  // Reduces incoming damage further, but lowers movement to 0.
-  // Guardian becomes an *anchor* — perfect pure tank fantasy.
-
-  ProtectAlly = "ProtectAlly",
-  // ACTIVE — Redirect the next attack that would hit an ally.
-  // Guardian takes the hit instead, with reduced damage.
-  // A core guardian-style intervention skill.
-
-  Sentinel = "Sentinel",
-  // PASSIVE — When hit, Guardian gains a small DEF boost for 1 turn.
-  // Stacks up to a low limit.
-  // Encourages being attacked and rewards tanking properly.
 }
 
 export enum PaladinSkillId {
-
   DivineStrike = "DivineStrike",
   // ACTIVE — A melee attack blessed with holy energy.
-  // Deals physical + light magic damage.
-  // Slight chance to purge 1 minor debuff from self.
-  // Bread-and-butter offensive tool.
+  // target one, front first, melee.
+  // Must have any weapon but not bow, orb, wand, book,
+  // Deal (weapon damage * 1.2 + (str mod) + (will mod)) * (skill level multiplier) * (position modifier) holy damage.
+  // If enemy is undead or fiend, deal additional 1d6 holy damage. (1d10 at lvl5)
+  // consume 2 order, produce 1 neutral.
 
-  HolyAegis = "HolyAegis",
-  // ACTIVE — Place a holy shield on an ally.
-  // Absorbs a moderate amount of damage.
-  // Strong, reliable single-target protection.
-
-  Judgment = "Judgment",
-  // ACTIVE — Smite the target with righteous power.
-  // Deals moderate damage and reduces their attack or accuracy.
-  // Combines offense and control.
-
-  PurifyingWave = "PurifyingWave",
+  AegisPulse = "AegisPulse",
+  // Must have Aegis Pulse buff
   // ACTIVE — Emit a wave of holy light.
-  // Cleanses 1 debuff from all allies OR grants a small regen for a few turns.
-  // Light support tool that defines Paladin's role.
+  // Healing allies for 1d4 + willpower mod * (1 + 0.1 * skill level) HP.
+  // Dealing small holy damage to all enemies. for 1d4 + willpower mod * (1 + 0.1 * skill level) holy damage.
+  // consume nothing but will remove Aegis Pulse buff.
 
-  RadiantCharge = "RadiantCharge",
-  // ACTIVE — Ultimate-ish.
-  // Dash to an enemy and unleash a burst of holy energy.
-  // Damages the target and grants allies a small defensive buff.
-  // Great initiation skill.
-
-  RighteousGuard = "RighteousGuard",
-  // PASSIVE — When the Paladin protects or assists an ally (Aegis/Purify),
-  // gain a small temporary DEF or magic resist boost.
-  // Encourages Paladin's supportive playstyle.
+  AegisShield = "AegisShield",
+  // Active - Activate Aegis Shield for 3 stack (4 at lvl5)
+  // Must not have Aegis Shield buff
+  // Aegis Shield: each stack can mitigate 5 + (willpower mod) points of incoming damage. 
+  // example, (will power mod = 0), taking 5 damage: Aegis shield will mitigate 5 damage and decrease 1 stack.
+  // Taking 7 damage: Aegis shield will mitigate 7 damage and decrease 2 stack.
+  // When Aegis Shield is depleted, add Aegis Pulse buff for 1 turn.
+  // consume 3 order, produce 1 neutral.
 }
 
 export enum DruidSkillId {
-
   VineWhip = "VineWhip",
-  // ACTIVE — Medium-range strike using conjured vines.
-  // Deals physical+magic nature damage and may pull the enemy 1 tile closer.
-  // Bread-and-butter attack with battlefield control.
+  // Deal 1d6 + (willpower mod) * (1 + 0.1 * skill level) nature damage.
+  // target roll DC7 endurance save or get entangled for 1 turn.
+  // Entangled: when take turns, must roll DC10 strength save or skip the turn.
+  // produce 1 earth.
 
-  Regrowth = "Regrowth",
-  // ACTIVE — Restore HP to an ally over several turns.
-  // A regeneration-over-time spell instead of a burst heal.
-  // Defines Druid's healing identity as slow but steady.
+  ThrowSpear = "ThrowSpear",
+  // Must equip Spear
+  // rare
+  // deal damage based on range.
+  // if front - front 0.8 + skillLevel
+  // if front - back 1.2 + skillLevel
+  // if back - back 1.6 + skillLevel
+  // Note that this skill don't have level multiplier but add the level into damage directly.
+  // at level 5, based range damage added 0.2 times (1.0, 1.4, 1.8)
+  // consume 2 neutral, produce 1 earth.
 
-  EntanglingRoots = "EntanglingRoots",
-  // ACTIVE — Root an enemy in place for 1–2 turns.
-  // May also reduce their attack or movement.
-  // Classic Druid battlefield control tool.
-
-  ThornShield = "ThornShield",
-  // ACTIVE — Coat an ally (or self) in protective thorns.
-  // Slight damage reduction + deals thorn retaliation damage to attackers.
-  // Great for frontline synergy.
-
-  WildShape = "WildShape",
-  // ACTIVE — Ultimate-ish transformation.
-  // Temporarily assume an animal aspect (Wolf, Bear, Hawk, etc.).
-  // Gain different bonuses depending on build:
-  //   - Bear: Defense + HP
-  //   - Wolf: Speed + lifesteal
-  //   - Hawk: Accuracy + initiative
-  // Not a permanent shift; lasts a few turns.
-
-  NatureBond = "NatureBond",
-  // PASSIVE — Whenever Druid applies a regen or root effect,
-  // gain a small self-buff (DEF up, regen, or resource tick).
-  // Encourages using Druid’s nature control & healing cycle.
+  RejuvenatingMist = "RejuvenatingMist",
+  // Rare
+  // Release a gentle natural mist around the party.
+  // All allies gain Regen buff for 2 turns: the perm value will be used for remember will mod: restore (1d4 + WIL mod) HP at the start of their turn.
+  // At level 5, lasts 3 turns. at level 7 will mod remember + 2
+  // consume 4 MP, produce 1 earth
 }
 
 export enum MonkSkillId {
-
   PalmStrike = "PalmStrike",
   // ACTIVE — A precise melee strike using internal force.
-  // Ignores a portion of the target’s armor.
-  // Bread-and-butter Monk damage skill.
+  // target one, front first, melee.
+  // Must equip barehand.
+  // deal 1d6 + (str | dex mod whichever higher) * (position modifier) blunt damage.
+  // Each level ignore 1 point of armor.
+  // at level 5 damage dice = 1d8
+  // produce 1 wind.
+  // If armor is NOT cloth, damageOutput reduce by 70%.
 
   Meditation = "Meditation",
-  // ACTIVE — Enter a short meditative focus.
-  // Restore a small amount of HP or resource, and gain minor defense for 1 turn.
-  // Defines Monk's self-sustain + discipline.
+  // Restore 1d4 + skillLevel to HP or MP or SP, whichever is lowest (in percent).
+  // produce 1 order.
 
-  CounterStance = "CounterStance",
-  // ACTIVE — Take a defensive martial posture.
-  // The next melee attack taken triggers an automatic counter-hit.
-  // Encourages timing and prediction.
-
-  ChiBurst = "ChiBurst",
-  // ACTIVE — Release stored chi in a short-range blast.
-  // AOE cone damage + small knockback or stagger.
-  // Monk's only early AOE option.
-
-  InnerHarmony = "InnerHarmony",
-  // ACTIVE — Ultimate-ish.
-  // Enter a heightened state of balance and calm.
-  // For a few turns:
-  //   - Increased evasion
-  //   - Increased accuracy
-  //   - Basic attacks become empowered with chi damage
-  //   - Meditation becomes instant
-  // The Monk's peak form.
-
-  MartialDiscipline = "MartialDiscipline",
-  // PASSIVE — Each time the Monk dodges or counters an attack,
-  // gain a stacking buff that increases damage slightly for the next turn.
-  // Rewards reactive, skillful gameplay.
+  FlurryOfBlows = "FlurryOfBlows",
+  // ACTIVE — Perform a flurry of rapid blows.
+  // target one, front first, melee.
+  // Must equip barehand.
+  // Deal 2 hits (3 hits at lvl5) of damage *FROM* Palm Strike level that one self had,
+  // (Palm Strike level can be check from character.skills + character.activeSkills + character.conditionalDeck, I think)
+  // If no palm strike, damage = 1d4 + (str | dex mod whichever higher) * (position modifier) blunt damage.
+  // consume 2 wind, produce 1 neutral.
+  // If armor is NOT cloth, damageOutput reduce by 70%.
 }
 
 export enum WarlockSkillId {
@@ -379,17 +350,10 @@ export enum WarlockSkillId {
   // Deals damage and restores a portion of HP to the Warlock.
   // Core sustain tool.
 
-  SoulTether = "SoulTether",
-  // ACTIVE — Bind the Warlock to a target.
-  // Both are tethered: if the target moves away, it is slowed or suffers damage.
-  // Optionally reduces escape or increases received damage.
-  // Battlefield control through shadow binds.
-
-  GloomField = "GloomField",
-  // ACTIVE — Create a small zone of oppressive shadow.
-  // Enemies inside suffer reduced accuracy or lowered resistances,
-  // and may take minor DOT shadow damage.
-  // Area control tool.
+  Corruption = "Corruption",
+  // ACTIVE — Corrupt the target with dark energy.
+  // Deals immediate damage and applies multiple debuffs.
+  // DOT/Debuff application tool.
 
   DarkPact = "DarkPact",
   // ACTIVE — Ultimate-ish.
@@ -397,118 +361,78 @@ export enum WarlockSkillId {
   // OR to instantly unleash a high-damage shadow burst.
   // High-risk, high-reward signature Warlock move.
 
-  ForbiddenKnowledge = "ForbiddenKnowledge",
-  // PASSIVE — When applying DOTs or draining HP,
-  // Warlock gains a stacking buff to magic damage or resource regen.
-  // Encourages sustained corruption playstyle.
 }
 
-export enum RangerSkillId {
+export enum DuelistSkillId {
+  PreciseStrike = "PreciseStrike",
+  // ACTIVE — Execute a precise blade strike with perfect timing.
+  // Basic precision attack, generates wind element.
+  // Uses CONTROL for precision (expanded attribute).
 
-  AimedShot = "AimedShot",
-  // ACTIVE — Carefully line up a precise arrow.
-  // High damage, increased crit chance, but slower to fire.
-  // Ranger's bread-and-butter burst attack.
+  ParryRiposte = "ParryRiposte",
+  // ACTIVE — Assume defensive stance, ready to parry and counter.
+  // Defensive counter-attack with reactive mechanics.
+  // Uses CONTROL for precision timing (expanded attribute).
 
-  TwinArrows = "TwinArrows",
-  // ACTIVE — Fire two fast arrows at one target OR split between two.
-  // Lower damage per hit but great for applying effects quickly.
-  // Reliable multi-hit option.
+  BladeFlurry = "BladeFlurry",
+  // ACTIVE — Unleash a rapid flurry of blade strikes.
+  // Multi-hit combo for fast damage application.
 
-  TripwireTrap = "TripwireTrap",
-  // ACTIVE — Lay a trap on the ground.
-  // The first enemy that moves into it is slowed, tripped, or briefly rooted.
-  // Battlefield control through hunting tools.
-
-  HunterMark = "HunterMark",
-  // ACTIVE — Mark an enemy with a tracking sigil.
-  // Marked enemy takes increased damage from Ranger attacks
-  // and becomes easier to hit.
-  // Signature skill for building damage over time.
-
-  VolleyRain = "VolleyRain",
-  // ACTIVE — Ultimate-ish.
-  // Launch a rain of arrows over an area for multiple turns.
-  // Deals chip damage each turn and disrupts enemy positioning.
-  // Excellent zoning tool for ranged dominance.
-
-  TrackerInstinct = "TrackerInstinct",
-  // PASSIVE — Ranger gains increased accuracy and crit chance 
-  // against enemies affected by traps or HunterMark.
-  // Reinforces the synergy between marks, traps, and ranged hits.
+  DuelingStance = "DuelingStance",
+  // ACTIVE — Adopt a focused dueling stance, enhancing precision.
+  // Setup buff that enhances combat effectiveness.
+  // Uses CONTROL and AGILITY (expanded attributes).
 }
 
 export enum WitchSkillId {
-  CurseMark = "CurseMark",
-  // ACTIVE — Place a hex sigil on a target.
-  // Target takes increased damage over time, and the Witch gains bonuses 
-  // when attacking marked enemies.
-  // Signature setup skill — defines Witch’s curse mechanics.
+  CurseBolt = "CurseBolt", // Too bland, we have so much fire bolt arcane bolt shadow bolt, I think should be a bit weirder, maybe small true damage and can curse with low DC?
+  // ACTIVE — Launch a bolt of cursed energy at the target.
+  // Basic curse attack, generates chaos element.
+  // Uses INTELLIGENCE for damage, CONTROL for save DC (precision in curse application).
 
-  PoisonMist = "PoisonMist",
-  // ACTIVE — Create a lingering poisonous cloud in an area.
-  // Enemies inside take poison damage each turn and suffer reduced healing.
-  // Slow, cruel battlefield corruption.
+  CurseMark = "CurseMark",
+  // ACTIVE — Place a hex sigil on a target, marking them for increased suffering.
+  // Setup skill that amplifies damage from all sources.
+  // Uses INTELLIGENCE for strategic advantage (knowledge of weak points).
+  // Good idea, but seems like we need a new buff again? can we just use the existing ones?
 
   HexDoll = "HexDoll",
-  // ACTIVE — Bind a target to a small effigy.
-  // Damaging the doll deals a fraction of that damage to the target,
-  // OR causes periodic pain regardless of distance.
-  // Classic “voodoo doll” mechanic.
+  // ACTIVE — Bind a target to a small effigy, creating a sympathetic link.
+  // Voodoo doll mechanic with damage over time.
+  // Uses INTELLIGENCE for damage, CONTROL for save DC (precision in hex application).
 
   Bewitch = "Bewitch",
-  // ACTIVE — Influence an enemy’s mind with witchcraft.
-  // Light charm/confuse effect: enemy might skip a turn, mis-target, or reduce aggression.
-  // Not full mind-control, but disruptive.
-
-  RitualCircle = "RitualCircle",
-  // ACTIVE — Ultimate-ish.
-  // Draw a cursed ritual circle on the ground.
-  // Enemies inside suffer stacking debuffs (weaken, slow, defense down),
-  // and curses applied by the Witch become stronger or spread.
-  // Strong area denial + curse amplification zone.
-
-  Malice = "Malice",
-  // PASSIVE — Whenever the Witch applies a curse or poison effect,
-  // extend its duration or slightly increase its potency.
-  // Rewards maintaining multiple curses and ritual zones.
+  // ACTIVE — Influence an enemy's mind with witchcraft, causing confusion.
+  // Mind control and battlefield disruption.
+  // Uses CONTROL for save DC (precision in mind control), INTELLIGENCE for strategic advantage.
+  // Might need to fix the getTarget method to receive more atgument.
+  // getTarget(actor, actorParty, targetParty, targetType: 'ally' | 'enemy' | 'any') so chooding target with charc means the character needs to roll will power saves or target wrong part
+  
 }
 
 export enum InquisitorSkillId {
   RadiantSmite = "RadiantSmite",
-  // ACTIVE — Deliver a focused blast of radiant energy.
-  // High single-target holy damage, especially against debuffed or "corrupted" targets.
-  // Inquisitor's signature strike.
+  // ACTIVE — Launch a focused blast of radiant energy.
+  // Basic holy damage nuke, generates order element.
+  // Deals 1d6 + (WIL + PLANAR)/2 holy damage. DC8 + control mod willpower save for Exposed.
+  // +1d4 bonus damage against undead/fiends. 1d8 at level 5.
 
   ExposeWeakness = "ExposeWeakness",
-  // ACTIVE — Reveal the enemy’s wrongdoing or impurity.
-  // Reduces their defenses or increases damage taken.
-  // Stacks with ally attacks; strong support-debuff.
+  // ACTIVE — Reveal the enemy's wrongdoing or impurity.
+  // Setup skill that applies Exposed debuff. Consumes order, produces fire.
+  // Marked enemies take +1d3 damage from all sources. -2 crit defense at level 5.
+  // Inquisitor gains +WIL mod/2 hit against exposed enemies.
 
   PurgeMagic = "PurgeMagic",
   // ACTIVE — Attempt to forcibly remove magical buffs from a target.
-  // If successful, deals extra holy damage.
-  // Inquisitor's anti-mage / anti-buff tool.
-
-  TruthSentence = "TruthSentence",
-  // ACTIVE — Pronounce a "sentence of truth" on an enemy.
-  // Enemy must pass a willpower-like check or suffer:
-  // - reduced accuracy
-  // - reduced damage
-  // - or forced inability to hide/stealth.
-  // Psychological suppression technique.
+  // DC10 + control mod willpower save. Failed: remove 1-2 buffs + deal holy damage.
+  // Passed: deal half holy damage. Consumes fire, produces order.
 
   JudgmentDay = "JudgmentDay",
-  // ACTIVE — Ultimate-ish.
-  // Call down a concentrated pillar or beam of radiant force.
-  // Deals heavy damage, massively penalizes corrupted/marked/evil targets,
-  // and may blind or stagger surrounding enemies.
-  // Devastating finisher with thematic zeal.
-
-  Zeal = "Zeal",
-  // PASSIVE — When the Inquisitor attacks or debuffs an enemy,
-  // gain a small stacking buff to damage or accuracy for the next turn.
-  // Encourages relentless offensive pressure.
+  // ACTIVE — Call down a concentrated pillar of radiant force.
+  // Big holy damage nuke: 2d6 + (WIL + PLANAR) * (1 + 0.15 * skill level).
+  // +50% damage if target has Exposed. +1d8 against undead/fiends.
+  // Consumes 2 order + 1 fire, produces neutral. 2d8 at level 5.
 }
 
 export enum ScholarSkillId {

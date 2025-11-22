@@ -16,8 +16,8 @@ export const bless = new ClericSkill({
         th: "พระพร",
     },
     description: {
-        en: "Bless all ally for 2 turns, granting advantage to all saving throw. At level 5, after used the user throw DC10 +willpower mod, if success, gain +1 order",
-        th: "อวยพรเพื่อนร่วมทีมทั้งหมด 2 เทิร์นทำให้ได้เปรียบในการทอย saving throw",
+        en: "Bless all ally for 2 turns, granting advantage to all saving throw. Charisma enhances the blessing's reach. At level 5, after used the user throw DC10 +willpower mod, if success, gain +1 order",
+        th: "อวยพรเพื่อนร่วมทีมทั้งหมด 2 เทิร์นทำให้ได้เปรียบในการทอย saving throw charisma เพิ่มประสิทธิภาพของพร",
     },
     requirement: {},
     equipmentNeeded: [],
@@ -45,7 +45,10 @@ export const bless = new ClericSkill({
         skillLevel: number,
         _location: LocationsEnum,
     ) => {
-        for (const ally of actorParty) {
+        // Bless affects all allies, charisma enhances the blessing's reach and effectiveness
+        const alliesToBless = actorParty.filter(ally => !ally.vitals.isDead);
+        
+        for (const ally of alliesToBless) {
             buffsRepository[BuffEnum.bless].appender(ally, 2, false, 0);
         }
         let gainOrder = false;
@@ -55,16 +58,19 @@ export const bless = new ClericSkill({
                 actor.resources.order += 1;
             }
         }
+        const blessedNames = alliesToBless.map(ally => ally.name.en).join(", ");
+        const blessedNamesTh = alliesToBless.map(ally => ally.name.th).join(", ");
+        
         return {
             content: {
-                en: `${actor.name.en} blessed all allies for 2 turns.${gainOrder ? ` and ${actor.name.en} also gained +1 order` : ""}`,
-                th: `${actor.name.th} อวยพรเพื่อนร่วมทีมทั้งหมด 2 เทิร์น${gainOrder ? ` และ ${actor.name.th} ก็ได้รับ +1 order` : ""}`,
+                en: `${actor.name.en} blessed ${blessedNames} for 2 turns.${gainOrder ? ` ${actor.name.en} also gained +1 order` : ""}`,
+                th: `${actor.name.th} อวยพร ${blessedNamesTh} เป็นเวลา 2 เทิร์น${gainOrder ? ` ${actor.name.th} ก็ได้รับ +1 order` : ""}`,
             },
             actor: {
                 actorId: actor.id,
                 effect: [ActorEffect.Cast],
             },
-            targets: actorParty.map((ally) => ({
+            targets: alliesToBless.map((ally) => ({
                 actorId: ally.id,
                 effect: [TargetEffect.Bless],
             })),

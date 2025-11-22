@@ -1,3 +1,10 @@
+// Patch Bun.randomUUIDv7 FIRST, before any other imports that might use it
+// This is critical for Docker environments with older Bun versions
+if (typeof Bun !== 'undefined' && typeof (Bun as any).randomUUIDv7 !== 'function') {
+  (Bun as any).randomUUIDv7 = () => crypto.randomUUID();
+  console.log('[PATCH] Bun.randomUUIDv7 patched to use crypto.randomUUID()');
+}
+
 import { Game } from "./Game";
 import Report from "./Utils/Reporter";
 import { initializeDatabase, shutdownDatabase } from "./Database/init";

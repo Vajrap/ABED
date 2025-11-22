@@ -60,7 +60,7 @@ export const backstab = new RogueSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const target = getTarget(actor, targetParty).from("backFirst").one();
+    const target = getTarget(actor, actorParty, targetParty, "enemy").from("backFirst").one();
 
     if (!target) {
       return {

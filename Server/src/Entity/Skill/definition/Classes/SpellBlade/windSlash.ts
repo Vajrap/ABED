@@ -54,7 +54,7 @@ export const windSlash = new SpellBladeSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    const target = getTarget(actor, targetParty).one();
+    const target = getTarget(actor, actorParty, targetParty, "enemy").one();
 
     if (!target) {
       return {

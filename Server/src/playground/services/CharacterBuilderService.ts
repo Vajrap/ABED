@@ -1,0 +1,412 @@
+import { Character } from "src/Entity/Character/Character";
+import { activeCharacterRegistry } from "src/Entity/Character/repository";
+import { mobRepository } from "src/Entity/Character/MOBs/repository";
+import { RaceEnum, ClassEnum, CharacterEquipmentSlot, CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
+import type { SkillId } from "src/Entity/Skill/enums";
+import type { EquipmentId } from "src/Entity/Item/Equipment/types";
+import { equipDirect } from "src/Entity/Item/Equipment/equipDirect";
+import { makeAttribute, makeProficiencies, scaleByDifficulty } from "src/Entity/Character/MOBs/helpers";
+import { RACE_ATTRIBUTES } from "src/Entity/Character/RaceAttributes";
+import type { CharacterConfig } from "../types/requests";
+import { CharacterAlignment } from "src/Entity/Character/Subclass/Alignment/CharacterAlignment";
+import { CharacterArtisans } from "src/Entity/Character/Subclass/Stats/CharacterArtisans";
+import { CharacterBattleStats } from "src/Entity/Character/Subclass/Stats/CharacterBattleStats";
+import { CharacterElements } from "src/Entity/Character/Subclass/Stats/CharacterElements";
+import { CharacterFame } from "src/Entity/Character/Subclass/Fame/CharacterFame";
+import { CharacterNeeds } from "src/Entity/Character/Subclass/Needs/CharacterNeeds";
+import { CharacterVitals, Vital } from "src/Entity/Character/Subclass/Vitals/CharacterVitals";
+import { defaultActionSequence } from "src/Entity/Character/Subclass/Action/CharacterAction";
+import { DeckCondition } from "src/Entity/Character/Subclass/DeckCondition/DeckCondition";
+import { defaultSaveRoll } from "src/Utils/CharacterDefaultSaveRoll";
+import type { CharacterSkillObject } from "src/Entity/Character/Character";
+import {
+  MonkSkillId,
+  DuelistSkillId,
+  WitchSkillId,
+  InquisitorSkillId,
+  ScholarSkillId,
+  SpellBladeSkillId,
+  MysticSkillId,
+  ShamanSkillId,
+  KnightSkillId,
+  GuardianSkillId,
+  WarriorSkillId,
+  ClericSkillId,
+  PaladinSkillId,
+  DruidSkillId,
+  MageSkillId,
+  RogueSkillId,
+  BarbarianSkillId,
+  WarlockSkillId,
+} from "src/Entity/Skill/enums";
+import { equipMOB } from "src/Entity/Character/MOBs/equipmentHelpers";
+
+export class CharacterBuilderService {
+  /**
+   * Create a custom character of a specific class and race
+   */
+  private static createCharacterOfClass(
+    className: ClassEnum,
+    race: RaceEnum,
+    difficulty: 1 | 2 | 3 | 4 | 5,
+    nameEn: string,
+    nameTh: string,
+  ): Character {
+    const baseAttrs = RACE_ATTRIBUTES[race].attributes;
+    
+    // Default stats - will be customized per class
+    let hp = scaleByDifficulty(20, difficulty);
+    let mp = scaleByDifficulty(10, difficulty);
+    let sp = scaleByDifficulty(30, difficulty);
+    
+    const attrMods: Record<string, number> = {};
+    const proficiencies: Record<string, number> = {};
+    const activeSkills: CharacterSkillObject[] = [];
+    
+    // Customize based on class
+    switch (className) {
+      case ClassEnum.Monk:
+        hp = scaleByDifficulty(22, difficulty);
+        mp = scaleByDifficulty(8, difficulty);
+        sp = scaleByDifficulty(35, difficulty);
+        Object.assign(attrMods, {
+          strength: 2, dexterity: 3, agility: 2, endurance: 2, willpower: 1, control: 1
+        });
+        Object.assign(proficiencies, {
+          bareHand: 10, dagger: 3, sword: 4, blade: 5, staff: 3
+        });
+        activeSkills.push({ id: MonkSkillId.PalmStrike as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: MonkSkillId.FlurryOfBlows as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Duelist:
+        hp = scaleByDifficulty(20, difficulty);
+        mp = scaleByDifficulty(8, difficulty);
+        sp = scaleByDifficulty(35, difficulty);
+        Object.assign(attrMods, {
+          dexterity: 3, control: 2, agility: 2, strength: 1, intelligence: 1
+        });
+        Object.assign(proficiencies, {
+          blade: 10, sword: 8, dagger: 6, bareHand: 4
+        });
+        activeSkills.push({ id: DuelistSkillId.PreciseStrike as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: DuelistSkillId.DuelingStance as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Witch:
+        hp = scaleByDifficulty(18, difficulty);
+        mp = scaleByDifficulty(25, difficulty);
+        sp = scaleByDifficulty(15, difficulty);
+        Object.assign(attrMods, {
+          intelligence: 3, control: 3, planar: 2, willpower: 1
+        });
+        Object.assign(proficiencies, {
+          wand: 8, staff: 6, book: 5, orb: 4
+        });
+        activeSkills.push({ id: WitchSkillId.CurseBolt as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: WitchSkillId.CurseMark as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Inquisitor:
+        hp = scaleByDifficulty(20, difficulty);
+        mp = scaleByDifficulty(20, difficulty);
+        sp = scaleByDifficulty(20, difficulty);
+        Object.assign(attrMods, {
+          willpower: 3, planar: 2, control: 2, strength: 1
+        });
+        Object.assign(proficiencies, {
+          sword: 7, blade: 6, staff: 5, book: 4, wand: 4
+        });
+        activeSkills.push({ id: InquisitorSkillId.RadiantSmite as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: InquisitorSkillId.ExposeWeakness as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Scholar:
+        hp = scaleByDifficulty(18, difficulty);
+        mp = scaleByDifficulty(15, difficulty);
+        sp = scaleByDifficulty(25, difficulty);
+        Object.assign(attrMods, {
+          intelligence: 3, control: 2, planar: 1, dexterity: 1
+        });
+        Object.assign(proficiencies, {
+          book: 8, staff: 5, wand: 4, orb: 3
+        });
+        activeSkills.push({ id: ScholarSkillId.Analyze as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: ScholarSkillId.DisruptPattern as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.SpellBlade:
+        hp = scaleByDifficulty(20, difficulty);
+        mp = scaleByDifficulty(18, difficulty);
+        sp = scaleByDifficulty(25, difficulty);
+        Object.assign(attrMods, {
+          planar: 2, dexterity: 2, control: 2, strength: 1, intelligence: 1
+        });
+        Object.assign(proficiencies, {
+          blade: 8, sword: 7, staff: 5, wand: 4
+        });
+        activeSkills.push({ id: SpellBladeSkillId.PlanarEdge as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: SpellBladeSkillId.WindSlash as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Mystic:
+        hp = scaleByDifficulty(18, difficulty);
+        mp = scaleByDifficulty(22, difficulty);
+        sp = scaleByDifficulty(20, difficulty);
+        Object.assign(attrMods, {
+          planar: 3, control: 2, willpower: 2, intelligence: 1
+        });
+        Object.assign(proficiencies, {
+          staff: 7, wand: 6, orb: 5, book: 4
+        });
+        activeSkills.push({ id: MysticSkillId.MistStep as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: MysticSkillId.InnerVeil as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Shaman:
+        hp = scaleByDifficulty(20, difficulty);
+        mp = scaleByDifficulty(20, difficulty);
+        sp = scaleByDifficulty(20, difficulty);
+        Object.assign(attrMods, {
+          willpower: 2, planar: 2, control: 2, vitality: 1
+        });
+        Object.assign(proficiencies, {
+          staff: 7, wand: 5, book: 4, orb: 3
+        });
+        activeSkills.push({ id: ShamanSkillId.ChaoticBlessing as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: ShamanSkillId.HexOfRot as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Knight:
+        hp = scaleByDifficulty(25, difficulty);
+        mp = scaleByDifficulty(5, difficulty);
+        sp = scaleByDifficulty(35, difficulty);
+        Object.assign(attrMods, {
+          strength: 3, endurance: 2, vitality: 2, leadership: 1, willpower: 1
+        });
+        Object.assign(proficiencies, {
+          sword: 10, blade: 8, spear: 7, shield: 9, axe: 6, hammer: 6
+        });
+        activeSkills.push({ id: KnightSkillId.PrecisionThrust as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: KnightSkillId.AdvancingPace as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Guardian:
+        hp = scaleByDifficulty(28, difficulty);
+        mp = scaleByDifficulty(5, difficulty);
+        sp = scaleByDifficulty(30, difficulty);
+        Object.assign(attrMods, {
+          endurance: 3, vitality: 3, strength: 2, willpower: 1
+        });
+        Object.assign(proficiencies, {
+          shield: 10, sword: 8, hammer: 7, axe: 6, spear: 5
+        });
+        activeSkills.push({ id: GuardianSkillId.Taunt as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: GuardianSkillId.ShieldUp as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Warrior:
+        hp = scaleByDifficulty(25, difficulty);
+        mp = scaleByDifficulty(5, difficulty);
+        sp = scaleByDifficulty(35, difficulty);
+        Object.assign(attrMods, { strength: 3, endurance: 2, vitality: 2, leadership: 1 });
+        Object.assign(proficiencies, { sword: 9, axe: 8, hammer: 8, shield: 9, blade: 7 });
+        activeSkills.push({ id: WarriorSkillId.WarCry as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: WarriorSkillId.PowerStrike as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Cleric:
+        hp = scaleByDifficulty(20, difficulty);
+        mp = scaleByDifficulty(22, difficulty);
+        sp = scaleByDifficulty(10, difficulty);
+        Object.assign(attrMods, { willpower: 3, planar: 2, control: 2, vitality: 1 });
+        Object.assign(proficiencies, { hammer: 10, staff: 11, shield: 10, orb: 9 });
+        activeSkills.push({ id: ClericSkillId.Heal as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: ClericSkillId.Bless as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Paladin:
+        hp = scaleByDifficulty(24, difficulty);
+        mp = scaleByDifficulty(15, difficulty);
+        sp = scaleByDifficulty(30, difficulty);
+        Object.assign(attrMods, { strength: 2, willpower: 3, planar: 2, endurance: 2 });
+        Object.assign(proficiencies, { sword: 10, shield: 10, hammer: 8, blade: 7 });
+        activeSkills.push({ id: ClericSkillId.Radiance as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: PaladinSkillId.DivineStrike as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Druid:
+        hp = scaleByDifficulty(20, difficulty);
+        mp = scaleByDifficulty(18, difficulty);
+        sp = scaleByDifficulty(15, difficulty);
+        Object.assign(attrMods, { willpower: 3, planar: 2, control: 2, vitality: 1 });
+        Object.assign(proficiencies, { staff: 10, wand: 7, book: 6, orb: 5 });
+        activeSkills.push({ id: DruidSkillId.VineWhip as SkillId, level: difficulty as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Mage:
+        hp = scaleByDifficulty(14, difficulty);
+        mp = scaleByDifficulty(25, difficulty);
+        sp = scaleByDifficulty(8, difficulty);
+        Object.assign(attrMods, { intelligence: 3, planar: 3, control: 2, willpower: 1 });
+        Object.assign(proficiencies, { wand: 10, staff: 9, book: 10, orb: 9 });
+        activeSkills.push({ id: MageSkillId.FireBolt as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: MageSkillId.ArcaneBolt as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Rogue:
+        hp = scaleByDifficulty(18, difficulty);
+        mp = scaleByDifficulty(8, difficulty);
+        sp = scaleByDifficulty(30, difficulty);
+        Object.assign(attrMods, { dexterity: 3, agility: 3, control: 2, strength: 1 });
+        Object.assign(proficiencies, { dagger: 11, sword: 10, bow: 10, bareHand: 9 });
+        activeSkills.push({ id: RogueSkillId.Backstab as SkillId, level: difficulty as any, exp: 0 });
+        activeSkills.push({ id: RogueSkillId.RetreatDash as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Barbarian:
+        hp = scaleByDifficulty(28, difficulty);
+        mp = scaleByDifficulty(3, difficulty);
+        sp = scaleByDifficulty(35, difficulty);
+        Object.assign(attrMods, { strength: 3, endurance: 3, vitality: 2, willpower: 1 });
+        Object.assign(proficiencies, { axe: 10, hammer: 9, sword: 8, bareHand: 8 });
+        activeSkills.push({ id: BarbarianSkillId.Rage as SkillId, level: difficulty as any, exp: 0 });
+        break;
+        
+      case ClassEnum.Warlock:
+        hp = scaleByDifficulty(16, difficulty);
+        mp = scaleByDifficulty(22, difficulty);
+        sp = scaleByDifficulty(12, difficulty);
+        Object.assign(attrMods, { intelligence: 2, planar: 3, control: 2, willpower: 2 });
+        Object.assign(proficiencies, { wand: 9, staff: 8, book: 8, orb: 7 });
+        activeSkills.push({ id: WarlockSkillId.ShadowBolt as SkillId, level: difficulty as any, exp: 0 });
+        break;
+        
+      default:
+        // Fallback for unknown classes - use basic stats
+        Object.assign(attrMods, { strength: 1, dexterity: 1 });
+        Object.assign(proficiencies, { sword: 5, bareHand: 3 });
+    }
+    
+    const character = new Character({
+      actionSequence: defaultActionSequence(),
+      alignment: new CharacterAlignment({}),
+      artisans: new CharacterArtisans({}),
+      attribute: makeAttribute({
+        charisma: scaleByDifficulty(baseAttrs.charisma + (attrMods.charisma || 0), difficulty),
+        luck: scaleByDifficulty(baseAttrs.luck + (attrMods.luck || 0), difficulty),
+        intelligence: scaleByDifficulty(baseAttrs.intelligence + (attrMods.intelligence || 0), difficulty),
+        leadership: scaleByDifficulty(baseAttrs.leadership + (attrMods.leadership || 0), difficulty),
+        vitality: scaleByDifficulty(baseAttrs.vitality + (attrMods.vitality || 0), difficulty),
+        willpower: scaleByDifficulty(baseAttrs.willpower + (attrMods.willpower || 0), difficulty),
+        planar: scaleByDifficulty(baseAttrs.planar + (attrMods.planar || 0), difficulty),
+        control: scaleByDifficulty(baseAttrs.control + (attrMods.control || 0), difficulty),
+        dexterity: scaleByDifficulty(baseAttrs.dexterity + (attrMods.dexterity || 0), difficulty),
+        agility: scaleByDifficulty(baseAttrs.agility + (attrMods.agility || 0), difficulty),
+        strength: scaleByDifficulty(baseAttrs.strength + (attrMods.strength || 0), difficulty),
+        endurance: scaleByDifficulty(baseAttrs.endurance + (attrMods.endurance || 0), difficulty),
+      }),
+      battleStats: new CharacterBattleStats(),
+      elements: new CharacterElements(),
+      fame: new CharacterFame(),
+      id: `${className}_${race}_${Bun.randomUUIDv7()}`,
+      level: difficulty,
+      name: { en: nameEn, th: nameTh },
+      needs: new CharacterNeeds(),
+      proficiencies: makeProficiencies(proficiencies),
+      saveRolls: defaultSaveRoll,
+      type: CharacterType.humanoid,
+      vitals: new CharacterVitals({
+        hp: new Vital({ base: hp }),
+        mp: new Vital({ base: mp }),
+        sp: new Vital({ base: sp }),
+      }),
+    });
+    
+    character.race = race;
+    character.activeSkills = activeSkills;
+    character.conditionalSkills = [];
+    character.conditionalSkillsCondition = new DeckCondition({});
+    
+    // Equip based on class
+    equipMOB(character, className, difficulty);
+    
+    return character;
+  }
+
+  /**
+   * Build a character from configuration
+   */
+  static buildCharacter(config: CharacterConfig): Character {
+    let character: Character;
+
+    if (config.type === 'mob' && config.mobId) {
+      // Use predefined MOB
+      const mobFactory = mobRepository[config.mobId];
+      if (!mobFactory) {
+        throw new Error(`Unknown MOB: ${config.mobId}`);
+      }
+      character = mobFactory(config.level);
+    } else if (config.type === 'custom' && config.race && config.class) {
+      // Create custom character
+      character = this.createCharacterOfClass(
+        config.class,
+        config.race,
+        config.level,
+        config.name.en,
+        config.name.th
+      );
+    } else {
+      throw new Error('Invalid character configuration: must specify mobId for mob type or race+class for custom type');
+    }
+
+    // Override name
+    character.name = config.name;
+
+    // Set position
+    character.position = config.position;
+
+    // Override skills if provided
+    if (config.skills && config.skills.length > 0) {
+      character.activeSkills = config.skills.map(skill => ({
+        id: skill.id,
+        level: skill.level as any,
+        exp: 0
+      }));
+    }
+
+    // Override equipment if provided
+    if (config.equipment) {
+      for (const [slot, equipmentId] of Object.entries(config.equipment)) {
+        if (equipmentId) {
+          equipDirect(character, equipmentId, slot as CharacterEquipmentSlot);
+        }
+      }
+    } else if (config.type === 'custom' && config.class) {
+      // Auto-equip based on class if no equipment specified
+      equipMOB(character, config.class, config.level);
+    }
+
+    // Register character
+    activeCharacterRegistry[character.id] = character;
+
+    return character;
+  }
+
+  /**
+   * Build multiple characters from configurations
+   */
+  static buildCharacters(configs: CharacterConfig[]): Character[] {
+    return configs.map(config => this.buildCharacter(config));
+  }
+
+  /**
+   * Clean up characters from registry (call after battle)
+   */
+  static cleanupCharacters(characterIds: string[]): void {
+    for (const id of characterIds) {
+      delete activeCharacterRegistry[id];
+    }
+  }
+}
+

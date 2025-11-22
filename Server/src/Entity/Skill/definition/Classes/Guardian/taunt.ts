@@ -5,7 +5,9 @@ import type { TurnResult } from "../../../types";
 import { ActorEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { statMod } from "src/Utils/statMod";
 import { GuardianSkill } from "./index";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const taunt = new GuardianSkill({
   id: GuardianSkillId.Taunt,
@@ -14,11 +16,12 @@ export const taunt = new GuardianSkill({
     th: "ยั่วยุ",
   },
   description: {
-    en: "Provokes enemies. Grants taunt for 1 turns (+0.5 turns, rounded down, per level). When taunt, enemies will attack you and if attacked during taunt get +1 fire resource",
-    th: "ยั่วยุศัตรู ได้รับสถานะยั่วยุ 1 เทิร์น (+0.5 เทิร์น ต่อเลเวลสกิล ปัดลง). เมื่ออยู่ในสถานะ taunt จะถูกศัตรูเล็งเป็นเป้าหมาย หากถูกโจมตีขณะที่มีสถานะ taunt จะได้รับ fire 1 หน่วย",
+    en: "Provokes enemies. Grants taunt for 2 turns (+0.5 turns, rounded down, per level) + charisma mod/2. When taunt, enemies will attack you and if attacked during taunt get +1 fire resource",
+    th: "ยั่วยุศัตรู ได้รับสถานะยั่วยุ 2 เทิร์น (+0.5 เทิร์น ต่อเลเวลสกิล ปัดลง) + charisma mod/2. เมื่ออยู่ในสถานะ taunt จะถูกศัตรูเล็งเป็นเป้าหมาย หากถูกโจมตีขณะที่มีสถานะ taunt จะได้รับ fire 1 หน่วย",
   },
   requirement: {},
   equipmentNeeded: [],
+  notExistBuff: [BuffEnum.taunt],
   tier: TierEnum.common,
   consume: {
     hp: 0,
@@ -45,8 +48,10 @@ export const taunt = new GuardianSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    // Calculate taunt duration: 2 + 0.5 per level, rounded down
-    const tauntDuration = 1 + Math.floor(0.5 * skillLevel);
+    // Calculate taunt duration: 1 + 0.5 per level + charisma mod/2, rounded down
+    const charismaMod = statMod(actor.attribute.getTotal("charisma"));
+    const charismaBonus = Math.floor(charismaMod / 2);
+    const tauntDuration = 2 + Math.floor(0.5 * skillLevel) + charismaBonus;
 
     // Apply taunt buff to self
     buffsAndDebuffsRepository.taunt.appender(actor, tauntDuration, false, 0);

@@ -14,10 +14,19 @@ export enum BuffEnum {
   planarAbsorption = "planarAbsorption",
   reversalPalm = "reversalPalm",
   innerVeil = "innerVeil",
+  advancingPace = "advancingPace",
   warCry = "warCry",
   edgeCharge = "edgeCharge",
   spellParry = "spellParry",
   rage = "rage",
+  aegisShield = "aegisShield",
+  aegisPulse = "aegisPulse",
+  regen = "regen",
+  parry = "parry",
+  duelingStance = "duelingStance",
+  curseMarkActive = "curseMarkActive",
+  charm = "charm",
+  exposeWeaknessActive = "exposeWeaknessActive",
 }
 
 export enum DebuffEnum {
@@ -30,4 +39,6 @@ export enum DebuffEnum {
   exposed = "exposed",
   bleed = "bleed",
   stun = "stun",
+  entangled = "entangled",
+  hexMark = "hexMark",
 }

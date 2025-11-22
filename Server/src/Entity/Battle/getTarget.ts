@@ -12,13 +12,18 @@ import { TraitEnum } from "../Trait/enum";
 
 export function getTarget(
   actor: Character,
-  targets: Character[],
+  actorParty: Character[],
+  enemyParty: Character[],
+  targetType: "ally" | "enemy" | "any" = "any",
 ): TargetSelector {
-  return new TargetSelector(actor, targets);
+  return new TargetSelector(actor, actorParty, enemyParty, targetType);
 }
 
 class TargetSelector {
   actor: Character;
+  actorParty: Character[];
+  enemyParty: Character[];
+  targetType: "ally" | "enemy" | "any" = "any";
   possibleTargets: Character[];
   scope: "one" | "many" | "all" = "one";
   row: "any" | "frontOnly" | "backOnly" | "frontFirst" | "backFirst" = "any";
@@ -33,9 +38,31 @@ class TargetSelector {
   tauntCount: boolean = true;
   skipHiding: boolean = false;
   deadTarget: "include" | "exclude" | "only" = "exclude";
-  constructor(actor: Character, possibleTargets: Character[]) {
+  constructor(actor: Character, actorParty: Character[], enemyParty: Character[], targetType: "ally" | "enemy" | "any" = "any") {
     this.actor = actor;
-    this.possibleTargets = possibleTargets;
+    this.actorParty = actorParty;
+    this.enemyParty = enemyParty;
+    this.targetType = targetType;
+    this.possibleTargets = this.getPossibleTargets();
+  }
+
+  getPossibleTargets(): Character[] {
+    const charmed = this.actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.charm)?.value ? true : false;
+    const canResistCharm = rollTwenty().total + statMod(this.actor.attribute.getTotal("willpower")) > 15;
+    
+    // If charmed and can't resist, target wrong party
+    const targetWrongParty = charmed && !canResistCharm;
+    
+    if (this.targetType === "ally") {
+      // Want to target allies: if charmed and can't resist, target enemies instead
+      return targetWrongParty ? this.enemyParty : this.actorParty;
+    } else if (this.targetType === "enemy") {
+      // Want to target enemies: if charmed and can't resist, target allies instead
+      return targetWrongParty ? this.actorParty : this.enemyParty;
+    } else {
+      // "any" - return all characters
+      return [...this.actorParty, ...this.enemyParty];
+    }
   }
 
   // Scoping Methods

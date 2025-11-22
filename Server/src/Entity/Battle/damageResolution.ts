@@ -13,6 +13,8 @@ import type { BattleStatistics } from "./BattleStatistics";
 import {traitRepository} from "src/Entity/Trait/repository";
 import { roll } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
+import { ArmorClass } from "../Item/Equipment/Armor/Armor";
+import { bodyRepository } from "../Item/Equipment/Armor/Body/repository";
 
 export interface DamageResult {
   actualDamage: number;
@@ -75,14 +77,87 @@ export function resolveDamage(
     )
   }
 
+  // Dueling Stance: Add hit bonus and crit bonus from attacker's buff
+  const duelingStanceAttacker = attacker.buffsAndDebuffs.buffs.entry.get(BuffEnum.duelingStance);
+  if (duelingStanceAttacker && duelingStanceAttacker.value > 0) {
+    // Recalculate control mod from current attributes
+    const controlMod = statMod(attacker.attribute.getTotal("control"));
+    
+    // +control mod/2 to hit rolls
+    const hitBonus = Math.floor(controlMod / 2);
+    damageOutput.hit += hitBonus;
+    
+    // +2 crit at level 5 (permValue > 0 indicates level 5+)
+    if (duelingStanceAttacker.permValue > 0) {
+      damageOutput.crit += 2;
+    }
+    
+    Report.debug(`        ⚔️ Dueling Stance: +${hitBonus} hit${duelingStanceAttacker.permValue > 0 ? ", +2 crit" : ""}`);
+  }
+
+  // Curse Mark: Check if attacker has Curse Mark Active buff and target has Hex Mark debuff
+  // If matched, add bonus damage and remove both buff/debuff
+  const curseMarkActive = attacker.buffsAndDebuffs.buffs.entry.get(BuffEnum.curseMarkActive);
+  const hexMark = target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.hexMark);
+  
+  if (curseMarkActive && curseMarkActive.value > 0 && hexMark && hexMark.value > 0) {
+    // Both buff and debuff are active - add bonus damage
+    // Bonus damage based on INT mod stored in permValue
+    const intMod = curseMarkActive.permValue || 0;
+    const bonusDamage = Math.floor(intMod / 2) + roll(1).d(4).total; // INT mod/2 + 1d4
+    damageOutput.damage += bonusDamage;
+    
+    Report.debug(`        🧙 Curse Mark matched! Bonus damage: ${bonusDamage} (INT mod/2 + 1d4)`);
+    
+    // Remove both buff and debuff completely after use
+    attacker.buffsAndDebuffs.buffs.entry.delete(BuffEnum.curseMarkActive);
+    target.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.hexMark);
+    
+    Report.debug(`        🧙 Curse Mark and Hex Mark removed`);
+  }
+
+  // Expose Weakness: Check if attacker has Expose Weakness Active buff and target has Exposed debuff
+  // If matched, add hit bonus and remove the buff (keep Exposed for JudgmentDay +50% damage)
+  const exposeWeaknessActive = attacker.buffsAndDebuffs.buffs.entry.get(BuffEnum.exposeWeaknessActive);
+  const exposedWeakness = target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.exposed);
+  
+  if (exposeWeaknessActive && exposeWeaknessActive.value > 0 && exposedWeakness && exposedWeakness.value > 0) {
+    // Both buff and debuff are active - add hit bonus
+    // Hit bonus based on WIL mod stored in permValue
+    const wilMod = exposeWeaknessActive.permValue || 0;
+    const hitBonus = Math.floor(wilMod / 2);
+    if (hitBonus > 0) {
+      damageOutput.hit += hitBonus;
+      Report.debug(`        ⚖️ Expose Weakness matched! +${hitBonus} hit (WIL mod/2)`);
+    }
+    
+    // Remove only the buff after use (keep Exposed debuff for JudgmentDay +50% damage and other skills)
+    attacker.buffsAndDebuffs.buffs.entry.delete(BuffEnum.exposeWeaknessActive);
+    
+    Report.debug(`        ⚖️ Expose Weakness Active removed (Exposed persists for JudgmentDay)`);
+  }
+
   // --- HIT / DODGE ---
   // If you mean "nat 20 can't be dodged", you need a raw die or a boolean flag.
   // Here we treat 20+ as "auto-hit" only if that's your rule; adjust as needed.
   // Neutral AC is added to the dodge chance to prevent the player from always hitting;
-  const dodgeChance =
+  let dodgeChance =
     target.battleStats.getTotal("dodge") +
     statMod(target.attribute.getTotal("agility")) +
     NEUTRAL_AC;
+  
+  // Dueling Stance: Add dodge bonus from target's buff
+  const duelingStanceTarget = target.buffsAndDebuffs.buffs.entry.get(BuffEnum.duelingStance);
+  if (duelingStanceTarget && duelingStanceTarget.value > 0) {
+    // Recalculate agility mod from current attributes
+    const agilityMod = statMod(target.attribute.getTotal("agility"));
+    
+    // +agility mod/2 to dodge
+    const dodgeBonus = Math.floor(agilityMod / 2);
+    dodgeChance += dodgeBonus;
+    
+    Report.debug(`        ⚔️ Dueling Stance: +${dodgeBonus} dodge`);
+  }
 
   // Attacker's 'hit' already includes their bonuses
   const critDefense = statMod(target.attribute.getTotal("endurance"));
@@ -117,11 +192,41 @@ export function resolveDamage(
 
   Report.debug(`        ✅ HIT!`);
 
-  // Aptitude
+  // Spell Casting Armor Penalty: Reduce magic damage if caster wears non-cloth armor
+  // True damage bypasses this penalty as it cannot be reduced
+  if (damageOutput.isMagic && !damageOutput.trueDamage) {
+    const spellCastingArmorPenaltyMultiplier: Record<ArmorClass, number> = {
+      [ArmorClass.Cloth]: 1.0,    // No penalty for cloth armor
+      [ArmorClass.Light]: 0.9,    // 10% damage reduction for light armor
+      [ArmorClass.Medium]: 0.8,   // 20% damage reduction for medium armor
+      [ArmorClass.Heavy]: 0.7,    // 30% damage reduction for heavy armor
+    };
+
+    let armorPenaltyMultiplier = 1.0;
+    if (attacker.equipments.body) {
+      const armor = bodyRepository[attacker.equipments.body];
+      if (armor) {
+        armorPenaltyMultiplier = spellCastingArmorPenaltyMultiplier[armor.armorData.armorClass] ?? 1.0;
+        if (armorPenaltyMultiplier < 1.0) {
+          const originalDamage = damageOutput.damage;
+          damageOutput.damage = Math.floor(damageOutput.damage * armorPenaltyMultiplier);
+          const reductionPercent = Math.round((1 - armorPenaltyMultiplier) * 100);
+          Report.debug(
+            `        🛡️ Spell Casting Armor Penalty: ${armor.armorData.armorClass} armor reduces magic damage by ${reductionPercent}% (${originalDamage} → ${damageOutput.damage})`,
+          );
+        }
+      }
+    }
+  }
+
+  // Aptitude: Apply caster's spell effectiveness and target's magic resistance
   if (damageOutput.isMagic) {
-    damageOutput.damage =
-      damageOutput.damage *
-      target.planarAptitude.getSpellEffectivenessAptitude();
+    // Caster's spell effectiveness: how well they cast spells
+    const casterSpellEffectiveness = attacker.planarAptitude.getSpellEffectivenessAptitude();
+    damageOutput.damage = damageOutput.damage * casterSpellEffectiveness;
+    Report.debug(
+      `        Caster Spell Effectiveness: ${casterSpellEffectiveness.toFixed(2)} (aptitude: ${attacker.planarAptitude.aptitude})`,
+    );
   }
 
   // --- MITIGATION ---
@@ -256,6 +361,62 @@ export function resolveDamage(
     }
   }
 
+  // Parry & Riposte: Check before other damage mitigation
+  // If save passes, negate attack and counter-attack with slash damage
+  const parry = target.buffsAndDebuffs.buffs.entry.get(BuffEnum.parry);
+  if (parry && parry.value > 0 && !damageOutput.isMagic) {
+    const dc = 13;
+    const saveRoll = target.rollSave("control");
+    
+    if (saveRoll >= dc) {
+      // Save passed: negate attack and counter-attack
+      const skillLevel = parry.permValue || 1; // Use stored skill level
+      const dexMod = statMod(target.attribute.getTotal("dexterity"));
+      const levelScalar = skillLevelMultiplier(skillLevel);
+      const weaponDamge = target.getWeapon().weaponData.damage.physicalDamageDice;
+      const counterDamage = (roll(weaponDamge.dice).d(weaponDamge.face).total + dexMod )* levelScalar;
+      
+      // Deal counter damage to attacker
+      const counterDamageOutput: DamageInput = {
+        damage: Math.max(0, Math.floor(counterDamage)),
+        hit: 999, // Auto-hit counter
+        crit: 0,
+        type: DamageType.slash,
+        isMagic: false,
+      };
+      
+      // Remove the buff before resolving the counter damage to prevent infinite loops
+      target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.parry);
+      
+      const counterResult = resolveDamage(
+        targetId,
+        attackerId,
+        counterDamageOutput,
+        location,
+        critModifier,
+        stats || undefined,
+      );
+      
+      Report.debug(`        ⚔️ Parry & Riposte! ${target.name.en} countered for ${counterResult.actualDamage} damage!`);
+      
+      // Record the negated attack as a miss
+      if (stats) {
+        stats.recordDamageDealt(attackerId, targetId, 0, false, false);
+      }
+      
+      return {
+        actualDamage: 0,
+        damageType: damageOutput.type,
+        isHit: false, // Attack was negated
+        isCrit: false,
+      };
+    } else {
+      // Save failed: remove buff and continue with normal damage
+      Report.debug(`        ❌ Parry & Riposte failed! ${target.name.en} failed the willpower save (DC${dc}).`);
+      target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.parry);
+    }
+  }
+
   const arcaneShield = target.buffsAndDebuffs.buffs.entry.get(
     BuffEnum.arcaneShield,
   );
@@ -266,6 +427,37 @@ export function resolveDamage(
 
     if (arcaneShield.value <= 0) {
       target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.arcaneShield);
+    }
+  }
+
+  // Aegis Shield: Each stack can mitigate 5 + (willpower mod) points of incoming damage
+  const aegisShield = target.buffsAndDebuffs.buffs.entry.get(BuffEnum.aegisShield);
+  if (aegisShield && aegisShield.value > 0 && damage > 0) {
+    const willMod = statMod(target.attribute.getTotal("willpower"));
+    const mitigationPerStack = 5 + willMod;
+    let remainingDamage = damage;
+    let stacksUsed = 0;
+
+    // Calculate how many stacks are needed to fully mitigate damage
+    while (remainingDamage > 0 && aegisShield.value > 0) {
+      const mitigated = Math.min(remainingDamage, mitigationPerStack);
+      remainingDamage -= mitigated;
+      aegisShield.value -= 1;
+      stacksUsed += 1;
+    }
+
+    const originalDamage = damage;
+    damage = remainingDamage;
+    const totalMitigated = originalDamage - damage;
+    
+    if (stacksUsed > 0) {
+      Report.debug(`        🛡️ Aegis Shield mitigated ${totalMitigated} damage using ${stacksUsed} stack(s) (${damage} remaining)`);
+    }
+
+    if (aegisShield.value <= 0) {
+      // When Aegis Shield is depleted, add Aegis Pulse buff for 1 turn
+      buffsRepository.aegisPulse.appender(target, 1, false, 0);
+      target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.aegisShield);
     }
   }
 
@@ -305,6 +497,7 @@ export function resolveDamage(
   }
 
   // Exposed debuff: Add 1d3 extra damage from all sources
+  // Note: exposed variable is already defined earlier for crit defense, reuse it
   if (exposed && exposed.value > 0) {
     const exposedBonus = roll(1).d(3).total;
     damage += exposedBonus;

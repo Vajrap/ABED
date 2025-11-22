@@ -1,7 +1,8 @@
 import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums";
 import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 import { statMod } from "../../Utils/statMod";
-import { BuffAndDebuffEnum } from "../BuffsAndDebuffs/enum";
+import { roll } from "../../Utils/Dice";
+import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
 import { buffsAndDebuffsRepository, buffsRepository, debuffsRepository } from "../BuffsAndDebuffs/repository";
 import type { Character } from "../Character/Character";
 import { trainAttribute } from "../Character/Subclass/Stats/train";
@@ -317,7 +318,7 @@ export class Battle {
     Report.debug(`  Selected Skill: ${skill.name.en} (Level ${skillLevel})`);
 
     // Record turn and skill used
-    this.battleStatistics.recordTurn(actor.id, skill.id);
+    this.battleStatistics.recordTurn(actor.id, skill.id as string);
     // Consume Resource
     for (const consume of skill.consume.elements) {
       actor.resources[consume.element] -= consume.value;
@@ -559,9 +560,30 @@ enum BattleStatus {
 
 function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
   let abGaugeIncrement = Math.max(
-    statMod(actor.attribute.getStat("agility").total),
+    10 + statMod(actor.attribute.getStat("agility").total),
     1,
   );
+
+  const hasteEntry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.haste);
+  const slowEntry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.slow);
+  const advancingPaceEntry = actor.buffsAndDebuffs.buffs.entry.get(
+    BuffEnum.advancingPace,
+  );
+
+  let speedMultiplier = 1;
+  if (hasteEntry) {
+    speedMultiplier += 0.5;
+  }
+
+  if (slowEntry) {
+    speedMultiplier -= 0.5;
+  }
+
+  abGaugeIncrement*=speedMultiplier;
+
+  if (advancingPaceEntry) {
+    abGaugeIncrement += roll(1).d(4).total;
+  }
 
   actor.abGauge += abGaugeIncrement;
 

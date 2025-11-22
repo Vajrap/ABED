@@ -57,7 +57,7 @@ export const throwingKnives = new RogueSkill({
 
     // Select random targets (can repeat)
     for (let i = 0; i < numTargets; i++) {
-      const target = getTarget(actor, targetParty).one();
+      const target = getTarget(actor, actorParty, targetParty, "enemy").one();
       
       if (!target) {
         break; // No more valid targets
