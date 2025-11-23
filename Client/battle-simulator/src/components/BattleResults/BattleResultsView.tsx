@@ -7,12 +7,19 @@ import {
   AccordionSummary,
   AccordionDetails,
   Grid,
+  Button,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import type { SimulateBattleResponse } from '../../services/types';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import type { SimulateBattleResponse, AIAnalysis } from '../../services/types';
+import { BattleSimulatorAPI } from '../../services/api';
+import { BATTLE_ANALYSIS_SYSTEM_PROMPT } from '../../constants/aiSystemPrompt';
 import TurnDetail from './TurnDetail';
 import StatisticsPanel from './StatisticsPanel';
 import PartySummary from './PartySummary';
+import AIAnalysisPanel from './AIAnalysisPanel';
 
 interface BattleResultsViewProps {
   result: SimulateBattleResponse;
@@ -23,14 +30,33 @@ export default function BattleResultsView({ result }: BattleResultsViewProps) {
   const [expandedSections, setExpandedSections] = useState({
     turnByTurn: true,
     statistics: true,
+    aiAnalysis: false,
   });
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const handleTurnChange = (turn: number) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpandedTurn(isExpanded ? turn : false);
   };
 
-  const handleSectionChange = (section: 'turnByTurn' | 'statistics') => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+  const handleSectionChange = (section: 'turnByTurn' | 'statistics' | 'aiAnalysis') => (_event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpandedSections(prev => ({ ...prev, [section]: isExpanded }));
+  };
+
+  const handleAIAnalysis = async () => {
+    setAnalyzing(true);
+    setAnalysisError(null);
+    try {
+      const analysis = await BattleSimulatorAPI.analyzeBattle(result, BATTLE_ANALYSIS_SYSTEM_PROMPT);
+      setAiAnalysis(analysis);
+      setExpandedSections(prev => ({ ...prev, aiAnalysis: true }));
+    } catch (error) {
+      console.error('AI analysis failed', error);
+      setAnalysisError(error instanceof Error ? error.message : 'Failed to analyze battle');
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   return (
@@ -120,6 +146,45 @@ export default function BattleResultsView({ result }: BattleResultsViewProps) {
           </Box>
         </AccordionDetails>
       </Accordion>
+
+      {/* AI Analysis Section */}
+      <Paper sx={{ p: 2, mt: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h6">AI Battle Analysis</Typography>
+          <Button
+            onClick={handleAIAnalysis}
+            disabled={analyzing}
+            variant="outlined"
+            startIcon={analyzing ? <CircularProgress size={20} /> : <AutoAwesomeIcon />}
+          >
+            {analyzing ? 'Analyzing...' : 'Analyze with AI'}
+          </Button>
+        </Box>
+
+        {analysisError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {analysisError}
+          </Alert>
+        )}
+
+        {aiAnalysis && (
+          <Accordion
+            expanded={expandedSections.aiAnalysis}
+            onChange={handleSectionChange('aiAnalysis')}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="h6">
+                Analysis Results
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 0 }}>
+              <Box sx={{ p: 3 }}>
+                <AIAnalysisPanel analysis={aiAnalysis} />
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+        )}
+      </Paper>
     </Box>
   );
 }

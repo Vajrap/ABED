@@ -89,6 +89,25 @@ export interface StructuredBattleStatistics {
   characters: Record<string, CharacterStructuredStats>;
 }
 
+export interface SkillDeckEntry {
+  skillId: string;
+  skillName: string;
+  level: number;
+  position: number;
+  consume: {
+    hp: number;
+    mp: number;
+    sp: number;
+    elements: Array<{ element: string; value: number }>;
+  };
+  produce: {
+    hp: number;
+    mp: number;
+    sp: number;
+    elements: Array<{ element: string; min: number; max: number }>;
+  };
+}
+
 export interface CharacterStructuredStats {
   characterId: string;
   characterName: string;
@@ -101,6 +120,8 @@ export interface CharacterStructuredStats {
   frontRowTargets: number;
   backRowTargets: number;
   skillsUsed: Record<string, number>;
+  skillDeck: SkillDeckEntry[];
+  conditionalSkillDeck?: SkillDeckEntry[];
 }
 
 export interface TurnAction {
@@ -137,6 +158,57 @@ export interface PresetInfo {
 
 export interface PresetsResponse {
   presets: PresetInfo[];
+}
+
+/**
+ * AI Analysis response from n8n/LM Studio
+ */
+export interface AIAnalysisResponse {
+  outPut?: string;  // Response from n8n (may be JSON string or object)
+  output?: string;  // Alternative field name
+  [key: string]: any;  // Allow other response formats
+}
+
+/**
+ * Parsed AI Analysis result
+ */
+export interface AIAnalysis {
+  sanityScore: number;
+  summary: string;
+  skillFlow: {
+    diversity: string;
+    selectionLogic: string;
+    conditionalDeck: string;
+    issues: string[];
+  };
+  elementFlow: {
+    production: string;
+    consumption: string;
+    chains: string;
+    accumulation: string;
+    efficiency: string;
+    issues: string[];
+  };
+  battleFlow: {
+    duration: string;
+    resourceUsage: string;
+    turnEfficiency: string;
+    partyBalance: string;
+  };
+  performance: {
+    roleFulfillment: string;
+    positionLogic: string;
+    resourceManagement: string;
+  };
+  anomalies: Array<{
+    type: 'bug' | 'balance' | 'flow';
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    description: string;
+    evidence: string;
+    character?: string;
+    turn?: number;
+  }>;
+  recommendations: string[];
 }
 
 export interface SavePresetRequest {

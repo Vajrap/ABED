@@ -8,11 +8,12 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import type { Character } from "src/Entity/Character/Character";
 import { CharacterBuilderService } from "./CharacterBuilderService";
 import type { SimulateBattleRequest } from "../types/requests";
-import type { SimulateBattleResponse, TurnDetail, CharacterSnapshot, StructuredBattleStatistics, CharacterStructuredStats, TurnAction } from "../types/responses";
+import type { SimulateBattleResponse, TurnDetail, CharacterSnapshot, StructuredBattleStatistics, CharacterStructuredStats, TurnAction, SkillDeckEntry } from "../types/responses";
 import type { CharacterBattleStats } from "src/Entity/Battle/BattleStatistics";
 import type { TurnResult } from "src/Entity/Skill/types";
 import { skillRepository } from "src/Entity/Skill/repository";
 import type { SkillId } from "src/Entity/Skill/enums";
+import Report from "src/Utils/Reporter";
 
 export class BattleSimulatorService {
   /**
@@ -65,7 +66,7 @@ export class BattleSimulatorService {
         throw new Error(`Unknown location: ${request.location}`);
       }
 
-      // Create and run battle
+      // Create battle first (this initializes allParticipants)
       const battle = new Battle(
         partyA,
         partyB,
@@ -73,6 +74,18 @@ export class BattleSimulatorService {
         GameTime,
         request.battleType,
       );
+
+      // Capture skill decks AFTER battle creation but BEFORE battle starts
+      // Use battle.allParticipants to ensure we're using the exact characters that will fight
+      const skillDecks = new Map<string, { active: SkillDeckEntry[]; conditional?: SkillDeckEntry[] }>();
+      for (const char of battle.allParticipants) {
+        const activeDeck = this.buildSkillDeck(char.activeSkills || []);
+        const conditionalDeck = char.conditionalSkills && char.conditionalSkills.length > 0 
+          ? this.buildSkillDeck(char.conditionalSkills) 
+          : undefined;
+        
+        skillDecks.set(char.id, { active: activeDeck, conditional: conditionalDeck });
+      }
 
       await battle.startBattle();
 
@@ -148,7 +161,7 @@ export class BattleSimulatorService {
       // Get statistics
       const characterStats = battle.battleStatistics.getAllStats();
       const summary = battle.battleStatistics.getSummary();
-      const structuredStats = this.buildStructuredStatistics(battle, turns);
+      const structuredStats = this.buildStructuredStatistics(battle, turns, skillDecks);
 
       return {
         battleId: battle.id,
@@ -428,11 +441,61 @@ export class BattleSimulatorService {
   }
 
   /**
+   * Build skill deck entry from character skill object
+   */
+  private static buildSkillDeck(skills: Array<{ id: SkillId; level: number; exp: number }>): SkillDeckEntry[] {
+    if (!skills || skills.length === 0) {
+      return [];
+    }
+    return skills.map((skillObj, index) => {
+      const skill = skillRepository[skillObj.id];
+      if (!skill) {
+        // Fallback if skill not found
+      return {
+        skillId: String(skillObj.id),
+        skillName: String(skillObj.id),
+        level: skillObj.level,
+        position: index,
+        consume: { hp: 0, mp: 0, sp: 0, elements: [] },
+        produce: { hp: 0, mp: 0, sp: 0, elements: [] },
+      };
+      }
+
+      return {
+        skillId: String(skillObj.id),
+        skillName: skill.name.en,
+        level: skillObj.level,
+        position: index,
+        consume: {
+          hp: skill.consume.hp,
+          mp: skill.consume.mp,
+          sp: skill.consume.sp,
+          elements: skill.consume.elements.map(e => ({
+            element: String(e.element),
+            value: e.value,
+          })),
+        },
+        produce: {
+          hp: skill.produce.hp,
+          mp: skill.produce.mp,
+          sp: skill.produce.sp,
+          elements: skill.produce.elements.map(e => ({
+            element: String(e.element),
+            min: e.min,
+            max: e.max,
+          })),
+        },
+      };
+    });
+  }
+
+  /**
    * Build structured statistics for UI rendering
    */
   private static buildStructuredStatistics(
     battle: Battle,
-    turns: TurnDetail[]
+    turns: TurnDetail[],
+    skillDecks: Map<string, { active: SkillDeckEntry[]; conditional?: SkillDeckEntry[] }>
   ): StructuredBattleStatistics {
     const characterStats = battle.battleStatistics.getAllStats();
     const characters: Record<string, CharacterStructuredStats> = {};
@@ -447,7 +510,16 @@ export class BattleSimulatorService {
         .filter(([pos]) => parseInt(pos) >= 3)
         .reduce((sum, [, count]) => sum + count, 0);
 
-      characters[stats.characterId] = {
+      // Get skill deck for this character
+      const deckInfo = skillDecks.get(stats.characterId);
+      const activeDeck = deckInfo?.active || [];
+      const conditionalDeck = deckInfo?.conditional;
+
+      // Ensure skillDeck is always an array (never undefined or null)
+      const finalActiveDeck = Array.isArray(activeDeck) ? activeDeck : [];
+      const finalConditionalDeck = conditionalDeck && Array.isArray(conditionalDeck) ? conditionalDeck : undefined;
+      
+      const charStats: CharacterStructuredStats = {
         characterId: stats.characterId,
         characterName: stats.characterName,
         position: stats.position,
@@ -459,7 +531,11 @@ export class BattleSimulatorService {
         frontRowTargets,
         backRowTargets,
         skillsUsed: { ...stats.skillsUsed },
+        skillDeck: finalActiveDeck, // Always an array, never undefined
+        conditionalSkillDeck: finalConditionalDeck,
       };
+      
+      characters[stats.characterId] = charStats;
     }
 
     // Build turn-by-turn actions for each character

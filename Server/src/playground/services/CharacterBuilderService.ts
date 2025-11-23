@@ -40,10 +40,39 @@ import {
   WarlockSkillId,
 } from "src/Entity/Skill/enums";
 import { equipMOB } from "src/Entity/Character/MOBs/equipmentHelpers";
+import { MOBs } from "src/Entity/Character/MOBs/enums";
 
 export class CharacterBuilderService {
   /**
+   * Map race + class combination to MOB factory function
+   * TODO: Complete this mapping for all race/class combinations
+   * Currently returns the MOB enum if available, otherwise null
+   */
+  private static getMOBIdForClass(
+    className: ClassEnum,
+    race: RaceEnum,
+  ): MOBs | null {
+    // Map race to lowercase prefix (Human -> human, Elven -> elven, etc.)
+    const racePrefix = race.charAt(0).toLowerCase() + race.slice(1).toLowerCase();
+    // Class name should match exactly (Warrior, Mage, Cleric, etc.)
+    const classSuffix = className;
+    const mobKey = `${racePrefix}${classSuffix}` as keyof typeof MOBs;
+    
+    // Check if this MOB exists in the enum and repository
+    if (mobKey in MOBs) {
+      const mobId = MOBs[mobKey as keyof typeof MOBs];
+      if (mobId in mobRepository) {
+        return mobId;
+      }
+    }
+    
+    return null;
+  }
+
+  /**
    * Create a custom character of a specific class and race
+   * TODO: This should use the actual MOB factory functions from mobRepository
+   * For now, it tries to use the MOB factory if available, otherwise falls back to manual creation
    */
   private static createCharacterOfClass(
     className: ClassEnum,
@@ -52,6 +81,20 @@ export class CharacterBuilderService {
     nameEn: string,
     nameTh: string,
   ): Character {
+    // Try to get the MOB factory for this race/class combination
+    const mobId = this.getMOBIdForClass(className, race);
+    
+    if (mobId && mobId in mobRepository) {
+      // Use the predefined MOB factory
+      const mobFactory = mobRepository[mobId];
+      const character = mobFactory(difficulty);
+      // Override name
+      character.name = { en: nameEn, th: nameTh };
+      return character;
+    }
+    
+    // Fallback to manual creation (old implementation)
+    // TODO: Remove this fallback once all race/class combinations are mapped to MOB factories
     const baseAttrs = RACE_ATTRIBUTES[race].attributes;
     
     // Default stats - will be customized per class
@@ -211,6 +254,7 @@ export class CharacterBuilderService {
         sp = scaleByDifficulty(35, difficulty);
         Object.assign(attrMods, { strength: 3, endurance: 2, vitality: 2, leadership: 1 });
         Object.assign(proficiencies, { sword: 9, axe: 8, hammer: 8, shield: 9, blade: 7 });
+        // Order: Hardest first (WarCry needs 3 SP + 2 fire), easiest last (PowerStrike needs 2 neutral)
         activeSkills.push({ id: WarriorSkillId.WarCry as SkillId, level: difficulty as any, exp: 0 });
         activeSkills.push({ id: WarriorSkillId.PowerStrike as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
         break;
@@ -221,8 +265,9 @@ export class CharacterBuilderService {
         sp = scaleByDifficulty(10, difficulty);
         Object.assign(attrMods, { willpower: 3, planar: 2, control: 2, vitality: 1 });
         Object.assign(proficiencies, { hammer: 10, staff: 11, shield: 10, orb: 9 });
-        activeSkills.push({ id: ClericSkillId.Heal as SkillId, level: difficulty as any, exp: 0 });
+        // Order: Hardest first (Bless needs 4 MP + 3 order), easiest last (Heal needs 3 MP)
         activeSkills.push({ id: ClericSkillId.Bless as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        activeSkills.push({ id: ClericSkillId.Heal as SkillId, level: difficulty as any, exp: 0 });
         break;
         
       case ClassEnum.Paladin:
@@ -231,8 +276,9 @@ export class CharacterBuilderService {
         sp = scaleByDifficulty(30, difficulty);
         Object.assign(attrMods, { strength: 2, willpower: 3, planar: 2, endurance: 2 });
         Object.assign(proficiencies, { sword: 10, shield: 10, hammer: 8, blade: 7 });
-        activeSkills.push({ id: ClericSkillId.Radiance as SkillId, level: difficulty as any, exp: 0 });
+        // Order: Hardest first (DivineStrike needs 2 SP + 2 order), easiest last (Radiance needs 2 MP)
         activeSkills.push({ id: PaladinSkillId.DivineStrike as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        activeSkills.push({ id: ClericSkillId.Radiance as SkillId, level: difficulty as any, exp: 0 });
         break;
         
       case ClassEnum.Druid:
@@ -250,8 +296,10 @@ export class CharacterBuilderService {
         sp = scaleByDifficulty(8, difficulty);
         Object.assign(attrMods, { intelligence: 3, planar: 3, control: 2, willpower: 1 });
         Object.assign(proficiencies, { wand: 10, staff: 9, book: 10, orb: 9 });
-        activeSkills.push({ id: MageSkillId.FireBolt as SkillId, level: difficulty as any, exp: 0 });
+        // Order: Both are similar (2 MP, no elements), but FireBolt produces fire (more useful for chains)
+        // So put ArcaneBolt first (less useful), FireBolt last (more useful, cantrip-like)
         activeSkills.push({ id: MageSkillId.ArcaneBolt as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+        activeSkills.push({ id: MageSkillId.FireBolt as SkillId, level: difficulty as any, exp: 0 });
         break;
         
       case ClassEnum.Rogue:

@@ -77,6 +77,25 @@ export interface StructuredBattleStatistics {
   characters: Record<string, CharacterStructuredStats>; // characterId -> stats
 }
 
+export interface SkillDeckEntry {
+  skillId: string;
+  skillName: string;
+  level: number;
+  position: number; // Position in deck (0 = first checked)
+  consume: {
+    hp: number;
+    mp: number;
+    sp: number;
+    elements: Array<{ element: string; value: number }>;
+  };
+  produce: {
+    hp: number;
+    mp: number;
+    sp: number;
+    elements: Array<{ element: string; min: number; max: number }>;
+  };
+}
+
 export interface CharacterStructuredStats {
   characterId: string;
   characterName: string;
@@ -89,6 +108,8 @@ export interface CharacterStructuredStats {
   frontRowTargets: number; // Hits on front row (0-2)
   backRowTargets: number; // Hits on back row (3+)
   skillsUsed: Record<string, number>; // skillId -> count
+  skillDeck: SkillDeckEntry[]; // Active skill deck in order
+  conditionalSkillDeck?: SkillDeckEntry[]; // Conditional skill deck (if exists)
 }
 
 export interface TurnAction {

@@ -128,10 +128,198 @@ export default function StatisticsPanel({ statistics }: StatisticsPanelProps) {
                 </Box>
               </Grid>
 
-              {/* Skills Used */}
+              {/* Skill Deck */}
               <Grid item xs={12}>
                 <Typography variant="subtitle2" gutterBottom color="text.secondary">
-                  Skills Used
+                  Skill Deck (in order, position 0 = first checked)
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {char.skillDeck && char.skillDeck.length > 0 ? (
+                    char.skillDeck.map((skill, idx) => {
+                      const usageCount = char.skillsUsed[skill.skillId] || 0;
+                      const usagePercentage = char.turns.length > 0 
+                        ? ((usageCount / char.turns.length) * 100).toFixed(1) 
+                        : '0.0';
+                      
+                      return (
+                        <Paper 
+                          key={idx} 
+                          elevation={1} 
+                          sx={{ 
+                            p: 1.5, 
+                            bgcolor: usageCount > 0 ? 'action.selected' : 'action.hover',
+                            border: usageCount === 0 ? '1px dashed' : 'none',
+                            borderColor: 'warning.main'
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                            <Chip 
+                              label={`#${skill.position}`}
+                              size="small"
+                              variant="outlined"
+                              sx={{ minWidth: 50 }}
+                            />
+                            <Typography variant="body2" fontWeight="bold">
+                              {skill.skillName} (Lv {skill.level})
+                            </Typography>
+                            {usageCount > 0 && (
+                              <Chip 
+                                label={`Used ${usageCount}x (${usagePercentage}%)`}
+                                size="small"
+                                color="success"
+                              />
+                            )}
+                            {usageCount === 0 && (
+                              <Chip 
+                                label="Never used"
+                                size="small"
+                                color="warning"
+                                variant="outlined"
+                              />
+                            )}
+                          </Box>
+                          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 0.5 }}>
+                            {/* Consume */}
+                            <Box>
+                              <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                                Consumes:
+                              </Typography>
+                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.25 }}>
+                                {skill.consume.hp > 0 && (
+                                  <Chip label={`${skill.consume.hp} HP`} size="small" color="error" variant="outlined" />
+                                )}
+                                {skill.consume.mp > 0 && (
+                                  <Chip label={`${skill.consume.mp} MP`} size="small" color="info" variant="outlined" />
+                                )}
+                                {skill.consume.sp > 0 && (
+                                  <Chip label={`${skill.consume.sp} SP`} size="small" color="warning" variant="outlined" />
+                                )}
+                                {skill.consume.elements.map((elem, i) => (
+                                  <Chip 
+                                    key={i}
+                                    label={`${elem.value} ${elem.element}`}
+                                    size="small"
+                                    variant="outlined"
+                                  />
+                                ))}
+                                {skill.consume.hp === 0 && skill.consume.mp === 0 && skill.consume.sp === 0 && skill.consume.elements.length === 0 && (
+                                  <Typography variant="caption" color="text.secondary">None</Typography>
+                                )}
+                              </Box>
+                            </Box>
+                            {/* Produce */}
+                            <Box>
+                              <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                                Produces:
+                              </Typography>
+                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.25 }}>
+                                {skill.produce.hp > 0 && (
+                                  <Chip label={`${skill.produce.hp} HP`} size="small" color="success" variant="outlined" />
+                                )}
+                                {skill.produce.mp > 0 && (
+                                  <Chip label={`${skill.produce.mp} MP`} size="small" color="info" variant="outlined" />
+                                )}
+                                {skill.produce.sp > 0 && (
+                                  <Chip label={`${skill.produce.sp} SP`} size="small" color="warning" variant="outlined" />
+                                )}
+                                {skill.produce.elements.map((elem, i) => (
+                                  <Chip 
+                                    key={i}
+                                    label={`${elem.min === elem.max ? elem.min : `${elem.min}-${elem.max}`} ${elem.element}`}
+                                    size="small"
+                                    color="success"
+                                    variant="outlined"
+                                  />
+                                ))}
+                                {skill.produce.hp === 0 && skill.produce.mp === 0 && skill.produce.sp === 0 && skill.produce.elements.length === 0 && (
+                                  <Typography variant="caption" color="text.secondary">None</Typography>
+                                )}
+                              </Box>
+                            </Box>
+                          </Box>
+                        </Paper>
+                      );
+                    })
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No skills in deck
+                    </Typography>
+                  )}
+                </Box>
+              </Grid>
+
+              {/* Conditional Skill Deck */}
+              {char.conditionalSkillDeck && char.conditionalSkillDeck.length > 0 && (
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" gutterBottom color="text.secondary">
+                    Conditional Skill Deck (used when HP low)
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {char.conditionalSkillDeck.map((skill, idx) => (
+                      <Paper key={idx} elevation={1} sx={{ p: 1.5, bgcolor: 'action.hover' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                          <Chip 
+                            label={`#${skill.position}`}
+                            size="small"
+                            variant="outlined"
+                            sx={{ minWidth: 50 }}
+                          />
+                          <Typography variant="body2" fontWeight="bold">
+                            {skill.skillName} (Lv {skill.level})
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 0.5 }}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                              Consumes:
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.25 }}>
+                              {skill.consume.hp > 0 && (
+                                <Chip label={`${skill.consume.hp} HP`} size="small" color="error" variant="outlined" />
+                              )}
+                              {skill.consume.mp > 0 && (
+                                <Chip label={`${skill.consume.mp} MP`} size="small" color="info" variant="outlined" />
+                              )}
+                              {skill.consume.sp > 0 && (
+                                <Chip label={`${skill.consume.sp} SP`} size="small" color="warning" variant="outlined" />
+                              )}
+                              {skill.consume.elements.map((elem, i) => (
+                                <Chip 
+                                  key={i}
+                                  label={`${elem.value} ${elem.element}`}
+                                  size="small"
+                                  variant="outlined"
+                                />
+                              ))}
+                            </Box>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                              Produces:
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.25 }}>
+                              {skill.produce.elements.map((elem, i) => (
+                                <Chip 
+                                  key={i}
+                                  label={`${elem.min === elem.max ? elem.min : `${elem.min}-${elem.max}`} ${elem.element}`}
+                                  size="small"
+                                  color="success"
+                                  variant="outlined"
+                                />
+                              ))}
+                            </Box>
+                          </Box>
+                        </Box>
+                      </Paper>
+                    ))}
+                  </Box>
+                </Grid>
+              )}
+
+              {/* Skills Used Summary */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" gutterBottom color="text.secondary">
+                  Skills Used Summary
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {Object.entries(char.skillsUsed).map(([skill, count]) => (
@@ -142,6 +330,11 @@ export default function StatisticsPanel({ statistics }: StatisticsPanelProps) {
                       variant="outlined"
                     />
                   ))}
+                  {Object.keys(char.skillsUsed).length === 0 && (
+                    <Typography variant="body2" color="text.secondary">
+                      No skills used
+                    </Typography>
+                  )}
                 </Box>
               </Grid>
 
