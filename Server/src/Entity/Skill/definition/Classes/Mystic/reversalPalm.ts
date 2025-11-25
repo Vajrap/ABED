@@ -18,11 +18,11 @@ export const reversalPalm = new MysticSkill({
     th: "หลังจากใช้ จะได้รับบัฟ 'ฝ่ามือพลิก' เป็นเวลา 1 เทิร์น: เมื่อถูกโจมตี ให้ทอย d20 willpower save หากสำเร็จ จะสร้างความเสียหายทื่อ 1d6 + dex mod * (1 + 0.1 * เลเวลสกิล) ต่อผู้โจมตีและยกเลิกการโจมตีนั้น แล้วลบบัฟ หากล้มเหลว จะลบบัฟและรับความเสียหายตามปกติ",
   },
   requirement: {},
-  equipmentNeeded: [],
+  equipmentNeeded: ["bareHand"],
   tier: TierEnum.rare,
   consume: {
     hp: 0,
-    mp: 2,
+    mp: 0,
     sp: 2,
     elements: [],
   },
@@ -30,9 +30,7 @@ export const reversalPalm = new MysticSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [
-      {element: 'neutral', min: 1, max: 1},
-    ],
+    elements: [{ element: "neutral", min: 1, max: 1 }],
   },
   exec: (
     actor: Character,
@@ -42,7 +40,12 @@ export const reversalPalm = new MysticSkill({
     location: LocationsEnum,
   ): TurnResult => {
     // Apply Reversal Palm buff for 1 turn, store skill level in permValue
-    buffsAndDebuffsRepository.reversalPalm.appender(actor, 1, false, skillLevel);
+    buffsAndDebuffsRepository.reversalPalm.appender(
+      actor,
+      1,
+      false,
+      skillLevel,
+    );
 
     return {
       content: {
@@ -57,4 +60,3 @@ export const reversalPalm = new MysticSkill({
     };
   },
 });
-

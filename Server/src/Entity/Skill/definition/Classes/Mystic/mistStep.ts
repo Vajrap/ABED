@@ -25,15 +25,13 @@ export const mistStep = new MysticSkill({
     hp: 0,
     mp: 3,
     sp: 0,
-    elements: [
-      { element: "wind", value: 1 },
-    ],
+    elements: [{ element: "neutral", value: 1 }],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [{ element: "wind", min: 1, max: 1 }],
   },
   exec: (
     actor: Character,
@@ -51,7 +49,10 @@ export const mistStep = new MysticSkill({
     const hasSlow = !!slowEntry;
     if (hasSlow && slowEntry) {
       // Restore agility before removing (slow reduces agility)
-      actor.attribute.mutateBattle("agility", slowEntry.value + slowEntry.permValue);
+      actor.attribute.mutateBattle(
+        "agility",
+        slowEntry.value + slowEntry.permValue,
+      );
       actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.slow);
     }
 
@@ -99,4 +100,3 @@ export const mistStep = new MysticSkill({
     };
   },
 });
-

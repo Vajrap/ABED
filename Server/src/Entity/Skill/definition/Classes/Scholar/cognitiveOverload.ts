@@ -30,14 +30,15 @@ export const cognitiveOverload = new ScholarSkill({
     hp: 0,
     mp: 4,
     sp: 0,
-    elements: [],
+    elements: [{ element: "neutral", value: 2 }],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
     elements: [
-      { element: "neutral", min: 1, max: 1 },
+      { element: "chaos", min: 0, max: 1 },
+      { element: "order", min: 0, max: 1 },
     ],
   },
   exec: (
@@ -70,9 +71,11 @@ export const cognitiveOverload = new ScholarSkill({
     // Determine damage dice based on debuff count and skill level
     let damageDice: { dice: number; face: number };
     if (debuffCount >= 3) {
-      damageDice = skillLevel >= 5 ? { dice: 1, face: 8 } : { dice: 1, face: 6 };
+      damageDice =
+        skillLevel >= 5 ? { dice: 1, face: 8 } : { dice: 1, face: 6 };
     } else {
-      damageDice = skillLevel >= 5 ? { dice: 1, face: 6 } : { dice: 1, face: 4 };
+      damageDice =
+        skillLevel >= 5 ? { dice: 1, face: 6 } : { dice: 1, face: 4 };
     }
 
     const baseDamage = roll(damageDice.dice).d(damageDice.face).total;
@@ -81,7 +84,9 @@ export const cognitiveOverload = new ScholarSkill({
     // Refresh 1 random debuff (extend duration by 1 turn)
     let debuffRefreshed = "";
     if (target.buffsAndDebuffs.debuffs.entry.size > 0) {
-      const debuffEntries = Array.from(target.buffsAndDebuffs.debuffs.entry.entries());
+      const debuffEntries = Array.from(
+        target.buffsAndDebuffs.debuffs.entry.entries(),
+      );
       const randomIndex = Math.floor(Math.random() * debuffEntries.length);
       const [debuffId, entry] = debuffEntries[randomIndex]!;
       entry.value += 1; // Refresh by adding 1 turn
@@ -97,8 +102,18 @@ export const cognitiveOverload = new ScholarSkill({
       trueDamage: true,
     };
 
-    const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
-    const combatMsg = buildCombatMessage(actor, target, { en: "Cognitive Overload", th: "ความล้นเกินของความคิด" }, damageResult);
+    const damageResult = resolveDamage(
+      actor.id,
+      target.id,
+      damageOutput,
+      location,
+    );
+    const combatMsg = buildCombatMessage(
+      actor,
+      target,
+      { en: "Cognitive Overload", th: "ความล้นเกินของความคิด" },
+      damageResult,
+    );
 
     return {
       content: {
@@ -118,4 +133,3 @@ export const cognitiveOverload = new ScholarSkill({
     };
   },
 });
-

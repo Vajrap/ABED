@@ -6,7 +6,10 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ScholarSkill } from "./index";
-import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import {
+  buffsAndDebuffsRepository,
+  debuffsRepository,
+} from "src/Entity/BuffsAndDebuffs/repository";
 import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const disruptPattern = new ScholarSkill({
@@ -16,15 +19,16 @@ export const disruptPattern = new ScholarSkill({
     th: "ทำลายรูปแบบ",
   },
   description: {
-    en: "Force DC10 (DC12 at level 5) Will save. Fail: target is Dazed 1 turn. Success: reduce target's next initiative by 20 (30 at level 5).",
-    th: "บังคับให้ทำการทดสอบ Will DC10 (DC12 ที่เลเวล 5) หากล้มเหลว: เป้าหมายจะสับสน 1 เทิร์น หากสำเร็จ: ลด initiative ครั้งถัดไปของเป้าหมาย 20 (30 ที่เลเวล 5)",
+    en: "Force DC10 (DC12 at level 5) Will save. Fail: target is Dazed 1 turn. Success: reduce target's next initiative by 20 (30 at level 5). After using, if the reducing is success, this skill will go into cooldown (Debuff) for 3 turns.",
+    th: "บังคับให้ทำการทดสอบ Will DC10 (DC12 ที่เลเวล 5) หากล้มเหลว: เป้าหมายจะสับสน 1 เทิร์น หากสำเร็จ: ลด initiative ครั้งถัดไปของเป้าหมาย 20 (30 ที่เลเวล 5). หลังใช้เสร็จสิ้น ทักษะนี้จะอยู่ในช่วง Cooldown 3 เทิร์น",
   },
   requirement: {},
   equipmentNeeded: [],
+  notExistDebuff: [DebuffEnum.disruptPattern],
   tier: TierEnum.common,
   consume: {
     hp: 0,
-    mp: 0,
+    mp: 2,
     sp: 0,
     elements: [],
   },
@@ -32,9 +36,7 @@ export const disruptPattern = new ScholarSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [
-      { element: "neutral", min: 1, max: 1 },
-    ],
+    elements: [{ element: "neutral", min: 1, max: 1 }],
   },
   exec: (
     actor: Character,
@@ -64,6 +66,7 @@ export const disruptPattern = new ScholarSkill({
 
     if (saveRoll < dc) {
       // Save failed: Apply Dazed debuff
+      debuffsRepository.disruptPattern.appender(actor, 3, false, 0);
       debuffsRepository.dazed.appender(target, 1, false, 0);
       return {
         content: {
@@ -104,4 +107,3 @@ export const disruptPattern = new ScholarSkill({
     }
   },
 });
-

@@ -41,4 +41,8 @@ export enum DebuffEnum {
   stun = "stun",
   entangled = "entangled",
   hexMark = "hexMark",
+
+  // Cooldown
+  disruptPattern = "disruptPattern",
+  analyze = "analyze",
 }

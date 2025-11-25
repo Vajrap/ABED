@@ -16,15 +16,16 @@ export const analyze = new ScholarSkill({
     th: "วิเคราะห์",
   },
   description: {
-    en: "Mark a vulnerable spot on the enemy. For 2 turns, the marked enemy gets Exposed debuff. Exposed: takes additional 1d3 damage from all sources. If skill level is 5, the exposed enemy also gains -2 to critical defense.",
+    en: "Mark a vulnerable spot on the enemy. For 2 turns, the marked enemy gets Exposed debuff. Exposed: takes additional 1d3 damage from all sources. If skill level is 5, the exposed enemy also gains -2 to critical defense. If the exposed is success, this skill gets into 3 turns cooldown. (Debuff)",
     th: "ทำเครื่องหมายจุดอ่อนบนศัตรู เป็นเวลา 2 เทิร์น ศัตรูที่ถูกทำเครื่องหมายจะได้รับ debuff 'เปิดเผยจุดอ่อน' เปิดเผยจุดอ่อน: รับความเสียหายเพิ่ม 1d3 จากทุกแหล่ง หากเลเวลสกิลถึง 5 ศัตรูที่ถูกเปิดเผยจะได้รับ -2 ต่อการป้องกันคริติคอลด้วย",
   },
   requirement: {},
   equipmentNeeded: [],
+  notExistDebuff: [DebuffEnum.analyze],
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
-    mp: 3,
+    mp: 2,
     sp: 0,
     elements: [],
   },
@@ -32,9 +33,7 @@ export const analyze = new ScholarSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [
-      { element: "neutral", min: 1, max: 1 },
-    ],
+    elements: [{ element: "neutral", min: 1, max: 1 }],
   },
   exec: (
     actor: Character,
@@ -64,6 +63,7 @@ export const analyze = new ScholarSkill({
     // TODO: Let's add some condition, maybe DC8 + target int mod against D20 + user int mod
     const permValue = skillLevel >= 5 ? 1 : 0;
     debuffsRepository.exposed.appender(target, 2, false, permValue);
+    debuffsRepository.analyze.appender(actor, 3, false, permValue);
 
     return {
       content: {
@@ -83,4 +83,3 @@ export const analyze = new ScholarSkill({
     };
   },
 });
-

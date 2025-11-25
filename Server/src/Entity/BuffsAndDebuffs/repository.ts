@@ -5,7 +5,7 @@ import type { BuffDef, DebuffDef } from "./type";
 import { hiding } from "./definitions/buffs/hiding";
 import { taunt } from "./definitions/buffs/taunt";
 import { dazed } from "./definitions/debuffs/dazed";
-import {fear} from "src/Entity/BuffsAndDebuffs/definitions/debuffs/fear.ts";
+import { fear } from "src/Entity/BuffsAndDebuffs/definitions/debuffs/fear.ts";
 import { defenseUp } from "./definitions/buffs/defenseUp";
 import { burn } from "./definitions/debuffs/burn";
 import { arcaneShield } from "./definitions/buffs/arcaneShield";
@@ -37,6 +37,8 @@ import { charm } from "./definitions/buffs/charm";
 import { exposeWeaknessActive } from "./definitions/buffs/exposeWeaknessActive";
 import { entangled } from "./definitions/debuffs/entangled";
 import { hexMark } from "./definitions/debuffs/hexMark";
+import { disruptPattern } from "./definitions/debuffs/disruptPattern";
+import { analyze } from "./definitions/debuffs/analyze";
 
 export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.haste]: haste,
@@ -79,9 +81,13 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   [DebuffEnum.stun]: stun,
   [DebuffEnum.entangled]: entangled,
   [DebuffEnum.hexMark]: hexMark,
+
+  // Cooldown
+  [DebuffEnum.disruptPattern]: disruptPattern,
+  [DebuffEnum.analyze]: analyze,
 };
 
 export const buffsAndDebuffsRepository = {
   ...buffsRepository,
   ...debuffsRepository,
-}
+};
