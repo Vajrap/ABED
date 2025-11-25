@@ -1,27 +1,50 @@
-import {Character} from "src/Entity/Character/Character.ts";
-import {MOBs} from "src/Entity/Character/MOBs/enums.ts";
-import {CharacterNeeds} from "src/Entity/Character/Subclass/Needs/CharacterNeeds.ts";
-import {CharacterEquipmentSlot, CharacterType, RaceEnum,} from "src/InterFacesEnumsAndTypes/Enums.ts";
-import {CharacterVitals, Vital,} from "src/Entity/Character/Subclass/Vitals/CharacterVitals.ts";
-import {makeAttribute, makeProficiencies, scaleByDifficulty} from "./helpers";
-import {CharacterBattleStats} from "../Subclass/Stats/CharacterBattleStats";
-import {CharacterElements} from "../Subclass/Stats/CharacterElements";
-import {CharacterFame} from "../Subclass/Fame/CharacterFame";
-import {defaultActionSequence} from "../Subclass/Action/CharacterAction";
-import {CharacterAlignment} from "../Subclass/Alignment/CharacterAlignment";
-import {CharacterArtisans} from "../Subclass/Stats/CharacterArtisans";
-import {RogueSkillId, MobSkillId, WarriorSkillId, GuardianSkillId, MageSkillId, ShamanSkillId } from "src/Entity/Skill/enums";
-import {DeckCondition} from "../Subclass/DeckCondition/DeckCondition";
-import {defaultSaveRoll} from "src/Utils/CharacterDefaultSaveRoll";
-import {equipDirect} from "src/Entity/Item/Equipment/equipDirect";
-import {BladeId, BodyId, BookWId, HeadWearId, ShieldId, StaffId, SwordId, WandId} from "src/Entity/Item";
-import {TraitEnum} from "src/Entity/Trait/enum.ts";
+import { Character } from "src/Entity/Character/Character.ts";
+import { MOBs } from "src/Entity/Character/MOBs/enums.ts";
+import { CharacterNeeds } from "src/Entity/Character/Subclass/Needs/CharacterNeeds.ts";
+import {
+  CharacterEquipmentSlot,
+  CharacterType,
+  RaceEnum,
+} from "src/InterFacesEnumsAndTypes/Enums.ts";
+import {
+  CharacterVitals,
+  Vital,
+} from "src/Entity/Character/Subclass/Vitals/CharacterVitals.ts";
+import { makeAttribute, makeProficiencies, scaleByDifficulty } from "./helpers";
+import { CharacterBattleStats } from "../Subclass/Stats/CharacterBattleStats";
+import { CharacterElements } from "../Subclass/Stats/CharacterElements";
+import { CharacterFame } from "../Subclass/Fame/CharacterFame";
+import { defaultActionSequence } from "../Subclass/Action/CharacterAction";
+import { CharacterAlignment } from "../Subclass/Alignment/CharacterAlignment";
+import { CharacterArtisans } from "../Subclass/Stats/CharacterArtisans";
+import {
+  RogueSkillId,
+  MobSkillId,
+  WarriorSkillId,
+  GuardianSkillId,
+  MageSkillId,
+  ShamanSkillId,
+} from "src/Entity/Skill/enums";
+import { DeckCondition } from "../Subclass/DeckCondition/DeckCondition";
+import { defaultSaveRoll } from "src/Utils/CharacterDefaultSaveRoll";
+import { equipDirect } from "src/Entity/Item/Equipment/equipDirect";
+import {
+  BladeId,
+  BodyId,
+  BookWId,
+  HeadWearId,
+  ShieldId,
+  StaffId,
+  SwordId,
+  WandId,
+} from "src/Entity/Item";
+import { TraitEnum } from "src/Entity/Trait/enum.ts";
 import { rollTwenty } from "src/Utils/Dice";
 
 const goblinTraits: Map<TraitEnum, number> = new Map([
-    [TraitEnum.GoblinCunning, 1],
-    [TraitEnum.ScrapSurvivalist, 1],
-    [TraitEnum.PackInstinct, 1]
+  [TraitEnum.GoblinCunning, 1],
+  [TraitEnum.ScrapSurvivalist, 1],
+  [TraitEnum.PackInstinct, 1],
 ]);
 
 function randomSkillLevel(difficulty: number): number {
@@ -88,7 +111,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
     }),
   });
 
-  character.traits = goblinTraits
+  character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
   character.activeSkills = [
@@ -226,22 +249,30 @@ export function goblinWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
       sp: new Vital({ base: sp }),
     }),
   });
-  
-  character.traits = goblinTraits
+
+  character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
-
-  const lastSkill = Math.random() < 0.5 ? WarriorSkillId.Bash : WarriorSkillId.Cleave;
-
   character.activeSkills = [
-    { id: lastSkill, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: GuardianSkillId.ShieldUp, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: GuardianSkillId.Taunt, level: randomSkillLevel(difficulty), exp: 0 },
+    { id: WarriorSkillId.WarCry, level: randomSkillLevel(difficulty), exp: 0 },
+    {
+      id: WarriorSkillId.PowerStrike,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
   ];
 
   character.conditionalSkills = [
-    { id: GuardianSkillId.ShieldUp, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: GuardianSkillId.HerosPose, level: randomSkillLevel(difficulty), exp: 0 },
+    {
+      id: GuardianSkillId.ShieldUp,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
+    {
+      id: GuardianSkillId.HerosPose,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
   ];
 
   character.conditionalSkillsCondition = new DeckCondition({
@@ -266,7 +297,7 @@ export function goblinWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
   const shieldId = difficulty > 3 ? ShieldId.Buckler : ShieldId.KiteShield;
   const swordId = difficulty > 3 ? SwordId.ShortSword : SwordId.LongSword;
   const armorId = difficulty > 3 ? BodyId.LeatherArmor : BodyId.ChainShirt;
-  
+
   equipDirect(character, shieldId, CharacterEquipmentSlot.leftHand);
   equipDirect(character, swordId, CharacterEquipmentSlot.rightHand);
   equipDirect(character, armorId, CharacterEquipmentSlot.body);
@@ -331,17 +362,30 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     }),
   });
 
-  character.traits = goblinTraits
+  character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
   character.activeSkills = [
-    { id: rollTwenty().total >= 10 ? MageSkillId.FireBall : MageSkillId.Backdraft, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: MageSkillId.BurningHand, level: randomSkillLevel(difficulty), exp: 0 },
+    {
+      id:
+        rollTwenty().total >= 10 ? MageSkillId.FireBall : MageSkillId.Backdraft,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
+    {
+      id: MageSkillId.BurningHand,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
     { id: MageSkillId.FireBolt, level: randomSkillLevel(difficulty), exp: 0 },
   ];
 
   character.conditionalSkills = [
-    { id: MageSkillId.ArcaneShield, level: randomSkillLevel(difficulty), exp: 0 },
+    {
+      id: MageSkillId.ArcaneShield,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
     { id: MageSkillId.ArcaneBolt, level: randomSkillLevel(difficulty), exp: 0 },
   ];
 
@@ -363,9 +407,17 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     },
   });
 
-  equipDirect(character, rollTwenty().total >= 10 ? WandId.Wand : BookWId.Grimoire, CharacterEquipmentSlot.rightHand);
+  equipDirect(
+    character,
+    rollTwenty().total >= 10 ? WandId.Wand : BookWId.Grimoire,
+    CharacterEquipmentSlot.rightHand,
+  );
   equipDirect(character, BodyId.MageRobe, CharacterEquipmentSlot.body);
-  equipDirect(character, HeadWearId.ScholarCap, CharacterEquipmentSlot.headWear);
+  equipDirect(
+    character,
+    HeadWearId.ScholarCap,
+    CharacterEquipmentSlot.headWear,
+  );
 
   return character;
 }
@@ -427,7 +479,7 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     }),
   });
 
-  character.traits = goblinTraits
+  character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
   // Goblin Cleric skills - MendSpirit first (no cost, can always use to generate resources)
@@ -437,13 +489,25 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
       level: randomSkillLevel(difficulty),
       exp: 0,
     },
-    { id: ShamanSkillId.SpiritRattle, level: randomSkillLevel(difficulty), exp: 0 },
+    {
+      id: ShamanSkillId.SpiritRattle,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
     { id: ShamanSkillId.HexOfRot, level: randomSkillLevel(difficulty), exp: 0 },
-    { id: ShamanSkillId.MendSpirit, level: randomSkillLevel(difficulty), exp: 0 },
+    {
+      id: ShamanSkillId.MendSpirit,
+      level: randomSkillLevel(difficulty),
+      exp: 0,
+    },
   ];
 
   // Equip weapon and armor based on difficulty
-  equipDirect(character, rollTwenty().total >= 10 ? WandId.Wand : BookWId.Bible, CharacterEquipmentSlot.rightHand);
+  equipDirect(
+    character,
+    rollTwenty().total >= 10 ? WandId.Wand : BookWId.Bible,
+    CharacterEquipmentSlot.rightHand,
+  );
   if (rollTwenty().total >= 10) {
     equipDirect(character, ShieldId.Buckler, CharacterEquipmentSlot.leftHand);
   }
@@ -509,7 +573,7 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
     }),
   });
 
-  character.traits = goblinTraits
+  character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
   character.activeSkills = [
@@ -531,9 +595,17 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
   ];
 
   // Equip weapon and armor based on difficulty
-  equipDirect(character, StaffId.QuarterStaff, CharacterEquipmentSlot.rightHand);
+  equipDirect(
+    character,
+    StaffId.QuarterStaff,
+    CharacterEquipmentSlot.rightHand,
+  );
   equipDirect(character, BodyId.LeatherArmor, CharacterEquipmentSlot.body);
-  equipDirect(character, HeadWearId.ScholarCap, CharacterEquipmentSlot.headWear);
+  equipDirect(
+    character,
+    HeadWearId.ScholarCap,
+    CharacterEquipmentSlot.headWear,
+  );
 
   // Skills will be added once commander and shout-type actions are defined
   return character;

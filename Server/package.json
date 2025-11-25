@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun run src/index.ts",
+    "dev:debug": "bun --inspect src/index.ts",
     "db:generate": "drizzle-kit generate:pg",
     "db:migrate": "drizzle-kit push:pg",
     "db:migrate:run": "bun run scripts/migrate.ts",

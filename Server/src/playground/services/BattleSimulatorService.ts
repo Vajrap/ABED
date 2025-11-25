@@ -1,19 +1,33 @@
 import { Battle } from "src/Entity/Battle/Battle";
-import { BattleType } from "src/Entity/Battle/types";
 import { Party } from "src/Entity/Party/Party";
 import { PartyBehavior } from "src/Entity/Party/PartyBehavior";
 import { locationRepository } from "src/Entity/Location/Location/repository";
 import { GameTime } from "src/Game/GameTime/GameTime";
-import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import type { Character } from "src/Entity/Character/Character";
 import { CharacterBuilderService } from "./CharacterBuilderService";
 import type { SimulateBattleRequest } from "../types/requests";
-import type { SimulateBattleResponse, TurnDetail, CharacterSnapshot, StructuredBattleStatistics, CharacterStructuredStats, TurnAction, SkillDeckEntry } from "../types/responses";
+import type {
+  SimulateBattleResponse,
+  TurnDetail,
+  CharacterSnapshot,
+  StructuredBattleStatistics,
+  CharacterStructuredStats,
+  TurnAction,
+  SkillDeckEntry,
+  EquipmentSnapshot,
+  StatDetail,
+  EquipmentModifierSnapshot,
+} from "../types/responses";
 import type { CharacterBattleStats } from "src/Entity/Battle/BattleStatistics";
 import type { TurnResult } from "src/Entity/Skill/types";
 import { skillRepository } from "src/Entity/Skill/repository";
 import type { SkillId } from "src/Entity/Skill/enums";
-import Report from "src/Utils/Reporter";
+import { getEquipment } from "src/Entity/Item";
+import { Armor } from "src/Entity/Item/Equipment/Armor/Armor";
+import { Weapon } from "src/Entity/Item/Equipment/Weapon/Weapon";
+import type { EquipmentModifier } from "src/Entity/Item/Equipment/type";
+import type { CharacterEquipmentSlot } from "src/InterFacesEnumsAndTypes/Enums";
+import type { StatBlock } from "src/Entity/Character/Subclass/Stats/CharacterStatArchetype";
 
 export class BattleSimulatorService {
   /**
@@ -489,6 +503,166 @@ export class BattleSimulatorService {
     });
   }
 
+  private static serializeStatBlocks(stats?: Record<string, StatBlock> | null): Record<string, StatDetail> | undefined {
+    if (!stats) {
+      return undefined;
+    }
+
+    const serialized: Record<string, StatDetail> = {};
+    for (const [key, block] of Object.entries(stats)) {
+      if (!block) continue;
+      const base = block.base ?? 0;
+      const bonus = block.bonus ?? 0;
+      const battle = block.battle ?? 0;
+      serialized[key] = {
+        base,
+        bonus,
+        battle,
+        total: base + bonus + battle,
+      };
+    }
+
+    return Object.keys(serialized).length > 0 ? serialized : undefined;
+  }
+
+  private static toStatRecord(archetype?: { toJSON?: () => Record<string, StatBlock> }): Record<string, StatBlock> | undefined {
+    if (!archetype || typeof archetype.toJSON !== "function") {
+      return undefined;
+    }
+    return archetype.toJSON() as Record<string, StatBlock>;
+  }
+
+  private static serializeEquipmentModifier(modifier?: EquipmentModifier): EquipmentModifierSnapshot | undefined {
+    if (!modifier) {
+      return undefined;
+    }
+
+    const convertNumberRecord = (record?: Partial<Record<string, number>>) => {
+      if (!record) return undefined;
+      const filtered: Record<string, number> = {};
+      for (const [key, value] of Object.entries(record)) {
+        if (typeof value === "number" && value !== 0) {
+          filtered[key] = value;
+        }
+      }
+      return Object.keys(filtered).length > 0 ? filtered : undefined;
+    };
+
+    const result: EquipmentModifierSnapshot = {};
+
+    const attributes = convertNumberRecord(modifier.attributes);
+    if (attributes) result.attributes = attributes;
+
+    const proficiencies = convertNumberRecord(modifier.proficiencies);
+    if (proficiencies) result.proficiencies = proficiencies;
+
+    const artisans = convertNumberRecord(modifier.artisans);
+    if (artisans) result.artisans = artisans;
+
+    const battleStatus = convertNumberRecord(modifier.battleStatus);
+    if (battleStatus) result.battleStatus = battleStatus;
+
+    const saves = convertNumberRecord(modifier.saves);
+    if (saves) result.saves = saves;
+
+    if (modifier.vitals) {
+      const vitals: Record<string, number> = {};
+      for (const [key, value] of Object.entries(modifier.vitals)) {
+        if (typeof value === "number" && value !== 0) {
+          vitals[key] = value;
+        }
+      }
+      if (Object.keys(vitals).length > 0) {
+        result.vitals = vitals;
+      }
+    }
+
+    if (modifier.traits && modifier.traits.length > 0) {
+      result.traits = [...modifier.traits];
+    }
+
+    if (modifier.buffsAndDebuffs && modifier.buffsAndDebuffs.size > 0) {
+      result.buffsAndDebuffs = Array.from(modifier.buffsAndDebuffs.entries()).map(([id, value]) => ({
+        id,
+        value,
+      }));
+    }
+
+    return Object.keys(result).length > 0 ? result : undefined;
+  }
+
+  private static buildEquipmentSnapshot(char: Character): EquipmentSnapshot[] | undefined {
+    if (!char.equipments) {
+      return undefined;
+    }
+
+    const entries: EquipmentSnapshot[] = [];
+    for (const [slot, equipmentId] of Object.entries(char.equipments) as Array<[CharacterEquipmentSlot, string | null]>) {
+      if (!equipmentId) continue;
+
+      const equipment = getEquipment(equipmentId);
+      const name = equipment?.name?.en ?? String(equipmentId);
+      const modifiers = equipment ? this.serializeEquipmentModifier(equipment.modifier) : undefined;
+      let armorStats: EquipmentSnapshot["armorStats"];
+      let weaponStats: EquipmentSnapshot["weaponStats"];
+
+      if (equipment instanceof Armor) {
+        const physical = equipment.armorData.pDef;
+        const magical = equipment.armorData.mDef;
+        armorStats = {
+          armorClass: equipment.armorData.armorClass,
+          physicalDefense: physical
+            ? {
+                slash: physical.slash,
+                pierce: physical.pierce,
+                blunt: physical.blunt,
+              }
+            : undefined,
+          magicalDefense: magical
+            ? {
+                order: magical.order,
+                chaos: magical.chaos,
+                fire: magical.fire,
+                earth: magical.earth,
+                water: magical.water,
+                air: magical.air,
+              }
+            : undefined,
+          dodgeBonus: equipment.armorData.dodge,
+        };
+      }
+
+      if (equipment instanceof Weapon) {
+        const damage = equipment.weaponData.damage;
+        const formatDice = (dice?: { dice: number; face: number }) =>
+          dice && dice.dice > 0 && dice.face > 0 ? `${dice.dice}d${dice.face}` : undefined;
+        weaponStats = {
+          weaponType: equipment.weaponData.weaponType,
+          preferredPosition: equipment.weaponData.preferredPosition,
+          handle: equipment.weaponData.handle,
+          physicalDamageDice: formatDice(damage?.physicalDamageDice),
+          magicalDamageDice: formatDice(damage?.magicalDamageDice),
+          physicalDamageType: damage?.physicalDamageType ? String(damage.physicalDamageType) : undefined,
+          magicalDamageType: damage?.magicalDamageType ? String(damage.magicalDamageType) : undefined,
+        };
+      }
+
+      entries.push({
+        slot,
+        itemId: equipment?.id ? String(equipment.id) : String(equipmentId),
+        name,
+        type: equipment ? String(equipment.slot) : undefined,
+        tier: equipment?.tier ? String(equipment.tier) : undefined,
+        weight: equipment?.weight,
+        modifiers,
+        armorStats,
+        weaponStats,
+      });
+    }
+
+    return entries.length > 0 ? entries : undefined;
+  }
+
   /**
    * Build structured statistics for UI rendering
    */
@@ -499,6 +673,10 @@ export class BattleSimulatorService {
   ): StructuredBattleStatistics {
     const characterStats = battle.battleStatistics.getAllStats();
     const characters: Record<string, CharacterStructuredStats> = {};
+    const participantMap = new Map<string, Character>();
+    for (const participant of battle.allParticipants) {
+      participantMap.set(participant.id, participant);
+    }
     
     // Initialize character stats
     for (const stats of characterStats) {
@@ -518,6 +696,12 @@ export class BattleSimulatorService {
       // Ensure skillDeck is always an array (never undefined or null)
       const finalActiveDeck = Array.isArray(activeDeck) ? activeDeck : [];
       const finalConditionalDeck = conditionalDeck && Array.isArray(conditionalDeck) ? conditionalDeck : undefined;
+
+      const participant = participantMap.get(stats.characterId);
+      const attributeSnapshot = participant ? this.serializeStatBlocks(this.toStatRecord(participant.attribute)) : undefined;
+      const proficiencySnapshot = participant ? this.serializeStatBlocks(this.toStatRecord(participant.proficiencies)) : undefined;
+      const battleStatsSnapshot = participant ? this.serializeStatBlocks(this.toStatRecord(participant.battleStats)) : undefined;
+      const equipmentSnapshot = participant ? this.buildEquipmentSnapshot(participant) : undefined;
       
       const charStats: CharacterStructuredStats = {
         characterId: stats.characterId,
@@ -533,19 +717,36 @@ export class BattleSimulatorService {
         skillsUsed: { ...stats.skillsUsed },
         skillDeck: finalActiveDeck, // Always an array, never undefined
         conditionalSkillDeck: finalConditionalDeck,
+        attributes: attributeSnapshot,
+        proficiencies: proficiencySnapshot,
+        battleStats: battleStatsSnapshot,
+        equipment: equipmentSnapshot,
       };
       
       characters[stats.characterId] = charStats;
     }
 
     // Build turn-by-turn actions for each character
+    // Determine party membership for ally/enemy detection
+    const partyAIds = new Set(battle.partyA.characters.filter((c): c is Character => c !== "none").map(c => c.id));
+    const partyBIds = new Set(battle.partyB.characters.filter((c): c is Character => c !== "none").map(c => c.id));
+    
     for (const turn of turns) {
       const charStats = characters[turn.actorId];
       if (!charStats) continue;
 
+      // Determine which party the actor belongs to
+      const actorInPartyA = partyAIds.has(turn.actorId);
+      const actorInPartyB = partyBIds.has(turn.actorId);
+
       // Extract actions from this turn
       if (turn.details.targets) {
         for (const target of turn.details.targets) {
+          // Determine if target is an ally (same party) or enemy (different party)
+          const targetInPartyA = partyAIds.has(target.id);
+          const targetInPartyB = partyBIds.has(target.id);
+          const isAlly = (actorInPartyA && targetInPartyA) || (actorInPartyB && targetInPartyB);
+          
           const action: TurnAction = {
             turnNumber: turn.turnNumber,
             type: target.damage !== undefined ? 'damage' : (target.healing !== undefined ? 'heal' : 'other'),
@@ -555,6 +756,7 @@ export class BattleSimulatorService {
             targetName: target.name,
             isCrit: target.isCrit,
             isHit: target.isHit,
+            isAlly,
           };
           charStats.turns.push(action);
         }

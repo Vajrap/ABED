@@ -29,7 +29,7 @@ export const bewitch = new WitchSkill({
     elements: [
       {
         element: "neutral",
-        value: 1,
+        value: 2,
       },
     ],
   },

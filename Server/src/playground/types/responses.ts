@@ -4,7 +4,7 @@ import type { CharacterBattleStats } from "src/Entity/Battle/BattleStatistics";
 import type { BattleType } from "src/Entity/Battle/types";
 import type { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import type { CharacterConfig } from "./requests";
-import type { RaceEnum, ClassEnum } from "src/InterFacesEnumsAndTypes/Enums";
+import type { RaceEnum, ClassEnum, CharacterEquipmentSlot } from "src/InterFacesEnumsAndTypes/Enums";
 
 /**
  * Detailed information about a single turn in the battle
@@ -96,6 +96,64 @@ export interface SkillDeckEntry {
   };
 }
 
+export interface StatDetail {
+  base: number;
+  bonus: number;
+  battle: number;
+  total: number;
+}
+
+export interface EquipmentModifierSnapshot {
+  attributes?: Record<string, number>;
+  proficiencies?: Record<string, number>;
+  artisans?: Record<string, number>;
+  battleStatus?: Record<string, number>;
+  saves?: Record<string, number>;
+  vitals?: Record<string, number>;
+  traits?: string[];
+  buffsAndDebuffs?: Array<{ id: string; value: number }>;
+}
+
+export interface EquipmentArmorStats {
+  armorClass?: string;
+  physicalDefense?: {
+    slash?: number;
+    pierce?: number;
+    blunt?: number;
+  };
+  magicalDefense?: {
+    order?: number;
+    chaos?: number;
+    fire?: number;
+    earth?: number;
+    water?: number;
+    air?: number;
+  };
+  dodgeBonus?: number;
+}
+
+export interface EquipmentWeaponStats {
+  weaponType?: string;
+  preferredPosition?: string;
+  handle?: number;
+  physicalDamageDice?: string;
+  magicalDamageDice?: string;
+  physicalDamageType?: string;
+  magicalDamageType?: string;
+}
+
+export interface EquipmentSnapshot {
+  slot: CharacterEquipmentSlot;
+  itemId: string;
+  name: string;
+  type?: string;
+  tier?: string;
+  weight?: number;
+  modifiers?: EquipmentModifierSnapshot;
+  armorStats?: EquipmentArmorStats;
+  weaponStats?: EquipmentWeaponStats;
+}
+
 export interface CharacterStructuredStats {
   characterId: string;
   characterName: string;
@@ -110,6 +168,10 @@ export interface CharacterStructuredStats {
   skillsUsed: Record<string, number>; // skillId -> count
   skillDeck: SkillDeckEntry[]; // Active skill deck in order
   conditionalSkillDeck?: SkillDeckEntry[]; // Conditional skill deck (if exists)
+  attributes?: Record<string, StatDetail>;
+  proficiencies?: Record<string, StatDetail>;
+  battleStats?: Record<string, StatDetail>;
+  equipment?: EquipmentSnapshot[];
 }
 
 export interface TurnAction {
@@ -121,6 +183,7 @@ export interface TurnAction {
   targetName?: string; // Target character name
   isCrit?: boolean;
   isHit?: boolean;
+  isAlly?: boolean; // true if target is in same party as actor, false if enemy
 }
 
 /**

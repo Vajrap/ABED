@@ -6,99 +6,112 @@ import { isUsingConditionDeck } from "../Character/Subclass/DeckCondition/isUsin
 import type { Party } from "../Party/Party";
 import Report from "src/Utils/Reporter";
 
-export function getPlayableSkill(actor: Character, actorParty: Party, i: number = 0): {skill: Skill, skillLevel: number} {
+export function getPlayableSkill(actor: Character, actorParty: Party): {skill: Skill, skillLevel: number} {
   // Check if we should use conditional deck
   const useConditionalDeck = isUsingConditionDeck(actor, actorParty);
   const skillDeck = useConditionalDeck ? actor.conditionalSkills : actor.activeSkills;
   
-  // Initialize logging on first call
-  if (i === 0) {
-    if (skillDeck.length === 0) {
-      return { skill: basicAttack, skillLevel: 1 };
-    }
-  }
-  
-  if (i >= skillDeck.length) {
+  if (skillDeck.length === 0) {
     return { skill: basicAttack, skillLevel: 1 };
   }
-
-  const skillObj = skillDeck[i]!;
-  const skillRep = skillRepository[skillObj.id];
   
-  // Debug logging for skill selection
-  if (i === 0) {
-    Report.debug(`  Skill Selection for ${actor.name.en}:`);
-  }
-  Report.debug(`    Checking skill ${i + 1}/${skillDeck.length}: ${skillRep.name.en}`);
-
-  // Insufficient HP/MP/SP
-  if (actor.vitals.hp.current <= skillRep.consume.hp) {
-    Report.debug(`      ❌ Skipped: Insufficient HP (${actor.vitals.hp.current} <= ${skillRep.consume.hp})`);
-    return getPlayableSkill(actor, actorParty, i + 1);
-  }
-  if (actor.vitals.mp.current < skillRep.consume.mp) {
-    Report.debug(`      ❌ Skipped: Insufficient MP (${actor.vitals.mp.current} < ${skillRep.consume.mp})`);
-    return getPlayableSkill(actor, actorParty, i + 1);
-  }
-  if (actor.vitals.sp.current < skillRep.consume.sp) {
-    Report.debug(`      ❌ Skipped: Insufficient SP (${actor.vitals.sp.current} < ${skillRep.consume.sp})`);
-    return getPlayableSkill(actor, actorParty, i + 1);
-  }
-
-  // Elemental resource check
-  for (const consume of skillRep.consume.elements) {
-    if (actor.resources[consume.element] < consume.value) {
-      Report.debug(`      ❌ Skipped: Insufficient ${consume.element} element (${actor.resources[consume.element]} < ${consume.value})`);
-      return getPlayableSkill(actor, actorParty, i + 1);
+  // Initialize logging (equivalent to i === 0)
+  
+  for (let i = 0; i < skillDeck.length; i++) {
+    // Safely get skillObj (no undefined)
+    const skillObj = skillDeck[i];
+    if (!skillObj) {
+      continue;
     }
-  }
-
-
-  // Buff/Debuff requirement check
-  if (skillRep.existBuff && skillRep.existBuff.length > 0) {
-    for (const buff of skillRep.existBuff) {
-      if (!actor.buffsAndDebuffs.buffs.entry.has(buff)) {
-        Report.debug(`      ❌ Skipped: Buff/Debuff ${buff} must exist`);
-        return getPlayableSkill(actor, actorParty, i + 1);
+    
+    // Safely get skillRep
+    const skillRep = skillRepository[skillObj.id];
+    if (!skillRep) {
+      continue;
+    }
+    
+    // info logging for skill selection
+    
+    // Insufficient HP/MP/SP
+    if (actor.vitals.hp.current <= skillRep.consume.hp) {
+      continue;
+    }
+    if (actor.vitals.mp.current < skillRep.consume.mp) {
+      continue;
+    }
+    if (actor.vitals.sp.current < skillRep.consume.sp) {
+      continue;
+    }
+    
+    // Elemental resource check
+    let canUseSkill = true;
+    for (const consume of skillRep.consume.elements) {
+      if (actor.resources[consume.element] < consume.value) {
+        canUseSkill = false;
+        break;
       }
     }
-  }
-  if (skillRep.existDebuff && skillRep.existDebuff.length > 0) {
-    for (const debuff of skillRep.existDebuff) {
-      if (!actor.buffsAndDebuffs.debuffs.entry.has(debuff)) {
-        Report.debug(`      ❌ Skipped: Buff/Debuff ${debuff} must exist`);
-        return getPlayableSkill(actor, actorParty, i + 1);
+    if (!canUseSkill) continue;
+    
+    // Buff requirement check (must exist ALL)
+    if (skillRep.existBuff && skillRep.existBuff.length > 0) {
+      canUseSkill = true;
+      for (const buff of skillRep.existBuff) {
+        if (!actor.buffsAndDebuffs.buffs.entry.has(buff)) {
+          canUseSkill = false;
+          break;
+        }
       }
+      if (!canUseSkill) continue;
     }
-  }
-
-  // Buff/Debuff requirement check
-  if (skillRep.notExistBuff && skillRep.notExistBuff.length > 0) {
-    for (const buff of skillRep.notExistBuff) {
-      if (actor.buffsAndDebuffs.buffs.entry.has(buff)) {
-        Report.debug(`      ❌ Skipped: Buff/Debuff ${buff} must not exist`);
-        return getPlayableSkill(actor, actorParty, i + 1);
+    
+    // Debuff requirement check (must exist ALL)
+    if (skillRep.existDebuff && skillRep.existDebuff.length > 0) {
+      canUseSkill = true;
+      for (const debuff of skillRep.existDebuff) {
+        if (!actor.buffsAndDebuffs.debuffs.entry.has(debuff)) {
+          canUseSkill = false;
+          break;
+        }
       }
+      if (!canUseSkill) continue;
     }
-  }
-  if (skillRep.notExistDebuff && skillRep.notExistDebuff.length > 0) {
-    for (const debuff of skillRep.notExistDebuff) {
-      if (actor.buffsAndDebuffs.debuffs.entry.has(debuff)) {
-        Report.debug(`      ❌ Skipped: Buff/Debuff ${debuff} must not exist`);
-        return getPlayableSkill(actor, actorParty, i + 1);
+    
+    // Buff not-exist check (must NOT exist ANY)
+    if (skillRep.notExistBuff && skillRep.notExistBuff.length > 0) {
+      canUseSkill = true;
+      for (const buff of skillRep.notExistBuff) {
+        if (actor.buffsAndDebuffs.buffs.entry.has(buff)) {
+          canUseSkill = false;
+          break;
+        }
       }
+      if (!canUseSkill) continue;
     }
+    
+    // Debuff not-exist check (must NOT exist ANY)
+    if (skillRep.notExistDebuff && skillRep.notExistDebuff.length > 0) {
+      canUseSkill = true;
+      for (const debuff of skillRep.notExistDebuff) {
+        if (actor.buffsAndDebuffs.debuffs.entry.has(debuff)) {
+          canUseSkill = false;
+          break;
+        }
+      }
+      if (!canUseSkill) continue;
+    }
+    
+    // Equipment requirement check
+    // If equipmentNeeded is empty [], allow any weapon. Otherwise, check if weapon is in the list.
+    const weapon = actor.getWeapon();
+    if (skillRep.equipmentNeeded.length > 0 && !skillRep.equipmentNeeded.includes(weapon.weaponType)) {
+      continue;
+    }
+    
+    // Success - can use this skill!
+    return { skill: skillRep, skillLevel: skillObj.level ?? 1 };  // fallback level 1 if missing
   }
   
-  // Equipment requirement check
-  // If equipmentNeeded is empty [], allow any weapon. Otherwise, check if weapon is in the list.
-  const weapon = actor.getWeapon();
-  if (skillRep.equipmentNeeded.length > 0 && !skillRep.equipmentNeeded.includes(weapon.weaponType)) {
-    Report.debug(`      ❌ Skipped: Wrong weapon type (has ${weapon.weaponType}, needs ${skillRep.equipmentNeeded.join(' or ')})`);
-    return getPlayableSkill(actor, actorParty, i + 1);
-  }
-
-  // Success - can use this skill!
-  Report.debug(`      ✅ Selected: ${skillRep.name.en}`);
-  return {skill: skillRep, skillLevel: skillObj.level};
+  // No playable skill found
+  return { skill: basicAttack, skillLevel: 1 };
 }

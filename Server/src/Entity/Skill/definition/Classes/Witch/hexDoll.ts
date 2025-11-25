@@ -13,7 +13,6 @@ import { roll } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WitchSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const hexDoll = new WitchSkill({
   id: WitchSkillId.HexDoll,
@@ -22,7 +21,7 @@ export const hexDoll = new WitchSkill({
     th: "ตุ๊กตาสาป",
   },
   description: {
-    en: "Bind a target to a small effigy, creating a sympathetic link. Deals 1d4 + INT mod * (1 + 0.1 * skill level) dark damage immediately. Target rolls DC10 + control mod willpower save or gets hexed for 2 turns (3 at level 5). Hexed reduces endurance by 2. At level 5, also applies cursed debuff.",
+    en: "Bind a target to a small effigy, creating a sympathetic link. Deals 1d4 + INT mod * (1 + 0.1 * skill level) dark damage immediately. Target rolls DC10 + control mod willpower save or gets hexed for 2 turns (3 at level 5). Hexed target takes 1d2 true chaos damage when turn start also reduces endurance by 2. At level 5, also applies cursed debuff.",
     th: "ผูกเป้าหมายกับตุ๊กตาตัวเล็ก สร้างความเชื่อมโยง สร้างความเสียหายมืด 1d4 + ค่า INT * (1 + 0.1 * เลเวลสกิล) ทันที เป้าหมายทอย willpower save DC10 + control mod หรือจะถูก hexed 2 เทิร์น (3 เทิร์นที่เลเวล 5) Hexed ลด endurance ลง 2 ที่เลเวล 5 จะเพิ่ม cursed debuff ด้วย",
   },
   requirement: {},

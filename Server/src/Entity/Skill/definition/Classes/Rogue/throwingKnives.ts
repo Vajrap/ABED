@@ -24,7 +24,7 @@ export const throwingKnives = new RogueSkill({
     th: "ขว้างมีดไปที่เป้าหมาย 2 คน (4 คนที่เลเวล 5) แต่ละคนรับความเสียหาย 1d4 + Dex mod * (1 + 0.1 * เลเวลสกิล) เป้าหมายสามารถซ้ำกันได้",
   },
   requirement: {},
-  equipmentNeeded: [],
+  equipmentNeeded: ['dagger'],
   tier: TierEnum.common,
   consume: {
     hp: 0,
@@ -37,7 +37,7 @@ export const throwingKnives = new RogueSkill({
     mp: 0,
     sp: 0,
     elements: [
-      {element: 'neutral', min: 1, max: 1},
+      {element: 'wind', min: 1, max: 1},
     ],
   },
   exec: (

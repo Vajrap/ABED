@@ -2,6 +2,7 @@ import type { Character } from "src/Entity/Character/Character";
 import { BuffDef } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
+import { statMod } from "src/Utils/statMod";
 
 export const duelingStance = new BuffDef({
   name: {
@@ -16,20 +17,26 @@ export const duelingStance = new BuffDef({
   ): L10N {
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.duelingStance);
     if (!entry) {
-      // Store skill level indicator in permValue (0 = not level 5, 1 = level 5+)
-      // Mods will be recalculated in damageResolution
+      actor.battleStats.mutateBattle('pHIT', 2);
+      actor.battleStats.mutateBattle('mHIT', 2);
+      actor.battleStats.mutateBattle('dodge', -2);
+      if (isPerm) {
+        actor.battleStats.mutateBattle('pCRT', 2);
+        actor.battleStats.mutateBattle('mCRT', 2);
+      }
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.duelingStance, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue, // Store level 5 indicator
+        permValue: permValue,
       });
     } else {
-      if (!entry.isPerm && isPerm) {
+      if (isPerm) {
         entry.isPerm = true;
+        actor.battleStats.mutateBattle('pCRT', 2);
+        actor.battleStats.mutateBattle('mCRT', 2);
       }
       entry.value += value;
-      // Use higher level indicator
-      entry.permValue = Math.max(entry.permValue, permValue);
+      entry.permValue += permValue;
     }
 
     return {
@@ -43,7 +50,14 @@ export const duelingStance = new BuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
+      } else if (entry.value === 0) {
+        actor.battleStats.mutateBattle('pHIT', -2);
+        actor.battleStats.mutateBattle('mHIT', -2);
+        actor.battleStats.mutateBattle('dodge', 2);
+        if (entry.isPerm) {
+          actor.battleStats.mutateBattle('pCRT', -2);
+          actor.battleStats.mutateBattle('mCRT', -2);
+        }
         actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.duelingStance);
       }
     }

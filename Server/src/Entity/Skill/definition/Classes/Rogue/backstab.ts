@@ -6,7 +6,7 @@ import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ActorEffect, TargetEffect } from "../../../effects";
-import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { BuffEnum, DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
@@ -25,16 +25,13 @@ export const backstab = new RogueSkill({
   },
   requirement: {},
   equipmentNeeded: ["dagger"],
+  existBuff: [BuffEnum.hiding],
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
     mp: 0,
     sp: 5,
     elements: [
-      {
-        element: "wind",
-        value: 2,
-      },
       {
         element: "chaos",
         value: 1,

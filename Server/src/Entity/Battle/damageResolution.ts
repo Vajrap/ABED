@@ -77,24 +77,6 @@ export function resolveDamage(
     )
   }
 
-  // Dueling Stance: Add hit bonus and crit bonus from attacker's buff
-  const duelingStanceAttacker = attacker.buffsAndDebuffs.buffs.entry.get(BuffEnum.duelingStance);
-  if (duelingStanceAttacker && duelingStanceAttacker.value > 0) {
-    // Recalculate control mod from current attributes
-    const controlMod = statMod(attacker.attribute.getTotal("control"));
-    
-    // +control mod/2 to hit rolls
-    const hitBonus = Math.floor(controlMod / 2);
-    damageOutput.hit += hitBonus;
-    
-    // +2 crit at level 5 (permValue > 0 indicates level 5+)
-    if (duelingStanceAttacker.permValue > 0) {
-      damageOutput.crit += 2;
-    }
-    
-    Report.debug(`        ⚔️ Dueling Stance: +${hitBonus} hit${duelingStanceAttacker.permValue > 0 ? ", +2 crit" : ""}`);
-  }
-
   // Curse Mark: Check if attacker has Curse Mark Active buff and target has Hex Mark debuff
   // If matched, add bonus damage and remove both buff/debuff
   const curseMarkActive = attacker.buffsAndDebuffs.buffs.entry.get(BuffEnum.curseMarkActive);

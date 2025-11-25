@@ -118,8 +118,6 @@ export const skillRepository: Record<SkillId, Skill> = {
     [MysticSkillId.PlanarAbsorption]: planarAbsorption,
     [MysticSkillId.InnerVeil]: innerVeil,
     [MysticSkillId.ReversalPalm]: reversalPalm,
-    [MysticSkillId.Serenity]: undefined as any,
-    [MysticSkillId.FluidMotion]: undefined as any,
     [SpellBladeSkillId.PlanarEdge]: planarEdge,
     [SpellBladeSkillId.WindSlash]: windSlash,
     [SpellBladeSkillId.SpellParry]: spellParry,

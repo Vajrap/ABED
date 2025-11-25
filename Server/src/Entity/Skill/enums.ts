@@ -100,11 +100,11 @@ export enum MysticSkillId {
   // Passives
   // =======================
 
-  Serenity = "Serenity",
+  // Serenity = "Serenity",
   // When taking no damage during a turn, gain a small regen at end of turn.
   // Encourages evasion + flowing playstyle.
 
-  FluidMotion = "FluidMotion",
+  // FluidMotion = "FluidMotion",
   // Gain increased movement OR reduced cooldowns when successfully dodging attacks.
   // Movement-based passive reward loop.
 }
