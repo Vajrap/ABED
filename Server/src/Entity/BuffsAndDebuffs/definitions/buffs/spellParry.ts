@@ -22,7 +22,8 @@ export const spellParry = new BuffDef({
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.spellParry, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue, // Store reduction amount in permValue
+        permValue: 0,
+        counter: permValue, // Store reduction amount in counter
       });
       return {
         en: `${actor.name.en} prepares Spell Parry! Next spell damage reduced by ${reduction}`,
@@ -43,7 +44,7 @@ export const spellParry = new BuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
+      } else if (entry.value === 0 && entry.counter === 0) {
         actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.spellParry);
       }
     }

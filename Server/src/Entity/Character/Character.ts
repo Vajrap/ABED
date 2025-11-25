@@ -15,7 +15,11 @@ import { CharacterVitals } from "./Subclass/Vitals/CharacterVitals";
 import { CharacterFame } from "./Subclass/Fame/CharacterFame";
 import { CharacterPlanarAptitude } from "./Subclass/PlanarAptitude/CharacterPlanarAptitude";
 import type { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
-import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
+import {
+  BuffAndDebuffEnum,
+  BuffEnum,
+  DebuffEnum,
+} from "../BuffsAndDebuffs/enum";
 import type { TraitEnum } from "../Trait/enum";
 import { DeckCondition } from "./Subclass/DeckCondition/DeckCondition";
 import type { SkillId } from "../Skill/enums";
@@ -34,7 +38,7 @@ import type { CharacterEpithetEnum } from "./Subclass/Title/Epithet/enum";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N.ts";
 import { roll, rollTwenty } from "src/Utils/Dice.ts";
 import { statMod } from "src/Utils/statMod.ts";
-import { Weapon } from "src/Entity/Item";
+import { getWeaponFromRepository, Weapon } from "src/Entity/Item";
 import type { ItemId } from "../Item/type.ts";
 import {
   ArmorClass,
@@ -53,6 +57,9 @@ import {
 import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
 import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
 import { RaceEnum } from "../../InterFacesEnumsAndTypes/Enums";
+import { weaponRepository } from "../Item/Equipment/Weapon/repository.ts";
+import { itemInstanceRepository } from "../Item/Equipment/ItemInstance/repository.ts";
+import Report from "src/Utils/Reporter.ts";
 
 export class Character {
   id: string = "";
@@ -138,9 +145,9 @@ export class Character {
     leftHand: null,
   };
 
-  buffsAndDebuffs: CharacterBuffsAndDebuffs = { 
-    buffs: { entry: new Map() }, 
-    debuffs: { entry: new Map() } 
+  buffsAndDebuffs: CharacterBuffsAndDebuffs = {
+    buffs: { entry: new Map() },
+    debuffs: { entry: new Map() },
   };
 
   statTracker: number;
@@ -378,9 +385,9 @@ export class Character {
   rollSave(stat: AttributeKey, mode: "norm" | "adv" | "dis" = "norm") {
     const hasBless = this.buffsAndDebuffs.buffs.entry.has(BuffEnum.bless);
     const hasCursed = this.buffsAndDebuffs.debuffs.entry.has(DebuffEnum.cursed);
-  
+
     let rollRes = rollTwenty();
-  
+
     if (mode === "norm") {
       if (hasBless && !hasCursed) {
         rollRes = rollRes.adv();
@@ -388,10 +395,10 @@ export class Character {
         rollRes = rollRes.dis();
       }
     }
-  
+
     if (mode === "adv") rollRes = rollRes.adv();
     if (mode === "dis") rollRes = rollRes.dis();
-  
+
     // Luck "lucky break" mechanic: roll d20 + luck mod first, if > 15 add luck mod/2 to save
     const luckMod = statMod(this.attribute.getTotal("luck"));
     let luckBonus = 0;
@@ -401,7 +408,7 @@ export class Character {
         luckBonus = Math.floor(luckMod / 2);
       }
     }
-  
+
     return statMod(this.attribute.getTotal(stat)) + rollRes.total + luckBonus;
   }
 }
@@ -423,6 +430,7 @@ type BuffAndDebuffRecord = {
   value: number;
   isPerm: boolean;
   permValue: number;
+  counter: number;
 };
 
 type CharacterBuffsAndDebuffs = {

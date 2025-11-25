@@ -19,14 +19,15 @@ export const reversalPalm = new BuffDef({
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.reversalPalm, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
+        permValue: 0,
+        counter: permValue, // Store skill level in counter
       });
     } else {
       if (!entry.isPerm && isPerm) {
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue += permValue;
+      entry.counter += permValue;
     }
 
     return {
@@ -40,7 +41,7 @@ export const reversalPalm = new BuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
+      } else if (entry.value === 0 && entry.counter === 0) {
         actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.reversalPalm);
       }
     }

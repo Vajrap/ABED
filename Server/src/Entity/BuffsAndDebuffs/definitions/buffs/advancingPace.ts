@@ -26,6 +26,7 @@ export const advancingPace = new BuffDef({
         value,
         isPerm,
         permValue,
+        counter: 0,
       });
       actor.attribute.mutateBattle("strength", 2);
       if (permValue === 0) {

@@ -1,4 +1,4 @@
-export type SkillId = 
+export type SkillId =
   | BasicSkillId
   | MobSkillId
   | ClericSkillId
@@ -21,8 +21,7 @@ export type SkillId =
   | WitchSkillId
   | InquisitorSkillId
   | EngineerSkillId
-  | NomadSkillId
-
+  | NomadSkillId;
 
 export enum BasicSkillId {
   Basic = "Basic",
@@ -47,12 +46,9 @@ export enum ClericSkillId {
   // HolyWater = "HolyWater", // Buff weapon with holy damage,
   // Passive
   // HealingMastery = "HealingMastery", // Increase healing amount
-  
 }
 
-export enum SeerSkillId {
-
-}
+export enum SeerSkillId {}
 
 export enum MageSkillId {
   ArcaneBolt = "ArcaneBolt",
@@ -92,9 +88,9 @@ export enum MysticSkillId {
 
   // FlowingForm = "FlowingForm", // Later Implementation for Passive skills
   // Passive
-  // PASSIVE — Each successful dodge grants 1 Flow Buff (max 3). 
-  // Each Flow: +1 dodge roll & restore 1 MP at end of turn. 
-  // Lose all Flow when hit. 
+  // PASSIVE — Each successful dodge grants 1 Flow Buff (max 3).
+  // Each Flow: +1 dodge roll & restore 1 MP at end of turn.
+  // Lose all Flow when hit.
 
   // =======================
   // Passives
@@ -111,7 +107,7 @@ export enum MysticSkillId {
 
 export enum RogueSkillId {
   RetreatDash = "RetreatDash",
-  Backstab = "Backstab", 
+  Backstab = "Backstab",
 
   BleedingCut = "BleedingCut",
   // Uncommon
@@ -121,14 +117,12 @@ export enum RogueSkillId {
   // target must roll DC10 (DC12 at lvl 5) Endurance save. or get 1d3 bleed stacks (debuff)
   // Bleed: takes 1d3 damage per turn for 3 turns.
 
-
   ThrowingKnives = "ThrowingKnives",
   // Common
   // Any range
   // Throw knives at 2 targets, each deals 1d4 + Dex mod * (1 + 0.1 * skill level) pierce damage.
   // target can be repeat, (so just get random again and again, no thing special here)
   // at level 5, add 2 more knives to the throw
-
 
   Hiding = "Hiding",
   // Uncommon
@@ -138,7 +132,6 @@ export enum RogueSkillId {
 }
 
 export enum SpellBladeSkillId {
-
   PlanarEdge = "PlanarEdge",
   // Cantrip, auto attack, core idea for spell blade
   // Dealing arcane damage, melee (see positionModifier)
@@ -157,18 +150,17 @@ export enum SpellBladeSkillId {
   // Target roll DC7 + (user planar mod) endurance save or get bleed for 1d2 turn.
   // At level 5, if edge charge stacks > 0 deal additional 0.5 damage per stack, round down.
 
-
   SpellParry = "SpellParry",
   // rare
   // Get Spell Parry buff for 1 turn.
   // Spell Parry: reduce next spell’s damage by (5 + Int mod).
-  // If attacked by a spell, gain 1 Edge Charge (2 if 0 damage taken). 
+  // If attacked by a spell, gain 1 Edge Charge (2 if 0 damage taken).
   // At level 5 also produce 1 Edge Charge when used.
   // Comsume 1 wind, produce 1 chaos
 
   EdgeBurst = "EdgeBurst",
   // rare
-  // Consume ALL Edge Charges (min 1). 
+  // Consume ALL Edge Charges (min 1).
   // Close range, melee (see positionModifier)
   // must equip sword, blade, dagger or barehand(no weapon)
   // Strike target for weapon dmg(or the same as Planar Edge) + Planar mod + (1d2 per edge charge stacks) * (1 + 0.1 * skill level) arcane damage.
@@ -183,7 +175,6 @@ export enum ShamanSkillId {
 }
 
 export enum BarbarianSkillId {
-
   Rage = "Rage",
   // Cantrip,
   // Common
@@ -195,22 +186,18 @@ export enum BarbarianSkillId {
   // Common
   // Multi-hit melee.
   // must have sword axe blade hammer spear barehand
-  // 2 hits (3 hits at lvl5), each (0.7×weapon + STR mod) * (1 + 0.1 * skill level) * (positionModifier) damage = weapon damage type , -3 hit roll. 
+  // 2 hits (3 hits at lvl5), each (0.7×weapon + STR mod) * (1 + 0.1 * skill level) * (positionModifier) damage = weapon damage type , -3 hit roll.
   // consume 4 SP 1 fire, produce 1 neutral
 
   Earthshatter = "Earthshatter",
   // Uncommon
-  // AoE front row. 
-  // 1d8 + STR mod (1d10 at lvl5). 
-  // Enemies roll DC10 (DC12 lvl5) Fort save or Dazed 1 turn.  
+  // AoE front row.
+  // 1d8 + STR mod (1d10 at lvl5).
+  // Enemies roll DC10 (DC12 lvl5) Fort save or Dazed 1 turn.
   // consume 5 SP 1 fire, produce 1 earth.
 }
 
 export enum WarriorSkillId {
-  Bash = "Bash",
-  // common
-  // consume 2 neutral, produce 1 earth
-  // Deal weapon damage, + str mod, target roll DC8 + (user str mod) endurance save or get stun for 1 turn.
   Cleave = "Cleave",
   // common
   // consume 2 neutral, produce 1 wind
@@ -258,6 +245,7 @@ export enum GuardianSkillId {
   Taunt = "Taunt",
   HerosPose = "HerosPose",
   ShieldUp = "ShieldUp",
+  Bash = "Bash",
 }
 
 export enum PaladinSkillId {
@@ -279,7 +267,7 @@ export enum PaladinSkillId {
   AegisShield = "AegisShield",
   // Active - Activate Aegis Shield for 3 stack (4 at lvl5)
   // Must not have Aegis Shield buff
-  // Aegis Shield: each stack can mitigate 5 + (willpower mod) points of incoming damage. 
+  // Aegis Shield: each stack can mitigate 5 + (willpower mod) points of incoming damage.
   // example, (will power mod = 0), taking 5 damage: Aegis shield will mitigate 5 damage and decrease 1 stack.
   // Taking 7 damage: Aegis shield will mitigate 7 damage and decrease 2 stack.
   // When Aegis Shield is depleted, add Aegis Pulse buff for 1 turn.
@@ -339,7 +327,6 @@ export enum MonkSkillId {
 }
 
 export enum WarlockSkillId {
-
   ShadowBolt = "ShadowBolt",
   // ACTIVE — Launch a bolt of condensed shadow energy.
   // Ranged single-target magic damage with a small chance to weaken the target.
@@ -357,10 +344,9 @@ export enum WarlockSkillId {
 
   DarkPact = "DarkPact",
   // ACTIVE — Ultimate-ish.
-  // Sacrifice a portion of your HP to greatly enhance damage for a few turns 
+  // Sacrifice a portion of your HP to greatly enhance damage for a few turns
   // OR to instantly unleash a high-damage shadow burst.
   // High-risk, high-reward signature Warlock move.
-
 }
 
 export enum DuelistSkillId {
@@ -407,7 +393,6 @@ export enum WitchSkillId {
   // Uses CONTROL for save DC (precision in mind control), INTELLIGENCE for strategic advantage.
   // Might need to fix the getTarget method to receive more atgument.
   // getTarget(actor, actorParty, targetParty, targetType: 'ally' | 'enemy' | 'any') so chooding target with charc means the character needs to roll will power saves or target wrong part
-  
 }
 
 export enum InquisitorSkillId {
@@ -445,8 +430,8 @@ export enum ScholarSkillId {
 
   DisruptPattern = "DisruptPattern",
   // Cantrip
-  // Force DC10 (DC12 at lvl 5) Will save. 
-  // Fail: target is Dazed 1 turn. 
+  // Force DC10 (DC12 at lvl 5) Will save.
+  // Fail: target is Dazed 1 turn.
   // Success: reduce target's next initiative by 20 (30 at lvl 5).
 
   CognitiveOverload = "CognitiveOverload",
@@ -455,10 +440,6 @@ export enum ScholarSkillId {
   // If target has ≥3 debuffs, damage becomes 1d6 (1d8 at lvl 5).
 }
 
-export enum EngineerSkillId {
+export enum EngineerSkillId {}
 
-}
-
-export enum NomadSkillId {
-
-}
+export enum NomadSkillId {}

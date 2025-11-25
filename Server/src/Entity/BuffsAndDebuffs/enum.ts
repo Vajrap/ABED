@@ -45,4 +45,7 @@ export enum DebuffEnum {
   // Cooldown
   disruptPattern = "disruptPattern",
   analyze = "analyze",
+  healCooldown = "healCooldown",
+  massHealCooldown = "massHealCooldown",
+  mendSpiritCooldown = "mendSpiritCooldown",
 }

@@ -6,6 +6,8 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { ShamanSkill } from "./index";
+import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const mendSpirit = new ShamanSkill({
   id: ShamanSkillId.MendSpirit,
@@ -19,6 +21,7 @@ export const mendSpirit = new ShamanSkill({
   },
   requirement: {},
   equipmentNeeded: [],
+  notExistDebuff: [DebuffEnum.mendSpiritCooldown],
   tier: TierEnum.common,
   consume: {
     hp: 0,
@@ -88,6 +91,9 @@ export const mendSpirit = new ShamanSkill({
       target.vitals.incHp(healAmount);
       message = `${target.name.en} healed for ${healAmount} HP and received 1 Chaos energy.`;
     }
+
+    // Apply cooldown debuff
+    debuffsRepository.mendSpiritCooldown.appender(actor, 3, false, 0);
 
     return {
       content: {

@@ -20,6 +20,7 @@ export const haste = new BuffDef({
         value,
         isPerm,
         permValue,
+        counter: 0,
       });
     } else {
       if (!entry.isPerm && isPerm) {

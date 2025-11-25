@@ -21,6 +21,7 @@ export const bleed = new DebuffDef({
         value: value,
         isPerm: isPerm,
         permValue: permValue,
+        counter: 0,
       });
     } else {
       if (!entry.isPerm && isPerm) {

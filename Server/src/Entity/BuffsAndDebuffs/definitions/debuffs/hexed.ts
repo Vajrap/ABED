@@ -21,6 +21,7 @@ export const hexed = new DebuffDef({
                 value,
                 isPerm,
                 permValue,
+                counter: 0,
             });
             actor.attribute.mutateBattle("endurance", -2);
         } else {

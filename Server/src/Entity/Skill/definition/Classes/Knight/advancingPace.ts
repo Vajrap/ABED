@@ -25,12 +25,12 @@ export const advancingPaceSkill = new KnightSkill({
   tier: TierEnum.rare,
   consume: {
     hp: 0,
-    mp: 3,
+    mp: 0,
     sp: 4,
     elements: [
       {
         element: "neutral",
-        value: 3,
+        value: 2,
       },
     ],
   },
@@ -38,13 +38,7 @@ export const advancingPaceSkill = new KnightSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [
-      {
-        element: "fire",
-        min: 1,
-        max: 1,
-      },
-    ],
+    elements: [],
   },
   exec: (
     actor: Character,
@@ -53,7 +47,9 @@ export const advancingPaceSkill = new KnightSkill({
     skillLevel: number,
     _location: LocationsEnum,
   ): TurnResult => {
-    const activeEntry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.advancingPace);
+    const activeEntry = actor.buffsAndDebuffs.buffs.entry.get(
+      BuffEnum.advancingPace,
+    );
     if (activeEntry && activeEntry.value > 0) {
       return {
         content: {
@@ -99,4 +95,3 @@ export const advancingPaceSkill = new KnightSkill({
     };
   },
 });
-

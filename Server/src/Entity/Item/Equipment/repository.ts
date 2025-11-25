@@ -37,7 +37,7 @@ export function getEquipment(id: EquipmentId | string): Equipment | null {
   }
   const instance = getItemInstance(id as string);
   if (instance) {
-    return instance
+    return instance;
   }
   return null;
 }

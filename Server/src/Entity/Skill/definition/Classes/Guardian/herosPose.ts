@@ -23,8 +23,8 @@ export const herosPose = new GuardianSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 0,
-    elements: [],
+    sp: 2,
+    elements: [{ element: "neutral", value: 1 }],
   },
   produce: {
     hp: 0,

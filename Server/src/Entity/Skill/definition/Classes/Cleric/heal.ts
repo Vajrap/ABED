@@ -7,6 +7,8 @@ import { roll } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ClericSkill } from "./index";
+import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const heal = new ClericSkill({
   id: ClericSkillId.Heal,
@@ -20,6 +22,7 @@ export const heal = new ClericSkill({
   },
   requirement: {},
   equipmentNeeded: [],
+  notExistDebuff: [DebuffEnum.healCooldown],
   tier: TierEnum.common,
   consume: {
     hp: 0,
@@ -102,6 +105,9 @@ export const heal = new ClericSkill({
       target.buffsAndDebuffs.debuffs.entry.delete(randomDebuffId);
       debuffRemoved = ` ${target.name.en} was cleansed of a debuff.`;
     }
+
+    // Apply cooldown debuff
+    debuffsRepository.healCooldown.appender(actor, 3, false, 0);
 
     return {
       content: {

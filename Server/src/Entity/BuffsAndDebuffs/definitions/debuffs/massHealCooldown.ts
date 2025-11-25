@@ -3,17 +3,17 @@ import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { DebuffDef } from "../../type";
 import { DebuffEnum } from "../../enum";
 
-export const disruptPattern = new DebuffDef({
+export const massHealCooldown = new DebuffDef({
   name: {
-    en: "disrupt pattern: cooldown",
-    th: "disrupt pattern: cooldown",
+    en: "mass heal: cooldown",
+    th: "mass heal: cooldown",
   },
   appender: function (actor: Character, value: number): L10N {
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(
-      DebuffEnum.disruptPattern,
+      DebuffEnum.massHealCooldown,
     );
     if (!entry) {
-      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.disruptPattern, {
+      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.massHealCooldown, {
         value: value,
         isPerm: false,
         permValue: 0,
@@ -31,7 +31,7 @@ export const disruptPattern = new DebuffDef({
 
   resolver: function (actor: Character): { canAct: boolean; content: L10N } {
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(
-      DebuffEnum.disruptPattern,
+      DebuffEnum.massHealCooldown,
     );
     if (entry) {
       if (entry.value > 0) {
@@ -39,7 +39,7 @@ export const disruptPattern = new DebuffDef({
       }
     }
     if (entry && entry.value === 0) {
-      actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.disruptPattern);
+      actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.massHealCooldown);
     }
 
     return {
@@ -51,3 +51,4 @@ export const disruptPattern = new DebuffDef({
     };
   },
 });
+

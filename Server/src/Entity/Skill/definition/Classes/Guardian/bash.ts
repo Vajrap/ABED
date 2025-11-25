@@ -1,8 +1,7 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { WarriorSkillId } from "../../../enums";
+import { GuardianSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
-import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ActorEffect, TargetEffect } from "../../../effects";
@@ -11,12 +10,12 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { statMod } from "src/Utils/statMod";
-import { WarriorSkill } from ".";
+import { GuardianSkill } from ".";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
-export const bash = new WarriorSkill({
-  id: WarriorSkillId.Bash,
+export const bash = new GuardianSkill({
+  id: GuardianSkillId.Bash,
   name: {
     en: "Bash",
     th: "ทุบสุดแรง",
@@ -34,7 +33,7 @@ export const bash = new WarriorSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
+        element: "earth",
         value: 2,
       },
     ],
@@ -45,7 +44,7 @@ export const bash = new WarriorSkill({
     sp: 0,
     elements: [
       {
-        element: "earth",
+        element: "fire",
         min: 1,
         max: 1,
       },
@@ -87,7 +86,8 @@ export const bash = new WarriorSkill({
       weapon,
     );
 
-    damageOutput.damage = (damageOutput.damage + strengthMod) * positionModifierValue;
+    damageOutput.damage =
+      (damageOutput.damage + strengthMod) * positionModifierValue;
 
     const totalDamage = resolveDamage(
       actor.id,
@@ -108,7 +108,12 @@ export const bash = new WarriorSkill({
       stunMessage = ` ${target.name.en} failed the save and is stunned!`;
     }
 
-    const combatMsg = buildCombatMessage(actor, target, { en: "Bash", th: "ทุบสุดแรง" }, totalDamage);
+    const combatMsg = buildCombatMessage(
+      actor,
+      target,
+      { en: "Bash", th: "ทุบสุดแรง" },
+      totalDamage,
+    );
 
     return {
       content: {

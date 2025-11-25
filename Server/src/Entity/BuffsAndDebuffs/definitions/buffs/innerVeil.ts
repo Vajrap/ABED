@@ -21,6 +21,7 @@ export const innerVeil = new BuffDef({
         value: value,
         isPerm: isPerm,
         permValue: permValue,
+        counter: 0,
       });
       actor.battleStats.mutateBattle("dodge", 2);
       isFirst = true;

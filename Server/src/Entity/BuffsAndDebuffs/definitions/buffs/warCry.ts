@@ -21,9 +21,10 @@ export const warCry = new BuffDef({
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.warCry, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue, // permValue stores buff strength (2 + leadership mod/2)
+        permValue: 0,
+        counter: permValue, // counter stores buff strength (2 + leadership mod/2)
       });
-      // War Cry gives +agility and +strength based on permValue (buff strength)
+      // War Cry gives +agility and +strength based on counter (buff strength)
       const buffStrength = permValue > 0 ? permValue : 2; // Default to 2 if not set
       actor.attribute.mutateBattle("agility", buffStrength);
       actor.attribute.mutateBattle("strength", buffStrength);
@@ -33,9 +34,9 @@ export const warCry = new BuffDef({
         entry.isPerm = true;
       }
       entry.value += value;
-      // Keep the highest permValue (buff strength) when stacking
-      if (permValue > entry.permValue) {
-        const oldStrength = entry.permValue > 0 ? entry.permValue : 2;
+      // Keep the highest counter (buff strength) when stacking
+      if (permValue > entry.counter) {
+        const oldStrength = entry.counter > 0 ? entry.counter : 2;
         const newStrength = permValue;
         // Adjust stat bonuses if strength changed: remove old, add new
         if (newStrength !== oldStrength) {
@@ -44,7 +45,7 @@ export const warCry = new BuffDef({
           actor.attribute.mutateBattle("agility", newStrength); // Add new
           actor.attribute.mutateBattle("strength", newStrength);
         }
-        entry.permValue = permValue;
+        entry.counter = permValue;
       }
     }
 
@@ -64,8 +65,8 @@ export const warCry = new BuffDef({
       }
       // When duration expires, remove stat bonuses and delete buff
       if (entry.value === 0) {
-        // Remove stat bonuses based on the buff strength stored in permValue
-        const buffStrength = entry.permValue > 0 ? entry.permValue : 2;
+        // Remove stat bonuses based on the buff strength stored in counter
+        const buffStrength = entry.counter > 0 ? entry.counter : 2;
         actor.attribute.mutateBattle("agility", -buffStrength);
         actor.attribute.mutateBattle("strength", -buffStrength);
         actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.warCry);

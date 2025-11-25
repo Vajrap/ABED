@@ -20,6 +20,7 @@ export const slaveDriver = new BuffDef({
         value: value,
         isPerm: isPerm,
         permValue: permValue,
+        counter: 0,
       });
     } else {
       entry.value += value;

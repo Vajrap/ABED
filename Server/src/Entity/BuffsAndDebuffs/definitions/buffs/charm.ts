@@ -20,6 +20,7 @@ export const charm = new BuffDef({
         value: value,
         isPerm: isPerm,
         permValue: permValue,
+        counter: 0,
       });
     } else {
       if (!entry.isPerm && isPerm) {

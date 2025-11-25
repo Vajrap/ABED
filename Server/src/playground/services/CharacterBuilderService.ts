@@ -53,8 +53,19 @@ import {
   WarlockSkillId,
 } from "src/Entity/Skill/enums";
 import { MOBs } from "src/Entity/Character/MOBs/enums";
-import { BladeId, BodyId, BookWId, DaggerId, StaffId } from "src/Entity/Item";
+import {
+  BladeId,
+  BodyId,
+  BookWId,
+  DaggerId,
+  ShieldId,
+  SpearId,
+  StaffId,
+  Sword,
+  SwordId,
+} from "src/Entity/Item";
 import { bareHand } from "src/Entity/Item/Equipment/Weapon/BareHand/definition/bareHand";
+import { roll } from "src/Utils/Dice";
 
 export class CharacterBuilderService {
   /**
@@ -464,20 +475,27 @@ export class CharacterBuilderService {
         Object.assign(proficiencies, {
           sword: 10,
           blade: 8,
-          spear: 7,
+          spear: 10,
           shield: 9,
           axe: 6,
           hammer: 6,
         });
         activeSkills.push({
-          id: KnightSkillId.PrecisionThrust as SkillId,
-          level: difficulty,
-          exp: 0,
-        });
-        activeSkills.push({
-          id: KnightSkillId.AdvancingPace as SkillId,
+          id: KnightSkillId.AdvancingPace,
           level: Math.max(1, difficulty - 1),
           exp: 0,
+        });
+        equipments.push({
+          id: SwordId.LongSword,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({
+          id: ShieldId.Buckler,
+          slot: CharacterEquipmentSlot.leftHand,
+        });
+        equipments.push({
+          id: BodyId.ChainShirt,
+          slot: CharacterEquipmentSlot.body,
         });
         break;
 
@@ -499,14 +517,36 @@ export class CharacterBuilderService {
           spear: 5,
         });
         activeSkills.push({
-          id: GuardianSkillId.Taunt as SkillId,
-          level: difficulty,
+          id: GuardianSkillId.Bash,
+          level: Math.max(1, difficulty - 1),
           exp: 0,
         });
         activeSkills.push({
-          id: GuardianSkillId.ShieldUp as SkillId,
+          id: GuardianSkillId.HerosPose,
           level: Math.max(1, difficulty - 1),
           exp: 0,
+        });
+        activeSkills.push({
+          id: GuardianSkillId.ShieldUp,
+          level: Math.max(1, difficulty - 1),
+          exp: 0,
+        });
+        activeSkills.push({
+          id: GuardianSkillId.Taunt,
+          level: Math.max(1, difficulty - 1),
+          exp: 0,
+        });
+        equipments.push({
+          id: SwordId.ShortSword,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({
+          id: ShieldId.Buckler,
+          slot: CharacterEquipmentSlot.leftHand,
+        });
+        equipments.push({
+          id: BodyId.ChainShirt,
+          slot: CharacterEquipmentSlot.body,
         });
         break;
 
@@ -538,6 +578,8 @@ export class CharacterBuilderService {
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });
+        equipments.push({id: SwordId.GreatSword, slot: CharacterEquipmentSlot.rightHand})
+        equipments.push({id: BodyId.PaddedArmor, slot: CharacterEquipmentSlot.body})
         break;
 
       case ClassEnum.Cleric:

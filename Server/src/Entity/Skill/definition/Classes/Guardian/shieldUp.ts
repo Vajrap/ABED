@@ -5,6 +5,7 @@ import { ActorEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { GuardianSkill } from ".";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const shieldUp = new GuardianSkill({
   id: GuardianSkillId.ShieldUp,
@@ -13,11 +14,12 @@ export const shieldUp = new GuardianSkill({
     th: "ยกโล่ขึ้น",
   },
   description: {
-    en: "Raise your shield and prepare for incoming attacks. Adds a defense up buff to self for 1 turn, at level 5 the buff lasts for 2 turns. \n Defense up: pDEF and mDEF goes up by 2 effect don't stack.",
+    en: "Raise your shield and prepare for incoming attacks. Adds a defense up buff to self for 3 turns, at level 5 the buff lasts 4 turns. \n Defense up: pDEF and mDEF goes up by 2 effect don't stack.",
     th: "ยกโล่ขึ้นและเตรียมรับการโจมตี เพิ่มบัฟป้องกัน (เพิ่มพลังป้องกัน) ตัวเอง 1 เทิร์น เมื่อเลเวล 5 จะรักษาได้ 2 เทิร์น บัฟไม่ซ้อนทับ",
   },
   requirement: {},
   equipmentNeeded: ["shield"],
+  notExistBuff: [BuffEnum.defenseUp],
   tier: TierEnum.common,
   consume: {
     hp: 0,
@@ -32,7 +34,7 @@ export const shieldUp = new GuardianSkill({
     elements: [
       {
         element: "neutral",
-        min: 1,
+        min: 0,
         max: 1,
       },
     ],
@@ -45,7 +47,12 @@ export const shieldUp = new GuardianSkill({
     location: LocationsEnum,
   ) => {
     // TODO: Implement defense buff logic when defenseUp buff is added
-    buffsAndDebuffsRepository.defenseUp.appender(actor, skillLevel >= 5 ? 2 : 1, false, 0);
+    buffsAndDebuffsRepository.defenseUp.appender(
+      actor,
+      skillLevel >= 5 ? 4 : 3,
+      false,
+      0,
+    );
 
     return {
       content: {

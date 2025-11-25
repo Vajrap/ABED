@@ -15,6 +15,7 @@ export const taunt = new BuffDef({
         value: value,
         isPerm: false,
         permValue: 0,
+        counter: 0,
       });
       actor.battleStats.mutateBonus("pDEF", 2);
     } else {

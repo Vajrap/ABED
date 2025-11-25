@@ -39,6 +39,9 @@ import { entangled } from "./definitions/debuffs/entangled";
 import { hexMark } from "./definitions/debuffs/hexMark";
 import { disruptPattern } from "./definitions/debuffs/disruptPattern";
 import { analyze } from "./definitions/debuffs/analyze";
+import { healCooldown } from "./definitions/debuffs/healCooldown";
+import { massHealCooldown } from "./definitions/debuffs/massHealCooldown";
+import { mendSpiritCooldown } from "./definitions/debuffs/mendSpiritCooldown";
 
 export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.haste]: haste,
@@ -85,6 +88,9 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   // Cooldown
   [DebuffEnum.disruptPattern]: disruptPattern,
   [DebuffEnum.analyze]: analyze,
+  [DebuffEnum.healCooldown]: healCooldown,
+  [DebuffEnum.massHealCooldown]: massHealCooldown,
+  [DebuffEnum.mendSpiritCooldown]: mendSpiritCooldown,
 };
 
 export const buffsAndDebuffsRepository = {

@@ -21,16 +21,17 @@ export const regen = new BuffDef({
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.regen, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue, // permValue stores willpower mod
+        permValue: 0,
+        counter: permValue, // counter stores willpower mod
       });
     } else {
       if (!entry.isPerm && isPerm) {
         entry.isPerm = true;
       }
       entry.value += value;
-      // Keep the highest permValue (willpower mod)
-      if (permValue > entry.permValue) {
-        entry.permValue = permValue;
+      // Keep the highest counter (willpower mod)
+      if (permValue > entry.counter) {
+        entry.counter = permValue;
       }
     }
 
@@ -45,7 +46,7 @@ export const regen = new BuffDef({
     let healed = 0;
     if (entry && entry.value > 0) {
       // Restore (1d4 + WIL mod + vitality mod) HP at the start of their turn
-      const willMod = entry.permValue || statMod(actor.attribute.getTotal("willpower"));
+      const willMod = entry.counter || statMod(actor.attribute.getTotal("willpower"));
       const vitalityMod = statMod(actor.attribute.getTotal("vitality"));
       const healAmount = roll(1).d(4).total + willMod + vitalityMod;
       const beforeHp = actor.vitals.hp.current;
@@ -53,7 +54,7 @@ export const regen = new BuffDef({
       healed = actor.vitals.hp.current - beforeHp;
 
       entry.value -= 1;
-      if (entry.value === 0 && entry.permValue === 0) {
+      if (entry.value === 0 && entry.counter === 0) {
         actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.regen);
       }
     }

@@ -20,9 +20,10 @@ export const exposed = new DebuffDef({
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.exposed, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
+        permValue: 0,
+        counter: permValue, // counter stores skill level indicator (1 = level 5+, 0 = not)
       });
-      // At skill level 5+, permValue is 1, which means -2 to critical defense
+      // At skill level 5+, counter is 1, which means -2 to critical defense
       if (permValue > 0) {
         // Critical defense is based on endurance mod, so we reduce it via battle stats
         // Actually, critical defense is calculated as statMod(endurance), so we can't directly modify it
@@ -34,7 +35,7 @@ export const exposed = new DebuffDef({
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue = Math.max(entry.permValue, permValue); // Keep the higher permValue
+      entry.counter = Math.max(entry.counter, permValue); // Keep the higher counter
     }
 
     return {
@@ -48,7 +49,7 @@ export const exposed = new DebuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
+      } else if (entry.value === 0 && entry.counter === 0) {
         actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.exposed);
       }
     }

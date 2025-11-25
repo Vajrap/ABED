@@ -32,7 +32,7 @@ export const precisionThrust = new KnightSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 0,
+    sp: 4,
     elements: [
       {
         element: "fire",
@@ -59,7 +59,9 @@ export const precisionThrust = new KnightSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    const target = getTarget(actor, actorParty, targetParty, "enemy").from("frontFirst").one();
+    const target = getTarget(actor, actorParty, targetParty, "enemy")
+      .from("frontFirst")
+      .one();
     if (!target) {
       return {
         content: {
@@ -91,11 +93,16 @@ export const precisionThrust = new KnightSkill({
 
     const damageKind = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, damageKind);
-    const positionModifier = getPositionModifier(actor.position, target.position, weapon);
+    const positionModifier = getPositionModifier(
+      actor.position,
+      target.position,
+      weapon,
+    );
     const strengthMod = statMod(actor.attribute.getTotal("strength"));
     const scale = 1 + 0.1 * skillLevel;
 
-    damageOutput.damage = (damageOutput.damage + strengthMod) * scale * positionModifier;
+    damageOutput.damage =
+      (damageOutput.damage + strengthMod) * scale * positionModifier;
     damageOutput.hit += 3;
 
     const hasAnyDebuff = target.buffsAndDebuffs.debuffs.entry.size > 0;
@@ -103,7 +110,12 @@ export const precisionThrust = new KnightSkill({
       damageOutput.crit += skillLevel >= 5 ? 4 : 2;
     }
 
-    const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
+    const totalDamage = resolveDamage(
+      actor.id,
+      target.id,
+      damageOutput,
+      location,
+    );
     const message = buildCombatMessage(
       actor,
       target,
@@ -126,4 +138,3 @@ export const precisionThrust = new KnightSkill({
     };
   },
 });
-

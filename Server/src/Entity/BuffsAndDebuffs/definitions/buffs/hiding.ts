@@ -15,6 +15,7 @@ export const hiding = new BuffDef({
                 value: value,
                 isPerm: false,
                 permValue: 0,
+                counter: 0,
             });
         } else {
             entry.value += value;

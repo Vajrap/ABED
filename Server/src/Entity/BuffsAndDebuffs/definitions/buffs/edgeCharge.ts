@@ -26,6 +26,7 @@ export const edgeCharge = new BuffDef({
         value: actualStacks,
         isPerm: false, // Edge Charge has no duration limit, but we track it in value
         permValue: 0,
+        counter: 0,
       });
       return {
         en: `${actor.name.en} gains ${actualStacks} Edge Charge stack(s)${totalStacks > MAX_STACKS ? ` (capped at ${MAX_STACKS})` : ""}`,

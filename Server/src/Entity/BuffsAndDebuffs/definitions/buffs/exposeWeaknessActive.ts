@@ -19,7 +19,8 @@ export const exposeWeaknessActive = new BuffDef({
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.exposeWeaknessActive, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue, // Store WIL mod for hit bonus
+        permValue: 0,
+        counter: permValue, // Store WIL mod for hit bonus
       });
     } else {
       if (!entry.isPerm && isPerm) {
@@ -27,7 +28,7 @@ export const exposeWeaknessActive = new BuffDef({
       }
       entry.value += value;
       // Use higher WIL mod
-      entry.permValue = Math.max(entry.permValue, permValue);
+      entry.counter = Math.max(entry.counter, permValue);
     }
 
     return {
@@ -41,7 +42,7 @@ export const exposeWeaknessActive = new BuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
+      } else if (entry.value === 0 && entry.counter === 0) {
         actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.exposeWeaknessActive);
       }
     }

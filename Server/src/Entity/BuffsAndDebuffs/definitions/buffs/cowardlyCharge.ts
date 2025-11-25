@@ -20,6 +20,7 @@ export const cowardlyCharge = new BuffDef({
         value: value,
         isPerm: isPerm,
         permValue: permValue,
+        counter: 0,
       });
       // Add +2 pAtk and +2 mAtk when first applied
       actor.battleStats.mutateBonus("pATK", 2);

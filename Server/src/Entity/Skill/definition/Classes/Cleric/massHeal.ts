@@ -6,6 +6,8 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { roll } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { ClericSkill } from "./index";
+import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const massHeal = new ClericSkill({
   id: ClericSkillId.MassHeal,
@@ -19,6 +21,7 @@ export const massHeal = new ClericSkill({
   },
   requirement: {},
   equipmentNeeded: [],
+  notExistDebuff: [DebuffEnum.massHealCooldown],
   tier: TierEnum.rare,
   consume: {
     hp: 0,
@@ -88,6 +91,9 @@ export const massHeal = new ClericSkill({
         effect: [TargetEffect.TestSkill],
       });
     }
+
+    // Apply cooldown debuff
+    debuffsRepository.massHealCooldown.appender(actor, 4, false, 0);
 
     const summary = livingAllies
       .map((ally) => ally.name.en)

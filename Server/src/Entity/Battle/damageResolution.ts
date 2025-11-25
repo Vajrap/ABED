@@ -95,8 +95,8 @@ export function resolveDamage(
     hexMark.value > 0
   ) {
     // Both buff and debuff are active - add bonus damage
-    // Bonus damage based on INT mod stored in permValue
-    const intMod = curseMarkActive.permValue || 0;
+    // Bonus damage based on INT mod stored in counter
+    const intMod = curseMarkActive.counter || 0;
     const bonusDamage = Math.floor(intMod / 2) + roll(1).d(4).total; // INT mod/2 + 1d4
     damageOutput.damage += bonusDamage;
 
@@ -127,8 +127,8 @@ export function resolveDamage(
     exposedWeakness.value > 0
   ) {
     // Both buff and debuff are active - add hit bonus
-    // Hit bonus based on WIL mod stored in permValue
-    const wilMod = exposeWeaknessActive.permValue || 0;
+    // Hit bonus based on WIL mod stored in counter
+    const wilMod = exposeWeaknessActive.counter || 0;
     const hitBonus = Math.floor(wilMod / 2);
     if (hitBonus > 0) {
       damageOutput.hit += hitBonus;
@@ -286,7 +286,7 @@ export function resolveDamage(
   // Keep stat usage consistent: use statMod(endurance) if dodge used statMod(agility)
   // Exposed debuff reduces critical defense at skill level 5+
   const exposed = target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.exposed);
-  const exposedCritPenalty = exposed && exposed.permValue > 0 ? 2 : 0;
+  const exposedCritPenalty = exposed && exposed.counter > 0 ? 2 : 0;
   const effectiveCritDefense = critDefense - exposedCritPenalty;
 
   let isCrit = false;
@@ -337,7 +337,7 @@ export function resolveDamage(
 
     if (saveRoll >= dc) {
       // Save passed: negate attack and counter-attack
-      const skillLevel = reversalPalm.permValue || 1; // Use stored skill level
+      const skillLevel = reversalPalm.counter || 1; // Use stored skill level
       const dexMod = statMod(target.attribute.getTotal("dexterity"));
       const bareHaneMod = statMod(target.proficiencies.getTotal("bareHand"));
       const levelScalar = skillLevelMultiplier(skillLevel);
@@ -400,7 +400,7 @@ export function resolveDamage(
 
     if (saveRoll >= dc) {
       // Save passed: negate attack and counter-attack
-      const skillLevel = parry.permValue || 1; // Use stored skill level
+      const skillLevel = parry.counter || 1; // Use stored skill level
       const dexMod = statMod(target.attribute.getTotal("dexterity"));
       const levelScalar = skillLevelMultiplier(skillLevel);
       const weaponDamge =

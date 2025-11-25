@@ -15,6 +15,7 @@ export const dazed = new DebuffDef({
                 value: value,
                 isPerm: false,
                 permValue: 0,
+                counter: 0,
             });
             actor.battleStats.mutateBattle('pHIT', -2);
             actor.battleStats.mutateBattle('mHIT', -2);

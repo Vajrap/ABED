@@ -8,6 +8,7 @@ import { remove } from "./remove";
 import Report from "src/Utils/Reporter";
 import { BodyId, EarId, FootId, HandId, HeadWearId, LegId, NeckId, RingId, UtilId } from "./Armor";
 import { WeaponId } from "./Weapon";
+import { BuffEnum, DebuffEnum } from "../../BuffsAndDebuffs/enum";
 
 /**
  * Direct equip function for MOBs - bypasses inventory checks
@@ -56,16 +57,23 @@ function modifyBuffsAndDebuffs(character: Character, equipment: Equipment) {
   for (const [buffId, delta] of equipment.modifier.buffsAndDebuffs ?? []) {
     if (!delta || delta <= 0) continue;
 
-    let rec = character.buffsAndDebuffs.entry.get(buffId) ?? {
+    // Determine if it's a buff or debuff
+    const isBuff = Object.values(BuffEnum).includes(buffId as BuffEnum);
+    const entry = isBuff 
+      ? character.buffsAndDebuffs.buffs.entry 
+      : character.buffsAndDebuffs.debuffs.entry;
+
+    let rec = entry.get(buffId) ?? {
       value: 0,
       isPerm: false,
       permValue: 0,
+      counter: 0,
     };
 
     rec.isPerm = true;
     rec.permValue += delta;
 
-    character.buffsAndDebuffs.entry.set(buffId, rec);
+    entry.set(buffId, rec);
   }
 }
 

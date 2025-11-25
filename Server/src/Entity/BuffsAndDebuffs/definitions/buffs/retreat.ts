@@ -16,6 +16,7 @@ export const retreat = new BuffDef({
         value: value,
         isPerm: false,
         permValue: 0,
+        counter: 0,
       });
       actor.battleStats.mutateBattle("dodge", 3);
       isFirst = true;
