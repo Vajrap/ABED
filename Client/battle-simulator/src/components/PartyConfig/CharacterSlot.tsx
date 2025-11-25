@@ -47,7 +47,8 @@ export default function CharacterSlot({ position, character, metadata, onChange 
   };
 
   const handleSave = () => {
-    if (editChar && editChar.name.en) {
+    if (editChar) {
+      // Allow saving even without a name - names will be auto-generated before simulation
       onChange(editChar);
     }
     setOpen(false);
@@ -203,7 +204,7 @@ export default function CharacterSlot({ position, character, metadata, onChange 
           )}
           <Box sx={{ flexGrow: 1 }} />
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSave} variant="contained" disabled={!editChar?.name.en}>
+          <Button onClick={handleSave} variant="contained">
             Save
           </Button>
         </DialogActions>

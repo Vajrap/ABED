@@ -53,6 +53,34 @@ export default function PartyConfigPanel({
     onLoadPreset(preset);
   };
 
+  const frontLinePositions = [0, 1, 2];
+  const backLinePositions = [3, 4, 5];
+
+  const renderLineColumns = (
+    party: CharacterConfig[],
+    onChange: (position: number, character: CharacterConfig | null) => void,
+    columns: Array<{ label: string; positions: number[] }>
+  ) => (
+    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+      {columns.map((column) => (
+        <Box key={column.label} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 600 }}>
+            {column.label}
+          </Typography>
+          {column.positions.map((position) => (
+            <CharacterSlot
+              key={position}
+              position={position}
+              character={party.find((c) => c.position === position) || null}
+              metadata={metadata}
+              onChange={(char) => onChange(position, char)}
+            />
+          ))}
+        </Box>
+      ))}
+    </Box>
+  );
+
   return (
     <Box>
       <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -107,17 +135,10 @@ export default function PartyConfigPanel({
             <Typography variant="h6" gutterBottom>
               Party A
             </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
-              {[0, 1, 2, 3, 4, 5].map((position) => (
-                <CharacterSlot
-                  key={position}
-                  position={position}
-                  character={partyA.find(c => c.position === position) || null}
-                  metadata={metadata}
-                  onChange={(char) => handlePartyACharacterChange(position, char)}
-                />
-              ))}
-            </Box>
+            {renderLineColumns(partyA, handlePartyACharacterChange, [
+              { label: 'Back Line', positions: backLinePositions },
+              { label: 'Front Line', positions: frontLinePositions },
+            ])}
           </Paper>
         </Grid>
 
@@ -126,17 +147,10 @@ export default function PartyConfigPanel({
             <Typography variant="h6" gutterBottom>
               Party B
             </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
-              {[0, 1, 2, 3, 4, 5].map((position) => (
-                <CharacterSlot
-                  key={position}
-                  position={position}
-                  character={partyB.find(c => c.position === position) || null}
-                  metadata={metadata}
-                  onChange={(char) => handlePartyBCharacterChange(position, char)}
-                />
-              ))}
-            </Box>
+            {renderLineColumns(partyB, handlePartyBCharacterChange, [
+              { label: 'Front Line', positions: frontLinePositions },
+              { label: 'Back Line', positions: backLinePositions },
+            ])}
           </Paper>
         </Grid>
       </Grid>

@@ -1,6 +1,14 @@
+import type { ReactNode } from 'react';
 import { Box, Typography, Paper, Chip, Grid, Accordion, AccordionSummary, AccordionDetails, LinearProgress } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import type { StructuredBattleStatistics, CharacterStructuredStats, TurnAction } from '../../services/types';
+import type {
+  StructuredBattleStatistics,
+  CharacterStructuredStats,
+  EquipmentModifierSnapshot,
+  EquipmentArmorStats,
+  EquipmentWeaponStats,
+  StatDetail,
+} from '../../services/types';
 
 interface StatisticsPanelProps {
   statistics: {
@@ -12,7 +20,243 @@ interface StatisticsPanelProps {
 
 export default function StatisticsPanel({ statistics }: StatisticsPanelProps) {
   const { structured } = statistics;
-  
+
+  const formatLabel = (key: string) =>
+    key
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+
+  const renderNumberRecordChips = (
+    label: string,
+    record?: Record<string, number>,
+    color: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'info' | 'error' = 'default'
+  ) => {
+    if (!record || Object.keys(record).length === 0) return null;
+    return (
+      <Box>
+        <Typography variant="caption" color="text.secondary" fontWeight="bold">
+          {label}
+        </Typography>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+          {Object.entries(record).map(([key, value]) => (
+            <Chip
+              key={`${label}-${key}`}
+              label={`${formatLabel(key)} ${value >= 0 ? '+' : ''}${value}`}
+              size="small"
+              color={color}
+              variant="outlined"
+            />
+          ))}
+        </Box>
+      </Box>
+    );
+  };
+
+  const renderEquipmentModifiers = (modifiers?: EquipmentModifierSnapshot) => {
+    if (!modifiers) {
+      return null;
+    }
+
+    const sections: ReactNode[] = [];
+    const pushSection = (node: ReactNode | null) => {
+      if (node) {
+        sections.push(node);
+      }
+    };
+
+    pushSection(renderNumberRecordChips('Attributes', modifiers.attributes, 'primary'));
+    pushSection(renderNumberRecordChips('Proficiencies', modifiers.proficiencies, 'info'));
+    pushSection(renderNumberRecordChips('Battle Stats', modifiers.battleStatus, 'warning'));
+    pushSection(renderNumberRecordChips('Artisans', modifiers.artisans, 'secondary'));
+    pushSection(renderNumberRecordChips('Saves', modifiers.saves, 'success'));
+    pushSection(renderNumberRecordChips('Vitals', modifiers.vitals, 'error'));
+
+    if (modifiers.traits && modifiers.traits.length > 0) {
+      sections.push(
+        <Box key="traits">
+          <Typography variant="caption" color="text.secondary" fontWeight="bold">
+            Traits
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+            {modifiers.traits.map((trait) => (
+              <Chip key={trait} label={formatLabel(trait)} size="small" variant="outlined" />
+            ))}
+          </Box>
+        </Box>
+      );
+    }
+
+    if (modifiers.buffsAndDebuffs && modifiers.buffsAndDebuffs.length > 0) {
+      sections.push(
+        <Box key="buffs">
+          <Typography variant="caption" color="text.secondary" fontWeight="bold">
+            Buffs / Debuffs
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+            {modifiers.buffsAndDebuffs.map((entry) => (
+              <Chip
+                key={`${entry.id}-${entry.value}`}
+                label={`${formatLabel(entry.id)} ${entry.value >= 0 ? '+' : ''}${entry.value}`}
+                size="small"
+                color={entry.value >= 0 ? 'success' : 'error'}
+                variant="outlined"
+              />
+            ))}
+          </Box>
+        </Box>
+      );
+    }
+
+    if (sections.length === 0) {
+      return null;
+    }
+
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {sections.map((section, index) => (
+          <Box key={index}>{section}</Box>
+        ))}
+      </Box>
+    );
+  };
+
+  const renderArmorStatsBox = (armor?: EquipmentArmorStats) => {
+    if (!armor) return null;
+    const hasPhysical = !!(armor.physicalDefense && Object.values(armor.physicalDefense).some(val => typeof val === 'number'));
+    const hasMagical = !!(armor.magicalDefense && Object.values(armor.magicalDefense).some(val => typeof val === 'number'));
+    const hasDodge = typeof armor.dodgeBonus === 'number' && armor.dodgeBonus !== 0;
+    if (!hasPhysical && !hasMagical && !hasDodge) {
+      return null;
+    }
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+        {hasPhysical && armor.physicalDefense && (
+          <Box>
+            <Typography variant="caption" color="text.secondary" fontWeight="bold">
+              Physical Defense
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+              {Object.entries(armor.physicalDefense).map(([key, value]) => (
+                typeof value === 'number' ? (
+                  <Chip key={key} label={`${formatLabel(key)} ${value}`} size="small" color="primary" variant="outlined" />
+                ) : null
+              ))}
+            </Box>
+          </Box>
+        )}
+        {hasMagical && armor.magicalDefense && (
+          <Box>
+            <Typography variant="caption" color="text.secondary" fontWeight="bold">
+              Elemental Defense
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+              {Object.entries(armor.magicalDefense).map(([key, value]) => (
+                typeof value === 'number' ? (
+                  <Chip key={key} label={`${formatLabel(key)} ${value}`} size="small" color="secondary" variant="outlined" />
+                ) : null
+              ))}
+            </Box>
+          </Box>
+        )}
+        {hasDodge && (
+          <Chip label={`Dodge +${armor.dodgeBonus}`} size="small" color="info" variant="outlined" />
+        )}
+      </Box>
+    );
+  };
+
+  const renderWeaponStatsBox = (weapon?: EquipmentWeaponStats) => {
+    if (!weapon) return null;
+    const physLine = weapon.physicalDamageDice
+      ? `Physical ${weapon.physicalDamageDice}${weapon.physicalDamageType ? ` (${weapon.physicalDamageType})` : ''}`
+      : null;
+    const magicLine = weapon.magicalDamageDice
+      ? `Magical ${weapon.magicalDamageDice}${weapon.magicalDamageType ? ` (${weapon.magicalDamageType})` : ''}`
+      : null;
+
+    const hasTagLine = weapon.weaponType || weapon.preferredPosition || weapon.handle;
+    if (!physLine && !magicLine && !hasTagLine) {
+      return null;
+    }
+
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {(physLine || magicLine) && (
+          <Box>
+            <Typography variant="caption" color="text.secondary" fontWeight="bold">
+              Damage Dice
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {physLine && (
+                <Typography variant="body2" fontWeight="bold">
+                  {physLine}
+                </Typography>
+              )}
+              {magicLine && (
+                <Typography variant="body2" fontWeight="bold">
+                  {magicLine}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        )}
+        {hasTagLine && (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {weapon.weaponType && <Chip label={formatLabel(weapon.weaponType)} size="small" variant="outlined" />}
+            {weapon.preferredPosition && <Chip label={formatLabel(weapon.preferredPosition)} size="small" variant="outlined" />}
+            {weapon.handle && <Chip label={`${weapon.handle}-handed`} size="small" variant="outlined" />}
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
+  const renderStatSection = (
+    title: string,
+    stats?: Record<string, StatDetail>,
+    grid: { xs?: number; md?: number } = { xs: 12, md: 6 }
+  ) => {
+    if (!stats) return null;
+    const entries = Object.entries(stats).filter(([, value]) => typeof value?.total === 'number');
+    if (entries.length === 0) return null;
+
+    return (
+      <Grid item xs={grid.xs} md={grid.md}>
+        <Typography variant="subtitle2" gutterBottom color="text.secondary">
+          {title}
+        </Typography>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: 0.75,
+          }}
+        >
+          {entries.map(([key, value]) => (
+            <Paper
+              key={key}
+              variant="outlined"
+              sx={{
+                p: 0.75,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1,
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                {formatLabel(key)}
+              </Typography>
+              <Typography variant="body2" fontWeight="bold">
+                {value.total}
+              </Typography>
+            </Paper>
+          ))}
+        </Box>
+      </Grid>
+    );
+  };
   if (!structured || !structured.characters || Object.keys(structured.characters).length === 0) {
     return (
       <Box>
@@ -28,14 +272,6 @@ export default function StatisticsPanel({ statistics }: StatisticsPanelProps) {
   // Sort by overall damage descending
   const sortedCharacters = [...characters].sort((a, b) => b.overallDamage - a.overallDamage);
   const maxDamage = Math.max(...characters.map(c => c.overallDamage), 1);
-
-  const getActionColor = (type: TurnAction['type']) => {
-    switch (type) {
-      case 'damage': return 'error';
-      case 'heal': return 'success';
-      default: return 'default';
-    }
-  };
 
   return (
     <Box sx={{ p: 2 }}>
@@ -127,6 +363,72 @@ export default function StatisticsPanel({ statistics }: StatisticsPanelProps) {
                   </Typography>
                 </Box>
               </Grid>
+
+              {renderStatSection('Attributes', char.attributes)}
+              {renderStatSection('Proficiencies', char.proficiencies)}
+
+              {/* Battle Stats */}
+              {typeof char.battleStats?.dodge?.total === 'number' && (
+                <Grid item xs={12} md={6}>
+                  <Typography variant="subtitle2" gutterBottom color="text.secondary">
+                    Battle Stats
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                    <Chip label={`Dodge ${char.battleStats.dodge.total}`} color="info" variant="outlined" />
+                  </Box>
+                </Grid>
+              )}
+
+              {/* Equipment */}
+              {char.equipment && char.equipment.length > 0 && (
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" gutterBottom color="text.secondary">
+                    Equipment & Modifiers
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {char.equipment.map((equip) => {
+                      const metaParts = [
+                        equip.type ? formatLabel(equip.type) : null,
+                        equip.tier ? formatLabel(equip.tier) : null,
+                        typeof equip.weight === 'number' ? `${equip.weight} wt` : null,
+                        equip.armorStats?.armorClass ? formatLabel(equip.armorStats.armorClass) : null,
+                        equip.weaponStats?.weaponType ? formatLabel(equip.weaponStats.weaponType) : null,
+                      ].filter(Boolean);
+                      const detailSections = [
+                        renderArmorStatsBox(equip.armorStats),
+                        renderWeaponStatsBox(equip.weaponStats),
+                        renderEquipmentModifiers(equip.modifiers),
+                      ].filter(Boolean);
+                      return (
+                        <Paper key={`${equip.slot}-${equip.itemId}`} variant="outlined" sx={{ p: 1.5 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                                {formatLabel(equip.slot)}
+                              </Typography>
+                              <Typography variant="body2" fontWeight="bold">
+                                {equip.name}
+                              </Typography>
+                              {metaParts.length > 0 && (
+                                <Typography variant="caption" color="text.secondary">
+                                  {metaParts.join(' • ')}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Box>
+                          {detailSections.length > 0 && (
+                            <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              {detailSections.map((section, index) => (
+                                <Box key={index}>{section}</Box>
+                              ))}
+                            </Box>
+                          )}
+                        </Paper>
+                      );
+                    })}
+                  </Box>
+                </Grid>
+              )}
 
               {/* Skill Deck */}
               <Grid item xs={12}>
@@ -353,45 +655,107 @@ export default function StatisticsPanel({ statistics }: StatisticsPanelProps) {
                     p: 1
                   }}
                 >
-                  {char.turns.map((turn, idx) => (
-                    <Box 
-                      key={idx}
-                      sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: 1, 
-                        py: 0.5,
-                        borderBottom: idx < char.turns.length - 1 ? '1px solid' : 'none',
-                        borderColor: 'divider'
-                      }}
-                    >
-                      <Chip 
-                        label={`T${turn.turnNumber}`}
-                        size="small"
-                        variant="outlined"
-                        sx={{ minWidth: 45 }}
-                      />
-                      <Chip 
-                        label={turn.skill}
-                        size="small"
-                        color={getActionColor(turn.type)}
-                        variant={turn.value > 0 ? "filled" : "outlined"}
-                      />
-                      {turn.value > 0 && (
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {turn.type === 'damage' ? '-' : '+'}{turn.value}
+                  {char.turns.map((turn, idx) => {
+                    // Format the result text explicitly
+                    const formatResult = (): string => {
+                      if (!turn.targetName) {
+                        return '';
+                      }
+                      
+                      // Check for miss: either isHit is false, or damage type with value 0
+                      if (turn.isHit === false || (turn.type === 'damage' && turn.value === 0)) {
+                        return 'Miss';
+                      }
+                      
+                      // Build result string
+                      let result = '';
+                      
+                      if (turn.type === 'damage' && turn.value > 0) {
+                        if (turn.isCrit) {
+                          result = `Crit -${turn.value}`;
+                        } else {
+                          result = `-${turn.value}`;
+                        }
+                        // TODO: Add damage type (pierce, holy, etc.) when available
+                      } else if (turn.type === 'heal' && turn.value > 0) {
+                        result = `heal +${turn.value}`;
+                      } else {
+                        // No result to show
+                        return '';
+                      }
+                      
+                      return result;
+                    };
+                    
+                    // Determine skill chip color based on action type
+                    const getSkillChipColor = () => {
+                      switch (turn.type) {
+                        case 'damage': return 'error'; // Red for damage/attack skills
+                        case 'heal': return 'success'; // Green for healing/support skills
+                        default: return 'default'; // Grey for other skills
+                      }
+                    };
+                    
+                    const resultText = formatResult();
+                    const targetColor = turn.isAlly === true ? 'success.main' : turn.isAlly === false ? 'error.main' : 'text.secondary';
+                    
+                    // Only show if we have a target or result
+                    if (!turn.targetName && !resultText) {
+                      return null;
+                    }
+                    
+                    return (
+                      <Box 
+                        key={idx}
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: 1, 
+                          py: 0.5,
+                          borderBottom: idx < char.turns.length - 1 ? '1px solid' : 'none',
+                          borderColor: 'divider'
+                        }}
+                      >
+                        <Chip 
+                          label={`T${turn.turnNumber}`}
+                          size="small"
+                          variant="outlined"
+                          sx={{ minWidth: 45 }}
+                        />
+                        <Chip 
+                          label={turn.skill}
+                          size="small"
+                          color={getSkillChipColor()}
+                          variant="outlined"
+                        />
+                        <Typography variant="body2" component="span" color="text.secondary">
+                          →
                         </Typography>
-                      )}
-                      {turn.targetName && (
-                        <Typography variant="body2" color="text.secondary">
-                          → {turn.targetName}
-                        </Typography>
-                      )}
-                      {turn.isCrit && (
-                        <Chip label="CRIT" size="small" color="warning" />
-                      )}
-                    </Box>
-                  ))}
+                        {turn.targetName && (
+                          <Typography 
+                            variant="body2" 
+                            component="span"
+                            sx={{ 
+                              color: targetColor,
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            {turn.targetName}:
+                          </Typography>
+                        )}
+                        {resultText && (
+                          <Typography 
+                            variant="body2" 
+                            component="span"
+                            sx={{ fontWeight: 'bold' }}
+                            color={turn.type === 'heal' ? 'success.main' : 'text.primary'}
+                          >
+                            {resultText}
+                          </Typography>
+                        )}
+                      </Box>
+                    );
+                  })}
                 </Box>
               </Grid>
             </Grid>

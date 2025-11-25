@@ -5,6 +5,7 @@ import type { BattleMetadataResponse, CharacterConfig, SimulateBattleResponse, P
 import PartyConfigPanel from './components/PartyConfig/PartyConfigPanel';
 import BattleResultsView from './components/BattleResults/BattleResultsView';
 import PresetSelector from './components/PresetManager/PresetSelector';
+import { assignDefaultNames } from './utils/nameGenerator';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -90,9 +91,14 @@ function App() {
     try {
       setSimulating(true);
       setError(null);
+      
+      // Assign default names to characters that don't have names
+      const partyAWithNames = assignDefaultNames(partyA);
+      const partyBWithNames = assignDefaultNames(partyB);
+      
       const result = await BattleSimulatorAPI.simulateBattle({
-        partyA,
-        partyB,
+        partyA: partyAWithNames,
+        partyB: partyBWithNames,
         location,
         battleType,
       });

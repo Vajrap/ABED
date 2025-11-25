@@ -108,6 +108,64 @@ export interface SkillDeckEntry {
   };
 }
 
+export interface StatDetail {
+  base: number;
+  bonus: number;
+  battle: number;
+  total: number;
+}
+
+export interface EquipmentModifierSnapshot {
+  attributes?: Record<string, number>;
+  proficiencies?: Record<string, number>;
+  artisans?: Record<string, number>;
+  battleStatus?: Record<string, number>;
+  saves?: Record<string, number>;
+  vitals?: Record<string, number>;
+  traits?: string[];
+  buffsAndDebuffs?: Array<{ id: string; value: number }>;
+}
+
+export interface EquipmentArmorStats {
+  armorClass?: string;
+  physicalDefense?: {
+    slash?: number;
+    pierce?: number;
+    blunt?: number;
+  };
+  magicalDefense?: {
+    order?: number;
+    chaos?: number;
+    fire?: number;
+    earth?: number;
+    water?: number;
+    air?: number;
+  };
+  dodgeBonus?: number;
+}
+
+export interface EquipmentWeaponStats {
+  weaponType?: string;
+  preferredPosition?: string;
+  handle?: number;
+  physicalDamageDice?: string;
+  magicalDamageDice?: string;
+  physicalDamageType?: string;
+  magicalDamageType?: string;
+}
+
+export interface EquipmentSnapshot {
+  slot: CharacterEquipmentSlot;
+  itemId: string;
+  name: string;
+  type?: string;
+  tier?: string;
+  weight?: number;
+  modifiers?: EquipmentModifierSnapshot;
+  armorStats?: EquipmentArmorStats;
+  weaponStats?: EquipmentWeaponStats;
+}
+
 export interface CharacterStructuredStats {
   characterId: string;
   characterName: string;
@@ -122,6 +180,10 @@ export interface CharacterStructuredStats {
   skillsUsed: Record<string, number>;
   skillDeck: SkillDeckEntry[];
   conditionalSkillDeck?: SkillDeckEntry[];
+  attributes?: Record<string, StatDetail>;
+  proficiencies?: Record<string, StatDetail>;
+  battleStats?: Record<string, StatDetail>;
+  equipment?: EquipmentSnapshot[];
 }
 
 export interface TurnAction {
@@ -133,6 +195,7 @@ export interface TurnAction {
   targetName?: string;
   isCrit?: boolean;
   isHit?: boolean;
+  isAlly?: boolean; // true if target is in same party as actor, false if enemy
 }
 
 export interface BattleMetadataResponse {

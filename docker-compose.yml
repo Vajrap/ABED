@@ -8,9 +8,10 @@ services:
     volumes:
       - ./Server:/app/Server
       - ./logs:/var/log/app
-    command: bun run src/index.ts
+    command: bun --inspect src/index.ts
     ports:
       - "7890:7890"
+      - "6499:6499"  # Debug port for VS Code attachment
     restart: unless-stopped
     depends_on:
       - postgres
@@ -30,32 +31,35 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  loki:
-    image: grafana/loki:2.9.0
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - ./loki-config.yaml:/etc/loki/local-config.yaml
-      - ./loki-data:/loki
+#  loki:
+#    image: grafana/loki:2.9.0
+#    ports:
+#      - "3100:3100"
+#    command: -config.file=/etc/loki/local-config.yaml
+#    volumes:
+#      - ./loki-config.yaml:/etc/loki/local-config.yaml
+#      - ./loki-data:/loki
+#    # NOTE: Disabled to avoid auto-starting observability stack. Uncomment to enable.
 
-  promtail:
-    image: grafana/promtail:2.9.0
-    ports:
-      - "9080:9080"
-    volumes:
-      - ./promtail-config.yaml:/etc/promtail/config.yaml
-      - ./logs:/var/log/app:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    command: -config.file=/etc/promtail/config.yaml -log.level=debug
+#  promtail:
+#    image: grafana/promtail:2.9.0
+#    ports:
+#      - "9080:9080"
+#    volumes:
+#      - ./promtail-config.yaml:/etc/promtail/config.yaml
+#      - ./logs:/var/log/app:ro
+#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#    command: -config.file=/etc/promtail/config.yaml -log.level=debug
+#    # NOTE: Disabled to avoid auto-starting observability stack. Uncomment to enable.
 
-  grafana:
-    image: grafana/grafana:10.4.0
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
+#  grafana:
+#    image: grafana/grafana:10.4.0
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - grafana-data:/var/lib/grafana
+#    # NOTE: Disabled to avoid auto-starting observability stack. Uncomment to enable.
 
 volumes:
   grafana-data:
