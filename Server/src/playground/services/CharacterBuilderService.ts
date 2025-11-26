@@ -58,6 +58,7 @@ import {
   BodyId,
   BookWId,
   DaggerId,
+  HammerId,
   ShieldId,
   SpearId,
   StaffId,
@@ -578,8 +579,14 @@ export class CharacterBuilderService {
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });
-        equipments.push({id: SwordId.GreatSword, slot: CharacterEquipmentSlot.rightHand})
-        equipments.push({id: BodyId.PaddedArmor, slot: CharacterEquipmentSlot.body})
+        equipments.push({
+          id: SwordId.GreatSword,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({
+          id: BodyId.PaddedArmor,
+          slot: CharacterEquipmentSlot.body,
+        });
         break;
 
       case ClassEnum.Cleric:
@@ -598,9 +605,13 @@ export class CharacterBuilderService {
           shield: 10,
           orb: 9,
         });
-        // Order: Hardest first (Bless needs 4 MP + 3 order), easiest last (Heal needs 3 MP)
         activeSkills.push({
           id: ClericSkillId.Bless as SkillId,
+          level: Math.max(1, difficulty - 1),
+          exp: 0,
+        });
+        activeSkills.push({
+          id: ClericSkillId.Radiance as SkillId,
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });
@@ -609,6 +620,11 @@ export class CharacterBuilderService {
           level: difficulty,
           exp: 0,
         });
+        equipments.push({
+          id: StaffId.QuarterStaff,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({ id: BodyId.Robe, slot: CharacterEquipmentSlot.body });
         break;
 
       case ClassEnum.Paladin:
@@ -622,21 +638,38 @@ export class CharacterBuilderService {
           endurance: 2,
         });
         Object.assign(proficiencies, {
-          sword: 10,
+          sword: 8,
           shield: 10,
-          hammer: 8,
+          hammer: 10,
           blade: 7,
         });
         // Order: Hardest first (DivineStrike needs 2 SP + 2 order), easiest last (Radiance needs 2 MP)
+        activeSkills.push({
+          id: PaladinSkillId.AegisPulse as SkillId,
+          level: Math.max(1, difficulty - 1),
+          exp: 0,
+        });
+        activeSkills.push({
+          id: PaladinSkillId.AegisShield as SkillId,
+          level: Math.max(1, difficulty - 1),
+          exp: 0,
+        });
         activeSkills.push({
           id: PaladinSkillId.DivineStrike as SkillId,
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });
-        activeSkills.push({
-          id: ClericSkillId.Radiance as SkillId,
-          level: difficulty,
-          exp: 0,
+        equipments.push({
+          id: HammerId.Hammer,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({
+          id: ShieldId.Buckler,
+          slot: CharacterEquipmentSlot.leftHand,
+        });
+        equipments.push({
+          id: BodyId.StuddedLeatherArmor,
+          slot: CharacterEquipmentSlot.body,
         });
         break;
 

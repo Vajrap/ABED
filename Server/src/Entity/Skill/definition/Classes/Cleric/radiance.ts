@@ -12,6 +12,7 @@ import { rollTwenty, roll } from "src/Utils/Dice";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { ClericSkill } from "./index";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
+import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
 
 export const radiance = new ClericSkill({
   id: ClericSkillId.Radiance,
@@ -20,7 +21,7 @@ export const radiance = new ClericSkill({
     th: "รัศมีศักดิ์สิทธิ์",
   },
   description: {
-    en: "Unleash a flash of consecrated light dealing 1d6 + willpower modifier, scaled by skill level.",
+    en: "Unleash a flash of consecrated light dealing 1d6 + willpower modifier, scaled by skill level. Deal additional 1d4 (+2 at level 5) if the target is undead or fiend.",
     th: "ปล่อยแสงศักดิ์สิทธิ์ สร้างความเสียหาย 1d6 + willpower mod และเพิ่มตามเลเวล",
   },
   requirement: {},
@@ -69,10 +70,17 @@ export const radiance = new ClericSkill({
 
     const willpowerMod = statMod(actor.attribute.getTotal("willpower"));
     const baseRoll = roll(1).d(6).total;
-    const totalDamage = Math.max(
+    let totalDamage = Math.max(
       0,
       (baseRoll + willpowerMod) * skillLevelMultiplier(skillLevel),
     );
+
+    if (
+      target.type === CharacterType.undead ||
+      target.type === CharacterType.fiend
+    ) {
+      totalDamage += roll(1).d(4).total + skillLevel === 5 ? 2 : 0;
+    }
 
     const damageOutput = {
       damage: Math.floor(totalDamage),
@@ -82,10 +90,20 @@ export const radiance = new ClericSkill({
       isMagic: true,
     };
 
-    const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
+    const damageResult = resolveDamage(
+      actor.id,
+      target.id,
+      damageOutput,
+      location,
+    );
 
     return {
-      content: buildCombatMessage(actor, target, { en: "Radiance", th: "รัศมีศักดิ์สิทธิ์" }, damageResult),
+      content: buildCombatMessage(
+        actor,
+        target,
+        { en: "Radiance", th: "รัศมีศักดิ์สิทธิ์" },
+        damageResult,
+      ),
       actor: {
         actorId: actor.id,
         effect: [ActorEffect.Cast],

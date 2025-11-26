@@ -20,7 +20,17 @@ import type { ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
 
 // Must have any weapon but not bow, orb, wand, book
 // So allowed weapons are: bareHand, sword, blade, dagger, spear, axe, hammer, shield, staff
-const allowedWeapons: ProficiencyKey[] = ["bareHand", "sword", "blade", "dagger", "spear", "axe", "hammer", "shield", "staff"];
+const allowedWeapons: ProficiencyKey[] = [
+  "bareHand",
+  "sword",
+  "blade",
+  "dagger",
+  "spear",
+  "axe",
+  "hammer",
+  "shield",
+  "staff",
+];
 
 export const divineStrike = new PaladinSkill({
   id: PaladinSkillId.DivineStrike,
@@ -41,7 +51,7 @@ export const divineStrike = new PaladinSkill({
     sp: 2,
     elements: [
       {
-        element: "order",
+        element: "neutral",
         value: 2,
       },
     ],
@@ -52,7 +62,7 @@ export const divineStrike = new PaladinSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
+        element: "order",
         min: 1,
         max: 1,
       },
@@ -65,7 +75,9 @@ export const divineStrike = new PaladinSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    const target = getTarget(actor, actorParty, targetParty, "enemy").from("frontFirst").one();
+    const target = getTarget(actor, actorParty, targetParty, "enemy")
+      .from("frontFirst")
+      .one();
     if (!target) {
       return {
         content: {
@@ -98,14 +110,22 @@ export const divineStrike = new PaladinSkill({
 
     const damageType = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, damageType);
-    const positionModifier = getPositionModifier(actor.position, target.position, weapon);
+    const positionModifier = getPositionModifier(
+      actor.position,
+      target.position,
+      weapon,
+    );
     const strMod = statMod(actor.attribute.getTotal("strength"));
     const willMod = statMod(actor.attribute.getTotal("willpower"));
     const levelScalar = skillLevelMultiplier(skillLevel);
 
     // Deal (weapon damage * 1.2 + (str mod) + (will mod)) * (skill level multiplier) * (position modifier) holy damage
     const holyDamageOutput = {
-      damage: Math.floor((damageOutput.damage * 1.2 + strMod + willMod) * levelScalar * positionModifier),
+      damage: Math.floor(
+        (damageOutput.damage * 1.2 + strMod + willMod) *
+          levelScalar *
+          positionModifier,
+      ),
       hit: damageOutput.hit,
       crit: damageOutput.crit,
       type: DamageType.holy,
@@ -113,7 +133,9 @@ export const divineStrike = new PaladinSkill({
     };
 
     // If enemy is undead or fiend, deal additional 1d6 (1d10 at lvl5) holy damage
-    const isUndeadOrFiend = target.type === CharacterType.undead || target.type === CharacterType.fiend;
+    const isUndeadOrFiend =
+      target.type === CharacterType.undead ||
+      target.type === CharacterType.fiend;
     if (isUndeadOrFiend) {
       const bonusDice = skillLevel >= 5 ? 10 : 6;
       const bonusDamage = roll(1).d(bonusDice).total;
@@ -124,7 +146,12 @@ export const divineStrike = new PaladinSkill({
     holyDamageOutput.hit = rollTwenty().total + holyDamageOutput.hit;
     holyDamageOutput.crit = rollTwenty().total + holyDamageOutput.crit;
 
-    const totalDamage = resolveDamage(actor.id, target.id, holyDamageOutput, location);
+    const totalDamage = resolveDamage(
+      actor.id,
+      target.id,
+      holyDamageOutput,
+      location,
+    );
     const message = buildCombatMessage(
       actor,
       target,
@@ -147,4 +174,3 @@ export const divineStrike = new PaladinSkill({
     };
   },
 });
-

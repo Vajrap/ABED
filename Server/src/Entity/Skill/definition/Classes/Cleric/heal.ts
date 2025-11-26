@@ -17,7 +17,7 @@ export const heal = new ClericSkill({
     th: "รักษา",
   },
   description: {
-    en: "Restore HP to an ally with least HP percentage. Heals for 1d6 + willpower modifier * (1 + 0.1 * skill level). At level 3+, also removes one debuff from the target.",
+    en: "Restore HP to an ally with least HP percentage. Heals for 1d6 + willpower modifier * (1 + 0.1 * skill level). At level 3+, also removes one debuff from the target. Have 3 turns cooldown.",
     th: "ฟื้นฟู HP ให้กับพันธมิตร รักษา 1d6 + ค่า willpower + เลเวลสกิล ที่เลเวล 3+ จะลบ debuff หนึ่งตัวจากเป้าหมายด้วย",
   },
   requirement: {},
@@ -69,7 +69,9 @@ export const heal = new ClericSkill({
     }
 
     // Prefer injured allies, but can target any ally
-    const target = getTarget(actor, actorParty, targetParty, "ally").with('least', 'currentHPPercentage').one();
+    const target = getTarget(actor, actorParty, targetParty, "ally")
+      .with("least", "currentHPPercentage")
+      .one();
     if (!target) {
       return {
         content: {
@@ -83,7 +85,7 @@ export const heal = new ClericSkill({
         targets: [],
       };
     }
-    
+
     // Calculate healing: 1d6 + willpower mod + skill level
     const willpowerMod = statMod(actor.attribute.getTotal("willpower"));
     const baseHeal = roll(1).d(6).total + willpowerMod + skillLevel;
@@ -127,4 +129,3 @@ export const heal = new ClericSkill({
     };
   },
 });
-
