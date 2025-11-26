@@ -30,7 +30,7 @@ export const earthshatter = new BarbarianSkill({
     hp: 0,
     mp: 0,
     sp: 5,
-    elements: [{ element: "fire", value: 1 }],
+    elements: [{ element: "fire", value: 2 }],
   },
   produce: {
     hp: 0,

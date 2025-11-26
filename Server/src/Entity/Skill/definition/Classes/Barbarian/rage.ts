@@ -19,6 +19,7 @@ export const rage = new BarbarianSkill({
     th: "ทักษะพื้นฐาน ได้รับ Rage 3 เทิร์น (4 เทิร์นที่เลเวล 5) Rage: +2 pATK, -2 pDEF, -2 mDEF ไม่สามารถใช้ได้ระหว่างมี Rage",
   },
   requirement: {},
+  notExistBuff: [BuffEnum.rage],
   equipmentNeeded: [],
   tier: TierEnum.common,
   consume: {
@@ -33,7 +34,6 @@ export const rage = new BarbarianSkill({
     sp: 0,
     elements: [{ element: "fire", min: 1, max: 1 }],
   },
-  notExistBuff: [BuffEnum.rage],
   exec: (
     actor: Character,
     actorParty: Character[],

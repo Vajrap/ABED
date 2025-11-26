@@ -53,6 +53,7 @@ import {
 } from "src/Entity/Skill/enums";
 import { MOBs } from "src/Entity/Character/MOBs/enums";
 import {
+  AxeId,
   BladeId,
   BodyId,
   BookWId,
@@ -800,9 +801,22 @@ export class CharacterBuilderService {
           bareHand: 8,
         });
         activeSkills.push({
+          id: BarbarianSkillId.RecklessSwing as SkillId,
+          level: difficulty,
+          exp: 0,
+        });
+        activeSkills.push({
           id: BarbarianSkillId.Rage as SkillId,
           level: difficulty,
           exp: 0,
+        });
+        equipments.push({
+          id: AxeId.BroadAxe,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({
+          id: BodyId.LeatherArmor,
+          slot: CharacterEquipmentSlot.body,
         });
         break;
 
@@ -818,9 +832,32 @@ export class CharacterBuilderService {
         });
         Object.assign(proficiencies, { wand: 9, staff: 8, book: 8, orb: 7 });
         activeSkills.push({
+          id: WarlockSkillId.DarkPact as SkillId,
+          level: difficulty,
+          exp: 0,
+        });
+        activeSkills.push({
+          id: WarlockSkillId.LifeDrain as SkillId,
+          level: difficulty,
+          exp: 0,
+        });
+        activeSkills.push({
+          id: WarlockSkillId.Corruption as SkillId,
+          level: difficulty,
+          exp: 0,
+        });
+        activeSkills.push({
           id: WarlockSkillId.ShadowBolt as SkillId,
           level: difficulty,
           exp: 0,
+        });
+        equipments.push({
+          id: WandId.Wand,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({
+          id: BodyId.MageRobe,
+          slot: CharacterEquipmentSlot.body,
         });
         break;
 
