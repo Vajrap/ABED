@@ -62,12 +62,9 @@ import {
   ShieldId,
   SpearId,
   StaffId,
-  Sword,
   SwordId,
   WandId,
 } from "src/Entity/Item";
-import { bareHand } from "src/Entity/Item/Equipment/Weapon/BareHand/definition/bareHand";
-import { roll } from "src/Utils/Dice";
 
 export class CharacterBuilderService {
   /**
