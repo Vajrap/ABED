@@ -6,7 +6,6 @@ import {
   ClassEnum,
   CharacterEquipmentSlot,
   CharacterType,
-  EquipmentSlot,
 } from "src/InterFacesEnumsAndTypes/Enums";
 import type { SkillId } from "src/Entity/Skill/enums";
 import type { EquipmentId } from "src/Entity/Item/Equipment/types";
