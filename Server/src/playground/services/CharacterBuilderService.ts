@@ -64,6 +64,7 @@ import {
   StaffId,
   Sword,
   SwordId,
+  WandId,
 } from "src/Entity/Item";
 import { bareHand } from "src/Entity/Item/Equipment/Weapon/BareHand/definition/bareHand";
 import { roll } from "src/Utils/Dice";
@@ -347,13 +348,11 @@ export class CharacterBuilderService {
         Object.assign(attrMods, {
           planar: 2,
           dexterity: 2,
-          control: 2,
-          strength: 1,
-          intelligence: 1,
+          agility: 2,
         });
         Object.assign(proficiencies, {
-          blade: 8,
-          sword: 7,
+          blade: 10,
+          sword: 10,
           staff: 5,
           wand: 4,
         });
@@ -373,7 +372,7 @@ export class CharacterBuilderService {
           exp: 0,
         });
         equipments.push({
-          id: BodyId.MageRobe,
+          id: BodyId.LeatherArmor,
           slot: CharacterEquipmentSlot.body,
         });
         break;
@@ -685,9 +684,27 @@ export class CharacterBuilderService {
         });
         Object.assign(proficiencies, { staff: 10, wand: 7, book: 6, orb: 5 });
         activeSkills.push({
+          id: DruidSkillId.ThrowSpear as SkillId,
+          level: difficulty,
+          exp: 0,
+        });
+        activeSkills.push({
           id: DruidSkillId.VineWhip as SkillId,
           level: difficulty,
           exp: 0,
+        });
+        activeSkills.push({
+          id: DruidSkillId.RejuvenatingMist as SkillId,
+          level: difficulty,
+          exp: 0,
+        });
+        equipments.push({
+          id: SpearId.Javelin,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({
+          id: BodyId.HideArmor,
+          slot: CharacterEquipmentSlot.body,
         });
         break;
 
@@ -705,14 +722,27 @@ export class CharacterBuilderService {
         // Order: Both are similar (2 MP, no elements), but FireBolt produces fire (more useful for chains)
         // So put ArcaneBolt first (less useful), FireBolt last (more useful, cantrip-like)
         activeSkills.push({
-          id: MageSkillId.ArcaneBolt as SkillId,
+          id: MageSkillId.Backdraft as SkillId,
+          level: Math.max(1, difficulty - 1),
+          exp: 0,
+        });
+        activeSkills.push({
+          id: MageSkillId.BurningHand as SkillId,
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });
         activeSkills.push({
           id: MageSkillId.FireBolt as SkillId,
-          level: difficulty,
+          level: Math.max(1, difficulty - 1),
           exp: 0,
+        });
+        equipments.push({
+          id: WandId.Wand,
+          slot: CharacterEquipmentSlot.rightHand,
+        });
+        equipments.push({
+          id: BodyId.MageRobe,
+          slot: CharacterEquipmentSlot.body,
         });
         break;
 

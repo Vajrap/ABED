@@ -27,6 +27,7 @@ export class Skill {
   notExistBuff?: BuffEnum[];
   notExistDebuff?: DebuffEnum[];
   class?: ClassEnum;
+  cooldown: number;
   exec: (
     user: Character,
     userParty: Character[],
@@ -48,6 +49,7 @@ export class Skill {
     notExistBuff?: BuffEnum[];
     notExistDebuff?: DebuffEnum[];
     class?: ClassEnum;
+    cooldown?: number;
     exec: (
       user: Character,
       userParty: Character[],
@@ -71,6 +73,7 @@ export class Skill {
     this.existDebuff = data.existDebuff;
     this.notExistBuff = data.notExistBuff;
     this.notExistDebuff = data.notExistDebuff;
+    this.cooldown = data.cooldown ?? 0;
   }
 }
 

@@ -22,6 +22,7 @@ export const rejuvenatingMist = new DruidSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.rare,
+  cooldown: 3,
   consume: {
     hp: 0,
     mp: 4,

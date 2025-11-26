@@ -1,7 +1,6 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SpellBladeSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
-import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
@@ -9,7 +8,6 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
-import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { SpellBladeSkill } from "./index";
@@ -78,30 +76,15 @@ export const planarEdge = new SpellBladeSkill({
     const edgeChargeEntry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.edgeCharge);
     const edgeChargeStacks = edgeChargeEntry?.value || 0;
 
-    let baseDamage = 0;
-    let hitValue = 0;
-    let critValue = 0;
-
-    if (isBareHand) {
-      // No weapon: use skill level dice
-      let diceConfig: { dice: number; face: number };
-      if (skillLevel === 1) diceConfig = { dice: 1, face: 6 };
-      else if (skillLevel === 2) diceConfig = { dice: 1, face: 6 };
-      else if (skillLevel === 3) diceConfig = { dice: 1, face: 8 };
-      else if (skillLevel === 4) diceConfig = { dice: 1, face: 8 };
-      else diceConfig = { dice: 2, face: 4 }; // level 5+
-
-      baseDamage = roll(diceConfig.dice).d(diceConfig.face).total;
-      hitValue = rollTwenty().total + statMod(actor.attribute.getTotal("control"));
-      critValue = rollTwenty().total + statMod(actor.attribute.getTotal("luck"));
-    } else {
-      // Has weapon: use weapon damage
-      const type = getWeaponDamageType(weapon.weaponType);
-      const weaponDamage = getWeaponDamageOutput(actor, weapon, type);
-      baseDamage = weaponDamage.damage;
-      hitValue = weaponDamage.hit;
-      critValue = weaponDamage.crit;
-    }
+    const baseDamage = 
+      isBareHand ? 
+        skillLevel <= 2 ? roll(1).d(6).total : 
+        skillLevel <= 4 ? roll(1).d(8).total : 
+        roll(2).d(4).total : 
+      roll(weapon.weaponData.damage.magicalDamageDice.dice)
+        .d(weapon.weaponData.damage.magicalDamageDice.face).total;
+    const hitValue = rollTwenty().total + statMod(actor.attribute.getTotal("dexterity"));
+    const critValue = rollTwenty().total + statMod(actor.attribute.getTotal("luck"));
 
     const rawDamage = baseDamage + planarMod + edgeChargeStacks;
     const scaledDamage = Math.max(0, rawDamage * levelScalar);

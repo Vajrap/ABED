@@ -100,6 +100,7 @@ export class Character {
   conditionalSkills: CharacterSkillObject[] = [];
   conditionalSkillsCondition: DeckCondition = new DeckCondition({});
   skillLearningProgress: Map<SkillId, number> = new Map();
+  cooldowns: Map<SkillId, number> = new Map(); // Skill cooldowns: Map<SkillId, turnsRemaining>
   // Internal
   // TODO: breathing skill ideas
   breathingSkills: Map<BreathingSkillId, CharacterBreathingSkillObject> =

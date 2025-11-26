@@ -21,8 +21,8 @@ export const mendSpirit = new ShamanSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  notExistDebuff: [DebuffEnum.mendSpiritCooldown],
   tier: TierEnum.common,
+  cooldown: 3,
   consume: {
     hp: 0,
     mp: 0,

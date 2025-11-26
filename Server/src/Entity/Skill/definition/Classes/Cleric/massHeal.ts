@@ -21,8 +21,8 @@ export const massHeal = new ClericSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  notExistDebuff: [DebuffEnum.massHealCooldown],
   tier: TierEnum.rare,
+  cooldown: 4,
   consume: {
     hp: 0,
     mp: 6,

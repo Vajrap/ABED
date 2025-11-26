@@ -29,13 +29,17 @@ export const backdraft = new MageSkill({
     hp: 0,
     mp: 3,
     sp: 0,
-    elements: [],
+    elements: [
+      {element: "chaos", value: 2},
+    ],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+      {element: "fire", min: 1, max: 1},
+    ],
   },
   exec: (
     actor: Character,

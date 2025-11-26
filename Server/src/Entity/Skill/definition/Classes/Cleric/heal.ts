@@ -22,8 +22,8 @@ export const heal = new ClericSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  notExistDebuff: [DebuffEnum.healCooldown],
   tier: TierEnum.common,
+  cooldown: 3,
   consume: {
     hp: 0,
     mp: 3,

@@ -171,7 +171,6 @@ export class Battle {
 
             const actorTurnResult = this.startActorTurn(actor);
 
-
             for (const [trait, value] of actor.traits) {
                 traitRepository[trait].config.onEndTurn?.(
                     actor,
@@ -295,6 +294,7 @@ export class Battle {
 
   startActorTurn(actor: Character): TurnResult {
     activateBreathingSkillTurnPassive(actor.id);
+    reduceCooldowns(actor);
 
     actor.replenishResource();
 
@@ -313,9 +313,14 @@ export class Battle {
     const isPartyA = this.partyA.characters.includes(actor);
     const actorParty = isPartyA ? this.partyA : this.partyB;
 
-    // Check: If a character can play any cards
+    // Get a skill to use
     const { skill, skillLevel } = getPlayableSkill(actor, actorParty);
     Report.debug(`  Selected Skill: ${skill.name.en} (Level ${skillLevel})`);
+
+    // Apply cooldown if skill has one
+    if (skill.cooldown > 0) {
+      actor.cooldowns.set(skill.id, skill.cooldown);
+    }
 
     // Record turn and skill used
     this.battleStatistics.recordTurn(actor.id, skill.id as string);
@@ -350,6 +355,7 @@ export class Battle {
       skillLevel,
       this.location.id,
     );
+      
     // Produce Resource
 
     for (const produce of skill.produce.elements) {
@@ -593,6 +599,17 @@ function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
   }
 
   return false;
+}
+
+function reduceCooldowns(actor: Character) {
+  for (const [skillId, turnsRemaining] of actor.cooldowns.entries()) {
+    const newValue = turnsRemaining - 1;
+    if (newValue <= 0) {
+      actor.cooldowns.delete(skillId);
+    } else {
+      actor.cooldowns.set(skillId, newValue);
+    }
+  }
 }
 
 function resolveBuffAndDebuff(actor: Character): {

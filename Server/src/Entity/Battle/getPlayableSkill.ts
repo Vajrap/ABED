@@ -116,6 +116,12 @@ export function getPlayableSkill(
       }
     }
     
+    // Cooldown check
+    const cooldownRemaining = actor.cooldowns.get(skillObj.id);
+    if (cooldownRemaining !== undefined && cooldownRemaining > 0) {
+      continue;
+    }
+    
     // Success - can use this skill!
     return { skill: skillRep, skillLevel: skillObj.level ?? 1 };  // fallback level 1 if missing
   }

@@ -8,6 +8,7 @@ import { roll } from "src/Utils/Dice";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { MageSkill } from "./index";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const arcaneShield = new MageSkill({
   id: MageSkillId.ArcaneShield,
@@ -21,6 +22,7 @@ export const arcaneShield = new MageSkill({
   },
   requirement: {},
   equipmentNeeded: [],
+  notExistBuff: [BuffEnum.arcaneShield],
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
