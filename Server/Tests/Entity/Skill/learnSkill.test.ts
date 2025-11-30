@@ -31,7 +31,7 @@ let skill = new Skill({
   id: BasicSkillId.Basic,
   name: {en: "Test", th: "ทดสอบ"},
   tier: TierEnum.common,
-  description: {en: "Testing skill", th: "ทดสอบทักษะ"},
+  description: { text: { en: "Testing skill", th: "ทดสอบทักษะ" } },
   requirement: {},
   equipmentNeeded: [],
   consume: {
@@ -65,7 +65,7 @@ const mutReqSkills: [string, Skill][] = [
       id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
-      description: {en: "Testing skill", th: "ทดสอบทักษะ"},
+      description: { text: { en: "Testing skill", th: "ทดสอบทักษะ" } },
       requirement: { reqCharacterLevel: 10 },
       equipmentNeeded: [],
       consume: {
@@ -98,7 +98,7 @@ const mutReqSkills: [string, Skill][] = [
       id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
-      description: {en: "Testing skill", th: "ทดสอบทักษะ"},
+      description: { text: { en: "Testing skill", th: "ทดสอบทักษะ" } },
       requirement: { reqCharacterTrait: [TraitEnum.GoblinCunning] },
       equipmentNeeded: [],
       consume: {
@@ -131,7 +131,7 @@ const mutReqSkills: [string, Skill][] = [
       id: MobSkillId.ThrowPebble,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
-      description: {en: "Testing skill", th: "ทดสอบทักษะ"},
+      description: { text: { en: "Testing skill", th: "ทดสอบทักษะ" } },
       requirement: { reqSkillId: [BasicSkillId.Basic] },
       equipmentNeeded: [],
       consume: {
@@ -164,7 +164,7 @@ const mutReqSkills: [string, Skill][] = [
       id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
-      description: {en: "Testing skill", th: "ทดสอบทักษะ"},
+      description: { text: { en: "Testing skill", th: "ทดสอบทักษะ" } },
       requirement: { reqElement: [{ element: "fire", value: 10 }] },
       equipmentNeeded: [],
       consume: {
@@ -197,7 +197,7 @@ const mutReqSkills: [string, Skill][] = [
       id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
-      description: {en: "Testing skill", th: "ทดสอบทักษะ"},
+      description: { text: { en: "Testing skill", th: "ทดสอบทักษะ" } },
       requirement: { reqAttribute: [{ attribute: "strength", value: 10 }] },
       equipmentNeeded: [],
       consume: {
@@ -230,7 +230,7 @@ const mutReqSkills: [string, Skill][] = [
       id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
-      description: {en: "Testing skill", th: "ทดสอบทักษะ"},  
+      description: { text: { en: "Testing skill", th: "ทดสอบทักษะ" } },  
       requirement: { reqArtisans: [{ artisan: "alchemy", value: 10 }] },
       equipmentNeeded: [],
       consume: {
@@ -263,7 +263,7 @@ const mutReqSkills: [string, Skill][] = [
       id: BasicSkillId.Basic,
       name: {en: "Test", th: "ทดสอบ"},
       tier: TierEnum.common,
-      description: {en: "Testing skill", th: "ทดสอบทักษะ"},
+      description: { text: { en: "Testing skill", th: "ทดสอบทักษะ" } },
       requirement: { reqProficiencies: [{ proficiency: "sword", value: 10 }] },
       equipmentNeeded: [],
       consume: {

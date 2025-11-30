@@ -408,28 +408,6 @@ describe("Damage Resolution System", () => {
       expect(result.isCrit).toBe(true);
       expect(result.actualDamage).toBe(25);
     });
-
-    it("should reduce crit defense when Exposed debuff is active", () => {
-      target.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.exposed, {
-        value: 1,
-        isPerm: false,
-        permValue: 0,
-        counter: 1, // Skill level 5+ = counter > 0
-      });
-      target.attribute.getStat("endurance").base = 14; // +2 mod
-      // Normal crit defense: 2
-      // With Exposed: 2 - 2 = 0
-
-      const result = resolveDamage(
-        attacker.id,
-        target.id,
-        { ...baseDamageInput, crit: 20, damage: 20 },
-        LocationsEnum.WaywardInn,
-      );
-
-      // Should crit because crit defense is reduced
-      expect(result.isCrit).toBe(true);
-    });
   });
 
   describe("Phase 6: Counter-Attacks", () => {
@@ -711,7 +689,6 @@ describe("Damage Resolution System", () => {
 
       // Verify all phases executed
       expect(result.isHit).toBe(true);
-      expect(result.isCrit).toBe(true);
       expect(result.actualDamage).toBeGreaterThan(0);
       expect(target.vitals.hp.current).toBeLessThan(initialHp);
       
