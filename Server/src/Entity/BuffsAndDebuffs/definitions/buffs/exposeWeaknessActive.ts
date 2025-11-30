@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
@@ -10,17 +10,21 @@ export const exposeWeaknessActive = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      universalCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.exposeWeaknessActive);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.exposeWeaknessActive, {
         value: value,
         isPerm: isPerm,
         permValue: 0,
-        counter: permValue, // Store WIL mod for hit bonus
+        counter: universalCounter, // Store WIL mod for hit bonus
       });
     } else {
       if (!entry.isPerm && isPerm) {
@@ -28,7 +32,7 @@ export const exposeWeaknessActive = new BuffDef({
       }
       entry.value += value;
       // Use higher WIL mod
-      entry.counter = Math.max(entry.counter, permValue);
+      entry.counter = Math.max(entry.counter, universalCounter);
     }
 
     return {

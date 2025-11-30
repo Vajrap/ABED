@@ -8,7 +8,6 @@ import { statMod } from "src/Utils/statMod";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ClericSkill } from "./index";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const heal = new ClericSkill({
   id: ClericSkillId.Heal,
@@ -17,8 +16,14 @@ export const heal = new ClericSkill({
     th: "รักษา",
   },
   description: {
-    en: "Restore HP to an ally with least HP percentage. Heals for 1d6 + willpower modifier * (1 + 0.1 * skill level). At level 3+, also removes one debuff from the target. Have 3 turns cooldown.",
-    th: "ฟื้นฟู HP ให้กับพันธมิตร รักษา 1d6 + ค่า willpower + เลเวลสกิล ที่เลเวล 3+ จะลบ debuff หนึ่งตัวจากเป้าหมายด้วย",
+    text: {
+      en: "Cast a healing spell, restore HP to an ally with least HP percentage. \nHeals for <FORMULA>. \n{3}\nThen [b]removes one random debuff[/b] from the target.{/}",
+      th: "ร่ายเวทย์มนต์รักษา ฟื้นฟู HP ให้กับพันธมิตร \nรักษา <FORMULA> \n{3}\nจากนั้น[b]ลบหนึ่งดีบัฟแบบสุ่ม[/b]จากเป้าหมายด้วย{/}",
+    },
+    formula: {
+      en: "1d6 + <WILmod> + skill level",
+      th: "1d6 + <WILmod> + เลเวลสกิล",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -109,7 +114,7 @@ export const heal = new ClericSkill({
     }
 
     // Apply cooldown debuff
-    debuffsRepository.healCooldown.appender(actor, 3, false, 0);
+    debuffsRepository.healCooldown.appender(actor, { turnsAppending: 3 });
 
     return {
       content: {

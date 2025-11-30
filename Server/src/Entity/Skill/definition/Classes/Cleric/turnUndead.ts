@@ -20,8 +20,14 @@ export const turnUndead = new ClericSkill({
     th: "ขับไล่ผี",
   },
   description: {
-    en: "Deal 1d4 (+caster willpower mod) true holy damage to non-undead targets. Against undead, target makes a willpower saving throw (DC 10, or DC 12 at level 5+). If it failed to save, take 9999 true damage (instant kill). else take deal 1d12 (+caster willpower mod) holy damage.",
-    th: "สร้างความเสียหายจริง 1d4 ต่อเป้าหมายที่ไม่ใช่ undead, หากเป้าหมายเป็น undead เป้าหมายทำการทดสอบ willpower (DC 10 หรือ DC 12 ที่เลเวล 5+) หากล้มเหลว สร้างความเสียหายจริง 9999 (ฆ่าทันที) หากสำเร็จ สร้างความเสียหายศักดิ์สิทธิ์ 1d12 (+ค่า willpower ของผู้ใช้)",
+    text: {
+      en: "Cast a holy spell to destroy undead. \nDeal <FORMULA> true holy damage to non-undead targets. \nAgainst undead, target makes a [r](DC {5}'12':'10'{/}) WILsave roll[/r]. \nIf it failed to save, take 9999 true damage (instant kill). \nElse take [b]1d12 + <WILmod>[/b] holy damage.",
+      th: "ร่ายเวทย์มนต์ศักดิ์สิทธิ์เพื่อทำลาย undead \nสร้างความเสียหายจริง <FORMULA> ต่อเป้าหมายที่ไม่ใช่ undead \nหากเป้าหมายเป็น undead เป้าหมายจะต้องทอย [r](DC {5}'12':'10'{/}) WILsave[/r] \nหากล้มเหลว สร้างความเสียหายจริง 9999 (ฆ่าทันที) \nหากสำเร็จ สร้างความเสียหายศักดิ์สิทธิ์ [b]1d12 + <WILmod>[/b]",
+    },
+    formula: {
+      en: "1d4 + <WILmod>",
+      th: "1d4 + <WILmod>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -74,7 +80,7 @@ export const turnUndead = new ClericSkill({
         damage,
         hit: roll(1).d(20).total + statMod(actor.attribute.getTotal("control")),
         crit: roll(1).d(20).total + statMod(actor.attribute.getTotal("luck")),
-        type: DamageType.holy,
+        type: DamageType.radiance,
         trueDamage: true,
       };
 
@@ -105,7 +111,7 @@ export const turnUndead = new ClericSkill({
         damage: 9999,
         hit: 999,
         crit: 0,
-        type: DamageType.holy,
+        type: DamageType.radiance,
         trueDamage: true,
       };
 
@@ -135,7 +141,7 @@ export const turnUndead = new ClericSkill({
         damage,
         hit: 999,
         crit: 0,
-        type: DamageType.holy,
+        type: DamageType.radiance,
         isMagic: true,
       };
 

@@ -25,8 +25,14 @@ export const windSlash = new SpellBladeSkill({
     th: "ฟันลม",
   },
   description: {
-    en: "Deal Planar Edge-like damage * (1 + 0.1 * skill level) arcane damage. Target rolls DC7 + (user planar mod) Endurance save or gets bleed for 1d2 turns. At level 5, if edge charge stacks > 0, deal additional 0.5 damage per stack (rounded down).",
-    th: "สร้างความเสียหายแบบ Planar Edge * (1 + 0.1 * เลเวลสกิล) เป้าหมายทอย Endurance save DC7 + (planar mod ของผู้ใช้) หรือได้รับ bleed 1d2 เทิร์น ที่เลเวล 5 หาก edge charge stacks > 0 สร้างความเสียหายเพิ่ม 0.5 ต่อ stack (ปัดลง)",
+    text: {
+      en: "Slice through the air with a blade of wind-infused arcane energy.\nDeal <FORMULA> wind damage.\nTarget must [r]roll DC7 + <PlanarMod> ENDsave[/r] or get <DebuffBleed> for 1d2 turns.\n{5}\nIf <BuffEdgeCharge> stacks > 0, [r]deal +0.5 damage per stack[/r] (rounded down).{/}",
+      th: "ฟันผ่านอากาศด้วยใบมีดพลังงานอาร์เคนที่ผสมลม\nสร้างความเสียหายลม <FORMULA>\nเป้าหมายต้องทอย [r]ENDsave DC7 + <PlanarMod>[/r] หรือถูก <DebuffBleed> 1d2 เทิร์น\n{5}\nหากสแตค <BuffEdgeCharge> > 0 [r]สร้างความเสียหายเพิ่ม +0.5 ต่อสแตค[/r] (ปัดลง){/}",
+    },
+    formula: {
+      en: "Planar Edge damage × <SkillLevelMultiplier>",
+      th: "ความเสียหาย Planar Edge × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -115,7 +121,7 @@ export const windSlash = new SpellBladeSkill({
       damage: Math.floor(scaledDamage),
       hit: hitValue,
       crit: critValue,
-      type: DamageType.arcane,
+      type: DamageType.wind,
       isMagic: true,
     };
 
@@ -129,7 +135,7 @@ export const windSlash = new SpellBladeSkill({
     if (saveRoll < dc) {
       // Save failed: apply bleed
       const bleedTurns = roll(1).d(2).total;
-      debuffsRepository.bleed.appender(target, bleedTurns, false, 0);
+      debuffsRepository.bleed.appender(target, { turnsAppending: bleedTurns });
       bleedMessage = ` ${target.name.en} failed the save and is bleeding!`;
     }
 

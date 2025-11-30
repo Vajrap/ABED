@@ -1,14 +1,15 @@
 import { Character } from "src/Entity/Character/Character";
 import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { BuffEnum } from "../../enum";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 
 export const taunt = new BuffDef({
   name: {
     en: "taunt",
     th: "ยั่วยุ",
   },
-  appender: function (actor: Character, value: number): L10N {
+  appender: function (actor: Character, options: AppenderOptions): L10N {
+    const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {

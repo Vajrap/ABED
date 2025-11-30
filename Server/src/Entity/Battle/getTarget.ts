@@ -194,6 +194,7 @@ class TargetSelector {
     return this.selectRandomOne(filtered);
   }
 
+  // TODO: This method seems to allow picking the same target multiple times by default, needed to fix, might need a new arg, 'filterSelected: boolean = true'
   many(count: number): Character[] {
     const filtered = this.getFilteredTargets();
     if (filtered.length === 0) {

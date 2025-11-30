@@ -16,8 +16,14 @@ export const taunt = new GuardianSkill({
     th: "ยั่วยุ",
   },
   description: {
-    en: "Provokes enemies. Grants taunt for 2 turns (+0.5 turns, rounded down, per level) + charisma mod/2. When taunt, enemies will attack you and if attacked during taunt get +1 fire resource",
-    th: "ยั่วยุศัตรู ได้รับสถานะยั่วยุ 2 เทิร์น (+0.5 เทิร์น ต่อเลเวลสกิล ปัดลง) + charisma mod/2. เมื่ออยู่ในสถานะ taunt จะถูกศัตรูเล็งเป็นเป้าหมาย หากถูกโจมตีขณะที่มีสถานะ taunt จะได้รับ fire 1 หน่วย",
+    text: {
+      en: "Roar defiantly and draw all enemy attention to yourself.\nGain <BuffTaunt> for <FORMULA> turns",
+      th: "คำรามท้าทายและดึงความสนใจของศัตรูทั้งหมดมาที่คุณ\nได้รับ <BuffTaunt> เป็นเวลา <FORMULA> เทิร์น",
+    },
+    formula: {
+      en: "2 + floor(0.5 × skill level) + floor(<CHAmod> / 2)",
+      th: "2 + floor(0.5 × เลเวลสกิล) + floor(<CHAmod> / 2)",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -54,7 +60,7 @@ export const taunt = new GuardianSkill({
     const tauntDuration = 2 + Math.floor(0.5 * skillLevel) + charismaBonus;
 
     // Apply taunt buff to self
-    buffsAndDebuffsRepository.taunt.appender(actor, tauntDuration, false, 0);
+    buffsAndDebuffsRepository.taunt.appender(actor, { turnsAppending: tauntDuration });
 
     let turnResult: TurnResult = {
       content: {

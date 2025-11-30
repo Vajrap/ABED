@@ -15,11 +15,7 @@ import { CharacterVitals } from "./Subclass/Vitals/CharacterVitals";
 import { CharacterFame } from "./Subclass/Fame/CharacterFame";
 import { CharacterPlanarAptitude } from "./Subclass/PlanarAptitude/CharacterPlanarAptitude";
 import type { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
-import {
-  BuffAndDebuffEnum,
-  BuffEnum,
-  DebuffEnum,
-} from "../BuffsAndDebuffs/enum";
+import { BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
 import type { TraitEnum } from "../Trait/enum";
 import { DeckCondition } from "./Subclass/DeckCondition/DeckCondition";
 import type { SkillId } from "../Skill/enums";
@@ -38,7 +34,7 @@ import type { CharacterEpithetEnum } from "./Subclass/Title/Epithet/enum";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N.ts";
 import { roll, rollTwenty } from "src/Utils/Dice.ts";
 import { statMod } from "src/Utils/statMod.ts";
-import { getWeaponFromRepository, Weapon } from "src/Entity/Item";
+import { Weapon } from "src/Entity/Item";
 import type { ItemId } from "../Item/type.ts";
 import {
   ArmorClass,
@@ -57,9 +53,6 @@ import {
 import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
 import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
 import { RaceEnum } from "../../InterFacesEnumsAndTypes/Enums";
-import { weaponRepository } from "../Item/Equipment/Weapon/repository.ts";
-import { itemInstanceRepository } from "../Item/Equipment/ItemInstance/repository.ts";
-import Report from "src/Utils/Reporter.ts";
 
 export class Character {
   id: string = "";
@@ -343,7 +336,7 @@ export class Character {
   getWeapon(expectedShield: boolean = false): Weapon {
     const rWeaponId = this.equipments.rightHand as WeaponId | string | null;
     const lWeaponId = this.equipments.leftHand as WeaponId | string | null;
-    
+
     // Right hand first
     if (rWeaponId) {
       // Use getEquipment which handles both base EquipmentId and instance IDs (strings)

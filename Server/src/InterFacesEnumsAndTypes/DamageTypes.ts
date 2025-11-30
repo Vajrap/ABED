@@ -9,21 +9,22 @@ export enum DamageType {
   fire = "fire",
   earth = "earth",
   water = "water",
-  air = "air",
+  wind = "air",
   // 2nd tier
   ice = "ice",
   spirit = "spirit",
   lightning = "lightning",
-  demonic = "demonic",
+  inferno = "demonic",
   metal = "metal",
-  angelic = "angelic",
+  crystal = "angelic",
   // 3rd tier
   nature = "nature",
-  life = "life",
+  mist = "life",
   dark = "dark",
-  necrotic = "necrotic",
+  erosion = "necrotic",
   poison = "poison",
-  holy = "holy",
+  radiance = "holy",
   // all elements
   arcane = "arcane",
 }
+

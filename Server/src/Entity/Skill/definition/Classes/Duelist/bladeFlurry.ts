@@ -21,11 +21,17 @@ export const bladeFlurry = new DuelistSkill({
     th: "ชุดการโจมตีดาบ",
   },
   description: {
-    en: "Unleash a rapid flurry of blade strikes. Deal 2 hits (3 at level 5) of (70% weapon damage) + DEX mod * (1 + 0.1 * skill level) slash damage. Each hit benefits from position modifier. Targets can be the same or different.",
-    th: "ปล่อยชุดการโจมตีดาบอย่างรวดเร็ว สร้างความเสียหาย 2 ครั้ง (3 ครั้งที่เลเวล 5) แต่ละครั้ง (70% อาวุธ) + DEX mod * (1 + 0.1 * เลเวลสกิล) เป็นความเสียหายตัด แต่ละครั้งได้รับประโยชน์จาก position modifier เป้าหมายสามารถเป็นคนเดียวกันหรือต่างกัน",
+    text: {
+      en: "Unleash a rapid flurry of blade strikes. \nDeal {5}'3':'2'{/} hits of <FORMULA> slash damage. \nTargets can be the same or different.",
+      th: "ปล่อยชุดการโจมตีดาบอย่างรวดเร็ว \nสร้างความเสียหาย {5}'3':'2'{/} ครั้ง แต่ละครั้ง <FORMULA> เป็นความเสียหายตัด \nเป้าหมายสามารถเป็นคนเดียวกันหรือต่างกัน",
+    },
+    formula: {
+      en: "(([r]0.7[/r] × <WeaponDamage>) + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "(([r]0.7[/r] × <WeaponDamage>) + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
-  equipmentNeeded: ["blade"],
+  equipmentNeeded: ["blade", 'sword', 'dagger'],
   tier: TierEnum.common,
   consume: {
     hp: 0,
@@ -58,19 +64,6 @@ export const bladeFlurry = new DuelistSkill({
     location: LocationsEnum,
   ): TurnResult => {
     const weapon = actor.getWeapon();
-    if (weapon.weaponType !== "blade") {
-      return {
-        content: {
-          en: `${actor.name.en} must equip a blade to use Blade Flurry`,
-          th: `${actor.name.th} ต้องใช้อาวุธประเภทดาบเพื่อใช้ชุดการโจมตีดาบ`,
-        },
-        actor: {
-          actorId: actor.id,
-          effect: [ActorEffect.TestSkill],
-        },
-        targets: [],
-      };
-    }
 
     const aliveTargets = targetParty.filter(t => !t.vitals.isDead);
     if (aliveTargets.length === 0) {

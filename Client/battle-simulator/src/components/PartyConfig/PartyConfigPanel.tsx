@@ -1,6 +1,8 @@
-import { Box, Grid, Paper, Typography, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Box, Grid, Paper, Typography, Button, Select, MenuItem, FormControl, InputLabel, Menu } from '@mui/material';
 import type { BattleMetadataResponse, CharacterConfig } from '../../services/types';
+import type { ClassEnum } from '../../services/types';
 import CharacterSlot from './CharacterSlot';
+import { useState } from 'react';
 
 interface PartyConfigPanelProps {
   metadata: BattleMetadataResponse;
@@ -33,6 +35,9 @@ export default function PartyConfigPanel({
   presets,
   onLoadPreset,
 }: PartyConfigPanelProps) {
+  const [partyAAnchor, setPartyAAnchor] = useState<null | HTMLElement>(null);
+  const [partyBAnchor, setPartyBAnchor] = useState<null | HTMLElement>(null);
+
   const updateCharacter = (party: CharacterConfig[], position: number, character: CharacterConfig | null) => {
     const newParty = party.filter(c => c.position !== position);
     if (character) {
@@ -51,6 +56,82 @@ export default function PartyConfigPanel({
 
   const handleQuickLoad = (preset: any) => {
     onLoadPreset(preset);
+  };
+
+  const loadouts = {
+    goblin: {
+      S: { name: 'Goblin S (2)', size: 2, mobs: ['goblinWarrior', 'goblinScout'] as const },
+      M: { name: 'Goblin M (4)', size: 4, mobs: ['goblinCaptain', 'goblinWarrior', 'goblinScout', 'goblinMage'] as const },
+      L: { name: 'Goblin L (6)', size: 6, mobs: ['goblinCaptain', 'goblinWarrior', 'goblinWarrior', 'goblinScout', 'goblinMage', 'goblinCleric'] as const },
+    },
+    human: {
+      S1: { name: 'Human S1 (2)', size: 2, classes: ['Warrior', 'Paladin'] as const },
+      S2: { name: 'Human S2 (2)', size: 2, classes: ['Knight', 'Guardian'] as const },
+      S3: { name: 'Human S3 (2)', size: 2, classes: ['Cleric', 'Druid'] as const },
+      M1: { name: 'Human M1 (4)', size: 4, classes: ['Mage', 'Warlock', 'Witch', 'Inquisitor'] as const },
+      M2: { name: 'Human M2 (4)', size: 4, classes: ['SpellBlade', 'Mystic', 'Seer', 'Mage'] as const },
+      M3: { name: 'Human M3 (4)', size: 4, classes: ['Warlock', 'Witch', 'Inquisitor', 'SpellBlade'] as const },
+      L1: { name: 'Human L1 (6)', size: 6, classes: ['Rogue', 'Duelist', 'Monk', 'Barbarian', 'Shaman', 'Scholar'] as const },
+      L2: { name: 'Human L2 (6)', size: 6, classes: ['Rogue', 'Monk', 'Barbarian', 'Shaman', 'Scholar', 'Duelist'] as const },
+      L3: { name: 'Human L3 (6)', size: 6, classes: ['Duelist', 'Monk', 'Barbarian', 'Shaman', 'Scholar', 'Rogue'] as const },
+    },
+  };
+
+  const handleLoadLoadout = (party: 'A' | 'B', loadoutKey: string, loadoutType: 'goblin' | 'human') => {
+    const loadout = loadoutType === 'goblin' 
+      ? loadouts.goblin[loadoutKey as keyof typeof loadouts.goblin]
+      : loadouts.human[loadoutKey as keyof typeof loadouts.human];
+    
+    if (!loadout) return;
+
+    const newParty: CharacterConfig[] = [];
+    
+    if (loadoutType === 'goblin' && 'mobs' in loadout) {
+      const mobNames: Record<string, { en: string; th: string }> = {
+        goblinWarrior: { en: 'Goblin Warrior', th: 'ก๊อปลินนักรบ' },
+        goblinScout: { en: 'Goblin Scout', th: 'ก๊อปลินสายลับ' },
+        goblinCaptain: { en: 'Goblin Captain', th: 'ก๊อปลินกัปตัน' },
+        goblinMage: { en: 'Goblin Mage', th: 'ก๊อปลินนักเวทย์' },
+        goblinCleric: { en: 'Goblin Cleric', th: 'ก๊อปลินนักบวช' },
+      };
+      
+      loadout.mobs.forEach((mobId, index) => {
+        const name = mobNames[mobId] || { en: mobId, th: mobId };
+        // If duplicate mobs, add a number
+        const count = loadout.mobs.filter((m, i) => i < index && m === mobId).length;
+        const displayName = count > 0 
+          ? { en: `${name.en} ${count + 1}`, th: `${name.th} ${count + 1}` }
+          : name;
+        
+        newParty.push({
+          type: 'mob',
+          mobId: mobId,
+          level: 3,
+          name: displayName,
+          position: index as 0 | 1 | 2 | 3 | 4 | 5,
+        });
+      });
+    } else if (loadoutType === 'human' && 'classes' in loadout) {
+      loadout.classes.forEach((className, index) => {
+        newParty.push({
+          type: 'custom',
+          race: 'Human',
+          class: className as ClassEnum,
+          level: 3,
+          name: { en: `Human ${className}`, th: `${className} มนุษย์` },
+          position: index as 0 | 1 | 2 | 3 | 4 | 5,
+        });
+      });
+    }
+
+    if (party === 'A') {
+      onPartyAChange(newParty);
+    } else {
+      onPartyBChange(newParty);
+    }
+
+    setPartyAAnchor(null);
+    setPartyBAnchor(null);
   };
 
   const frontLinePositions = [0, 1, 2];
@@ -108,17 +189,6 @@ export default function PartyConfigPanel({
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {presets.filter(p => p.isDefault).slice(0, 3).map((preset) => (
-          <Button
-            key={preset.id}
-            variant="outlined"
-            size="small"
-            onClick={() => handleQuickLoad(preset)}
-          >
-            Load {preset.name}
-          </Button>
-        ))}
-
         <Button
           variant="contained"
           size="large"
@@ -132,9 +202,36 @@ export default function PartyConfigPanel({
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Party A
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">
+                Party A
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={(e) => setPartyAAnchor(e.currentTarget)}
+              >
+                Load Party A
+              </Button>
+              <Menu
+                anchorEl={partyAAnchor}
+                open={Boolean(partyAAnchor)}
+                onClose={() => setPartyAAnchor(null)}
+              >
+                <MenuItem disabled sx={{ fontWeight: 600 }}>Goblin</MenuItem>
+                {Object.entries(loadouts.goblin).map(([key, loadout]) => (
+                  <MenuItem key={key} onClick={() => handleLoadLoadout('A', key, 'goblin')}>
+                    {loadout.name}
+                  </MenuItem>
+                ))}
+                <MenuItem disabled sx={{ fontWeight: 600, mt: 1 }}>Human</MenuItem>
+                {Object.entries(loadouts.human).map(([key, loadout]) => (
+                  <MenuItem key={key} onClick={() => handleLoadLoadout('A', key, 'human')}>
+                    {loadout.name}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
             {renderLineColumns(partyA, handlePartyACharacterChange, [
               { label: 'Back Line', positions: backLinePositions },
               { label: 'Front Line', positions: frontLinePositions },
@@ -144,9 +241,36 @@ export default function PartyConfigPanel({
 
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Party B
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6">
+                Party B
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={(e) => setPartyBAnchor(e.currentTarget)}
+              >
+                Load Party B
+              </Button>
+              <Menu
+                anchorEl={partyBAnchor}
+                open={Boolean(partyBAnchor)}
+                onClose={() => setPartyBAnchor(null)}
+              >
+                <MenuItem disabled sx={{ fontWeight: 600 }}>Goblin</MenuItem>
+                {Object.entries(loadouts.goblin).map(([key, loadout]) => (
+                  <MenuItem key={key} onClick={() => handleLoadLoadout('B', key, 'goblin')}>
+                    {loadout.name}
+                  </MenuItem>
+                ))}
+                <MenuItem disabled sx={{ fontWeight: 600, mt: 1 }}>Human</MenuItem>
+                {Object.entries(loadouts.human).map(([key, loadout]) => (
+                  <MenuItem key={key} onClick={() => handleLoadLoadout('B', key, 'human')}>
+                    {loadout.name}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
             {renderLineColumns(partyB, handlePartyBCharacterChange, [
               { label: 'Front Line', positions: frontLinePositions },
               { label: 'Back Line', positions: backLinePositions },

@@ -19,8 +19,10 @@ export const disruptPattern = new ScholarSkill({
     th: "ทำลายรูปแบบ",
   },
   description: {
-    en: "Force DC10 (DC12 at level 5) Will save. Fail: target is Dazed 1 turn. Success: reduce target's next initiative by 20 (30 at level 5). After using, if the reducing is success, this skill will go into cooldown (Debuff) for 3 turns.",
-    th: "บังคับให้ทำการทดสอบ Will DC10 (DC12 ที่เลเวล 5) หากล้มเหลว: เป้าหมายจะสับสน 1 เทิร์น หากสำเร็จ: ลด initiative ครั้งถัดไปของเป้าหมาย 20 (30 ที่เลเวล 5). หลังใช้เสร็จสิ้น ทักษะนี้จะอยู่ในช่วง Cooldown 3 เทิร์น",
+    text: {
+      en: "Disrupt your enemy's combat rhythm by identifying and breaking their attack patterns.\nForce target to [r]roll DC{5}'12':'10'{/} WILsave[/r].\nIf failed: target becomes <DebuffDazed> for 1 turn.\nIf passed: [r]reduce target's next initiative by {5}'30':'20'{/}[/r].",
+      th: "ทำลายจังหวะการต่อสู้ของศัตรูโดยระบุและทำลายรูปแบบการโจมตี\nบังคับเป้าหมายให้ทอย [r]WILsave DC{5}'12':'10'{/}[/r]\nหากล้มเหลว: เป้าหมายถูก <DebuffDazed> 1 เทิร์น\nหากสำเร็จ: [r]ลด initiative ครั้งถัดไปของเป้าหมาย {5}'30':'20'{/}[/r]",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -66,8 +68,8 @@ export const disruptPattern = new ScholarSkill({
 
     if (saveRoll < dc) {
       // Save failed: Apply Dazed debuff
-      debuffsRepository.disruptPattern.appender(actor, 3, false, 0);
-      debuffsRepository.dazed.appender(target, 1, false, 0);
+      debuffsRepository.disruptPattern.appender(actor, { turnsAppending: 3 });
+      debuffsRepository.dazed.appender(target, { turnsAppending: 1 });
       return {
         content: {
           en: `${actor.name.en} disrupts ${target.name.en}'s pattern! ${target.name.en} is dazed!`,

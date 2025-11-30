@@ -14,8 +14,10 @@ export const shieldUp = new GuardianSkill({
     th: "ยกโล่ขึ้น",
   },
   description: {
-    en: "Raise your shield and prepare for incoming attacks. Adds a defense up buff to self for 3 turns, at level 5 the buff lasts 4 turns. \n Defense up: pDEF and mDEF goes up by 2 effect don't stack.",
-    th: "ยกโล่ขึ้นและเตรียมรับการโจมตี เพิ่มบัฟป้องกัน (เพิ่มพลังป้องกัน) ตัวเอง 1 เทิร์น เมื่อเลเวล 5 จะรักษาได้ 2 เทิร์น บัฟไม่ซ้อนทับ",
+    text: {
+      en: "Raise your shield high, forming an impenetrable barrier.\nGain <BuffDefenseUp> for {5}'4':'3'{/} turns",
+      th: "ยกโล่ขึ้นสูง สร้างกำแพงป้องกันที่แข็งแกร่ง\nได้รับ <BuffDefenseUp> เป็นเวลา {5}'4':'3'{/} เทิร์น",
+    },
   },
   requirement: {},
   equipmentNeeded: ["shield"],
@@ -46,12 +48,11 @@ export const shieldUp = new GuardianSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    // TODO: Implement defense buff logic when defenseUp buff is added
     buffsAndDebuffsRepository.defenseUp.appender(
       actor,
-      skillLevel >= 5 ? 4 : 3,
-      false,
-      0,
+      {
+        turnsAppending: skillLevel >= 5 ? 4 : 3,
+      },
     );
 
     return {

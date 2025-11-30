@@ -29,5 +29,6 @@ export const nobody = new Character({
     needs: new CharacterNeeds(),
     vitals: new CharacterVitals({}),
     fame: new CharacterFame(),
+    saveRolls: new CharacterAttributes(),
     actionSequence: defaultActionSequence(),
 });

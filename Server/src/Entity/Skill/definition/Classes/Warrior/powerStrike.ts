@@ -21,8 +21,14 @@ export const powerStrike = new WarriorSkill({
     th: "โจมตีแรง",
   },
   description: {
-    en: "Strong single-target melee attack. Deals 1.3x (1.5x at level 5) weapon damage + Strength mod * skillScalar * positionModifier.",
-    th: "การโจมตีระยะประชิดที่รุนแรงต่อเป้าหมายเดียว สร้างความเสียหาย 1.3 เท่า (1.5 เท่าที่เลเวล 5) ของอาวุธ + Strength mod * skillScalar * positionModifier",
+    text: {
+      en: "Channel all your strength into a single devastating strike.\nDeal <FORMULA> damage.",
+      th: "ควบคุมพลังทั้งหมดของคุณเข้าสู่การโจมตีครั้งเดียวที่ทำลายล้าง\nสร้างความเสียหาย <FORMULA>",
+    },
+    formula: {
+      en: "({5}'1.5':'1.3'{/} × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "({5}'1.5':'1.3'{/} × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
@@ -12,12 +12,15 @@ export const edgeCharge = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.edgeCharge);
-    const totalStacks = value + permValue;
+    const totalStacks = value + permanentCounter;
     
     if (!entry) {
       // Cap at MAX_STACKS

@@ -40,8 +40,8 @@ export const commanderScream = new Skill({
     for (const ally of allies) {
       const save = rollTwenty().total + statMod(ally.saveRolls.getStat("willpower").total);
       if (save < 15) {
-        buffsAndDebuffsRepository.fear.appender(ally, 2, false, 0);
-        buffsAndDebuffsRepository.cowardlyCharge.appender(ally, 2, false, 0);
+        buffsAndDebuffsRepository.fear.appender(ally, { turnsAppending: 2 });
+        buffsAndDebuffsRepository.cowardlyCharge.appender(ally, { turnsAppending: 2 });
         affected.push(ally);
         targets.push({ actorId: ally.id, effect: [TargetEffect.Fear] });
       } else {

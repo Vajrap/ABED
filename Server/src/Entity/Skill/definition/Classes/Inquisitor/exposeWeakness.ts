@@ -17,8 +17,10 @@ export const exposeWeakness = new InquisitorSkill({
     th: "เปิดเผยจุดอ่อน",
   },
   description: {
-    en: "Reveal the enemy's wrongdoing or impurity. Target gets Exposed debuff for 2 turns (3 at level 5). Marked enemies take +1d3 damage from all sources. At level 5, also gain -2 to critical defense. Additionally, the Inquisitor gains +willpower mod/2 to hit rolls against exposed enemies for the duration.",
-    th: "เปิดเผยความผิดหรือความไม่บริสุทธิ์ของศัตรู เป้าหมายได้รับ Exposed debuff 2 เทิร์น (3 เทิร์นที่เลเวล 5) เป้าหมายที่ถูกทำเครื่องหมายจะรับความเสียหายเพิ่ม +1d3 จากทุกแหล่ง ที่เลเวล 5 จะได้รับ -2 ต่อการป้องกันคริติคอล และผู้ใช้จะได้รับ +willpower mod/2 ต่อ hit rolls ต่อเป้าหมายที่ถูกเปิดเผย",
+    text: {
+      en: "Point out the enemy's sins and expose their vulnerabilities for all to see.\n{5}\nAlso reduces their [r]critical defense by 2[/r].{/}\n[b]You gain +floor(<WILmod> / 2) hit[/b] against exposed enemies.",
+      th: "ชี้ให้เห็นบาปของศัตรูและเปิดเผยจุดอ่อนให้ทุกคนเห็น\n{5}\nยังลด [r]การป้องกันคริติคอล 2[/r] ด้วย{/}\n[b]คุณได้รับ +floor(<WILmod> / 2) hit[/b] ต่อเป้าหมายที่ถูกเปิดเผย",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -71,14 +73,20 @@ export const exposeWeakness = new InquisitorSkill({
 
     // Apply Exposed debuff for 2 turns (3 at level 5)
     const duration = skillLevel >= 5 ? 3 : 2;
-    const permValue = skillLevel >= 5 ? 1 : 0; // permValue = 1 means -2 crit defense at level 5
+    const universalCounter = skillLevel >= 5 ? 1 : 0; // universalCounter = 1 means -2 crit defense at level 5
     
-    buffsAndDebuffsRepository.exposed.appender(target, duration, false, permValue);
+    buffsAndDebuffsRepository.exposed.appender(target, { 
+      turnsAppending: duration, 
+      universalCounter 
+    });
 
     // Apply ExposeWeaknessActive buff to user with same duration for hit bonus
-    // Store willpower mod in permValue for hit bonus calculation
+    // Store willpower mod in universalCounter for hit bonus calculation
     const willMod = statMod(actor.attribute.getTotal("willpower"));
-    buffsAndDebuffsRepository.exposeWeaknessActive.appender(actor, duration, false, willMod);
+    buffsAndDebuffsRepository.exposeWeaknessActive.appender(actor, { 
+      turnsAppending: duration, 
+      universalCounter: willMod 
+    });
 
     return {
       content: {

@@ -287,6 +287,7 @@ export enum RaceEnum {
   Orc = "Orc",
   Dwarf = "Dwarf",
   Halfling = "Halfling",
+  Vulpine = "Vulpine",
   Goblin = "Goblin",
 }
 

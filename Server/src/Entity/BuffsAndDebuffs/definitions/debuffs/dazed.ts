@@ -1,6 +1,6 @@
 import { Character } from "src/Entity/Character/Character";
 import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
-import { DebuffDef } from "../../type";
+import { DebuffDef, type AppenderOptions } from "../../type";
 import { DebuffEnum } from "../../enum";
 
 export const dazed = new DebuffDef({
@@ -8,7 +8,8 @@ export const dazed = new DebuffDef({
         en: "dazed",
         th: "สับสน",
     },
-    appender: function (actor: Character, value: number): L10N {
+    appender: function (actor: Character, options: AppenderOptions): L10N {
+        const { turnsAppending: value } = options;
         const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.dazed);
         if (!entry) {
             actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.dazed, {

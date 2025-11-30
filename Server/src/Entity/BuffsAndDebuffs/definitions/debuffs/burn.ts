@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { DebuffDef } from "../../type";
+import { DebuffDef, type AppenderOptions } from "../../type";
 import { DebuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
@@ -10,8 +10,9 @@ export const burn = new DebuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
+    options: AppenderOptions,
   ): L10N {
+    const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.burn);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.burn, {

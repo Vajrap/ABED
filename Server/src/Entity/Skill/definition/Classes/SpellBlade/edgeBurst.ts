@@ -25,8 +25,14 @@ export const edgeBurst = new SpellBladeSkill({
     th: "ระเบิดขอบ",
   },
   description: {
-    en: "Consume ALL Edge Charges (min 1). Strike target for weapon damage (or Planar Edge dice if no weapon) + Planar mod + (1d2 per edge charge stack) * (1 + 0.1 * skill level) arcane damage.",
-    th: "ใช้ Edge Charge ทั้งหมด (อย่างน้อย 1) โจมตีเป้าหมายด้วยความเสียหายอาวุธ (หรือลูกเต๋า Planar Edge หากไม่มีอาวุธ) + Planar mod + (1d2 ต่อ edge charge stack) * (1 + 0.1 * เลเวลสกิล)",
+    text: {
+      en: "Unleash all accumulated edge charges in a devastating burst of arcane energy.\nConsume ALL <BuffEdgeCharge> stacks (min 1).\nDeal <FORMULA> arcane damage.\nDamage increases with each edge charge consumed.",
+      th: "ปลดปล่อย edge charge ที่สะสมไว้ทั้งหมดในระเบิดพลังงานอาร์เคนที่ทำลายล้าง\nใช้สแตค <BuffEdgeCharge> ทั้งหมด (อย่างน้อย 1)\nสร้างความเสียหายอาร์เคน <FORMULA>\nความเสียหายเพิ่มขึ้นตามจำนวน edge charge ที่ใช้",
+    },
+    formula: {
+      en: "(<WeaponDamage> or Planar Edge dice if no weapon) + <PlanarMod> + (1d2 per <BuffEdgeCharge> stack) × <SkillLevelMultiplier>",
+      th: "(<WeaponDamage> หรือลูกเต๋า Planar Edge หากไม่มีอาวุธ) + <PlanarMod> + (1d2 ต่อสแตค <BuffEdgeCharge>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: ["sword", "blade", "dagger", "bareHand"],
@@ -81,6 +87,7 @@ export const edgeBurst = new SpellBladeSkill({
         value: 1,
         isPerm: false,
         permValue: 0,
+        counter: 0
       });
       actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.edgeCharge);
     }

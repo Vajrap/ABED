@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { BuffEnum } from "../../enum";
 
@@ -10,21 +10,25 @@ export const slaveDriver = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.slaveDriver);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.slaveDriver, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
+        permValue: permanentCounter,
         counter: 0,
       });
     } else {
       entry.value += value;
-      entry.permValue += permValue;
+      entry.permValue += permanentCounter;
     }
 
     return {

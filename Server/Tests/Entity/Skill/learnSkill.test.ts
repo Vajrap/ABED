@@ -1,4 +1,4 @@
-import { expect, describe, beforeEach, afterEach, it } from "@jest/globals";
+import { expect, describe, it } from "@jest/globals";
 import {
   CharacterArtisansFactory,
   CharacterAttributesFactory,
@@ -7,10 +7,11 @@ import {
   CharacterProficienciesFactory,
 } from "../../Helper/Character";
 import { Skill } from "../../../src/Entity/Skill/Skill";
-import { BasicSkillId, MobSkillId, SkillId } from "../../../src/Entity/Skill/enums";
+import { BasicSkillId, MobSkillId } from "../../../src/Entity/Skill/enums";
 import { TierEnum } from "../../../src/InterFacesEnumsAndTypes/Tiers";
 import { tryTolearnSkill } from "../../../src/Entity/Skill/learnSkill";
-import { TraitEnum } from "../../../src/Entity/Trait.ts/enum";
+import { TraitEnum } from "src/Entity/Trait/enum";
+
 
 jest.mock("../../../src/Utils/Dice", () => ({
   roll: jest.fn((amount: number) => ({

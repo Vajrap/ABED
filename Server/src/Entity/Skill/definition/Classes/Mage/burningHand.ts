@@ -12,6 +12,7 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { MageSkill } from "./index";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const burningHand = new MageSkill({
   id: MageSkillId.BurningHand,
@@ -20,8 +21,14 @@ export const burningHand = new MageSkill({
     th: "มือไฟแผดเผา",
   },
   description: {
-    en: "Project waves of searing flame from your hand, engulfing all enemies in the front most row. Deals 1d6 (1d8 at Skill Level 5) + Planar modifier + 0.5× Skill Level as Fire damage. On hit, roll DC10(+user planar mod) endurance save to apply 1–2 Burn stacks to each enemy. When skill reaches level 5, the damage increases to 1d8 with small possibility to deal damage to one more target from another row if the attack lands on the front row.",
-    th: "ปล่อยคลื่นเปลวไฟจากฝ่ามือ โอบล้อมศัตรูทั้งหมดในแถวหน้าสุด สร้างความเสียหาย 1d6 (1d8 ที่เลเวล 5) + ค่าพลังเวท (Planar) + 0.5×เลเวลสกิล เป็นความเสียหายประเภทไฟ หลังโจมตีโดน ทอย DC10(+ค่าพลังเวทของผู้ใช้) ค่าความทนทานจนต้องทอยค่าความทนทานเพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่ศัตรูแต่ละตัว. เมื่อเลเวลสกิลถึง 5 ความเสียหายเพิ่มเป็น 1d8 มีโอกาสเล็กน้อยที่จะสร้างความเสียหายให้ศัตรูอีกหนึ่งตัวจากแถวอื่น ถ้าการโจมตีสำเร็จบนแถวหน้า",
+    text: {
+      en: "Project waves of searing flame from your hand, engulfing all enemies in the front row.\nDeal <FORMULA> fire damage to each target.\nOn hit, target must [r]roll DC10 + <PlanarMod> ENDsave[/r] or get <DebuffBurn> {5}'2-3':'1-2'{/} stacks.\n{5}\nMay also strike one additional target from another row.{/}",
+      th: "ปล่อยคลื่นเปลวไฟจากฝ่ามือ โอบล้อมศัตรูทั้งหมดในแถวหน้า\nสร้างความเสียหายไฟ <FORMULA> ต่อแต่ละเป้าหมาย\nเมื่อโดน เป้าหมายต้องทอย [r]ENDsave DC10 + <PlanarMod>[/r] หรือถูก <DebuffBurn> {5}'2-3':'1-2'{/} สแตค\n{5}\nอาจโจมตีเป้าหมายเพิ่มเติมอีกหนึ่งตัวจากแถวอื่น{/}",
+    },
+    formula: {
+      en: "({5}'1d8':'1d6'{/} + <PlanarMod>) x <SkillLevelMultiplier>",
+      th: "({5}'1d8':'1d6'{/} + <PlanarMod>) x <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -90,16 +97,15 @@ export const burningHand = new MageSkill({
     const minBurnStacks = isShifted ? 2 : 1;
     const maxBurnStacks = isShifted ? 3 : 2;
 
-
     // Process all targets
     const targetEffects: { actorId: string; effect: TargetEffect[] }[] = [];
     let combinedMessage = "";
 
+    const levelScalar = skillLevelMultiplier(skillLevel);
     for (const target of targets) {
       // Calculate base damage
-      const baseDiceDamage = roll(diceSides).d(1).total;
-      const skillLevelBonus = 0.5 * skillLevel;
-      const totalDamage = Math.max(0, baseDiceDamage + planarMod + skillLevelBonus);
+      const baseDiceDamage = roll(1).d(diceSides).total;
+      const totalDamage = Math.max(0, baseDiceDamage + planarMod) * levelScalar;
 
       // Hit and crit
       const hitBonus = controlMod;
@@ -120,10 +126,9 @@ export const burningHand = new MageSkill({
       if (totalDamageResult.isHit) {
         const burnSave = target.rollSave('endurance')
         if (burnSave < burnDC) {
-          const burnStacks = roll(maxBurnStacks).d(1).total;
+          const burnStacks = roll(1).d(maxBurnStacks).total;
           const finalBurnStacks = Math.max(burnStacks, minBurnStacks);
-          // Actually apply the burn debuff
-          const burnResult = buffsAndDebuffsRepository.burn.appender(target, finalBurnStacks, false, 0);
+          const burnResult = buffsAndDebuffsRepository.burn.appender(target, { turnsAppending: finalBurnStacks });
           burnMessage = burnResult.en;
         }
       }

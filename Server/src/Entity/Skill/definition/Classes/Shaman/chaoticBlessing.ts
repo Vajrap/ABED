@@ -18,8 +18,14 @@ export const chaoticBlessing = new ShamanSkill({
     th: "พรแห่งความยุ่งเหยิง",
   },
   description: {
-    en: "Has 50% chance to deal damage to all enemies or heal the whole team for 1d6 + ((willpower mod + planar mod )/2) * (1 + (0.1 * skillLevel)). At level 5 the dice is 1d8: heal target roll DC10, if success, gain +1 chaos, attacked target roll DC10 willpower save if fail remove random resource by 1.",
-    th: "มี 50% โอกาสที่สร้างความเสียหายให้ศัตรูทั้งหมดหรือรักษาเพื่อนร่วมทีม ความเสียหายคือ 1d6 + willpower mod, การรักษาคือ 1d3 + willpower mod; + ค่า planar + skill Level * 0.5 ที่เลเวล 5 ความเสียหายคือ 1d8, การรักษาคือ 1d4",
+    text: {
+      en: "Channel the chaotic forces of the planes, unleashing unpredictable energy.\n50% chance to deal <FORMULA> chaos damage to all enemies, or heal all allies for <FORMULA> HP.\n{5}\nHealed allies [r]roll DC10 WILsave[/r], if passed, [b]gain +1 chaos[/b].\nDamaged enemies [r]roll DC10 WILsave[/r], if failed, [r]lose 1 random resource[/r].{/}",
+      th: "ควบคุมพลังแห่งระนาบที่ยุ่งเหยิง ปลดปล่อยพลังงานที่คาดเดาไม่ได้\n50% โอกาสสร้างความเสียหาย chaos <FORMULA> ให้ศัตรูทั้งหมด หรือรักษาพันธมิตรทั้งหมด <FORMULA> HP\n{5}\nพันธมิตรที่ได้รับการรักษา: ทอย [r]WILsave DC10[/r] หากสำเร็จ [b]ได้รับ +1 chaos[/b]\nศัตรูที่ถูกโจมตี: ทอย [r]WILsave DC10[/r] หากล้มเหลว [r]สูญเสียทรัพยากรแบบสุ่ม 1 หน่วย[/r]{/}",
+    },
+    formula: {
+      en: "{5}'1d8':'1d6'{/} + ((<WILmod> + <PlanarMod>) / 2) × <SkillLevelMultiplier>",
+      th: "{5}'1d8':'1d6'{/} + ((<WILmod> + <PlanarMod>) / 2) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

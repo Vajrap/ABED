@@ -12,7 +12,6 @@ import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { statMod } from "src/Utils/statMod";
 import { GuardianSkill } from ".";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const bash = new GuardianSkill({
   id: GuardianSkillId.Bash,
@@ -21,8 +20,14 @@ export const bash = new GuardianSkill({
     th: "ทุบสุดแรง",
   },
   description: {
-    en: "Deal weapon damage + Strength modifier. Target must roll DC8 + (user Strength mod) Endurance save or get stunned for 1 turn.",
-    th: "สร้างความเสียหายอาวุธ + Strength modifier เป้าหมายต้องทอย Endurance save DC8 + (Strength mod ของผู้ใช้) หรือถูกทำให้มึนงง 1 เทิร์น",
+    text: {
+      en: "Slam your weapon with overwhelming force, crushing your enemy's defenses.\nDeal <FORMULA> damage.\nTarget must [r]roll DC8 + STRmod ENDsave[/r] or become <DebuffStun> for 1 turn.",
+      th: "ฟาดอาวุธด้วยแรงมหาศาล ทำลายการป้องกันของศัตรู\nสร้างความเสียหาย <FORMULA>\nเป้าหมายต้องทอย [r]DC8 + STRmod ENDsave[/r] หรือถูก <DebuffStun> 1 เทิร์น",
+    },
+    formula: {
+      en: "<WeaponDamage> + <STRmod> × <MeleeRangePenalty>",
+      th: "<WeaponDamage> + <STRmod> × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -104,7 +109,7 @@ export const bash = new GuardianSkill({
 
     if (saveRoll < dc) {
       // Save failed: apply stun
-      debuffsRepository.stun.appender(target, 1, false, 0);
+      debuffsRepository.stun.appender(target, { turnsAppending: 1 });
       stunMessage = ` ${target.name.en} failed the save and is stunned!`;
     }
 

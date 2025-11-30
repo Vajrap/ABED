@@ -1,6 +1,6 @@
 import type { Character } from "src/Entity/Character/Character";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 
 export const cowardlyCharge = new BuffDef({
@@ -10,16 +10,20 @@ export const cowardlyCharge = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.cowardlyCharge);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.cowardlyCharge, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
+        permValue: permanentCounter,
         counter: 0,
       });
       // Add +2 pAtk and +2 mAtk when first applied
@@ -27,7 +31,7 @@ export const cowardlyCharge = new BuffDef({
       actor.battleStats.mutateBonus("mATK", 2);
     } else {
       entry.value += value;
-      entry.permValue += permValue;
+      entry.permValue += permanentCounter;
     }
 
     return {

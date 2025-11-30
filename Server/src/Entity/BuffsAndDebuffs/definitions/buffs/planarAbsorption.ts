@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
@@ -10,16 +10,20 @@ export const planarAbsorption = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.planarAbsorption);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.planarAbsorption, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
+        permValue: permanentCounter,
         counter: 0,
       });
     } else {
@@ -27,12 +31,12 @@ export const planarAbsorption = new BuffDef({
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue += permValue;
+      entry.permValue += permanentCounter;
     }
 
     return {
-      en: `${actor.name.en} gained Planar Absorption: ${value + permValue} stacks`,
-      th: `${actor.name.th} ได้รับ "ดูดซับพลัง": ${value + permValue} หน่วย`,
+      en: `${actor.name.en} gained Planar Absorption: ${value + permanentCounter} stacks`,
+      th: `${actor.name.th} ได้รับ "ดูดซับพลัง": ${value + permanentCounter} หน่วย`,
     };
   },
 

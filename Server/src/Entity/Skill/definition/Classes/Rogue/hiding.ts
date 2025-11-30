@@ -16,8 +16,10 @@ export const hiding = new RogueSkill({
     th: "ซ่อนตัว",
   },
   description: {
-    en: "Try to get hiding. Roll D20 + dex mod against DC10 (DC8 at level 5) + (highest enemy int mod) + (row === 'front' ? 5 : 0, or 3 at level 5). If passed, get hiding buff for 2 turns.",
-    th: "พยายามซ่อนตัว ทอย D20 + dex mod กับ DC10 (DC8 ที่เลเวล 5) + (int mod สูงสุดของศัตรู) + (แถว === 'หน้า' ? 5 : 0 หรือ 3 ที่เลเวล 5) หากสำเร็จ จะได้รับบัฟซ่อนตัว 2 เทิร์น",
+    text: {
+      en: "Melt into the shadows, becoming one with the darkness.\nRoll D20 + <DEXmod> against DC{5}'8':'10'{/} + highest enemy INTmod + {5}'3':'5'{/} if in front row.\nIf passed, gain <BuffHiding> for 2 turns.",
+      th: "ละลายเข้ากับเงามืด กลายเป็นหนึ่งเดียวกับความมืด\nทอย D20 + <DEXmod> กับ DC{5}'8':'10'{/} + INTmod สูงสุดของศัตรู + {5}'3':'5'{/} หากอยู่ในแถวหน้า\nหากสำเร็จ ได้รับ <BuffHiding> 2 เทิร์น",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -68,7 +70,7 @@ export const hiding = new RogueSkill({
     
     if (totalRoll >= dc) {
       // Success: Get hiding buff for 2 turns
-      buffsAndDebuffsRepository.hiding.appender(actor, 2, false, 0);
+      buffsAndDebuffsRepository.hiding.appender(actor, { turnsAppending: 2 });
       
       return {
         content: {

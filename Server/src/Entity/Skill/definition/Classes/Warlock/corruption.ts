@@ -20,8 +20,14 @@ export const corruption = new WarlockSkill({
     th: "การเสื่อมสลาย",
   },
   description: {
-    en: "Corrupt the target with dark energy. Deals 1d4 + planar mod dark damage immediately. Target rolls DC10 (+control mod) endurance save or gets cursed for 3 turns AND hexed for 2 turns. At level 5, also applies 2 stack of burn.",
-    th: "ทำให้เป้าหมายเสื่อมสลายด้วยพลังงานมืด สร้างความเสียหายมืด 1d4 + ค่า planar ทันที เป้าหมายทอย endurance save DC10 (+ค่า planar) หรือจะถูกสาป 3 เทิร์น และ hexed 2 เทิร์น ที่เลเวล 5 จะเพิ่ม burn 2 สแต็ก",
+    text: {
+      en: "Channel dark energy to corrupt your enemy's very essence.\nDeal <FORMULA> dark damage immediately.\nTarget must [r]roll DC10 + <ControlMod> ENDsave[/r] or get <DebuffCursed> for 3 turns and <DebuffHexed> for 2 turns.\n{5}\nAlso applies [r]2 stacks of <DebuffBurn>[/r].{/}",
+      th: "ควบคุมพลังงานมืดเพื่อทำให้แก่นแท้ของศัตรูเสื่อมสลาย\nสร้างความเสียหายมืด <FORMULA> ทันที\nเป้าหมายต้องทอย [r]ENDsave DC10 + <ControlMod>[/r] หรือถูก <DebuffCursed> 3 เทิร์น และ <DebuffHexed> 2 เทิร์น\n{5}\nยังเพิ่ม [r]<DebuffBurn> 2 สแตค[/r] ด้วย{/}",
+    },
+    formula: {
+      en: "1d4 + <PlanarMod>",
+      th: "1d4 + <PlanarMod>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -96,16 +102,16 @@ export const corruption = new WarlockSkill({
     
     if (saveRoll < enduranceDC) {
       // Apply cursed for 3 turns
-      buffsAndDebuffsRepository.cursed.appender(target, 3, false, 0);
+      buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: 3 });
       
       // Apply hexed for 2 turns
-      buffsAndDebuffsRepository.hexed.appender(target, 2, false, 0);
+      buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: 2 });
       
       debuffMessage = ` ${target.name.en} is corrupted!`;
       
       // At level 5, also apply 2 stack of burn
       if (skillLevel >= 5) {
-        buffsAndDebuffsRepository.burn.appender(target, 2, false, 0);
+        buffsAndDebuffsRepository.burn.appender(target, { turnsAppending: 2 });
         debuffMessage += ` ${target.name.en} is burning!`;
       }
     } else {

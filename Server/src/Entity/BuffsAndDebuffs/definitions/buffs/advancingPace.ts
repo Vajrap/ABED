@@ -1,13 +1,13 @@
 import type { Character } from "src/Entity/Character/Character";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { BuffEnum } from "../../enum";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 
 /**
  * Advancing Pace — fuels a knight's momentum. While active:
  * - Always grants +2 Strength.
  * - If applied below skill level 5, reduces physical & magical defense by 1.
- * - At skill level 5+ (permValue = 1), removes the defense penalty and unlocks the “+35% AB speed” bonus handled in battle logic.
+ * - At skill level 5+ (permanentCounter = 1), removes the defense penalty and unlocks the "+35% AB speed" bonus handled in battle logic.
  */
 export const advancingPace = new BuffDef({
   name: {
@@ -16,20 +16,24 @@ export const advancingPace = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.advancingPace);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.advancingPace, {
         value,
         isPerm,
-        permValue,
+        permValue: permanentCounter,
         counter: 0,
       });
       actor.attribute.mutateBattle("strength", 2);
-      if (permValue === 0) {
+      if (permanentCounter === 0) {
         actor.battleStats.mutateBattle("pDEF", -1);
         actor.battleStats.mutateBattle("mDEF", -1);
       }
@@ -38,15 +42,15 @@ export const advancingPace = new BuffDef({
       entry.value = value;
       entry.isPerm = entry.isPerm || isPerm;
       const previouslyAdvanced = entry.permValue > 0;
-      entry.permValue = permValue;
-      if (!previouslyAdvanced && permValue === 1) {
+      entry.permValue = permanentCounter;
+      if (!previouslyAdvanced && permanentCounter === 1) {
         // Upgrade from non-advanced to advanced — remove prior DEF penalty
         actor.battleStats.mutateBattle("pDEF", 1);
         actor.battleStats.mutateBattle("mDEF", 1);
       }
     }
 
-    const advanced = permValue === 1;
+    const advanced = permanentCounter === 1;
     return {
       en: `${actor.name.en} maintains an Advancing Pace${advanced ? " (enhanced)" : ""}.`,
       th: `${actor.name.th} รักษาจังหวะบุกไว้${advanced ? " (ขั้นสูง)" : ""}`,

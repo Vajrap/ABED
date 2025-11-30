@@ -1,3 +1,4 @@
+// TODO: Add Poison Debuff
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { WitchSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
@@ -13,17 +14,22 @@ import { roll } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WitchSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
-export const curseBolt = new WitchSkill({
-  id: WitchSkillId.CurseBolt,
+export const poisonDart = new WitchSkill({
+  id: WitchSkillId.PoisonDart,
   name: {
-    en: "Curse Bolt",
+    en: "Poison Dart",
     th: "ลูกบอลคำสาป",
   },
   description: {
-    en: "Launch a bolt of cursed energy that bypasses defenses. Deals 1d3 + INT mod * (1 + 0.1 * skill level) true dark damage. Target rolls DC6 + control mod willpower save or gets cursed for 2 turns (3 at level 5). At level 5, damage increases to 1d4.",
-    th: "ปล่อยลูกบอลพลังงานคำสาปที่ผ่านการป้องกัน สร้างความเสียหายมืดจริง 1d3 + ค่า INT * (1 + 0.1 * เลเวลสกิล) เป้าหมายทอย willpower save DC6 + control mod หรือจะถูกสาป 2 เทิร์น (3 เทิร์นที่เลเวล 5) ที่เลเวล 5 ความเสียหายเพิ่มเป็น 1d4",
+    text: {
+      en: "Launch a small magical dart tipped with potent poison that seeps through all defenses.\nDeal <FORMULA> [r]true poison damage[/r] that bypasses all defenses.\nTarget must [r]roll DC6 + <ControlMod> ENDsave[/r] or get <DebuffPoisoned> for {5}'3':'2'{/} turns.",
+      th: "ขว้างลูกดอกเวทมนตร์เล็กๆ ที่มีปลายอาบยาพิษที่ซึมผ่านการป้องกันทั้งหมด\nสร้างความเสียหายพิษแท้ <FORMULA> [r]ที่ผ่านการป้องกันทั้งหมด[/r]\nเป้าหมายต้องทอย [r]ENDsave DC6 + <ControlMod>[/r] หรือถูก <DebuffPoisoned> {5}'3':'2'{/} เทิร์น",
+    },
+    formula: {
+      en: "({5}'1d4':'1d3'{/} + <INTmod>) × <SkillLevelMultiplier>",
+      th: "({5}'1d4':'1d3'{/} + <INTmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -95,7 +101,7 @@ export const curseBolt = new WitchSkill({
     
     if (willpowerSave < willpowerDC) {
       const cursedDuration = skillLevel >= 5 ? 3 : 2;
-      buffsAndDebuffsRepository.cursed.appender(target, cursedDuration, false, 0);
+      buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: cursedDuration });
       cursedMessage = ` ${target.name.en} is cursed!`;
     }
 

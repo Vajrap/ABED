@@ -21,8 +21,14 @@ export const radiantSmite = new InquisitorSkill({
     th: "การลงโทษด้วยแสง",
   },
   description: {
-    en: "Launch a focused blast of radiant energy. Deals 1d6 + (willpower + planar mod)/2 * (1 + 0.1 * skill level) holy damage. At level 5, damage increases to 1d8. Deals +1d4 bonus damage against undead/fiends. And +1d4 bonus damage against evil aligned targets.",
-    th: "ปล่อยพลังงานแสงที่มุ่งเน้น สร้างความเสียหายศักดิ์สิทธิ์ 1d6 + (willpower + planar mod)/2 * (1 + 0.1 * เลเวลสกิล) ที่เลเวล 5 ความเสียหายเพิ่มเป็น 1d8 และสร้างความเสียหายเพิ่ม +1d4 ต่อ undead/fiends และ +1d4 ต่อเป้าหมายที่มีความชั่วร้าย",
+    text: {
+      en: "Channel divine wrath into a searing beam of light that smites the wicked.\nDeal <FORMULA> holy damage.\n[r]Deal +1d4 bonus damage[/r] against undead or fiends.\n[r]Deal +1d4 bonus damage[/r] against evil-aligned targets.",
+      th: "รวมพลังพิพากษาจากสวรรค์เป็นลำแสงที่เผาผลาญผู้ชั่วร้าย\nสร้างความเสียหายศักดิ์สิทธิ์ <FORMULA>\n[r]สร้างความเสียหายเพิ่ม +1d4[/r] ต่อ undead หรือ fiends\n[r]สร้างความเสียหายเพิ่ม +1d4[/r] ต่อเป้าหมายที่มีความชั่วร้าย",
+    },
+    formula: {
+      en: "({5}'1d8':'1d6'{/} + (<WILmod> + <PlanarMod>) / 2) × <SkillLevelMultiplier>",
+      th: "({5}'1d8':'1d6'{/} + (<WILmod> + <PlanarMod>) / 2) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -94,7 +100,7 @@ export const radiantSmite = new InquisitorSkill({
       damage: totalDamage + bonusDamage,
       hit: rollTwenty().total + controlMod,
       crit: rollTwenty().total + luckMod,
-      type: DamageType.holy,
+      type: DamageType.radiance,
       isMagic: true,
     };
 

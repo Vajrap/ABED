@@ -15,8 +15,10 @@ export const mistStep = new MysticSkill({
     th: "ก้าวหมอก",
   },
   description: {
-    en: "Shift like mist to a safer position. Move to the backline if you are in the front row; if already in the back row, gain evasion instead. Remove Slow if present. Gain +3 dodge roll for 1 turn (increases to 2 turns at skill level 5).",
-    th: "เคลื่อนไหวเหมือนหมอกไปยังตำแหน่งที่ปลอดภัยกว่า หากอยู่ในแถวหน้าให้ย้ายไปแถวหลัง หากอยู่ในแถวหลังแล้วจะได้รับความสามารถหลบหลีกแทน ลบ Slow หากมีอยู่ เพิ่ม dodge +3 เป็นเวลา 1 เทิร์น (เพิ่มเป็น 2 เทิร์นที่เลเวล 5)",
+    text: {
+      en: "Shift like mist to a safer position, becoming one with the air itself.\nIf in front row: move to backline.\nIf in back row: gain <BuffRetreat> for {5}'2':'1'{/} turns.\nRemoves <DebuffSlow> if present.",
+      th: "เคลื่อนไหวเหมือนหมอกไปยังตำแหน่งที่ปลอดภัยกว่า กลายเป็นหนึ่งเดียวกับอากาศ\nหากอยู่ในแถวหน้า: ย้ายไปแถวหลัง\nหากอยู่ในแถวหลัง: ได้รับ <BuffRetreat> เป็นเวลา {5}'2':'1'{/} เทิร์น\nลบ <DebuffSlow> หากมีอยู่",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -69,18 +71,14 @@ export const mistStep = new MysticSkill({
     } else {
       // Already in back row, gain evasion (retreat buff gives +3 dodge)
       gainedEvasion = true;
-      buffsAndDebuffsRepository.retreat.appender(actor, 1, false, 0);
+      buffsAndDebuffsRepository.retreat.appender(actor, { turnsAppending: skillLevel >= 5 ? 2 : 1 });
     }
-
-    // Add dodge buff (using retreat buff which gives +3 dodge)
-    const dodgeDuration = skillLevel >= 5 ? 2 : 1;
-    buffsAndDebuffsRepository.retreat.appender(actor, dodgeDuration, false, 0);
 
     const messages: string[] = [];
     if (hasSlow) messages.push("removed Slow");
     if (moved) messages.push("moved to backline");
     if (gainedEvasion) messages.push("gained evasion");
-    messages.push(`gained +3 dodge for ${dodgeDuration} turn(s)`);
+    if (!isFrontRow) messages.push(`gained +3 dodge for ${skillLevel >= 5 ? 2 : 1} turn(s)`);
 
     return {
       content: {

@@ -24,8 +24,14 @@ export const bleedingCut = new RogueSkill({
     th: "ตัดเลือดไหล",
   },
   description: {
-    en: "Deal weapon damage + Dex mod * (1 + 0.1 * skill level) slash damage. Must be front-front to deal full damage. Target must roll DC10 (DC12 at level 5) Endurance save or get 1d3 bleed stacks. Bleed: takes 1d3 damage per turn for 3 turns.",
-    th: "สร้างความเสียหายอาวุธ + Dex mod * (1 + 0.1 * เลเวลสกิล) ต้องอยู่แถวหน้า-แถวหน้าเพื่อสร้างความเสียหายเต็มที่ เป้าหมายต้องทอย Endurance save DC10 (DC12 ที่เลเวล 5) หรือได้รับ bleed 1d3 หน่วย Bleed: รับความเสียหาย 1d3 ต่อเทิร์น เป็นเวลา 3 เทิร์น",
+    text: {
+      en: "Slice your enemy with a precise cut that leaves them bleeding profusely.\nDeal <FORMULA> slash damage.\nTarget must [r]roll DC{5}'12':'10'{/} ENDsave[/r] or get <DebuffBleed> 1d3 stacks.",
+      th: "ตัดศัตรูด้วยการตัดที่แม่นยำ ทำให้เลือดไหลไม่หยุด\nสร้างความเสียหายตัด <FORMULA>\nเป้าหมายต้องทอย [r]ENDsave DC{5}'12':'10'{/}[/r] หรือถูก <DebuffBleed> 1d3 สแตค",
+    },
+    formula: {
+      en: "(<WeaponDamage> + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "(<WeaponDamage> + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: ["sword", "dagger", "blade"],
@@ -97,7 +103,7 @@ export const bleedingCut = new RogueSkill({
     if (saveRoll < dc) {
       // Save failed: apply bleed
       const bleedStacks = roll(1).d(3).total;
-      debuffsRepository.bleed.appender(target, bleedStacks, false, 0);
+      debuffsRepository.bleed.appender(target, { turnsAppending: bleedStacks });
       bleedMessage = ` ${target.name.en} failed the save and is bleeding!`;
     }
 

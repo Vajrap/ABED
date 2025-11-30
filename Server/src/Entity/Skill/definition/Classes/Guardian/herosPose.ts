@@ -14,8 +14,14 @@ export const herosPose = new GuardianSkill({
     th: "ท่าเชิงฮีโร่",
   },
   description: {
-    en: "Stand proud like a hero in a battle field. Has small chance (raised by skill level) to heal a small amount of HP.",
-    th: "ยืนอย่างมั่นใจ เป็นฮีโร่ในสนามรบ มีโอกาสน้อยเล็กน้อย (ยิ่งเลเวลสกิลสูงขึ้น มีโอกาสยิ่งสูง) ในการรักษา HP เล็กน้อย",
+    text: {
+      en: "Strike a heroic pose, channeling your inner strength.\nRoll DC{5}'10 - skill level':'15 - skill level'{/}. On success, restore <FORMULA> HP.\nThe higher your skill, the easier it becomes to inspire yourself.",
+      th: "ใช้ท่าเชิงฮีโร่ ปลุกพลังภายใน\nทอย DC{5}'10 - เลเวลสกิล':'15 - เลเวลสกิล'{/} หากสำเร็จ ฟื้นฟู <FORMULA> HP\nยิ่งเลเวลสกิลสูง ยิ่งง่ายต่อการปลุกแรงใจ",
+    },
+    formula: {
+      en: "<VITmod> + skill level",
+      th: "<VITmod> + เลเวลสกิล",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -46,9 +52,7 @@ export const herosPose = new GuardianSkill({
     location: LocationsEnum,
   ) => {
     const DC = 15 - skillLevel;
-
     const roll = rollTwenty().total;
-
     const success = roll >= DC;
 
     if (success) {

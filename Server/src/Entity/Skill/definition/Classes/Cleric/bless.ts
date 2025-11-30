@@ -13,11 +13,13 @@ export const bless = new ClericSkill({
     id: ClericSkillId.Bless,
     name: {
         en: "Bless",
-        th: "พระพร",
+        th: "อวยพร",
     },
     description: {
-        en: "Bless all ally for 2 turns, granting advantage to all saving throw. Charisma enhances the blessing's reach. At level 5, after used the user throw DC10 +willpower mod, if success, gain +1 order",
-        th: "อวยพรเพื่อนร่วมทีมทั้งหมด 2 เทิร์นทำให้ได้เปรียบในการทอย saving throw charisma เพิ่มประสิทธิภาพของพร",
+        text: {
+            en: "Ask for the Blessing from Laoh, <BuffBlessing> all ally for 2 turns. \n{5}\nThe user [b]throw DC10 + <WILmod>, if success, gain +1 order.[/b]{/}",
+            th: "อธิษฐานขอการอวยพรจากลาโอห์ เพื่อนร่วมทีมทั้งหมดได้รับสถานะ '<BuffBlessing>' 2 เทิร์น \n{5}\nหลังจากใช้ ทอย [b]DC10 + <WILmod>[/b] หากผ่านจะได้รับ +1 order{/}",
+        },
     },
     requirement: {},
     equipmentNeeded: [],
@@ -49,7 +51,7 @@ export const bless = new ClericSkill({
         const alliesToBless = actorParty.filter(ally => !ally.vitals.isDead);
         
         for (const ally of alliesToBless) {
-            buffsRepository[BuffEnum.bless].appender(ally, 2, false, 0);
+            buffsRepository[BuffEnum.bless].appender(ally, { turnsAppending: 2 });
         }
         let gainOrder = false;
         if (skillLevel >= 5) {

@@ -1,4 +1,4 @@
-import {TraitEnum} from "src/Entity/Trait.ts/enum.ts";
+import {TraitEnum} from "src/Entity/Trait/enum";
 import {L10N} from "src/InterFacesEnumsAndTypes/L10N.ts";
 import {Character} from "src/Entity/Character/Character.ts";
 import {DamageType} from "src/InterFacesEnumsAndTypes/DamageTypes.ts";

@@ -17,8 +17,14 @@ export const arcaneBolt = new MageSkill({
   id: MageSkillId.ArcaneBolt,
   name: { en: "Arcane Bolt", th: "ลูกเวทมนตร์" },
   description: {
-    en: "Unleash a focused spark of fire toward an enemy. Deals 1d6 + Planar modifier * (1 + Skill Level * 0.1) as Magic damage.",
-    th: "ปล่อยประกายไฟพุ่งใส่ศัตรู สร้างความเสียหาย 1d6 + ค่าพลังเวท (Planar) + 0.5×เลเวลสกิล เป็นความเสียหายประเภทไฟ หลังโจมตีโดน ทอย DC 13 เพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่ศัตรู",
+    text: {
+      en: "Unleash a focused bolt of raw arcane energy.\nDeal <FORMULA> arcane damage.",
+      th: "ปล่อยลูกพลังงานเวทมนตร์ดิบ\nสร้างความเสียหายอาร์เคน <FORMULA>",
+    },
+    formula: {
+      en: "({5}'1d8':'1d6'{/} + <PlanarMod>) × <SkillLevelMultiplier>",
+      th: "({5}'1d8':'1d6'{/} + <PlanarMod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

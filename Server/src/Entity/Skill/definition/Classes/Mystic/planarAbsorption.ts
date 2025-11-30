@@ -18,8 +18,14 @@ export const planarAbsorption = new MysticSkill({
     th: "ดูดซับพลัง",
   },
   description: {
-    en: "Gain 'Planar Absorption' buff for 2d3 stacks + intelligence mod + control mod/2 + 0.01 times per skill level. If attacked by a magic spell, absorb damage up to the stacks of planar absorption buff. Every 4 damage of each type that is absorbed turned into 1 resource of that element type.",
-    th: "ได้รับบัฟ 'ดูดซับพลัง' 2d3 หน่วย + intelligence mod + control mod/2 + 0.01 ต่อเลเวลสกิล หากถูกโจมตีด้วยเวทมนตร์ จะดูดซับความเสียหายตามจำนวนหน่วยที่เหลือ ทุก 4 ความเสียหายที่ดูดซับจะกลายเป็นทรัพยากรธาตุ 1 หน่วย",
+    text: {
+      en: "Channel planar energy into a protective barrier that absorbs magical harm.\nGain <FORMULA> stacks of <BuffPlanarAbsorption>.",
+      th: "ควบคุมพลังงานแห่งระนาบเป็นกำแพงป้องกันที่ดูดซับอันตรายจากเวทมนตร์\nได้รับ <FORMULA> สแตคของ <BuffPlanarAbsorption>",
+    },
+    formula: {
+      en: "(2d3 + <INTmod> + floor(<ControlMod> / 2)) × <SkillLevelMultiplier>",
+      th: "(2d3 + <INTmod> + floor(<ControlMod> / 2)) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -54,7 +60,7 @@ export const planarAbsorption = new MysticSkill({
     const controlBonus = Math.floor(controlMod / 2);
     const stacks = Math.floor(baseStacks) + controlBonus;
 
-    buffsAndDebuffsRepository.planarAbsorption.appender(actor, stacks, false, 0);
+    buffsAndDebuffsRepository.planarAbsorption.appender(actor, { turnsAppending: stacks });
 
     return {
       content: {

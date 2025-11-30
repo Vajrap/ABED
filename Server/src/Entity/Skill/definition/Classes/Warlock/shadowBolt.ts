@@ -1,3 +1,16 @@
+/**
+ * TODO: LORE ALIGNMENT - Character Creation Level 1
+ * 
+ * Current: "Shadow Bolt" - Uses "shadow energy" and "dark damage" which doesn't align with
+ * the elemental system (order, chaos, fire, earth, water, wind).
+ * 
+ * Suggested Changes:
+ * - Rename to "Chaos Bolt" or "Chaos Strike"
+ * - Change damage type from "dark" to "chaos" (or keep as arcane but describe as chaos energy)
+ * - Description: "Hurl a bolt of chaotic energy" instead of "condensed shadow energy"
+ * - Keep the chaos element production, but make it more explicit that this is elemental chaos
+ * - Consider: "Unstable Bolt" - a bolt of unstable chaos energy that can corrupt
+ */
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { WarlockSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
@@ -13,17 +26,22 @@ import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WarlockSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
-export const shadowBolt = new WarlockSkill({
-  id: WarlockSkillId.ShadowBolt,
+export const chaosBolt = new WarlockSkill({
+  id: WarlockSkillId.ChaosBolt,
   name: {
-    en: "Shadow Bolt",
-    th: "ลูกบอลเงา",
+    en: "Chaos Bolt",
+    th: "ลูกบอลวินาศ",
   },
   description: {
-    en: "Launch a bolt of condensed shadow energy. Deals 1d6 + planar mod * (1 + 0.1 * skill level) dark damage. Target rolls DC8 (+planar mod) willpower save or gets cursed for 2 turns (3 at level 5).",
-    th: "ปล่อยลูกบอลพลังงานเงา สร้างความเสียหายมืด 1d6 + ค่า planar * (1 + 0.1 * เลเวลสกิล) เป้าหมายทอย willpower save DC8 (+ค่า planar) หรือจะถูกสาป 2 เทิร์น (3 เทิร์นที่เลเวล 5)",
+    text: {
+      en: "Hurl a bolt of pure chaotic energy that corrupts everything it touches.\nDeal <FORMULA> chaos damage.\nTarget must [r]roll DC8 + <PlanarMod> WILsave[/r] or get <DebuffHexed> for {5}'3':'2'{/} turns.",
+      th: "ขว้างลูกบอลพลังงาน chaos บริสุทธิ์ที่ทำให้ทุกสิ่งที่สัมผัสเสื่อมสลาย\nสร้างความเสียหาย chaos <FORMULA>\nเป้าหมายต้องทอย [r]WILsave DC8 + <PlanarMod>[/r] หรือถูก <DebuffHexed> {5}'3':'2'{/} เทิร์น",
+    },
+    formula: {
+      en: "({5}'1d8':'1d6'{/} + <PlanarMod>) × <SkillLevelMultiplier>",
+      th: "({5}'1d8':'1d6'{/} + <PlanarMod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -58,8 +76,8 @@ export const shadowBolt = new WarlockSkill({
     if (!target) {
       return {
         content: {
-          en: `${actor.name.en} tried to cast Shadow Bolt but has no target`,
-          th: `${actor.name.th} พยายามใช้ลูกบอลเงาแต่ไม่พบเป้าหมาย`,
+          en: `${actor.name.en} tried to cast Chaos Bolt but has no target`,
+          th: `${actor.name.th} พยายามใช้ลูกบอลวินาศแต่ไม่พบเป้าหมาย`,
         },
         actor: {
           actorId: actor.id,
@@ -82,22 +100,22 @@ export const shadowBolt = new WarlockSkill({
       damage: totalDamage,
       hit: rollTwenty().total + controlMod,
       crit: rollTwenty().total + luckMod,
-      type: DamageType.dark,
+      type: DamageType.chaos,
       isMagic: true,
     };
 
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
 
     // Check for cursed debuff (DC8 + planar mod willpower save)
-    let cursedMessage = "";
+    let hexedMessage = "";
     if (damageResult.isHit) {
       const willpowerDC = 8 + statMod(actor.attribute.getTotal('intelligence'));
       const willpowerSave = target.rollSave("willpower");
       
       if (willpowerSave < willpowerDC) {
-        const cursedDuration = skillLevel >= 5 ? 3 : 2;
-        buffsAndDebuffsRepository.cursed.appender(target, cursedDuration, false, 0);
-        cursedMessage = ` ${target.name.en} is cursed!`;
+        const hexedDuration = skillLevel >= 5 ? 3 : 2;
+        buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: hexedDuration });
+        hexedMessage = ` ${target.name.en} is hexed!`;
       }
     }
 
@@ -110,8 +128,8 @@ export const shadowBolt = new WarlockSkill({
 
     return {
       content: {
-        en: `${message.en}${cursedMessage}`,
-        th: `${message.th}${cursedMessage ? ` ${target.name.th} ถูกสาป!` : ""}`,
+        en: `${message.en}${hexedMessage}`,
+        th: `${message.th}${hexedMessage ? ` ${target.name.th} ถูกสาป!` : ""}`,
       },
       actor: {
         actorId: actor.id,

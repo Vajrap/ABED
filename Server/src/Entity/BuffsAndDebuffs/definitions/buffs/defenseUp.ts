@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { BuffEnum } from "../../enum";
 
@@ -10,16 +10,21 @@ export const defenseUp = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.defenseUp);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.defenseUp, {
         value,
         isPerm,
-        permValue,
+        permValue: permanentCounter,
+        counter: 0,
       });
       actor.battleStats.mutateBattle("pDEF", 2);
       actor.battleStats.mutateBattle("mDEF", 2);
@@ -28,12 +33,12 @@ export const defenseUp = new BuffDef({
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue += permValue;
+      entry.permValue += permanentCounter;
     }
 
     return {
-      en: `${actor.name.en} got defenseUp buff: pDEF and mDEF goes up by ${value + permValue}`,
-      th: `${actor.name.th} ได้รับ "เพิ่มพลังป้องกัน": pDEF และ mDEF เพิ่มขึ้น ${value + permValue} หน่วย`,
+      en: `${actor.name.en} got defenseUp buff: pDEF and mDEF goes up by ${value + permanentCounter}`,
+      th: `${actor.name.th} ได้รับ "เพิ่มพลังป้องกัน": pDEF และ mDEF เพิ่มขึ้น ${value + permanentCounter} หน่วย`,
     };
   },
 

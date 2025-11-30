@@ -48,4 +48,7 @@ export enum DebuffEnum {
   healCooldown = "healCooldown",
   massHealCooldown = "massHealCooldown",
   mendSpiritCooldown = "mendSpiritCooldown",
+  
+  // Stat Debuffs
+  critDef = "critDef",
 }

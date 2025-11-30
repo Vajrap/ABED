@@ -15,8 +15,10 @@ export const aegisShield = new PaladinSkill({
     th: "โล่ป้องกันศักดิ์สิทธิ์",
   },
   description: {
-    en: "Activate Aegis Shield for 3 stacks (4 at level 5). Each stack can mitigate 5 + (willpower mod) points of incoming damage. When depleted, grants Aegis Pulse buff for 1 turn. Must not have Aegis Shield buff.",
-    th: "เปิดใช้งานโล่ป้องกันศักดิ์สิทธิ์ 3 หน่วย (4 ที่เลเวล 5) แต่ละหน่วยสามารถลดความเสียหายที่ได้รับ 5 + (willpower mod) หน่วย เมื่อหมดลงจะได้รับบัฟ Aegis Pulse 1 เทิร์น ต้องไม่มีบัฟ Aegis Shield",
+    text: {
+      en: "Summon a divine barrier of pure holy energy that protects you from harm.\nActivate <BuffAegisShield> with {5}'4':'3'{/} stacks.",
+      th: "เรียกกำแพงศักดิ์สิทธิ์จากพลังงานศักดิ์สิทธิ์บริสุทธิ์ที่ปกป้องคุณจากอันตราย\nเปิดใช้งาน <BuffAegisShield> {5}'4':'3'{/} สแตค",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -70,7 +72,7 @@ export const aegisShield = new PaladinSkill({
 
     // Activate Aegis Shield for 3 stack (4 at lvl5)
     const stacks = skillLevel >= 5 ? 4 : 3;
-    buffsRepository[BuffEnum.aegisShield].appender(actor, stacks, false, 0);
+    buffsRepository[BuffEnum.aegisShield].appender(actor, { turnsAppending: stacks });
 
     return {
       content: {

@@ -24,8 +24,14 @@ export const flurryOfBlows = new MonkSkill({
     th: "ชุดการโจมตี",
   },
   description: {
-    en: "Perform a flurry of rapid blows. Deal 2 hits (3 hits at level 5) of damage from Palm Strike level. If no palm strike, damage = 1d4 + (STR or DEX mod, whichever higher) * position modifier blunt damage. If armor is NOT cloth, damage is reduced by 70%.",
-    th: "ทำการโจมตีรวดเร็ว 2 ครั้ง (3 ครั้งที่เลเวล 5) ด้วยความเสียหายจากเลเวล Palm Strike หากไม่มี Palm Strike ความเสียหาย = 1d4 + (STR หรือ DEX mod สูงสุด) * position modifier หากเกราะไม่ใช่ผ้า ความเสียหายจะลดลง 70%",
+    text: {
+      en: "Unleash a rapid flurry of strikes, overwhelming your enemy with sheer speed.\nDeal {5}'3':'2'{/} hits of <FORMULA> blunt damage.\n[r]Damage reduced by 70%[/r] if wearing non-cloth armor.",
+      th: "ปล่อยชุดการโจมตีอย่างรวดเร็ว ท่วมท้นศัตรูด้วยความเร็ว\nสร้างความเสียหายทื่อ {5}'3':'2'{/} ครั้ง แต่ละครั้ง <FORMULA>\n[r]ความเสียหายลดลง 70%[/r] หากสวมเกราะที่ไม่ใช่ผ้า",
+    },
+    formula: {
+      en: "Palm Strike damage (if learned), else 1d4 + max(<STRmod>, <DEXmod>) × <MeleeRangePenalty>",
+      th: "ความเสียหาย Palm Strike (หากเรียนรู้) หรือ 1d4 + max(<STRmod>, <DEXmod>) × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: ["bareHand"],

@@ -21,8 +21,14 @@ export const fireBall = new MageSkill({
     th: "ลูกไฟระเบิด",
   },
   description: {
-    en: "Unleash a blazing sphere of fire that explodes upon impact, engulfing 1–6 enemies (weighted toward fewer targets). Deals 1d10 (+0.5× Skill Level) + Planar modifier as Fire damage, increasing to 1d12 at Skill Level 5. On hit, target must roll DC 10 (+user planar mod) endurance save or get 1–2 Burn stacks.",
-    th: "ปลดปล่อยลูกไฟทรงพลังที่ระเบิดกลางสนาม โอบล้อมศัตรู 1–6 ตัว (โอกาสสูงที่จะโจมตีเป้าหมายน้อยกว่า) สร้างความเสียหายไฟ 1d10 (+0.5×เลเวลสกิล) + ค่าพลังเวท (Planar) และเพิ่มเป็น 1d12 ที่เลเวล 5 หลังโจมตีโดน ทอย DC10(+ค่าพลังเวทของผู้ใช้) endurance save, หรือถูกเผาไหม้ (1–2 สแตค)",
+    text: {
+      en: "Unleash a blazing sphere of fire that explodes upon impact, engulfing 1–6 enemies in a devastating inferno.\nDeal <FORMULA> fire damage to each target.\nOn hit, target must [r]roll DC10 + <PlanarMod> ENDsave[/r] or get <DebuffBurn> 1–2 stacks.",
+      th: "ปลดปล่อยลูกไฟทรงพลังที่ระเบิดกลางสนาม โอบล้อมศัตรู 1–6 ตัวในไฟนรกที่ทำลายล้าง\nสร้างความเสียหายไฟ <FORMULA> ต่อแต่ละเป้าหมาย\nเมื่อโดน เป้าหมายต้องทอย [r]ENDsave DC10 + <PlanarMod>[/r] หรือถูก <DebuffBurn> 1–2 สแตค",
+    },
+    formula: {
+      en: "{5}'1d12':'1d10'{/} + <PlanarMod> + 0.5 × skill level",
+      th: "{5}'1d12':'1d10'{/} + <PlanarMod> + 0.5 × เลเวลสกิล",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -55,10 +61,10 @@ export const fireBall = new MageSkill({
     const roll2 = roll(6).d(1).total;
     let numTargets: number;
 
-    if (roll1 <= 3 && roll2 <= 3) {
+    if (roll1 <= 3 || roll2 <= 3) {
       numTargets = roll1; // 1-3 targets
     } else {
-      numTargets = Math.min(6, roll1 + roll2); // 2-6 targets
+      numTargets = Math.min(6, Math.floor((roll1 + roll2)/2)); // 2-6 targets
     }
 
     const targets = getTarget(actor, actorParty, targetParty, "enemy").many(numTargets);
@@ -126,7 +132,7 @@ export const fireBall = new MageSkill({
         if (burnSave < burnDC) {
           const burnStacks = roll(2).d(1).total;
           // Actually apply the burn debuff
-          const burnResult = buffsAndDebuffsRepository.burn.appender(target, burnStacks, false, 0);
+          const burnResult = buffsAndDebuffsRepository.burn.appender(target, { turnsAppending: burnStacks });
           burnMessage = burnResult.en;
         }
       }

@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import {BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
@@ -10,8 +10,9 @@ export const arcaneShield = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
+    options: AppenderOptions,
   ): L10N {
+    const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.arcaneShield);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.arcaneShield, {

@@ -490,7 +490,7 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
       exp: 0,
     },
     {
-      id: ShamanSkillId.SpiritRattle,
+      id: ShamanSkillId.HolyRattle,
       level: randomSkillLevel(difficulty),
       exp: 0,
     },

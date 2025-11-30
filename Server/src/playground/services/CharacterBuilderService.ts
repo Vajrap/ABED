@@ -239,12 +239,12 @@ export class CharacterBuilderService {
           exp: 0,
         });
         activeSkills.push({
-          id: WitchSkillId.HexDoll as SkillId,
+          id: WitchSkillId.ChaosBinding as SkillId,
           level: difficulty,
           exp: 0,
         });
         activeSkills.push({
-          id: WitchSkillId.CurseBolt as SkillId,
+          id: WitchSkillId.PoisonDart as SkillId,
           level: difficulty,
           exp: 0,
         });
@@ -434,7 +434,7 @@ export class CharacterBuilderService {
           exp: 0,
         });
         activeSkills.push({
-          id: ShamanSkillId.SpiritRattle,
+          id: ShamanSkillId.HolyRattle,
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });
@@ -847,7 +847,7 @@ export class CharacterBuilderService {
           exp: 0,
         });
         activeSkills.push({
-          id: WarlockSkillId.ShadowBolt as SkillId,
+          id: WarlockSkillId.ChaosBolt as SkillId,
           level: difficulty,
           exp: 0,
         });

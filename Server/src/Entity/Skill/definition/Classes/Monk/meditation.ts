@@ -15,8 +15,14 @@ export const meditation = new MonkSkill({
     th: "สมาธิ",
   },
   description: {
-    en: "Restore 1d4 + skillLevel + control mod/2 to HP or MP or SP, whichever is lowest (in percent).",
-    th: "ฟื้นฟู 1d4 + skillLevel + control mod/2 ให้กับ HP หรือ MP หรือ SP ตามค่าที่ต่ำที่สุด (เป็นเปอร์เซ็นต์)",
+    text: {
+      en: "Enter a meditative state, channeling inner peace to restore your depleted resources.\nRestore <FORMULA> to your lowest resource (HP, MP, or SP) as percentage of max.",
+      th: "เข้าสู่สถานะสมาธิ ควบคุมความสงบภายในเพื่อฟื้นฟูทรัพยากรที่หมดลง\nฟื้นฟู <FORMULA> ให้กับทรัพยากรที่ต่ำที่สุด (HP, MP, หรือ SP) เป็นเปอร์เซ็นต์ของค่าสูงสุด",
+    },
+    formula: {
+      en: "(1d4 + skill level + floor(<ControlMod> / 2))% of max",
+      th: "(1d4 + เลเวลสกิล + floor(<ControlMod> / 2))% ของค่าสูงสุด",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

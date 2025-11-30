@@ -19,8 +19,14 @@ export const backdraft = new MageSkill({
     th: "ไฟย้อนกลับ",
   },
   description: {
-    en: "Targets all enemies with burn status. Deals damage equal to their burn stacks, removes all burn stacks * (1 + 0.1 * skill level), then heals yourself for total equal to all damages did. Damage dealth and Healing amount increased to 1d2 per stack instead of 1 at skill level 5",
-    th: "โจมตีศัตรูทั้งหมดที่มีสถานะเผาไหม้ สร้างความเสียหายเท่ากับจำนวนชั้นของเผาไหม้ที่แต่ละเป้าหมายมีและลบเผาไหม้ทั้งหมดออก จากนั้นฟื้นฟูตัวเองเท่ากับจำนวนชั้นของเผ้าไหม้ทั้งหมด x 10% ต่อเลเวลสกิล. ความเสียหายและการฟื้นฟูเพิ่มขึ้นพิเศษ 1d2 เมื่อสกิลเลเวล 5",
+    text: {
+      en: "Ignite the flames already burning on your enemies, causing them to explode in a violent backdraft.\nTargets all enemies with <DebuffBurn>.\nDeal <FORMULA> fire damage per burn stack, then remove all burn stacks.\n[b]Heal yourself[/b] for total damage × (0.1 × skill level) {5} + 1d2 per stack: + 1 per stack{/}",
+      th: "จุดไฟที่กำลังลุกไหม้บนศัตรู ทำให้ระเบิดเป็นไฟย้อนกลับอย่างรุนแรง\nโจมตีศัตรูทั้งหมดที่มี <DebuffBurn>\nสร้างความเสียหายไฟ <FORMULA> ต่อสแตคเผาไหม้ จากนั้นลบสแตคเผาไหม้ทั้งหมด\n[b]ฟื้นฟูตัวเอง[/b] ความเสียหายทั้งหมด × (0.1 × เลเวลสกิล) {5} + 1d2 ต่อสแตค: + 1 ต่อสแตค{/}", 
+    },
+    formula: {
+      en: "total damage × (0.1 × skill level) {5}+ 1d2 per stack:+ 1 per stack{/}",
+      th: "ความเสียหายทั้งหมด × (0.1 × เลเวลสกิล) {5}+ 1d2 ต่อสแตค:+ 1 ต่อสแตค{/}",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

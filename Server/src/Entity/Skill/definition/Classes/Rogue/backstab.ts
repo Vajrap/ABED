@@ -12,6 +12,7 @@ import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { RogueSkill } from "./index";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const backstab = new RogueSkill({
   id: RogueSkillId.Backstab,
@@ -20,8 +21,14 @@ export const backstab = new RogueSkill({
     th: "แทงข้างหลัง",
   },
   description: {
-    en: "Slip into your enemy’s blind spot and drive your blade deep. The user must be in hiding state, Deals 1.3× weapon damage + Dexterity mod * (+0.1 per skill level). Gains +4 critical roll if the target is Frightened or Dazed. If skill level reached 5 the base damage went up to 1.5 times weapon damage and critical roll + 5.",
-    th: "เคลื่อนไหวจากเงามืด แทงทะลุจุดอ่อนของศัตรูสร้างความเสียหายแบบแทงทะลุ (Piercing) 1.3 เท่า (+0.1 ต่อเลเวลสกิล) ของความเสียหายอาวุธหากอยู่ในสถานะเร้นกาย ความเสียหายจะเพิ่มขึ้นอีก 0.5 เท่าและ critical roll เพิ่มขึ้น 4 หน่วย หากเป้าหมายอยู่ในสถานะ “หวาดกลัว” หรือ “มึนงง. เมื่อเลเวลสกิลถึง 5 ความเสียหายเพิ่มเป็น 1.5 เท่าและ critical roll 5 หน่วย”",
+    text: {
+      en: "While you're hiding, slip into your enemy's blind spot and drive your blade deep into their vulnerable back.\nDeal <FORMULA> pierce damage.\n[b]Gains +{5}'5':'4'{/} crit[/b] if target has <DebuffFear> or <DebuffDazed>.",
+      th: "ในขณะที่ซ่อนตัว ข้ามเข้าไปที่จุดที่ศัตรูมองไม่เห็น และทะลุจุดอ่อนของศัตรูที่หลัง\nสร้างความเสียหายแทง <FORMULA>\n[b]ได้รับ +{5}'5':'4'{/} crit[/b] หากเป้าหมายมี <DebuffFear> หรือ <DebuffDazed>",
+    },
+    formula: {
+      en: "({5}'1.5':'1.3'{/} × <WeaponDamage> + <DEXmod> × <SkillLevelMultiplier>",
+      th: "({5}'1.5':'1.3'{/} × <WeaponDamage> + <DEXmod> × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: ["dagger"],
@@ -76,22 +83,14 @@ export const backstab = new RogueSkill({
     const weapon = actor.getWeapon();
     const type = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, type);
-
-    const positionModifierValue = getPositionModifier(
-      actor.position,
-      target.position,
-      weapon,
-    );
-
-    const baseTimes = skillLevel >= 5 ? 1.5 : 1.3;
-    const baseMultiplier = baseTimes + 0.1 * skillLevel;
+    const levelScalar = skillLevelMultiplier(skillLevel);
 
     if (actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.hiding)) {
       damageOutput.damage =
-        damageOutput.damage * (baseMultiplier + 0.5) * positionModifierValue;
+        damageOutput.damage * levelScalar;
     } else {
       damageOutput.damage =
-        damageOutput.damage * baseMultiplier * positionModifierValue;
+        damageOutput.damage * levelScalar;
     }
 
     const additionCrit = skillLevel >= 5 ? 5 : 4;

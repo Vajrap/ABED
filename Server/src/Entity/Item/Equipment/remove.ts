@@ -45,20 +45,32 @@ function modifyBuffsAndDebuffs(character: Character, equipped: Equipment) {
 
     // Determine if it's a buff or debuff
     const isBuff = Object.values(BuffEnum).includes(buffId as BuffEnum);
-    const entry = isBuff 
-      ? character.buffsAndDebuffs.buffs.entry 
-      : character.buffsAndDebuffs.debuffs.entry;
+    if (isBuff) {
+      const entry = character.buffsAndDebuffs.buffs.entry;
+      const rec = entry.get(buffId as BuffEnum);
+      if (!rec) continue; // This should not be the case, it's bugged.
 
-    const rec = entry.get(buffId);
-    if (!rec) continue; // This should not be the case, it's bugged.
+      rec.permValue = Math.max(0, rec.permValue - delta);
+      rec.isPerm = rec.permValue > 0;
 
-    rec.permValue = Math.max(0, rec.permValue - delta);
-    rec.isPerm = rec.permValue > 0;
-
-    if (rec.permValue === 0 && rec.value === 0) {
-      entry.delete(buffId);
+      if (rec.permValue === 0 && rec.value === 0) {
+        entry.delete(buffId as BuffEnum);
+      } else {
+        entry.set(buffId as BuffEnum, rec);
+      }
     } else {
-      entry.set(buffId, rec);
+      const entry = character.buffsAndDebuffs.debuffs.entry;
+      const rec = entry.get(buffId as DebuffEnum);
+      if (!rec) continue; // This should not be the case, it's bugged.
+
+      rec.permValue = Math.max(0, rec.permValue - delta);
+      rec.isPerm = rec.permValue > 0;
+
+      if (rec.permValue === 0 && rec.value === 0) {
+        entry.delete(buffId as DebuffEnum);
+      } else {
+        entry.set(buffId as DebuffEnum, rec);
+      }
     }
   }
 }

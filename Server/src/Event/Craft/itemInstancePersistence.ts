@@ -8,7 +8,7 @@ import type { CraftMaterialSelection } from "./types";
 import Report from "src/Utils/Reporter";
 import { ItemCost } from "src/Entity/Item/Subclass/ItemCost";
 import type { EquipmentModifier } from "src/Entity/Item/Equipment/type";
-import { TraitEnum } from "src/Entity/Trait.ts/enum";
+import { TraitEnum } from "src/Entity/Trait/enum";
 
 type PersistContext = {
   instanceId: string;

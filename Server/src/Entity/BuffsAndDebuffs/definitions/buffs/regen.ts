@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { roll } from "src/Utils/Dice";
@@ -12,17 +12,21 @@ export const regen = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      universalCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.regen);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.regen, {
         value: value,
         isPerm: isPerm,
         permValue: 0,
-        counter: permValue, // counter stores willpower mod
+        counter: universalCounter, // counter stores willpower mod
       });
     } else {
       if (!entry.isPerm && isPerm) {
@@ -30,8 +34,8 @@ export const regen = new BuffDef({
       }
       entry.value += value;
       // Keep the highest counter (willpower mod)
-      if (permValue > entry.counter) {
-        entry.counter = permValue;
+      if (universalCounter > entry.counter) {
+        entry.counter = universalCounter;
       }
     }
 

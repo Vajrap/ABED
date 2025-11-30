@@ -1,3 +1,19 @@
+/**
+ * TODO: LORE ALIGNMENT - Character Creation Level 1
+ * 
+ * Current: "Hex Doll" - Uses abstract "voodoo doll" and "sympathetic link" concepts.
+ * Planar energy should manifest in tangible ways (fireballs, wind slashes), not abstract
+ * mystical connections.
+ * 
+ * Suggested Changes:
+ * - Rename to "Chaos Binding" or "Chaos Tether" or "Chaos Brand"
+ * - Description: "Channel chaos energy into target, creating a visible tether/brand that
+ *   causes ongoing chaos damage" instead of voodoo doll
+ * - Frame as tangible chaos energy physically binding/marking the target (visible effect)
+ * - The chaos consumption already exists, emphasize the tangible manifestation
+ * - Consider: "Chaos Brand" - physically brand target with visible chaos energy that
+ *   causes ongoing damage (like a burn but with chaos element)
+ */
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { WitchSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
@@ -14,15 +30,21 @@ import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WitchSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
-export const hexDoll = new WitchSkill({
-  id: WitchSkillId.HexDoll,
+export const chaosBinding = new WitchSkill({
+  id: WitchSkillId.ChaosBinding,
   name: {
-    en: "Hex Doll",
+    en: "Chaos Binding",
     th: "ตุ๊กตาสาป",
   },
   description: {
-    en: "Bind a target to a small effigy, creating a sympathetic link. Deals 1d4 + INT mod * (1 + 0.1 * skill level) dark damage immediately. Target rolls DC10 + control mod willpower save or gets hexed for 2 turns (3 at level 5). Hexed target takes 1d2 true chaos damage when turn start also reduces endurance by 2. At level 5, also applies cursed debuff.",
-    th: "ผูกเป้าหมายกับตุ๊กตาตัวเล็ก สร้างความเชื่อมโยง สร้างความเสียหายมืด 1d4 + ค่า INT * (1 + 0.1 * เลเวลสกิล) ทันที เป้าหมายทอย willpower save DC10 + control mod หรือจะถูก hexed 2 เทิร์น (3 เทิร์นที่เลเวล 5) Hexed ลด endurance ลง 2 ที่เลเวล 5 จะเพิ่ม cursed debuff ด้วย",
+    text: {
+      en: "Channel chaos energy into your enemy, creating a visible binding that causes ongoing corruption.\nDeal <FORMULA> dark damage immediately.\nTarget must [r]roll DC10 + <ControlMod> WILsave[/r] or get <DebuffHexed> for {5}'3':'2'{/} turns.\n{5}\nAlso applies <DebuffCursed> for 2 turns.{/}",
+      th: "ควบคุมพลังงาน chaos เข้าสู่ศัตรู สร้างพันธะที่มองเห็นได้ที่ทำให้เกิดการเสื่อมสลายต่อเนื่อง\nสร้างความเสียหายมืด <FORMULA> ทันที\nเป้าหมายต้องทอย [r]WILsave DC10 + <ControlMod>[/r] หรือถูก <DebuffHexed> {5}'3':'2'{/} เทิร์น\n{5}\nยังเพิ่ม <DebuffCursed> 2 เทิร์นด้วย{/}",
+    },
+    formula: {
+      en: "(1d4 + <INTmod>) × <SkillLevelMultiplier>",
+      th: "(1d4 + <INTmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -98,12 +120,12 @@ export const hexDoll = new WitchSkill({
     
     if (willpowerSave < willpowerDC) {
       const hexedDuration = skillLevel >= 5 ? 3 : 2;
-      buffsAndDebuffsRepository.hexed.appender(target, hexedDuration, false, 0);
+      buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: hexedDuration });
       hexedMessage = ` ${target.name.en} is hexed!`;
       
       // At level 5, also apply cursed debuff
       if (skillLevel >= 5) {
-        buffsAndDebuffsRepository.cursed.appender(target, 2, false, 0);
+        buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: 2 });
         hexedMessage += ` ${target.name.en} is also cursed!`;
       }
     }

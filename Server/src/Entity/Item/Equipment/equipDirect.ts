@@ -59,21 +59,33 @@ function modifyBuffsAndDebuffs(character: Character, equipment: Equipment) {
 
     // Determine if it's a buff or debuff
     const isBuff = Object.values(BuffEnum).includes(buffId as BuffEnum);
-    const entry = isBuff 
-      ? character.buffsAndDebuffs.buffs.entry 
-      : character.buffsAndDebuffs.debuffs.entry;
+    if (isBuff) {
+      const entry = character.buffsAndDebuffs.buffs.entry;
+      let rec = entry.get(buffId as BuffEnum) ?? {
+        value: 0,
+        isPerm: false,
+        permValue: 0,
+        counter: 0,
+      };
 
-    let rec = entry.get(buffId) ?? {
-      value: 0,
-      isPerm: false,
-      permValue: 0,
-      counter: 0,
-    };
+      rec.isPerm = true;
+      rec.permValue += delta;
 
-    rec.isPerm = true;
-    rec.permValue += delta;
+      entry.set(buffId as BuffEnum, rec);
+    } else {
+      const entry = character.buffsAndDebuffs.debuffs.entry;
+      let rec = entry.get(buffId as DebuffEnum) ?? {
+        value: 0,
+        isPerm: false,
+        permValue: 0,
+        counter: 0,
+      };
 
-    entry.set(buffId, rec);
+      rec.isPerm = true;
+      rec.permValue += delta;
+
+      entry.set(buffId as DebuffEnum, rec);
+    }
   }
 }
 

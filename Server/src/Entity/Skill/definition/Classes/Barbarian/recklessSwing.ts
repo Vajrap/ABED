@@ -9,7 +9,6 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
-import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { BarbarianSkill } from "./index";
@@ -21,8 +20,14 @@ export const recklessSwing = new BarbarianSkill({
     th: "ฟาดไม่ยั้ง",
   },
   description: {
-    en: "Multi-hit melee attack. Must equip sword, axe, blade, hammer, spear, or fight barehanded. Two hits (three hits at level 5), each dealing (0.7 × weapon damage + STR mod) * (1 + 0.1 * skill level) * positionModifier. Hit rolls suffer -3 penalty.",
-    th: "การโจมตีหลายครั้ง ต้องใช้อาวุธประเภทดาบ ขวาน ใบมีด ฆ้อน หอก หรือมือเปล่า ฟัน 2 ครั้ง (3 ครั้งที่เลเวล 5) แต่ละครั้งสร้างความเสียหาย (0.7 × ความเสียหายอาวุธ + STR mod) * (1 + 0.1 * เลเวลสกิล) * positionModifier และลดโอกาสโจมตีลง 3",
+    text: {
+      en: "Swing your weapon recklessly attacking targeted enemy {5}'three':'two'{/} times, \neach dealing <FORMULA>. Hit roll suffer [r]-2[/r] penalty.",
+      th: "เหวี่ยงอาวุธฟาดไม่ยั้งใส่เป้าหมาย โจมตีต่อเนื่อง {5}'3':'2'{/} ครั้ง \nแต่ละครั้งสร้างความเสียหาย <FORMULA> ความแม่นยำในการโจมตีลดลง [r]2[/r]",
+    },
+    formula: {
+      en: "(([r]0.7[/r] × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier>) × <MeleeRangePenalty>",
+      th: "(([r]0.7[/r] × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier>) × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: ["sword", "axe", "blade", "hammer", "spear", "bareHand"],
@@ -68,7 +73,7 @@ export const recklessSwing = new BarbarianSkill({
 
     const hits = skillLevel >= 5 ? 3 : 2;
     const weapon = actor.getWeapon();
-    const damageTypeMode = "physical";
+    const damageTypeMode = 'physical';
     const levelScalar = skillLevelMultiplier(skillLevel);
     const strMod = statMod(actor.attribute.getTotal("strength"));
     const positionModifierValue = getPositionModifier(
@@ -90,7 +95,7 @@ export const recklessSwing = new BarbarianSkill({
 
       const damageOutput = {
         damage: Math.floor(scaledDamage),
-        hit: weaponDamage.hit - 3,
+        hit: weaponDamage.hit - 2,
         crit: weaponDamage.crit,
         type: weaponDamage.type,
         isMagic: false,

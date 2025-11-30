@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { statMod } from "src/Utils/statMod";
@@ -11,10 +11,14 @@ export const warCry = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      universalCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.warCry);
     let isFirst = false;
     if (!entry) {
@@ -22,10 +26,10 @@ export const warCry = new BuffDef({
         value: value,
         isPerm: isPerm,
         permValue: 0,
-        counter: permValue, // counter stores buff strength (2 + leadership mod/2)
+        counter: universalCounter, // counter stores buff strength (2 + leadership mod/2)
       });
       // War Cry gives +agility and +strength based on counter (buff strength)
-      const buffStrength = permValue > 0 ? permValue : 2; // Default to 2 if not set
+      const buffStrength = universalCounter > 0 ? universalCounter : 2; // Default to 2 if not set
       actor.attribute.mutateBattle("agility", buffStrength);
       actor.attribute.mutateBattle("strength", buffStrength);
       isFirst = true;
@@ -35,9 +39,9 @@ export const warCry = new BuffDef({
       }
       entry.value += value;
       // Keep the highest counter (buff strength) when stacking
-      if (permValue > entry.counter) {
+      if (universalCounter > entry.counter) {
         const oldStrength = entry.counter > 0 ? entry.counter : 2;
-        const newStrength = permValue;
+        const newStrength = universalCounter;
         // Adjust stat bonuses if strength changed: remove old, add new
         if (newStrength !== oldStrength) {
           actor.attribute.mutateBattle("agility", -oldStrength); // Remove old
@@ -45,11 +49,11 @@ export const warCry = new BuffDef({
           actor.attribute.mutateBattle("agility", newStrength); // Add new
           actor.attribute.mutateBattle("strength", newStrength);
         }
-        entry.counter = permValue;
+        entry.counter = universalCounter;
       }
     }
 
-    const buffStrength = permValue > 0 ? permValue : 2;
+    const buffStrength = universalCounter > 0 ? universalCounter : 2;
     return {
       en: `${actor.name.en} is emboldened by War Cry! +${buffStrength} agility, +${buffStrength} strength`,
       th: `${actor.name.th} ได้รับกำลังใจจากเสียงร้องศึก! +${buffStrength} agility, +${buffStrength} strength`,

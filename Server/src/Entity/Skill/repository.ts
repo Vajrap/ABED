@@ -45,7 +45,7 @@ import { fireBall } from "./definition/Classes/Mage/fireBall";
 import { backdraft } from "./definition/Classes/Mage/backdraft";
 import { mendSpirit } from "./definition/Classes/Shaman/mendSpirit";
 import { hexOfRot } from "./definition/Classes/Shaman/hexOfRot";
-import { spiritRattle } from "./definition/Classes/Shaman/spiritRattle";
+import { holyRattle } from "./definition/Classes/Shaman/spiritRattle";
 import { chaoticBlessing } from "./definition/Classes/Shaman/chaoticBlessing";
 import { arcaneBolt } from "./definition/Classes/Mage/arcaneBolt";
 import { worksYouMaggots } from "./definition/MOBs/Goblin/worksYouMaggots";
@@ -81,7 +81,7 @@ import { rejuvenatingMist } from "./definition/Classes/Druid/rejuvenatingMist";
 import { palmStrike } from "./definition/Classes/Monk/palmStrike";
 import { meditation } from "./definition/Classes/Monk/meditation";
 import { flurryOfBlows } from "./definition/Classes/Monk/flurryOfBlows";
-import { shadowBolt } from "./definition/Classes/Warlock/shadowBolt";
+import { chaosBolt } from "./definition/Classes/Warlock/shadowBolt";
 import { lifeDrain } from "./definition/Classes/Warlock/lifeDrain";
 import { darkPact } from "./definition/Classes/Warlock/darkPact";
 import { corruption } from "./definition/Classes/Warlock/corruption";
@@ -89,9 +89,9 @@ import { preciseStrike } from "./definition/Classes/Duelist/preciseStrike";
 import { parryRiposte } from "./definition/Classes/Duelist/parryRiposte";
 import { bladeFlurry } from "./definition/Classes/Duelist/bladeFlurry";
 import { duelingStance } from "./definition/Classes/Duelist/duelingStance";
-import { curseBolt } from "./definition/Classes/Witch/curseBolt";
-import { curseMark } from "./definition/Classes/Witch/curseMark";
-import { hexDoll } from "./definition/Classes/Witch/hexDoll";
+import { poisonDart } from "./definition/Classes/Witch/poisonDart";
+import { chaosBrand } from "./definition/Classes/Witch/chaosBrand";
+import { chaosBinding } from "./definition/Classes/Witch/chaosBinding";
 import { bewitch } from "./definition/Classes/Witch/bewitch";
 import { radiantSmite } from "./definition/Classes/Inquisitor/radiantSmite";
 import { exposeWeakness } from "./definition/Classes/Inquisitor/exposeWeakness";
@@ -112,7 +112,7 @@ export const skillRepository: Record<SkillId, Skill> = {
   [GuardianSkillId.Taunt]: taunt,
   [GuardianSkillId.HerosPose]: herosPose,
   [GuardianSkillId.ShieldUp]: shieldUp,
-  [ShamanSkillId.SpiritRattle]: spiritRattle,
+  [ShamanSkillId.HolyRattle]: holyRattle,
   [ShamanSkillId.ChaoticBlessing]: chaoticBlessing,
   [ShamanSkillId.MendSpirit]: mendSpirit,
   [ShamanSkillId.HexOfRot]: hexOfRot,
@@ -158,7 +158,7 @@ export const skillRepository: Record<SkillId, Skill> = {
   [MonkSkillId.PalmStrike]: palmStrike,
   [MonkSkillId.Meditation]: meditation,
   [MonkSkillId.FlurryOfBlows]: flurryOfBlows,
-  [WarlockSkillId.ShadowBolt]: shadowBolt,
+  [WarlockSkillId.ChaosBolt]: chaosBolt,
   [WarlockSkillId.LifeDrain]: lifeDrain,
   [WarlockSkillId.Corruption]: corruption,
   [WarlockSkillId.DarkPact]: darkPact,
@@ -166,9 +166,9 @@ export const skillRepository: Record<SkillId, Skill> = {
   [DuelistSkillId.ParryRiposte]: parryRiposte,
   [DuelistSkillId.BladeFlurry]: bladeFlurry,
   [DuelistSkillId.DuelingStance]: duelingStance,
-  [WitchSkillId.CurseBolt]: curseBolt,
-  [WitchSkillId.CurseMark]: curseMark,
-  [WitchSkillId.HexDoll]: hexDoll,
+  [WitchSkillId.PoisonDart]: poisonDart,
+  [WitchSkillId.ChaosBrand]: chaosBrand,
+  [WitchSkillId.ChaosBinding]: chaosBinding,
   [WitchSkillId.Bewitch]: bewitch,
   [InquisitorSkillId.RadiantSmite]: radiantSmite,
   [InquisitorSkillId.ExposeWeakness]: exposeWeakness,

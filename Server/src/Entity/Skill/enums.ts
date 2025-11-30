@@ -170,7 +170,7 @@ export enum SpellBladeSkillId {
 export enum ShamanSkillId {
   MendSpirit = "MendSpirit",
   HexOfRot = "HexOfRot",
-  SpiritRattle = "SpiritRattle",
+  HolyRattle = "SpiritRattle",
   ChaoticBlessing = "ChaoticBlessing",
 }
 
@@ -327,7 +327,7 @@ export enum MonkSkillId {
 }
 
 export enum WarlockSkillId {
-  ShadowBolt = "ShadowBolt",
+  ChaosBolt = "ShadowBolt",
   // ACTIVE — Launch a bolt of condensed shadow energy.
   // Ranged single-target magic damage with a small chance to weaken the target.
   // Basic Warlock nuke.
@@ -371,18 +371,18 @@ export enum DuelistSkillId {
 }
 
 export enum WitchSkillId {
-  CurseBolt = "CurseBolt", // Too bland, we have so much fire bolt arcane bolt shadow bolt, I think should be a bit weirder, maybe small true damage and can curse with low DC?
+  PoisonDart = "CurseBolt", // Too bland, we have so much fire bolt arcane bolt shadow bolt, I think should be a bit weirder, maybe small true damage and can curse with low DC?
   // ACTIVE — Launch a bolt of cursed energy at the target.
   // Basic curse attack, generates chaos element.
   // Uses INTELLIGENCE for damage, CONTROL for save DC (precision in curse application).
 
-  CurseMark = "CurseMark",
+  ChaosBrand = "CurseMark",
   // ACTIVE — Place a hex sigil on a target, marking them for increased suffering.
   // Setup skill that amplifies damage from all sources.
   // Uses INTELLIGENCE for strategic advantage (knowledge of weak points).
   // Good idea, but seems like we need a new buff again? can we just use the existing ones?
 
-  HexDoll = "HexDoll",
+  ChaosBinding = "HexDoll",
   // ACTIVE — Bind a target to a small effigy, creating a sympathetic link.
   // Voodoo doll mechanic with damage over time.
   // Uses INTELLIGENCE for damage, CONTROL for save DC (precision in hex application).

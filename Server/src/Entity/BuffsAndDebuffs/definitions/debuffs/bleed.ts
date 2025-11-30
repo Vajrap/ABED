@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { DebuffDef } from "../../type";
+import { DebuffDef, type AppenderOptions } from "../../type";
 import { DebuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { roll } from "src/Utils/Dice";
@@ -11,16 +11,20 @@ export const bleed = new DebuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.bleed);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.bleed, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
+        permValue: permanentCounter,
         counter: 0,
       });
     } else {
@@ -28,12 +32,12 @@ export const bleed = new DebuffDef({
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue += permValue;
+      entry.permValue += permanentCounter;
     }
 
     return {
-      en: `${actor.name.en} is bleeding! ${value + permValue} stack(s)`,
-      th: `${actor.name.th} กำลังเลือดไหล! ${value + permValue} หน่วย`,
+      en: `${actor.name.en} is bleeding! ${value + permanentCounter} stack(s)`,
+      th: `${actor.name.th} กำลังเลือดไหล! ${value + permanentCounter} หน่วย`,
     };
   },
 

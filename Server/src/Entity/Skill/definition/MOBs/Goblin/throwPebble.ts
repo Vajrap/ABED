@@ -112,7 +112,7 @@ export const throwPebble = new Skill({
         !saved
       ) {
         dazedHit = true;
-        buffsAndDebuffsRepository.dazed.appender(target, 1, false, 0);
+        buffsAndDebuffsRepository.dazed.appender(target, { turnsAppending: 1 });
       }
     }
 

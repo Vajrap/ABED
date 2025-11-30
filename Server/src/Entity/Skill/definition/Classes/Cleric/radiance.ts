@@ -21,8 +21,14 @@ export const radiance = new ClericSkill({
     th: "รัศมีศักดิ์สิทธิ์",
   },
   description: {
-    en: "Unleash a flash of consecrated light dealing 1d6 + willpower modifier, scaled by skill level. Deal additional 1d4 (+2 at level 5) if the target is undead or fiend.",
-    th: "ปล่อยแสงศักดิ์สิทธิ์ สร้างความเสียหาย 1d6 + willpower mod และเพิ่มตามเลเวล",
+    text: {
+      en: "Unleash a flash of consecrated light dealing <FORMULA>. \nDeal additional [b]{5}'1d4 + 2':'1d4'{/}[/b] if the target is undead or fiend.",
+      th: "ปล่อยแสงศักดิ์สิทธิ์ สร้างความเสียหาย <FORMULA> \nสร้างความเสียหายเพิ่มเติม [b]{5}'1d4 + 2':'1d4'{/}[/b] หากเป้าหมายเป็น undead หรือ fiend",
+    },
+    formula: {
+      en: "(1d6 + <WILmod>) × <SkillLevelMultiplier>",
+      th: "(1d6 + <WILmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -86,7 +92,7 @@ export const radiance = new ClericSkill({
       damage: Math.floor(totalDamage),
       hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
       crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
-      type: DamageType.holy,
+      type: DamageType.radiance,
       isMagic: true,
     };
 

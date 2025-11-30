@@ -8,6 +8,7 @@ import { statMod } from "src/Utils/statMod";
 import { ShamanSkill } from "./index";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const mendSpirit = new ShamanSkill({
   id: ShamanSkillId.MendSpirit,
@@ -16,8 +17,14 @@ export const mendSpirit = new ShamanSkill({
     th: "ช่อมจิตวิญญาณ",
   },
   description: {
-    en: "Patch up an ally's life force with unstable spiritual energy. Heals a random injured ally for 1d4 + willpower mod + 0.5*skill level, but if the user roll 1D20 and result in 11+, generate 1 Chaos for them instead of full healing and the heal is halved.",
-    th: "ช่อมจิตวิญญาณของเพื่อนร่วมทีมด้วยพลังจิตที่ไม่เสถียร รักษาเพื่อนร่วมทีมที่บาดเจ็บแบบสุ่ม 1d4 + ค่า willpower + 0.5*เลเวลสกิล แต่ถ้าผู้ใช้ทอย 1D20 และผลลัพธ์ออกมาเป็น 11+ ให้เพิ่ม 1 Chaos แทนการรักษาเต็มจำนวน และการรักษาจะถูกลดลงครึ่งหนึ่ง",
+    text: {
+      en: "Mend an ally's wounds with unstable spiritual energy that flows unpredictably.\nHeal a random injured ally for <FORMULA> HP.\nRoll D20: if 11+, [r]heal is halved[/r] and target [b]gains +1 chaos[/b] instead of full healing.",
+      th: "ช่อมแผลของพันธมิตรด้วยพลังงานจิตที่ไม่เสถียรที่ไหลอย่างคาดเดาไม่ได้\nรักษาพันธมิตรที่บาดเจ็บแบบสุ่ม <FORMULA> HP\nทอย D20: หาก 11+ [r]การรักษาลดลงครึ่งหนึ่ง[/r] และเป้าหมาย [b]ได้รับ +1 chaos[/b] แทนการรักษาเต็มจำนวน",
+    },
+    formula: {
+      en: "(1d4 + <WILmod>) × <SkillLevelMultiplier>",
+      th: "(1d4 + <WILmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -78,7 +85,7 @@ export const mendSpirit = new ShamanSkill({
     let message = "";
     let healAmount = 0;
 
-    const baseHeal = roll(1).d(4).total + statMod(actor.attribute.getTotal("willpower")) + 0.5 * skillLevel;
+    const baseHeal = (roll(1).d(4).total + statMod(actor.attribute.getTotal("willpower"))) * skillLevelMultiplier(skillLevel);
 
     if (sideEffect <= 11) {
       // Full healing
@@ -93,7 +100,7 @@ export const mendSpirit = new ShamanSkill({
     }
 
     // Apply cooldown debuff
-    debuffsRepository.mendSpiritCooldown.appender(actor, 3, false, 0);
+    debuffsRepository.mendSpiritCooldown.appender(actor, { turnsAppending: 3 });
 
     return {
       content: {

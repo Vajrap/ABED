@@ -8,8 +8,6 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
-const ADVANCING_PACE_DURATION = 3;
-
 export const advancingPaceSkill = new KnightSkill({
   id: KnightSkillId.AdvancingPace,
   name: {
@@ -17,8 +15,10 @@ export const advancingPaceSkill = new KnightSkill({
     th: "ก้าวจังหวะรุก",
   },
   description: {
-    en: "Channel planar force into disciplined footwork. Grants Advancing Pace for 3 turns: +2 STR, +1d4 AB gauge per tick, -1 DEF. At skill level 5 the DEF penalty is removed and AB speed becomes +35%.",
-    th: "ถ่ายทอดพลังภายในสู่จังหวะก้าว ได้รับบัฟ 3 เทิร์น: STR +2, AB gauge +1d4 ต่อรอบ แต่ DEF -1. เมื่อเลเวล 5 จะไม่มีโทษ DEF และความเร็ว AB เพิ่ม 35%",
+    text: {
+      en: "Channel planar force into disciplined footwork, moving with unstoppable momentum.\nGain <BuffAdvancingPace> for {5}4:3{/} turns.",
+      th: "ถ่ายทอดพลังภายในสู่จังหวะก้าว เคลื่อนไหวด้วยโมเมนตัมที่ไม่อาจหยุดยั้ง\nได้รับ <BuffAdvancingPace> {5}4:3{/} เทิร์น",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -69,18 +69,17 @@ export const advancingPaceSkill = new KnightSkill({
       };
     }
 
-    const advancedTierFlag = skillLevel >= 5 ? 1 : 0;
     buffsRepository[BuffEnum.advancingPace].appender(
       actor,
-      ADVANCING_PACE_DURATION,
-      false,
-      advancedTierFlag,
+      {
+        turnsAppending: skillLevel >= 5 ? 4 : 3,
+      },
     );
 
     return {
       content: {
-        en: `${actor.name.en} quickens their step${advancedTierFlag ? ", moving with unstoppable rhythm!" : "."}`,
-        th: `${actor.name.th} เร่งจังหวะก้าว${advancedTierFlag ? " จนยากจะหยุดยั้ง!" : ""}`,
+        en: `${actor.name.en} advances their pace for ${skillLevel >= 5 ? 4 : 3} turns`,
+        th: `${actor.name.th} เร่งจังหวะก้าว ${skillLevel >= 5 ? 4 : 3} เทิร์น`,
       },
       actor: {
         actorId: actor.id,

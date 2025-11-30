@@ -79,7 +79,7 @@ export const shriek = new Skill({
       const saveSuccess = saveRoll >= 10;
       if (!saveSuccess) {
         // Failed save - apply fear
-        buffsAndDebuffsRepository.fear.appender(target, 1, false, 0);
+        buffsAndDebuffsRepository.fear.appender(target, { turnsAppending: 1 });
         affectedTargets.push(target);
         targetEffects.push({
           actorId: target.id,

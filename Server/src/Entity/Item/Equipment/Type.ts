@@ -5,7 +5,7 @@ import type {
   ProficiencyKey,
 } from "../../../InterFacesEnumsAndTypes/Enums";
 import type { BuffAndDebuffEnum } from "../../BuffsAndDebuffs/enum";
-import type { TraitEnum } from "../../Trait.ts/enum";
+import type { TraitEnum } from "../../Trait/enum";
 
 /**
  * Equipment modifier type - defines stat bonuses and effects from equipment

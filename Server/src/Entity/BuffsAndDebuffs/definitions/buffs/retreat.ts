@@ -1,6 +1,6 @@
 import { Character } from "src/Entity/Character/Character";
 import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 
 export const retreat = new BuffDef({
@@ -8,7 +8,8 @@ export const retreat = new BuffDef({
     en: "retreat",
     th: "ถอยก่อน",
   },
-  appender: function (actor: Character, value: number): L10N {
+  appender: function (actor: Character, options: AppenderOptions): L10N {
+    const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.retreat);
     let isFirst = false;
     if (!entry) {

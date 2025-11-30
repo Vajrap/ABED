@@ -12,12 +12,17 @@ import type { ClassEnum, ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enum
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
 
+export interface SkillDescription {
+  text: L10N;
+  formula?: L10N;
+}
+
 export class Skill {
   id: SkillId;
   name: L10N;
   tier: TierEnum;
   maxLevel: number;
-  description: L10N;
+  description: SkillDescription;
   requirement: SkillLearningRequirement;
   equipmentNeeded: ProficiencyKey[];
   consume: SkillConsume;
@@ -39,7 +44,7 @@ export class Skill {
     id: SkillId;
     name: L10N;
     tier: TierEnum;
-    description: L10N;
+    description: SkillDescription;
     requirement: SkillLearningRequirement;
     equipmentNeeded: ProficiencyKey[];
     consume: SkillConsume;

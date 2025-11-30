@@ -42,6 +42,7 @@ import { analyze } from "./definitions/debuffs/analyze";
 import { healCooldown } from "./definitions/debuffs/healCooldown";
 import { massHealCooldown } from "./definitions/debuffs/massHealCooldown";
 import { mendSpiritCooldown } from "./definitions/debuffs/mendSpiritCooldown";
+import { critDef } from "./definitions/debuffs/critDef";
 
 export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.haste]: haste,
@@ -91,6 +92,9 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   [DebuffEnum.healCooldown]: healCooldown,
   [DebuffEnum.massHealCooldown]: massHealCooldown,
   [DebuffEnum.mendSpiritCooldown]: mendSpiritCooldown,
+  
+  // Stat Debuffs
+  [DebuffEnum.critDef]: critDef,
 };
 
 export const buffsAndDebuffsRepository = {

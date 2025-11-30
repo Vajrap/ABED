@@ -6,14 +6,11 @@ import { getTarget } from "src/Entity/Battle/getTarget";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
-import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { rollTwenty } from "src/Utils/Dice";
 import { DruidSkill } from "./index";
-import type { ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
 
 export const throwSpear = new DruidSkill({
   id: DruidSkillId.ThrowSpear,
@@ -22,8 +19,14 @@ export const throwSpear = new DruidSkill({
     th: "ขว้างหอก",
   },
   description: {
-    en: "Throw your spear at the enemy. Damage based on range: front-front 0.8+level (1.0+level at level 5), front-back 1.2+level (1.4+level at level 5), back-back 1.6+level (1.8+level at level 5). Must equip Spear.",
-    th: "ขว้างหอกใส่ศัตรู ความเสียหายขึ้นกับระยะ: front-front 0.8+level (1.0+level ที่เลเวล 5), front-back 1.2+level (1.4+level ที่เลเวล 5), back-back 1.6+level (1.8+level ที่เลเวล 5) ต้องติดตั้งหอก",
+    text: {
+      en: "Throw your spear at the enemy. \nDealing <FORMULA> pierce damage multiplied by the range: \nfront-front {5}'1.0':'0.8'{/}\nfront-back {5}'1.4':'1.2'{/}\nback-back {5}'1.8':'1.6'{/}",
+      th: "ขว้างหอกใส่ศัตรู \nความเสียหายขึ้นกับระยะ: front-front {5}'1.0':'0.8'{/}\nfront-back {5}'1.4':'1.2'{/}\nback-back {5}'1.8':'1.6'{/}",
+    },
+    formula: {
+      en: "([r]0.8[/r] × <WeaponDamage> + <SkillLevelMultiplier>)",
+      th: "([r]0.8[/r] × <WeaponDamage> + <SkillLevelMultiplier>)",
+    },
   },
   requirement: {},
   equipmentNeeded: ["spear"],
@@ -74,19 +77,6 @@ export const throwSpear = new DruidSkill({
     }
 
     const weapon = actor.getWeapon();
-    if (weapon.weaponType !== "spear") {
-      return {
-        content: {
-          en: `${actor.name.en} must equip a spear to use Throw Spear`,
-          th: `${actor.name.th} ต้องติดตั้งหอกเพื่อใช้ขว้างหอก`,
-        },
-        actor: {
-          actorId: actor.id,
-          effect: [ActorEffect.TestSkill],
-        },
-        targets: [],
-      };
-    }
 
     const damageType = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, damageType);

@@ -20,8 +20,14 @@ export const fireBolt = new MageSkill({
     th: "ลูกไฟ",
   },
   description: {
-    en: "Unleash a focused spark of fire toward an enemy. Deals 1d6 + Planar modifier + 0.5× Skill Level as Fire damage. On hit, target must roll DC 8 (+user planar mod) endurance save, if fail, get 1–2 Burn stacks to enemy.",
-    th: "ปล่อยประกายไฟพุ่งใส่ศัตรู สร้างความเสียหาย 1d6 + ค่าพลังเวท (Planar) + 0.5×เลเวลสกิล เป็นความเสียหายประเภทไฟ หลังโจมตีโดน ทอย DC 13 เพื่อติดสถานะเผาไหม้ (1–2 สแตค) แก่ศัตรู",
+    text: {
+      en: "Unleash a focused bolt of fire that streaks toward your enemy like a shooting star.\nDeal <FORMULA> fire damage.\nOn hit, target must [r]roll DC8 + <PlanarMod> ENDsave[/r] or get <DebuffBurn> 1–2 stacks.",
+      th: "ปล่อยลูกไฟที่มุ่งเน้นพุ่งไปยังศัตรูเหมือนดาวตก\nสร้างความเสียหายไฟ <FORMULA>\nเมื่อโดน เป้าหมายต้องทอย [r]ENDsave DC8 + <PlanarMod>[/r] หรือถูก <DebuffBurn> 1–2 สแตค",
+    },
+    formula: {
+      en: "1d6 + <PlanarMod> + 0.5 × skill level",
+      th: "1d6 + <PlanarMod> + 0.5 × เลเวลสกิล",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -112,9 +118,9 @@ export const fireBolt = new MageSkill({
         const burnStacks = roll(2).d(1).total;
         const burnResult = buffsAndDebuffsRepository.burn.appender(
           target,
-          burnStacks,
-          false,
-          0,
+          {
+            turnsAppending: burnStacks,
+          },
         );
         burnMessage = burnResult.en;
       }

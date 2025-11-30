@@ -23,8 +23,14 @@ export const palmStrike = new MonkSkill({
     th: "ตบฝ่ามือ",
   },
   description: {
-    en: "A precise melee strike using internal force. Deal 1d6 (1d8 at level 5) + (STR or DEX mod, whichever higher) * position modifier blunt damage. Each level ignores 1 point of armor. If armor is NOT cloth, damage is reduced by 70%.",
-    th: "การโจมตีระยะประชิดที่แม่นยำด้วยพลังภายใน สร้างความเสียหายทื่อ 1d6 (1d8 ที่เลเวล 5) + (STR หรือ DEX mod สูงสุด) * position modifier แต่ละเลเวลจะเพิกเฉยต่อเกราะ 1 หน่วย หากเกราะไม่ใช่ผ้า ความเสียหายจะลดลง 70%",
+    text: {
+      en: "Channel internal force through your palm, striking with precision that bypasses armor.\nDeal <FORMULA> blunt damage.\nIgnores armor equal to skill level.\n[r]Damage reduced by 70%[/r] if wearing non-cloth armor.",
+      th: "ควบคุมพลังภายในผ่านฝ่ามือ โจมตีด้วยความแม่นยำที่ผ่านเกราะ\nสร้างความเสียหายทื่อ <FORMULA>\nเพิกเฉยต่อเกราะเท่ากับเลเวลสกิล\n[r]ความเสียหายลดลง 70%[/r] หากสวมเกราะที่ไม่ใช่ผ้า",
+    },
+    formula: {
+      en: "({5}'1d8':'1d6'{/} + max(<STRmod>, <DEXmod>)) × <MeleeRangePenalty>",
+      th: "({5}'1d8':'1d6'{/} + max(<STRmod>, <DEXmod>)) × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: ["bareHand"],

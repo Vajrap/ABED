@@ -23,8 +23,14 @@ export const precisionThrust = new KnightSkill({
     th: "แทงทะลุจุด",
   },
   description: {
-    en: "Lunge at a front-line foe with surgical accuracy. Deals weapon damage + STR mod, scaled by skill level, with +3 hit. Gains bonus crit chance if the target suffers any debuff.",
-    th: "พุ่งแทงศัตรูแถวหน้าอย่างแม่นยำ สร้างความเสียหายอาวุธ + STR ปรับตามเลเวลสกิล พร้อม +3 Hit และเพิ่มโอกาสคริติคอลหากเป้าหมายติดดีบัฟ",
+    text: {
+      en: "Lunge at a front-line foe with surgical accuracy, finding the perfect opening.\nDeal <FORMULA> damage.with [b]+3 hit[/b].\n[b]Gains bonus crit[/b] if target has any debuff.",
+      th: "พุ่งแทงศัตรูแถวหน้าอย่างแม่นยำ หาช่องว่างที่สมบูรณ์แบบ\nสร้างความเสียหาย <FORMULA> พร้อมกับ [b]+3 hit[/b]\n[b]ได้รับ crit เพิ่ม[/b] หากเป้าหมายมีดีบัฟ",
+    },
+    formula: {
+      en: "(<WeaponDamage> + <STRmod>) × (1 + 0.1 × skill level) × <MeleeRangePenalty>",
+      th: "(<WeaponDamage> + <STRmod>) × (1 + 0.1 × เลเวลสกิล) × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: allowedWeapons,

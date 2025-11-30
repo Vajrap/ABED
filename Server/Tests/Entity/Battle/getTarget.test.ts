@@ -2,9 +2,10 @@ import { expect, describe, it, beforeEach } from "@jest/globals";
 import { getTarget } from "../../../src/Entity/Battle/getTarget";
 import { Character } from "../../../src/Entity/Character/Character";
 import { CharacterFactory } from "../../Helper/Character";
-import { BuffAndDebuffEnum } from "../../../src/Entity/BuffsAndDebuffs/enum";
+import { BuffEnum, DebuffEnum } from "../../../src/Entity/BuffsAndDebuffs/enum";
 import { CharacterVitals } from "../../../src/Entity/Character/Subclass/Vitals/CharacterVitals";
 
+// Helper class for creating test vitals (matches real Vital class)
 class Vital {
   base: number;
   bonus: number;
@@ -16,6 +17,14 @@ class Vital {
   }
   get max() {
     return Math.max(1, this.base + this.bonus);
+  }
+  dec(n: number = 1) {
+    this.current = Math.max(0, this.current - n);
+    return this;
+  }
+  inc(n: number = 1) {
+    this.current = Math.min(this.max, this.current + n);
+    return this;
   }
 }
 
@@ -71,62 +80,62 @@ describe("getTarget", () => {
 
   describe("Basic Functionality", () => {
     it("should return a TargetSelector instance", () => {
-      const selector = getTarget(actor, [target1, target2]);
+      const selector = getTarget(actor, [], [target1, target2], "enemy");
       expect(selector).toBeDefined();
     });
 
     it("should handle single target", () => {
-      const result = getTarget(actor, [target1]).one();
+      const result = getTarget(actor, [], [target1], "enemy").one();
       expect(result).toBe(target1);
     });
 
     it("should throw error on empty target list", () => {
-      const result = getTarget(actor, []).one();
+      const result = getTarget(actor, [], [], "enemy").one();
       expect(result).toBeUndefined();
     });
   });
 
   describe("Random Selection", () => {
     it("should select one random target", () => {
-      const result = getTarget(actor, [target1, target2, target3]).one();
+      const result = getTarget(actor, [], [target1, target2, target3], "enemy").one();
       expect([target1, target2, target3]).toContain(result);
     });
 
     it("should select many random targets without duplicates", () => {
-      const result = getTarget(actor, [
+      const result = getTarget(actor, [], [
         target1,
         target2,
         target3,
         target4,
-      ]).many(3);
+      ], "enemy").many(3);
       expect(result).toHaveLength(3);
       const uniqueTargets = new Set(result);
       expect(uniqueTargets.size).toBe(3);
     });
 
     it("should select all targets", () => {
-      const result = getTarget(actor, [target1, target2, target3]).all();
+      const result = getTarget(actor, [], [target1, target2, target3], "enemy").all();
       expect(result).toHaveLength(3);
     });
   });
 
   describe("Sorted Selection", () => {
     it("should select target with lowest HP", () => {
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .with("least", "currentHP")
         .one();
       expect(result).toBe(target4);
     });
 
     it("should select target with highest HP", () => {
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .with("most", "currentHP")
         .one();
       expect(result).toBe(target1);
     });
 
     it("should select many targets sorted by HP", () => {
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .with("least", "currentHP")
         .many(2);
       expect(result).toHaveLength(2);
@@ -144,7 +153,7 @@ describe("getTarget", () => {
     });
 
     it("should filter by front row only", () => {
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .from("frontOnly")
         .all();
 
@@ -156,7 +165,7 @@ describe("getTarget", () => {
     });
 
     it("should filter by back row only", () => {
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .from("backOnly")
         .all();
 
@@ -168,7 +177,7 @@ describe("getTarget", () => {
     });
 
     it("should prefer front row but fall back to back", () => {
-      const result = getTarget(actor, [target1, target2])
+      const result = getTarget(actor, [], [target1, target2], "enemy")
         .from("frontFirst")
         .all();
 
@@ -178,7 +187,7 @@ describe("getTarget", () => {
     });
 
     it("should prefer back row but fall back to front", () => {
-      const result = getTarget(actor, [target3, target4])
+      const result = getTarget(actor, [], [target3, target4], "enemy")
         .from("backFirst")
         .all();
 
@@ -188,7 +197,7 @@ describe("getTarget", () => {
     });
 
     it("should fall back when preferred row is empty", () => {
-      const result = getTarget(actor, [target3, target4])
+      const result = getTarget(actor, [], [target3, target4], "enemy")
         .from("frontFirst")
         .all();
 
@@ -220,7 +229,7 @@ describe("getTarget", () => {
         const t4 = CharacterFactory.create().build();
         t4.position = 4 as any;
 
-        const result = getTarget(actor, [t1, t2, t3, t4]).one();
+        const result = getTarget(actor, [], [t1, t2, t3, t4], "enemy").one();
         frontSelections.push(result!);
       }
 
@@ -245,7 +254,7 @@ describe("getTarget", () => {
         const t4 = CharacterFactory.create().build();
         t4.position = 4 as any;
 
-        const result = getTarget(actor, [t1, t2, t3, t4])
+        const result = getTarget(actor, [], [t1, t2, t3, t4], "enemy")
           .preferRow("back")
           .one();
         backSelections.push(result!);
@@ -271,7 +280,7 @@ describe("getTarget", () => {
         const t4 = CharacterFactory.create().build();
         t4.position = 4 as any;
 
-        const result = getTarget(actor, [t1, t2, t3, t4])
+        const result = getTarget(actor, [], [t1, t2, t3, t4], "enemy")
           .preferRow("equal")
           .one();
         selections.push(result!);
@@ -285,7 +294,7 @@ describe("getTarget", () => {
     });
 
     it("should not apply preference when row filtering is active", () => {
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .from("frontOnly")
         .preferRow("back")
         .all();
@@ -299,13 +308,14 @@ describe("getTarget", () => {
 
   describe("Taunt Mechanics", () => {
     it("should prioritize taunting targets", () => {
-      target2.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.taunt, {
+      target2.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
         value: 1,
         isPerm: false,
         permValue: 0,
+        counter: 0
       });
 
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .with("least", "currentHP")
         .one();
 
@@ -313,13 +323,14 @@ describe("getTarget", () => {
     });
 
     it("should bypass taunt when byPassTaunt() is called", () => {
-      target1.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.taunt, {
+      target1.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
         value: 1,
         isPerm: false,
         permValue: 0,
+        counter: 0,
       });
 
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .byPassTaunt()
         .with("least", "currentHP")
         .one();
@@ -330,15 +341,16 @@ describe("getTarget", () => {
 
   describe("Hiding Mechanics", () => {
     it("should bypass hiding when byPassHiding() is called", () => {
-      target4.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.hiding, {
+      target4.buffsAndDebuffs.buffs.entry.set(BuffEnum.hiding, {
         value: 1,
         isPerm: false,
         permValue: 0,
+        counter: 0,
       });
 
       actor.attribute.getStat("willpower").base = 1;
 
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .byPassHiding()
         .with("least", "currentHP")
         .one();
@@ -352,12 +364,12 @@ describe("getTarget", () => {
       target2.vitals.hp.current = 0;
       target4.vitals.hp.current = 0;
 
-      const result = getTarget(actor, [
+      const result = getTarget(actor, [], [
         target1,
         target2,
         target3,
         target4,
-      ]).all();
+      ], "enemy").all();
 
       expect(result).toHaveLength(2);
       expect(result).not.toContain(target2);
@@ -368,7 +380,7 @@ describe("getTarget", () => {
       target2.vitals.hp.current = 0;
       target4.vitals.hp.current = 0;
 
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .dead("only")
         .all();
 
@@ -387,7 +399,7 @@ describe("getTarget", () => {
     });
 
     it("should combine row filtering with sorting", () => {
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .from("frontOnly")
         .with("least", "currentHP")
         .one();
@@ -396,13 +408,14 @@ describe("getTarget", () => {
     });
 
     it("should combine row preference with taunt", () => {
-      target3.buffsAndDebuffs.entry.set(BuffAndDebuffEnum.taunt, {
+      target3.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
         value: 1,
         isPerm: false,
         permValue: 0,
+        counter: 0,
       });
 
-      const result = getTarget(actor, [target1, target2, target3, target4])
+      const result = getTarget(actor, [], [target1, target2, target3, target4], "enemy")
         .preferRow("front")
         .one();
 

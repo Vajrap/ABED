@@ -8,6 +8,7 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { RogueSkill } from "./index";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const retreatDash = new RogueSkill({
   id: RogueSkillId.RetreatDash,
@@ -16,12 +17,15 @@ export const retreatDash = new RogueSkill({
     th: "วิ่งหนี",
   },
   description: {
-    en: "A desperate retreat. Grants +3 dodge for 1 turn and attempts to move to backline.",
-    th: "การหนีแบบสิ้นหวัง เพิ่ม dodge 3 หน่วย เป็นเวลา 1 เทิร์น และพยายามย้ายไปแถวหลัง",
+    text: {
+      en: "Make a desperate dash to safety, putting distance between you and danger.\nGain <BuffRetreat> for {5}'2':'1'{/} turn.\nAttempts to move to backline.",
+      th: "วิ่งหนีอย่างสิ้นหวัง สร้างระยะห่างระหว่างคุณกับอันตราย\nได้รับ <BuffRetreat> {5}'2':'1'{/} เทิร์น\nพยายามย้ายไปแถวหลัง",
+    },
   },
   requirement: {},
   equipmentNeeded: [], // No equipment needed for movement skill
   tier: TierEnum.common,
+  notExistBuff: [BuffEnum.retreat],
   consume: {
     hp: 0,
     mp: 0,
@@ -52,9 +56,7 @@ export const retreatDash = new RogueSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    // TODO: Implement Evasion +30% for 1 turn
-    buffsAndDebuffsRepository.retreat.appender(actor, 1, false, 0);
-    // TODO: Implement movement to backline logic
+    buffsAndDebuffsRepository.retreat.appender(actor, { turnsAppending: skillLevel >= 5 ? 2 : 1 });
     let moved = false;
 
     if (actor.position > 2) {

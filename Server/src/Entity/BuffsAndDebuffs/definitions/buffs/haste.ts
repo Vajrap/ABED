@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
@@ -10,16 +10,20 @@ export const haste = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.haste);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.haste, {
         value,
         isPerm,
-        permValue,
+        permValue: permanentCounter,
         counter: 0,
       });
     } else {
@@ -27,13 +31,13 @@ export const haste = new BuffDef({
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue += permValue;
+      entry.permValue += permanentCounter;
     }
 
-    actor.attribute.mutateBattle("agility", value + permValue);
+    actor.attribute.mutateBattle("agility", value + permanentCounter);
     return {
-      en: `${actor.name.en} got hasted buff: agi goes up by ${value + permValue}`,
-      th: `${actor.name.th} ได้รับ "เร่งความเร็ว": agi เพิ่มขึ้น ${value + permValue} หน่วย`,
+      en: `${actor.name.en} got hasted buff: agi goes up by ${value + permanentCounter}`,
+      th: `${actor.name.th} ได้รับ "เร่งความเร็ว": agi เพิ่มขึ้น ${value + permanentCounter} หน่วย`,
     };
   },
 

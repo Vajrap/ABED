@@ -6,7 +6,6 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { DruidSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { statMod } from "src/Utils/statMod";
 
 export const rejuvenatingMist = new DruidSkill({
@@ -16,8 +15,14 @@ export const rejuvenatingMist = new DruidSkill({
     th: "หมอกฟื้นฟู",
   },
   description: {
-    en: "Release a gentle natural mist around the party. All allies gain Regen buff for 2 turns (3 turns at level 5): restore (1d4 + WIL mod) HP at the start of their turn. At level 7, willpower mod is remembered + 2.",
-    th: "ปล่อยหมอกธรรมชาติรอบทีม พันธมิตรทั้งหมดได้รับบัฟฟื้นฟู 2 เทิร์น (3 เทิร์นที่เลเวล 5): ฟื้นฟู (1d4 + WIL mod) HP ที่เริ่มเทิร์น ที่เลเวล 7 จะจำ willpower mod + 2",
+    text: {
+      en: "Release a gentle natural mist around the party. \nAll allies gain <BuffRegen> for {5}'3':'2'{/} turns: restore <FORMULA> HP at the start of their turn.",
+      th: "ปล่อยหมอกธรรมชาติรอบทีม \nพันธมิตรทั้งหมดได้รับ <BuffRegen> {5}'3':'2'{/} เทิร์น: ฟื้นฟู <FORMULA> HP ที่เริ่มเทิร์น",
+    },
+    formula: {
+      en: "1d4 + <WILmod> {7} +2{/}",
+      th: "1d4 + <WILmod> {7} +2{/}",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -73,8 +78,11 @@ export const rejuvenatingMist = new DruidSkill({
     const allyNames: string[] = [];
 
     for (const ally of livingAllies) {
-      // permValue will be used to remember will mod
-      buffsAndDebuffsRepository.regen.appender(ally, duration, false, rememberedWillMod);
+      // universalCounter will be used to remember will mod
+      buffsAndDebuffsRepository.regen.appender(ally, { 
+        turnsAppending: duration, 
+        universalCounter: rememberedWillMod 
+      });
       allyNames.push(ally.name.en);
       targetEffects.push({
         actorId: ally.id,

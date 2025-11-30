@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { DebuffDef } from "../../type";
+import { DebuffDef, type AppenderOptions } from "../../type";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { DebuffEnum } from "../../enum";
 
@@ -10,29 +10,34 @@ export const slow = new DebuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.slow);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, {
         value,
         isPerm,
-        permValue,
+        permValue: permanentCounter,
+        counter: 0,
       });
     } else {
       if (!entry.isPerm && isPerm) {
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue += permValue;
+      entry.permValue += permanentCounter;
     }
 
-    actor.attribute.mutateBattle("agility", -(value + permValue));
+    actor.attribute.mutateBattle("agility", -(value + permanentCounter));
     return {
-      en: `${actor.name.en} got slow buff: agi goes down by ${value + permValue}`,
-      th: `${actor.name.th} ได้รับ "เชื่องช้า": agi ลดลง ${value + permValue} หน่วย`,
+      en: `${actor.name.en} got slow buff: agi goes down by ${value + permanentCounter}`,
+      th: `${actor.name.th} ได้รับ "เชื่องช้า": agi ลดลง ${value + permanentCounter} หน่วย`,
     };
   },
 

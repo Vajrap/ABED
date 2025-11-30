@@ -15,8 +15,10 @@ export const innerVeil = new MysticSkill({
     th: "ผ้าคลุมภายใน",
   },
   description: {
-    en: "Cast a veil on one frontline ally, make them harder to target or hit. Grants +2 dodge and -2 to enemy hit chance for 2 turns (3 turns at skill level 5).",
-    th: "สร้างผ้าคลุมให้กับพันธมิตรในแถวหน้าหนึ่งคน ทำให้ยากต่อการโจมตี เพิ่ม dodge +2 และลดความแม่นยำของศัตรู -2 เป็นเวลา 2 เทิร์น (3 เทิร์นที่เลเวล 5)",
+    text: {
+      en: "Weave a protective veil of planar energy around a frontline ally, obscuring them from enemy sight.\Give <BuffInnerVeil> for {5}'3':'2'{/} turns.",
+      th: "ถักทอผ้าคลุมป้องกันจากพลังงานระนาบรอบพันธมิตรแถวหน้า ทำให้ศัตรูมองไม่เห็น\nได้รับ <BuffInnerVeil> เป็นเวลา {5}'3':'2'{/} เทิร์น",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -64,7 +66,7 @@ export const innerVeil = new MysticSkill({
 
     // Apply Inner Veil buff
     const duration = skillLevel >= 5 ? 3 : 2;
-    buffsAndDebuffsRepository.innerVeil.appender(target, duration, false, 0);
+    buffsAndDebuffsRepository.innerVeil.appender(target, { turnsAppending: duration });
 
     return {
       content: {

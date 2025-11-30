@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { DebuffDef } from "../../type";
+import { DebuffDef, type AppenderOptions } from "../../type";
 import { DebuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { rollTwenty } from "src/Utils/Dice";
@@ -12,16 +12,20 @@ export const entangled = new DebuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      permanentCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.entangled);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.entangled, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
+        permValue: permanentCounter,
         counter: 0,
       });
     } else {
@@ -29,7 +33,7 @@ export const entangled = new DebuffDef({
         entry.isPerm = true;
       }
       entry.value += value;
-      entry.permValue += permValue;
+      entry.permValue += permanentCounter;
     }
 
     return {

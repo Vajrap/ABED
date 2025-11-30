@@ -12,11 +12,13 @@ export const rage = new BarbarianSkill({
   id: BarbarianSkillId.Rage,
   name: {
     en: "Rage",
-    th: "เดือดดาล",
+    th: "บ้าคลั่ง",
   },
   description: {
-    en: "Cantrip. Gain Rage for 3 turns (4 turns at skill level 5). Rage: +2 pATK, -2 pDEF, -2 mDEF. Cannot be cast while Rage is active.",
-    th: "ทักษะพื้นฐาน ได้รับ Rage 3 เทิร์น (4 เทิร์นที่เลเวล 5) Rage: +2 pATK, -2 pDEF, -2 mDEF ไม่สามารถใช้ได้ระหว่างมี Rage",
+    text: {
+      en: "Roar fiercefully and enter the <BuffRage> state for {5}'4':'3'{/} turns.",
+      th: "เข้าสู่สถานะ <BuffRage> เป็นเวลา {5}'4':'3'{/} เทิร์น",
+    },
   },
   requirement: {},
   notExistBuff: [BuffEnum.rage],
@@ -42,7 +44,7 @@ export const rage = new BarbarianSkill({
     location: LocationsEnum,
   ): TurnResult => {
     const duration = skillLevel >= 5 ? 4 : 3;
-    buffsAndDebuffsRepository.rage.appender(actor, duration, false, 0);
+    buffsAndDebuffsRepository.rage.appender(actor, { turnsAppending: duration });
 
     return {
       content: {

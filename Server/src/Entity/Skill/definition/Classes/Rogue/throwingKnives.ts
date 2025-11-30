@@ -20,8 +20,14 @@ export const throwingKnives = new RogueSkill({
     th: "ขว้างมีด",
   },
   description: {
-    en: "Throw knives at 2 targets (4 at level 5), each deals 1d4 + Dex mod * (1 + 0.1 * skill level) pierce damage. Targets can be repeated.",
-    th: "ขว้างมีดไปที่เป้าหมาย 2 คน (4 คนที่เลเวล 5) แต่ละคนรับความเสียหาย 1d4 + Dex mod * (1 + 0.1 * เลเวลสกิล) เป้าหมายสามารถซ้ำกันได้",
+    text: {
+      en: "Hurl a flurry of knives with deadly precision, striking multiple foes.\nThrow {5}'3':'2'{/} daggers at random targets, each dealing <FORMULA> pierce damage.\nTargets can be the same or different.",
+      th: "ขว้างมีดหลายเล่มด้วยความแม่นยำที่ร้ายแรง โจมตีศัตรูหลายคน\nขว้าง {5}'3':'2'{/} มีดกระทำศัตรูที่สุ่ม แต่ละคนสร้างความเสียหายแทง <FORMULA>\nเป้าหมายสามารถเป็นคนเดียวกันหรือต่างกัน",
+    },
+    formula: {
+      en: "(1d4 + <DEXmod>) × <SkillLevelMultiplier>",
+      th: "(1d4 + <DEXmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: ['dagger'],
@@ -47,7 +53,7 @@ export const throwingKnives = new RogueSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    const numTargets = skillLevel >= 5 ? 4 : 2;
+    const numTargets = skillLevel >= 5 ? 3 : 2;
     const dexMod = statMod(actor.attribute.getTotal("dexterity"));
     const levelScalar = skillLevelMultiplier(skillLevel);
     const bonusDamage = dexMod * levelScalar;

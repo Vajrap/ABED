@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
@@ -10,17 +10,21 @@ export const curseMarkActive = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = false,
+      universalCounter = 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.curseMarkActive);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.curseMarkActive, {
         value: value,
         isPerm: isPerm,
         permValue: 0,
-        counter: permValue, // Store INT mod for bonus damage
+        counter: universalCounter, // Store INT mod for bonus damage
       });
     } else {
       if (!entry.isPerm && isPerm) {
@@ -28,7 +32,7 @@ export const curseMarkActive = new BuffDef({
       }
       entry.value += value;
       // Use higher INT mod
-      entry.counter = Math.max(entry.counter, permValue);
+      entry.counter = Math.max(entry.counter, universalCounter);
     }
 
     return {

@@ -21,8 +21,14 @@ export const aegisPulse = new PaladinSkill({
     th: "คลื่นป้องกันศักดิ์สิทธิ์",
   },
   description: {
-    en: "Emit a wave of holy light. Healing allies for 1d4 + willpower mod * (1 + 0.1 * skill level) HP. Dealing small holy damage to all enemies for 1d4 + willpower mod * (1 + 0.1 * skill level) holy damage. Requires Aegis Pulse buff.",
-    th: "ปล่อยคลื่นแสงศักดิ์สิทธิ์ รักษาพันธมิตร 1d4 + willpower mod * (1 + 0.1 * skill level) HP และสร้างความเสียหายศักดิ์สิทธิ์เล็กน้อยให้ศัตรูทั้งหมด 1d4 + willpower mod * (1 + 0.1 * skill level) ต้องมีบัฟ Aegis Pulse",
+    text: {
+      en: "Release the stored holy energy in a devastating pulse that heals allies and smites enemies.\nHeal all allies for <FORMULA> HP.\nDeal <FORMULA> holy damage to all enemies.",
+      th: "ปลดปล่อยพลังงานศักดิ์สิทธิ์ที่สะสมไว้เป็นคลื่นที่ทำลายล้าง รักษาพันธมิตรและลงโทษศัตรู\nรักษาพันธมิตรทั้งหมด <FORMULA> HP\nสร้างความเสียหายศักดิ์สิทธิ์ <FORMULA> ให้ศัตรูทั้งหมด",
+    },
+    formula: {
+      en: "(1d4 + <WILmod>) × <SkillLevelMultiplier>",
+      th: "(1d4 + <WILmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -92,7 +98,7 @@ export const aegisPulse = new PaladinSkill({
         damage: damageAmount,
         hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
         crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
-        type: DamageType.holy,
+        type: DamageType.radiance,
         isMagic: true,
       };
 

@@ -1,6 +1,6 @@
 import { Character } from "src/Entity/Character/Character";
 import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 
 export const hiding = new BuffDef({
@@ -8,7 +8,8 @@ export const hiding = new BuffDef({
         en: "hiding",
         th: "ซ่อนตัว",
     },
-    appender: function (actor: Character, value: number): L10N {
+    appender: function (actor: Character, options: AppenderOptions): L10N {
+        const { turnsAppending: value } = options;
         const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.hiding);
         if (!entry) {
             actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.hiding, {

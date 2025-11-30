@@ -6,6 +6,7 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { SpellBladeSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const spellParry = new SpellBladeSkill({
   id: SpellBladeSkillId.SpellParry,
@@ -14,8 +15,10 @@ export const spellParry = new SpellBladeSkill({
     th: "ปัดเวท",
   },
   description: {
-    en: "Get Spell Parry buff for 1 turn. Spell Parry: reduce next spell's damage by (5 + Int mod). If attacked by a spell, gain 1 Edge Charge (2 if 0 damage taken). At level 5, also produce 1 Edge Charge when used.",
-    th: "ได้รับบัฟปัดเวท 1 เทิร์น ปัดเวท: ลดความเสียหายเวทครั้งถัดไป (5 + Int mod) หากถูกโจมตีด้วยเวท จะได้รับ Edge Charge 1 หน่วย (2 หน่วยหากไม่ได้รับความเสียหาย) ที่เลเวล 5 จะสร้าง Edge Charge 1 หน่วยเมื่อใช้ด้วย",
+    text: {
+      en: "Weave a defensive barrier of planar energy that deflects incoming spells.\nGain <BuffSpellParry> for {5}2:1{/} turn.\nReduces next spell's damage by 5 + <INTmod>.\nIf attacked by a spell, [b]gain 1 <BuffEdgeCharge>[/b] (2 if 0 damage taken).\n{5}\n[b]Gain 1 <BuffEdgeCharge>[/b] when used.{/}",
+      th: "ถักทอเกราะป้องกันจากพลังงานระนาบที่เบี่ยงเบนเวทมนตร์ที่เข้ามา\nได้รับ <BuffSpellParry> {5}2:1{/} เทิร์น\nลดความเสียหายเวทครั้งถัดไป 5 + <INTmod>\nหากถูกโจมตีด้วยเวท [b]ได้รับ <BuffEdgeCharge> 1 สแตค[/b] (2 สแตคหากไม่ได้รับความเสียหาย)\n{5}\n[b]ได้รับ <BuffEdgeCharge> 1 สแตค[/b] เมื่อใช้{/}",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -36,6 +39,7 @@ export const spellParry = new SpellBladeSkill({
       { element: "chaos", min: 1, max: 1 },
     ],
   },
+  notExistBuff: [BuffEnum.spellParry],
   exec: (
     actor: Character,
     actorParty: Character[],
@@ -44,11 +48,11 @@ export const spellParry = new SpellBladeSkill({
     location: LocationsEnum,
   ): TurnResult => {
     // Apply Spell Parry buff for 1 turn
-    buffsAndDebuffsRepository.spellParry.appender(actor, 1, false, 0);
+    buffsAndDebuffsRepository.spellParry.appender(actor, { turnsAppending: skillLevel >= 5 ? 2 : 1 });
 
     // At level 5, also produce 1 Edge Charge when used
     if (skillLevel >= 5) {
-      buffsAndDebuffsRepository.edgeCharge.appender(actor, 1, false, 0);
+      buffsAndDebuffsRepository.edgeCharge.appender(actor, { turnsAppending: 1 });
     }
 
     return {

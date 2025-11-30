@@ -1,14 +1,11 @@
-import type { BreathingSkillId } from "../Entity/BreathingSkill/enum";
-import type { CharacterBreathingSkillObject, CharacterSkillObject } from "../Entity/Character/Character";
+import { ItemId } from "src/Entity/Item";
 import type { CharacterActionSequence } from "../Entity/Character/Subclass/Action/CharacterAction";
 import type { CharacterCraftingPreference } from "../Entity/Character/Subclass/Behavior/subclasses/CharacterCraftingPreference";
 import type { DeckCondition } from "../Entity/Character/Subclass/DeckCondition/DeckCondition";
 import type { CharacterEpithetEnum } from "../Entity/Character/Subclass/Title/Epithet/enum";
 import type { CharacterRoleEnum } from "../Entity/Character/Subclass/Title/Role/enum";
-import type { ItemId } from "../Entity/Item/Item";
 import type { InnLevel } from "../Entity/Location/Config/Inn";
-import type { SkillId } from "../Entity/Skill/enums";
-import type { TraitEnum } from "../Entity/Trait.ts/enum";
+import type { TraitEnum } from "../Entity/Trait/enum";
 import type { CharacterBreathingSkillInterface } from "./CharacterBreathingSkillInterface";
 import type { CharacterSkillInterface } from "./CharacterSkillInterface";
 import type { ArtisanKey, AttributeKey, BattleStatKey, CharacterAlignmentEnum, CharacterEquipmentSlot, CharacterType, ElementKey, ProficiencyKey, RelationStatusEnum } from "./Enums";

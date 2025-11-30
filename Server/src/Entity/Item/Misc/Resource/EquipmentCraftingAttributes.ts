@@ -1,4 +1,4 @@
-import { TraitEnum } from "src/Entity/Trait.ts/enum";
+import { TraitEnum } from "src/Entity/Trait/enum";
 import { BuffAndDebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import {
   ATTRIBUTE_KEYS,

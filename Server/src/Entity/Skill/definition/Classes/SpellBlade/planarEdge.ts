@@ -24,8 +24,14 @@ export const planarEdge = new SpellBladeSkill({
     th: "ขอบแห่งระนาบ",
   },
   description: {
-    en: "Cantrip. Deal arcane damage. If weapon exists: weapon damage + planar mod + edge charge stacks * (1 + 0.1 * skill level). If no weapon: skill level dice (1d6, 1d6, 1d8, 1d8, 2d4 for levels 1-5) + planar mod + edge charge stacks * (1 + 0.1 * skill level). Generates 1 Edge Charge (max 5 stacks).",
-    th: "Cantrip สร้างความเสียหายเวท หากมีอาวุธ: ความเสียหายอาวุธ + planar mod + edge charge stacks * (1 + 0.1 * เลเวลสกิล) หากไม่มีอาวุธ: ลูกเต๋าตามเลเวล (1d6, 1d6, 1d8, 1d8, 2d4 สำหรับเลเวล 1-5) + planar mod + edge charge stacks * (1 + 0.1 * เลเวลสกิล) สร้าง Edge Charge 1 หน่วย (สูงสุด 5 หน่วย)",
+    text: {
+      en: "Channel planar energy into your weapon's edge, creating a blade of pure arcane power.\nDeal <FORMULA> arcane damage.\n[b]Gain 1 <BuffEdgeCharge>[/b] (max 5 stacks).\nThis skill Damage dice is based on weapon's physical damage dice or if you don't equip any weapon the damage dice will be (1d6, 1d6, 1d8, 1d8 or 2d4) based on skill level.",
+      th: "ควบคุมพลังงานระนาบเข้าสู่ขอบอาวุธ สร้างใบมีดจากพลังอาร์เคนบริสุทธิ์\nสร้างความเสียหายอาร์เคน <FORMULA>\n[b]ได้รับ <BuffEdgeCharge> 1 สแตค[/b] (สูงสุด 5 สแตค)\nลูกเต๋าความเสียหายของสกิลนี้ขึ้นอยู่กับความเสียหายกายภาพของอาวุธที่ถือ แต่ถ้าหากไม่ได้ถืออาวุธอยู่ ลูกเต๋าความเสียหายจะเป็น (1d6, 1d6, 1d8, 1d8, 2d4) ขึ้นอยู่กับเลเวลของสกิล",
+    },
+    formula: {
+      en: "(Damage Dice + <PlanarMod> + <BuffEdgeCharge> stacks) × <SkillLevelMultiplier>",
+      th: "(ลูกเต๋าความเสียหาย + <PlanarMod> + สแตค <BuffEdgeCharge>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: ["sword", "blade", "dagger", "bareHand"],
@@ -76,11 +82,11 @@ export const planarEdge = new SpellBladeSkill({
     const edgeChargeEntry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.edgeCharge);
     const edgeChargeStacks = edgeChargeEntry?.value || 0;
 
+    // TODO: Cantrip damage - should be 1d6 since it has special effect (Edge Charge)
+    // Currently varies by level, but should be consistent 1d6 for bare hand
     const baseDamage = 
       isBareHand ? 
-        skillLevel <= 2 ? roll(1).d(6).total : 
-        skillLevel <= 4 ? roll(1).d(8).total : 
-        roll(2).d(4).total : 
+        roll(1).d(6).total : // Should be 1d6 consistently (has special effect)
       roll(weapon.weaponData.damage.magicalDamageDice.dice)
         .d(weapon.weaponData.damage.magicalDamageDice.face).total;
     const hitValue = rollTwenty().total + statMod(actor.attribute.getTotal("dexterity"));
@@ -108,7 +114,7 @@ export const planarEdge = new SpellBladeSkill({
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
 
     // Generate 1 Edge Charge
-    buffsAndDebuffsRepository.edgeCharge.appender(actor, 1, false, 0);
+    buffsAndDebuffsRepository.edgeCharge.appender(actor, { turnsAppending: 1 });
 
     return {
       content: buildCombatMessage(

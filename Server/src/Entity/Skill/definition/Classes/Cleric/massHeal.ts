@@ -7,7 +7,6 @@ import { roll } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { ClericSkill } from "./index";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const massHeal = new ClericSkill({
   id: ClericSkillId.MassHeal,
@@ -16,8 +15,14 @@ export const massHeal = new ClericSkill({
     th: "รักษาหมู่",
   },
   description: {
-    en: "Restore all living allies for 1d6 + (willpower modifier + charisma modifier)/2 + skill level HP. At level 4+, also removes one random debuff from each healed ally.",
-    th: "ฟื้นฟูเพื่อนร่วมทีมทุกคนที่ยังมีชีวิต 1d6 + ค่าต้านทานจิต (willpower) + charisma + เลเวลสกิล และเมื่อเลเวลสกิล 4 ขึ้นไปจะชำระล้างดีบัฟแบบสุ่ม 1 ชนิดต่อพันธมิตรที่รักษาได้",
+    text: {
+      en: "Cast a mass healing spell, restore all living allies. \nHeals for <FORMULA>. \n{4}\nThen [b]removes one random debuff[/b] from each healed ally.{/}",
+      th: "ร่ายเวทย์มนต์รักษาหมู่ ฟื้นฟูเพื่อนร่วมทีมทุกคนที่ยังมีชีวิต \nรักษา <FORMULA> \n{4}\nจากนั้น[b]ลบหนึ่งดีบัฟแบบสุ่ม[/b]จากพันธมิตรที่ได้รับการรักษาแต่ละคน{/}",
+    },
+    formula: {
+      en: "1d6 + (<WILmod> + <CHAmod>) / 2 + skill level",
+      th: "1d6 + (<WILmod> + <CHAmod>) / 2 + เลเวลสกิล",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -93,7 +98,7 @@ export const massHeal = new ClericSkill({
     }
 
     // Apply cooldown debuff
-    debuffsRepository.massHealCooldown.appender(actor, 4, false, 0);
+    debuffsRepository.massHealCooldown.appender(actor, { turnsAppending: 4 });
 
     const summary = livingAllies
       .map((ally) => ally.name.en)

@@ -8,6 +8,7 @@ import { getTarget } from "src/Entity/Battle/getTarget";
 import { ScholarSkill } from "./index";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
+import { statMod } from "src/Utils/statMod";
 
 export const analyze = new ScholarSkill({
   id: ScholarSkillId.Analyze,
@@ -16,8 +17,10 @@ export const analyze = new ScholarSkill({
     th: "วิเคราะห์",
   },
   description: {
-    en: "Mark a vulnerable spot on the enemy. For 2 turns, the marked enemy gets Exposed debuff. Exposed: takes additional 1d3 damage from all sources. If skill level is 5, the exposed enemy also gains -2 to critical defense. If the exposed is success, this skill gets into 3 turns cooldown. (Debuff)",
-    th: "ทำเครื่องหมายจุดอ่อนบนศัตรู เป็นเวลา 2 เทิร์น ศัตรูที่ถูกทำเครื่องหมายจะได้รับ debuff 'เปิดเผยจุดอ่อน' เปิดเผยจุดอ่อน: รับความเสียหายเพิ่ม 1d3 จากทุกแหล่ง หากเลเวลสกิลถึง 5 ศัตรูที่ถูกเปิดเผยจะได้รับ -2 ต่อการป้องกันคริติคอลด้วย",
+    text: {
+      en: "Study your enemy's movements and mark their most vulnerable points.\nMark target with <DebuffExposed> for 2 turns.\n{5}\nAlso reduces their [r]critical defense by <INTmod> but not exceed 3 or below 1[/r].{/}",
+      th: "ศึกษาการเคลื่อนไหวของศัตรูและทำเครื่องหมายจุดอ่อนที่สุด\nทำเครื่องหมายเป้าหมายด้วย <DebuffExposed> 2 เทิร์น\n{5}\nยังลด [r]การป้องกันคริติคอล 2[/r] ด้วย{/}",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -59,11 +62,22 @@ export const analyze = new ScholarSkill({
     }
 
     // Apply Exposed debuff for 2 turns
-    // permValue = 1 if skill level >= 5 (for -2 crit defense)
-    // TODO: Let's add some condition, maybe DC8 + target int mod against D20 + user int mod
-    const permValue = skillLevel >= 5 ? 1 : 0;
-    debuffsRepository.exposed.appender(target, 2, false, permValue);
-    debuffsRepository.analyze.appender(actor, 3, false, permValue);
+    // universalCounter = 1 if skill level >= 5 (for -2 crit defense)
+
+    debuffsRepository.exposed.appender(target, { 
+      turnsAppending: 2, 
+    });
+    debuffsRepository.analyze.appender(actor, { 
+      turnsAppending: 3, 
+    });
+    if (skillLevel >= 5) {
+      const intMod = Math.max(Math.min(statMod(actor.attribute.getTotal("intelligence")), 3), 1);
+      // TODO: Add critDef debuff (later we'll have debuff for most stats)
+      debuffsRepository.critDef.appender(target, {
+        turnsAppending: 2,
+        universalCounter: intMod
+      })
+    }
 
     return {
       content: {

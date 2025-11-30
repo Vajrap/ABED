@@ -1,14 +1,12 @@
 import type { ProficiencyKey } from "../../../../../InterFacesEnumsAndTypes/Enums";
-import { TierEnum } from "../../../../../InterFacesEnumsAndTypes/Tiers";
-import { NewsSignificance, NewsPropagation } from "../../../../../InterFacesEnumsAndTypes/NewsEnums";
+import {
+  NewsSignificance,
+  NewsPropagation,
+} from "../../../../../InterFacesEnumsAndTypes/NewsEnums";
 import { rollTwenty } from "../../../../../Utils/Dice";
 import { statMod } from "../../../../../Utils/statMod";
 import type { Character } from "../../../../Character/Character";
-import {
-  createNews,
-  type NewsContext,
-  type News,
-} from "../../../../News/News";
+import { createNews, type NewsContext, type News } from "../../../../News/News";
 import { getExpNeededForStatus } from "./getExpNeeded";
 import { gainStatTracker } from "./statTracker";
 

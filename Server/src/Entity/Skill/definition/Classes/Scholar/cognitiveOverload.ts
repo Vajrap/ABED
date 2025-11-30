@@ -20,8 +20,14 @@ export const cognitiveOverload = new ScholarSkill({
     th: "ความล้นเกินของความคิด",
   },
   description: {
-    en: "Deal 1d4 (1d6 at level 5) + INT mod * (1 + 0.1 * skill level) true arcane damage. Refresh 1 random debuff on the target. If target has ≥3 debuffs, damage becomes 1d6 (1d8 at level 5).",
-    th: "สร้างความเสียหายจริง 1d4 (1d6 ที่เลเวล 5) + INT mod * (1 + 0.1 * เลเวลสกิล) ต่อเป้าหมาย รีเฟรช debuff แบบสุ่ม 1 ตัวบนเป้าหมาย หากเป้าหมายมี debuff ≥3 ตัว ความเสียหายจะกลายเป็น 1d6 (1d8 ที่เลเวล 5)",
+    text: {
+      en: "Overwhelm your enemy's mind with an overwhelming surge of arcane knowledge.\nDeal <FORMULA> [r]true arcane damage[/r] that bypasses all defenses.\nRefreshes 1 random debuff on the target.\nIf target has ≥3 debuffs, main dice becomes {5}'1d8':'1d6'{/}.",
+      th: "ท่วมท้นจิตใจของศัตรูด้วยคลื่นความรู้อาร์เคนที่ล้นเกิน\nสร้างความเสียหายอาร์เคนแท้ <FORMULA> [r]ที่ผ่านการป้องกันทั้งหมด[/r]\nรีเฟรชดีบัฟแบบสุ่ม 1 ตัวบนเป้าหมาย\nหากเป้าหมายมีดีบัฟ ≥3 ตัว ความเสียหายกลายเป็น {5}'1d8':'1d6'{/}.",
+    },
+    formula: {
+      en: "{5}'1d6':'1d4'{/} + <INTmod> × <SkillLevelMultiplier>",
+      th: "{5}'1d6':'1d4'{/} + <INTmod> × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

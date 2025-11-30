@@ -1,5 +1,5 @@
 import type { Character } from "src/Entity/Character/Character";
-import { DebuffDef } from "../../type";
+import { DebuffDef, type AppenderOptions } from "../../type";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 import { DebuffEnum } from "../../enum";
 import { roll } from "src/Utils/Dice";
@@ -11,16 +11,20 @@ export const hexed = new DebuffDef({
     },
     appender: function (
         actor: Character,
-        value: number,
-        isPerm: boolean,
-        permValue: number,
+        options: AppenderOptions,
     ): L10N {
+        const {
+            turnsAppending: value,
+            isPerm = false,
+            permanentCounter = 0,
+        } = options;
+        
         const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.hexed);
         if (!entry) {
             actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.hexed, {
                 value,
                 isPerm,
-                permValue,
+                permValue: permanentCounter,
                 counter: 0,
             });
             actor.attribute.mutateBattle("endurance", -2);
@@ -29,7 +33,7 @@ export const hexed = new DebuffDef({
                 entry.isPerm = true;
             }
             entry.value += value;
-            entry.permValue += permValue;
+            entry.permValue += permanentCounter;
         }
 
         return {

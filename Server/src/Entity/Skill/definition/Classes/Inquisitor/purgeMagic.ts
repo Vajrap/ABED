@@ -19,8 +19,14 @@ export const purgeMagic = new InquisitorSkill({
     th: "ล้างเวทมนตร์",
   },
   description: {
-    en: "Purge magical buffs from a target, dealing true holy damage that scales with their power. Deals 1d4 + target's planar mod + number of target's buffs true holy damage. Removes 1 random buff (2 at level 5). At level 5, also adds +2 raw damage.",
-    th: "ลบบัฟเวทมนตร์จากเป้าหมาย สร้างความเสียหายศักดิ์สิทธิ์แท้ที่เพิ่มตามพลังของเป้าหมาย สร้างความเสียหาย 1d4 + ค่า planar ของเป้าหมาย + จำนวนบัฟของเป้าหมาย ลบบัฟแบบสุ่ม 1 ตัว (2 ตัวที่เลเวล 5) ที่เลเวล 5 จะเพิ่มความเสียหายดิบ +2",
+    text: {
+      en: "Unleash purifying flames that strip away all magical enhancements, the stronger the magic, the greater the backlash.\nDeal <FORMULA> [r]true holy damage[/r] that bypasses all defenses.\nRemoves {5}'2':'1'{/} random buff(s) from the target.\n{5}\nDeals [r]+2 additional damage[/r].{/}",
+      th: "ปล่อยเปลวไฟชำระล้างที่ลบการเสริมเวทมนตร์ทั้งหมด ยิ่งเวทมนตร์แข็งแกร่ง ยิ่งได้รับผลกระทบมากขึ้น\nสร้างความเสียหายศักดิ์สิทธิ์แท้ <FORMULA> [r]ที่ผ่านการป้องกันทั้งหมด[/r]\nลบบัฟแบบสุ่ม {5}'2':'1'{/} ตัวจากเป้าหมาย\n{5}\nสร้างความเสียหาย [r]เพิ่ม +2[/r]{/}",
+    },
+    formula: {
+      en: "1d4 + target's PlanarMod + number of target's buffs {5} + 2{/}",
+      th: "1d4 + PlanarMod ของเป้าหมาย + จำนวนบัฟของเป้าหมาย {5} + 2{/}",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -104,7 +110,7 @@ export const purgeMagic = new InquisitorSkill({
       damage,
       hit: 999, // Auto-hit for true damage
       crit: 0,
-      type: DamageType.holy,
+      type: DamageType.radiance,
       isMagic: true,
       trueDamage: true, // TRUE DAMAGE - bypasses all mitigation
     };

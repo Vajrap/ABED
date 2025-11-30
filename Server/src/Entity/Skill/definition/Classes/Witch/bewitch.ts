@@ -16,8 +16,10 @@ export const bewitch = new WitchSkill({
     th: "สะกดจิต",
   },
   description: {
-    en: "Influence an enemy's mind with witchcraft. Target rolls DC10 + control mod willpower save. If failed, target gets Charm buff for 1 turn (2 at level 5). At level 5, also applies hexed debuff. Charm will be handled later.",
-    th: "มีอิทธิพลต่อจิตใจของศัตรูด้วยเวทมนตร์ เป้าหมายทอย willpower save DC10 + control mod หากล้มเหลว เป้าหมายจะได้รับ Charm buff 1 เทิร์น (2 เทิร์นที่เลเวล 5) ที่เลเวล 5 จะเพิ่ม hexed debuff ด้วย Charm จะถูกจัดการภายหลัง",
+    text: {
+      en: "Weave a subtle charm that clouds your enemy's judgment and makes them see you as an ally.\nTarget must [r]roll DC10 + <ControlMod> WILsave[/r].\nIf failed, target gets <BuffCharm> for {5}'2':'1'{/} turn.",
+      th: "ถักทอเสน่ห์ที่ทำให้จิตใจของศัตรูมืดมัวและทำให้พวกเขาเห็นคุณเป็นพันธมิตร\nเป้าหมายต้องทอย [r]WILsave DC10 + <ControlMod>[/r]\nหากล้มเหลว เป้าหมายได้รับ <BuffCharm> {5}'2':'1'{/} เทิร์น",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -80,12 +82,12 @@ export const bewitch = new WitchSkill({
     if (willpowerSave < willpowerDC) {
       // Save failed: apply charm buff to target
       const charmDuration = skillLevel >= 5 ? 2 : 1;
-      buffsAndDebuffsRepository.charm.appender(target, charmDuration, false, 0);
+      buffsAndDebuffsRepository.charm.appender(target, { turnsAppending: charmDuration });
       bewitchMessage = ` ${target.name.en} is charmed!`;
       
       // At level 5, also apply hexed debuff
       if (skillLevel >= 5) {
-        buffsAndDebuffsRepository.hexed.appender(target, 1, false, 0);
+        buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: 1 });
         bewitchMessage += ` ${target.name.en} is also hexed!`;
       }
       

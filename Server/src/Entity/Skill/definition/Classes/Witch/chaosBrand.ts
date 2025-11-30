@@ -1,3 +1,19 @@
+/**
+ * TODO: LORE ALIGNMENT - Character Creation Level 1
+ * 
+ * Current: "Curse Mark" - Uses abstract "hex sigil" concept. Planar energy should manifest
+ * in tangible ways, not abstract mystical symbols.
+ * 
+ * Suggested Changes:
+ * - Rename to "Chaos Brand" or "Weakness Mark" or "Vulnerability Mark"
+ * - Description: "Mark target with visible chaos energy, exposing physical weaknesses" instead
+ *   of abstract "hex sigil"
+ * - Frame as tangible chaos energy creating a visible mark/brand on target that exposes
+ *   vulnerabilities (like a glowing chaos mark on their armor/skin)
+ * - The chaos consumption and water production already exist, emphasize tangible manifestation
+ * - Consider: "Chaos Brand" - physically brand target with visible chaos energy that makes
+ *   them take more damage (tangible weakness exposure)
+ */
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { WitchSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
@@ -9,15 +25,17 @@ import { WitchSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { statMod } from "src/Utils/statMod";
 
-export const curseMark = new WitchSkill({
-  id: WitchSkillId.CurseMark,
+export const chaosBrand = new WitchSkill({
+  id: WitchSkillId.ChaosBrand,
   name: {
-    en: "Curse Mark",
-    th: "เครื่องหมายคำสาป",
+    en: "Chaos Brand",
+    th: "ประจุวินาที",
   },
   description: {
-    en: "Place a hex sigil on the target, marking them for increased suffering. Target gets Exposed debuff for 2 turns (3 at level 5). Marked enemies take +1d3 damage from all sources. At level 5, also gain -2 to critical defense. Additionally, the Witch gains +INT mod/2 to hit rolls against marked enemies.",
-    th: "วางเครื่องหมายคำสาปบนเป้าหมาย ทำให้เป้าหมายได้รับ Exposed debuff 2 เทิร์น (3 เทิร์นที่เลเวล 5) เป้าหมายที่ถูกทำเครื่องหมายจะรับความเสียหายเพิ่ม +1d3 จากทุกแหล่ง ที่เลเวล 5 จะได้รับ -2 ต่อการป้องกันคริติคอล และผู้ใช้จะได้รับ +INT mod/2 ต่อ hit rolls ต่อเป้าหมายที่ถูกทำเครื่องหมาย",
+    text: {
+      en: "Brand your enemy with visible chaos energy that exposes their weaknesses for all to see.\nTarget gets <DebuffExposed> for {5}'3':'2'{/} turns.\nMarked enemies take [r]+1d3 damage from all sources[/r].\n{5}\nAlso reduces their [r]critical defense by 2[/r].{/}\n[b]You gain +floor(<INTmod> / 2) hit[/b] against marked enemies.",
+      th: "ประทับตราพลังงาน chaos ที่มองเห็นได้บนศัตรู เปิดเผยจุดอ่อนของพวกเขาต่อทุกคน\nเป้าหมายได้รับ <DebuffExposed> {5}'3':'2'{/} เทิร์น\nศัตรูที่ถูกประทับตราจะรับ [r]ความเสียหายเพิ่ม +1d3 จากทุกแหล่ง[/r]\n{5}\nยังลด [r]การป้องกันคริติคอล 2[/r] ด้วย{/}\n[b]คุณได้รับ +floor(<INTmod> / 2) hit[/b] ต่อศัตรูที่ถูกประทับตรา",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -70,15 +88,21 @@ export const curseMark = new WitchSkill({
 
     // Apply Exposed debuff and Hex Mark debuff to target
     const duration = skillLevel >= 5 ? 3 : 2;
-    const permValue = skillLevel >= 5 ? 1 : 0; // permValue = 1 means -2 crit defense at level 5
+    const universalCounter = skillLevel >= 5 ? 1 : 0; // universalCounter = 1 means -2 crit defense at level 5
     
-    buffsAndDebuffsRepository.exposed.appender(target, duration, false, permValue);
-    buffsAndDebuffsRepository.hexMark.appender(target, duration, false, 0);
+    buffsAndDebuffsRepository.exposed.appender(target, { 
+      turnsAppending: duration, 
+      universalCounter 
+    });
+    buffsAndDebuffsRepository.hexMark.appender(target, { turnsAppending: duration });
 
     // Apply Curse Mark Active buff to user with same duration
-    // Store INT mod in permValue for bonus damage calculation
+    // Store INT mod in universalCounter for bonus damage calculation
     const intMod = statMod(actor.attribute.getTotal("intelligence"));
-    buffsAndDebuffsRepository.curseMarkActive.appender(actor, duration, false, intMod);
+    buffsAndDebuffsRepository.curseMarkActive.appender(actor, { 
+      turnsAppending: duration, 
+      universalCounter: intMod 
+    });
 
     return {
       content: {

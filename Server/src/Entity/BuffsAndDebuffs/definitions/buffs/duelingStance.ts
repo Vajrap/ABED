@@ -1,8 +1,7 @@
 import type { Character } from "src/Entity/Character/Character";
-import { BuffDef } from "../../type";
+import { BuffDef, type AppenderOptions } from "../../type";
 import { BuffEnum } from "../../enum";
 import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
-import { statMod } from "src/Utils/statMod";
 
 export const duelingStance = new BuffDef({
   name: {
@@ -11,33 +10,34 @@ export const duelingStance = new BuffDef({
   },
   appender: function (
     actor: Character,
-    value: number,
-    isPerm: boolean,
-    permValue: number,
+    options: AppenderOptions,
   ): L10N {
+    const {
+      turnsAppending: value,
+      isPerm = options.isPerm || false,
+      permanentCounter = 0,
+      universalCounter = options.universalCounter || 0,
+    } = options;
+    
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.duelingStance);
     if (!entry) {
       actor.battleStats.mutateBattle('pHIT', 2);
       actor.battleStats.mutateBattle('mHIT', 2);
-      actor.battleStats.mutateBattle('dodge', -2);
-      if (isPerm) {
-        actor.battleStats.mutateBattle('pCRT', 2);
-        actor.battleStats.mutateBattle('mCRT', 2);
-      }
+      actor.battleStats.mutateBattle('dodge', 2);
+      actor.battleStats.mutateBattle('pCRT', universalCounter);
+      actor.battleStats.mutateBattle('mCRT', universalCounter);
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.duelingStance, {
         value: value,
         isPerm: isPerm,
-        permValue: permValue,
-        counter: 0,
+        permValue: permanentCounter,
+        counter: universalCounter,
       });
     } else {
+      // won't mutate the universal counter when applied new stack, even if it's higher.
       if (isPerm) {
         entry.isPerm = true;
-        actor.battleStats.mutateBattle('pCRT', 2);
-        actor.battleStats.mutateBattle('mCRT', 2);
       }
       entry.value += value;
-      entry.permValue += permValue;
     }
 
     return {
@@ -52,14 +52,14 @@ export const duelingStance = new BuffDef({
       if (entry.value > 0) {
         entry.value -= 1;
       } else if (entry.value === 0) {
-        actor.battleStats.mutateBattle('pHIT', -2);
-        actor.battleStats.mutateBattle('mHIT', -2);
-        actor.battleStats.mutateBattle('dodge', 2);
-        if (entry.isPerm) {
-          actor.battleStats.mutateBattle('pCRT', -2);
-          actor.battleStats.mutateBattle('mCRT', -2);
+        if (!entry.isPerm) {
+          actor.battleStats.mutateBattle('pHIT', -2);
+          actor.battleStats.mutateBattle('mHIT', -2);
+          actor.battleStats.mutateBattle('dodge', -2);
+          actor.battleStats.mutateBattle('pCRT', -entry.counter);
+          actor.battleStats.mutateBattle('mCRT', -entry.counter);
+          actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.duelingStance);
         }
-        actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.duelingStance);
       }
     }
 

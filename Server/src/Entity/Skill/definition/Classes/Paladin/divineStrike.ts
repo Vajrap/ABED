@@ -39,8 +39,14 @@ export const divineStrike = new PaladinSkill({
     th: "โจมตีศักดิ์สิทธิ์",
   },
   description: {
-    en: "A melee attack blessed with holy energy. Deals weapon damage * 1.2 + (STR + WIL mod) * skill level multiplier * position modifier as holy damage. If enemy is undead or fiend, deal additional 1d6 (1d10 at level 5) holy damage.",
-    th: "การโจมตีระยะประชิดที่ได้รับพรจากพลังงานศักดิ์สิทธิ์ สร้างความเสียหายอาวุธ * 1.2 + (STR + WIL mod) * skill level multiplier * position modifier เป็นความเสียหายศักดิ์สิทธิ์ หากศัตรูเป็น undead หรือ fiend จะสร้างความเสียหายเพิ่ม 1d6 (1d10 ที่เลเวล 5)",
+    text: {
+      en: "Channel divine wrath through your weapon, striking with the fury of the righteous.\nDeal <FORMULA> holy damage.\n[r]Deal +{5}'1d10':'1d6'{/} bonus damage[/r] against undead or fiends.",
+      th: "ควบคุมความโกรธศักดิ์สิทธิ์ผ่านอาวุธ โจมตีด้วยความโกรธของคนชอบธรรม\nสร้างความเสียหายศักดิ์สิทธิ์ <FORMULA>\n[r]สร้างความเสียหายเพิ่ม +{5}'1d10':'1d6'{/}[/r] ต่อ undead หรือ fiends",
+    },
+    formula: {
+      en: "((<WeaponDamage> × 1.2) + (<STRmod> + <WILmod>)) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "((<WeaponDamage> × 1.2) + (<STRmod> + <WILmod>)) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: allowedWeapons,
@@ -128,7 +134,7 @@ export const divineStrike = new PaladinSkill({
       ),
       hit: damageOutput.hit,
       crit: damageOutput.crit,
-      type: DamageType.holy,
+      type: DamageType.radiance,
       isMagic: true,
     };
 

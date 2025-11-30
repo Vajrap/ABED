@@ -21,8 +21,14 @@ export const vineWhip = new DruidSkill({
     th: "เถาวัลย์",
   },
   description: {
-    en: "Deal 1d6 + (willpower mod) * (1 + 0.1 * skill level) nature damage. Target must roll DC7 + control mod endurance save or get entangled for 1 turn. Entangled: when taking turns, must roll DC10 strength save or skip the turn.",
-    th: "สร้างความเสียหายธรรมชาติ 1d6 + (willpower mod) * (1 + 0.1 * skill level) เป้าหมายต้องทอย endurance save DC7 + control mod หรือถูกพันกัน 1 เทิร์น เมื่อถูกพันกัน ต้องทอย strength save DC10 หรือข้ามเทิร์น",
+    text: {
+      en: "Lashed a magical vine whip at an enemy.\nDeal <FORMULA> nature damage. \nTarget must [r]roll DC7 + <ControlMod> endurance save[/r] or get <DebuffEntangled> for 1 turn.",
+      th: "ฟาดเป้าหมายด้วยเถาวัลย์เวทย์มนต์\nสร้างความเสียหายธรรมชาติ <FORMULA> \nเป้าหมายต้องทอย endurance save [r]DC7 + <ControlMod>[/r] หรือถูก <DebuffEntangled> 1 เทิร์น",
+    },
+    formula: {
+      en: "(1d6 + <WILmod>) × <SkillLevelMultiplier>",
+      th: "(1d6 + <WILmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -89,7 +95,7 @@ export const vineWhip = new DruidSkill({
       const entanglementDC = 7 + controlMod;
       const saveRoll = target.rollSave("endurance");
       if (saveRoll < entanglementDC) {
-        buffsAndDebuffsRepository.entangled.appender(target, 1, false, 0);
+        buffsAndDebuffsRepository.entangled.appender(target, { turnsAppending: 1 });
         entangledMessage = ` ${target.name.en} is entangled!`;
       }
     }

@@ -38,7 +38,7 @@ export const worksYouMaggots = new Skill({
     const damage = roll(1).d(3).total;
     const damageOutput = { damage, hit: 999, crit: 0, type: DamageType.blunt, trueDamage: true };
     const result = resolveDamage(actor.id, target.id, damageOutput, location);
-    buffsRepository.slaveDriver.appender(actor, damage, false, 0);
+    buffsRepository.slaveDriver.appender(actor, { turnsAppending: damage });
     target.abGauge += 5 + skillLevel;
     return {
       content: {

@@ -6,7 +6,6 @@ import { ActorEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { DuelistSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const parryRiposte = new DuelistSkill({
   id: DuelistSkillId.ParryRiposte,
@@ -15,11 +14,17 @@ export const parryRiposte = new DuelistSkill({
     th: "ปัดป้องและตอบโต้",
   },
   description: {
-    en: "Assume a defensive stance, ready to parry and counter. Gain Parry buff for 1 turn (2 turns at level 5). When attacked, roll DC10 control save. If passed, negate the attack and deal 1d6 + DEX mod * (1 + 0.1 * skill level) slash damage back to the attacker. Then remove Parry buff.",
-    th: "ใช้ท่าป้องกัน พร้อมปัดป้องและตอบโต้ ได้รับบัฟ Parry 1 เทิร์น (2 เทิร์นที่เลเวล 5) เมื่อถูกโจมตี ให้ทอย control save DC10 + control mod หากสำเร็จ จะยกเลิกการโจมตีและสร้างความเสียหาย 1d6 + DEX mod * (1 + 0.1 * เลเวลสกิล) ต่อผู้โจมตี แล้วลบบัฟ Parry",
+    text: {
+      en: "Assume a defensive stance, ready to parry and counter. \nGain <BuffParry> for {5}'2':'1'{/} turns. \nWhen attacked, [r]roll DC10 CONsave[/r]. If passed, negate the attack and deal <FORMULA> slash damage back to the attacker.",
+      th: "ใช้ท่าป้องกัน พร้อมปัดป้องและตอบโต้ \nได้รับ <BuffParry> {5}'2':'1'{/} เทิร์น \nเมื่อถูกโจมตี ให้ทอย control save DC10 หากสำเร็จ จะยกเลิกการโจมตีและสร้างความเสียหาย <FORMULA> ต่อผู้โจมตี",
+    },
+    formula: {
+      en: "(1d6 + <DEXmod>) × <SkillLevelMultiplier>",
+      th: "(1d6 + <DEXmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
-  equipmentNeeded: ["blade"],
+  equipmentNeeded: ["blade", 'sword', 'dagger'],
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
@@ -51,25 +56,13 @@ export const parryRiposte = new DuelistSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    const weapon = actor.getWeapon();
-    if (weapon.weaponType !== "blade") {
-      return {
-        content: {
-          en: `${actor.name.en} must equip a blade to use Parry & Riposte`,
-          th: `${actor.name.th} ต้องใช้อาวุธประเภทดาบเพื่อใช้ปัดป้องและตอบโต้`,
-        },
-        actor: {
-          actorId: actor.id,
-          effect: [ActorEffect.TestSkill],
-        },
-        targets: [],
-      };
-    }
-
     // Apply Parry buff for 1 turn (2 turns at level 5)
     const duration = skillLevel >= 5 ? 2 : 1;
-    // Store skill level in permValue for damage calculation
-    buffsAndDebuffsRepository.parry.appender(actor, duration, false, skillLevel);
+    // Store skill level in universalCounter for damage calculation
+    buffsAndDebuffsRepository.parry.appender(actor, { 
+      turnsAppending: duration, 
+      universalCounter: skillLevel 
+    });
 
     return {
       content: {

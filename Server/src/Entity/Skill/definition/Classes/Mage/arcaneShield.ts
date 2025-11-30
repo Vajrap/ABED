@@ -17,8 +17,14 @@ export const arcaneShield = new MageSkill({
     th: "โล่เวทมนตร์",
   },
   description: {
-    en: "Creates a protective magical barrier around yourself for (1d3 + planar mod/2 + 0.5 per skill level) stacks. Each arcane shield stack can mitigate 1 point of incoming damage. At level 5 the stacks increase by 1d3.",
-    th: "สร้างโล่ป้องกันเวทมนตร์รอบตัวเอง (1d3 + planar mod/2 + 0.5 ต่อเลเวลสกิล) หน่วย แต่ละหน่วยสามารถลดความเสียหายที่ได้รับลง 1 หน่วย. เมื่อเลเวลสกิลถึง 5 จะได้รับโล่ห์เวทย์มนต์เพิ่มอีก 1d3 หน่วย",
+    text: {
+      en: "Weave a protective barrier of pure arcane energy that absorbs incoming harm.\nGain <FORMULA> stacks of <BuffArcaneShield>.",
+      th: "ถักทอกำแพงป้องกันจากพลังงานอาร์เคนบริสุทธิ์ที่ดูดซับอันตราย\nได้รับ <FORMULA> สแตคของ <BuffArcaneShield>",
+    },
+    formula: {
+      en: "1d3 + floor(<PlanarMod> / 2) + floor(0.5 × skill level) {5}'+1d3'{/}",
+      th: "1d3 + floor(<PlanarMod> / 2) + floor(0.5 × เลเวลสกิล) {5}'+1d3'{/}",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -65,9 +71,9 @@ export const arcaneShield = new MageSkill({
     // TODO: Implement arcaneShield buff/debuff
     buffsAndDebuffsRepository.arcaneShield.appender(
       actor,
-      diceRoll + planarBonus + skillLevelBonus + shiftedBonus,
-      false,
-      0,
+      {
+        turnsAppending: diceRoll + planarBonus + skillLevelBonus + shiftedBonus,
+      },
     );
 
     let turnResult: TurnResult = {

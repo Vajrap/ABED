@@ -15,8 +15,10 @@ export const warCry = new WarriorSkill({
     th: "เสียงร้องศึก",
   },
   description: {
-    en: "Battle shout that boosts self or team morale. Increases agility and strength by +2 (+leadership mod/2) for 2 turns (3 turns at level 5). Affects self + charisma mod closest allies.",
-    th: "เสียงร้องศึกที่เพิ่มขวัญกำลังใจให้ตัวเองหรือทีม เพิ่ม agility และ strength +2 (+leadership mod/2) เป็นเวลา 2 เทิร์น (3 เทิร์นที่เลเวล 5) ส่งผลต่อตัวเอง + charisma mod เพื่อนร่วมทีมที่ใกล้ที่สุด",
+    text: {
+      en: "Let out a mighty battle cry that inspires you and your allies to fight harder.\nAffects yourself + <CHAmod> closest allies.\nGain <BuffWarCry> for {5}'3':'2'{/} turns.",
+      th: "เปล่งเสียงร้องศึกที่ยิ่งใหญ่ที่ปลุกใจคุณและพันธมิตรให้ต่อสู้อย่างหนักขึ้น\nส่งผลต่อตัวเอง + <CHAmod> พันธมิตรที่ใกล้ที่สุด\nได้รับ <BuffWarCry> {5}'3':'2'{/} เทิร์น",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -64,9 +66,12 @@ export const warCry = new WarriorSkill({
     const affectedCharacters = [actor, ...alliesToAffect];
     
     // Apply War Cry buff to affected characters
-    // Store buff strength in permValue
+    // Store buff strength in universalCounter
     for (const character of affectedCharacters) {
-      buffsAndDebuffsRepository.warCry.appender(character, duration, false, buffStrength);
+      buffsAndDebuffsRepository.warCry.appender(character, { 
+        turnsAppending: duration, 
+        universalCounter: buffStrength 
+      });
     }
     
     const affectedNames = affectedCharacters.map(c => c.name.en).join(", ");

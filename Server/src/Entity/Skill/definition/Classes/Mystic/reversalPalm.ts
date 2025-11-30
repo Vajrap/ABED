@@ -14,8 +14,14 @@ export const reversalPalm = new MysticSkill({
     th: "ฝ่ามือพลิก",
   },
   description: {
-    en: "After using, give self a buff 'Reverse Palm' for 1 turn: Reverse Palm: when attacked, roll a d20 willpower save, if passed, deal 1d6 blunt damage + dex mod * (1 + 0.1 * skill level) to the attacker and negate that attack, Then remove the buff, if fail, remove the buff and take damage normally.",
-    th: "หลังจากใช้ จะได้รับบัฟ 'ฝ่ามือพลิก' เป็นเวลา 1 เทิร์น: เมื่อถูกโจมตี ให้ทอย d20 willpower save หากสำเร็จ จะสร้างความเสียหายทื่อ 1d6 + dex mod * (1 + 0.1 * เลเวลสกิล) ต่อผู้โจมตีและยกเลิกการโจมตีนั้น แล้วลบบัฟ หากล้มเหลว จะลบบัฟและรับความเสียหายตามปกติ",
+    text: {
+      en: "Assume a defensive stance that redirects incoming attacks back at your foe.\nGain <BuffReversalPalm> for 1 turn.\nWhen attacked, [r]roll WILsave[/r]. If passed, deal <FORMULA> blunt damage to attacker and negate the attack.",
+      th: "ใช้ท่าป้องกันที่สะท้อนการโจมตีที่เข้ามากลับไปที่ศัตรู\nได้รับ <BuffReversalPalm> 1 เทิร์น\nเมื่อถูกโจมตี ทอย [r]WILsave[/r] หากสำเร็จ สร้างความเสียหายทื่อ <FORMULA> ต่อผู้โจมตีและยกเลิกการโจมตี",
+    },
+    formula: {
+      en: "(1d6 + <DEXmod>) × <SkillLevelMultiplier>",
+      th: "(1d6 + <DEXmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
   equipmentNeeded: ["bareHand"],
@@ -39,12 +45,13 @@ export const reversalPalm = new MysticSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    // Apply Reversal Palm buff for 1 turn, store skill level in permValue
+    // Apply Reversal Palm buff for 1 turn, store skill level in universalCounter
     buffsAndDebuffsRepository.reversalPalm.appender(
       actor,
-      1,
-      false,
-      skillLevel,
+      {
+        turnsAppending: 1,
+        universalCounter: skillLevel,
+      },
     );
 
     return {

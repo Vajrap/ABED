@@ -1,3 +1,16 @@
+/**
+ * TODO: LORE ALIGNMENT - Character Creation Level 1
+ * 
+ * Current: "Dark Pact" - Very mystical concept of making a "pact" which doesn't align
+ * with elemental system. The sacrifice mechanic is good, but the framing is too mystical.
+ * 
+ * Suggested Changes:
+ * - Rename to "Elemental Sacrifice" or "Chaos Surge" or "Overcharge"
+ * - Description: "Sacrifice HP to channel overwhelming chaos/water energy" instead of "dark pact"
+ * - Frame as overcharging elemental power by sacrificing vitality, not making a mystical pact
+ * - The chaos + water consumption already exists, so emphasize elemental overcharge
+ * - Consider: "Berserker Surge" - sacrifice HP to unleash massive chaos damage
+ */
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { WarlockSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
@@ -15,12 +28,18 @@ import { WarlockSkill } from "./index";
 export const darkPact = new WarlockSkill({
   id: WarlockSkillId.DarkPact,
   name: {
-    en: "Dark Pact",
-    th: "พันธสัญญามืด",
+    en: "Darkness Overcharge",
+    th: "วินาศกรรมมืด",
   },
   description: {
-    en: "Sacrifice 10 HP (8 at level 7) to deal 2d10 + (2 × planar mod) * (1 + 0.15 * skill level) dark damage with true damage. At level 7, add 1d6 extra damage.",
-    th: "เสียสละ 10 HP (8 ที่เลเวล 7) เพื่อสร้างความเสียหายมืด 2d10 + (2 × ค่า planar) * (1 + 0.15 * เลเวลสกิล) เป็นความเสียหายจริง ที่เลเวล 7 เพิ่มความเสียหาย 1d6",
+    text: {
+      en: "Sacrifice your own vitality to unleash overwhelming dark power.\nSacrifice {7}'8':'10'{/} HP to deal <FORMULA> [r]true dark damage[/r] that bypasses all defenses.",
+      th: "เสียสละพลังชีวิตของตัวเองเพื่อปลดปล่อยพลังมืดที่ล้นเกิน\nเสียสละ {7}'8':'10'{/} HP เพื่อสร้างความเสียหายมืดแท้ <FORMULA> [r]ที่ผ่านการป้องกันทั้งหมด[/r]",
+    },
+    formula: {
+      en: "(2d10 + (2 × <PlanarMod>)) × (1 + 0.15 × skill level) {7}+'1d6' extra damage{/}",
+      th: "(2d10 + (2 × <PlanarMod>)) × (1 + 0.15 × เลเวลสกิล) {7}+'1d6' ความเสียหายพิเศษเพิ่มเติม{/}",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -111,7 +130,7 @@ export const darkPact = new WarlockSkill({
     const message = buildCombatMessage(
       actor,
       target,
-      { en: "Dark Pact", th: "พันธสัญญามืด" },
+      { en: "Darkness Overcharge", th: "วินาศกรรมมืด" },
       damageResult,
     );
 

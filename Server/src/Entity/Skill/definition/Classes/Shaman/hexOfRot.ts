@@ -1,3 +1,19 @@
+/**
+ * TODO: LORE ALIGNMENT - Character Creation Level 1
+ * 
+ * Current: "Hex of Rot" - Uses abstract "restless spirits" and "hex" concepts. Planar energy
+ * should manifest in tangible ways, not abstract spirit summoning.
+ * 
+ * Suggested Changes:
+ * - Rename to "Decay Strike" or "Rotting Touch" or "Chaos Decay"
+ * - Description: "Channel chaos/earth energy to cause visible decay/rot on target" instead
+ *   of abstract "restless spirits"
+ * - Frame as tangible decay/rot effect (visible rotting, decay spreading) rather than
+ *   spirit-based hex
+ * - The chaos consumption already exists, emphasize tangible manifestation of decay
+ * - Consider: "Decay Strike" - physically cause visible decay/rot on target with chaos/earth
+ *   energy (like flesh rotting, armor rusting - tangible effects)
+ */
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ShamanSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
@@ -18,8 +34,14 @@ export const hexOfRot = new ShamanSkill({
     th: "คำสาปเน่าเปื่อย",
   },
   description: {
-    en: "Calls upon restless spirits to curse a foe. Deals 1d4 Chaos damage + planar mod + 0.5 * skill level. Target hit must roll DC10 + control mod willpower saves or get hexed: Endurance reduced by 2 points for 2 turns.",
-    th: "เรียกวิญญาณที่ไม่สงบมาสาปแช่งศัตรู สร้างความเสียหาย Chaos 1d4 + ค่า planar + 0.5 * เลเวลสกิล เป้าหมายที่โดนต้องทอย DC10 + control mod willpower saves หรือจะถูกสาป: Endurance ลดลง 2 หน่วยเป็นเวลา 2 เทิร์น",
+    text: {
+      en: "Channel chaos energy to cause visible decay and rot on your enemy.\nDeal <FORMULA> chaos damage.\nTarget must [r]roll DC10 + <ControlMod> WILsave[/r] or get <DebuffHexed> for 2 turns.",
+        th: "ควบคุมพลังงาน chaos เพื่อทำให้เกิดการเน่าเปื่อยที่มองเห็นได้บนศัตรู\nสร้างความเสียหาย chaos <FORMULA>\nเป้าหมายต้องทอย [r]WILsave DC10 + <ControlMod>[/r] หรือถูก <DebuffHexed> เป็นเวลา 2 เทิร์น",
+      },
+    formula: {
+      en: "1d4 + <PlanarMod> + 0.5 × skill level",
+      th: "1d4 + <PlanarMod> + 0.5 × เลเวลสกิล",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -93,7 +115,7 @@ export const hexOfRot = new ShamanSkill({
     if (willpowerSave < hexDC + statMod(target.attribute.getTotal("willpower"))) {
       // Target fails save - reduce endurance (TODO: implement endurance debuff)
       hexMessage = ` ${target.name.en} was hexed! Endurance reduced by 2 (not yet implemented)`;
-      buffsAndDebuffsRepository.hexed.appender(target, 1, false, 0);
+      buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: 1 });
     } else {
       hexMessage = ` ${target.name.en} resisted the hex!`;
     }

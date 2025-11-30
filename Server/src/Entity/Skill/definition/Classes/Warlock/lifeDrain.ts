@@ -10,7 +10,6 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
-import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WarlockSkill } from "./index";
 
 export const lifeDrain = new WarlockSkill({
@@ -20,8 +19,14 @@ export const lifeDrain = new WarlockSkill({
     th: "ดูดชีวิต",
   },
   description: {
-    en: "Drain vitality from an enemy. Deals 1d8 + planar mod + willpower mod necrotic damage. Heal self for 50% + vitality mod/10 of damage dealt (75% + vitality mod/10 at level 5).",
-    th: "ดูดพลังชีวิตจากศัตรู สร้างความเสียหายเน่าเปื่อย 1d8 + ค่า planar + ค่า willpower ฟื้นฟูตัวเอง 50% + vitality mod/10 ของความเสียหายที่สร้าง (75% + vitality mod/10 ที่เลเวล 5)",
+    text: {
+      en: "Drain the very life force from your enemy, converting their vitality into your own.\nDeal <FORMULA> erosion damage.\n[b]Heal yourself[/b] for {5}'75%':'50%'{/} + <VITmod>/10 of damage dealt.",
+      th: "ดูดพลังชีวิตจากศัตรู แปลงพลังชีวิตของพวกเขาเป็นของคุณเอง\nสร้างความเสียหายกัดกร่อน <FORMULA>\n[b]ฟื้นฟูตัวเอง[/b] {5}'75%':'50%'{/} + <VITmod>/10 ของความเสียหายที่สร้าง",
+    },
+    formula: {
+      en: "{5}'1d10':'1d8'{/} + <PlanarMod> + <WILmod>",
+      th: "{5}'1d10':'1d8'{/} + <PlanarMod> + <WILmod>",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -86,7 +91,7 @@ export const lifeDrain = new WarlockSkill({
       damage: totalDamage,
       hit: rollTwenty().total + controlMod,
       crit: rollTwenty().total + luckMod,
-      type: DamageType.necrotic,
+      type: DamageType.erosion,
       isMagic: true,
     };
 

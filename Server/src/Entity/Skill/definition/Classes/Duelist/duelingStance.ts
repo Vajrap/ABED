@@ -15,8 +15,10 @@ export const duelingStance = new DuelistSkill({
     th: "ท่าดวล",
   },
   description: {
-    en: "Adopt a focused dueling stance, enhancing your precision. Gain Dueling Stance buff for 2 turns (3 at level 5). While active: +2 to hit rolls, +2 to dodge. At level 5, also gain +2 crit.",
-    th: "ใช้ท่าดวลที่มุ่งเน้น เพิ่มความแม่นยำ ได้รับบัฟ Dueling Stance 2 เทิร์น (3 เทิร์นที่เลเวล 5) ขณะที่ใช้งาน: +control mod/2 ต่อ hit rolls, +agility mod/2 ต่อ dodge ที่เลเวล 5 จะได้รับ +2 crit ด้วย",
+    text: {
+      en: "Adopt a focused dueling stance, enhancing your precision. \nGain <BuffDuelingStance> for {5}'3':'2'{/} turns. \n{5}\nGains [g]+2 crit[/g].{/}",
+      th: "ใช้ท่าดวลที่มุ่งเน้น เพิ่มความแม่นยำ \nได้รับ <BuffDuelingStance> {5}'3':'2'{/} เทิร์น \n{5}\nได้รับ [g]+2 crit[/g]{/}",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -55,9 +57,12 @@ export const duelingStance = new DuelistSkill({
     // Apply Dueling Stance buff for 2 turns (3 at level 5)
     const duration = skillLevel >= 5 ? 3 : 2;
     // Store level 5 indicator in permValue (1 = level 5+, 0 = not level 5)
-    const isPerm = skillLevel >= 5;
+    const additionalCrit = skillLevel >= 5 ? 2 : 0;
 
-    buffsAndDebuffsRepository.duelingStance.appender(actor, duration, isPerm, 0);
+    buffsAndDebuffsRepository.duelingStance.appender(actor, { 
+      turnsAppending: duration, 
+      universalCounter: additionalCrit,
+    });
 
     const level5Bonus = skillLevel >= 5 ? " Gains +2 crit!" : "";
 

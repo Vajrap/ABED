@@ -1,3 +1,19 @@
+/**
+ * TODO: LORE ALIGNMENT - Character Creation Level 1
+ * 
+ * Current: "Spirit Rattle" - Uses abstract "ghostly aid" and "bone charm" concepts.
+ * Planar energy should manifest in tangible ways, not abstract spirit summoning.
+ * 
+ * Suggested Changes:
+ * - Rename to "Harmony Rattle" or "Order Resonance" or "Harmony Chant"
+ * - Description: "Channel order energy through rattle, creating visible healing resonance
+ *   waves" instead of abstract "ghostly aid"
+ * - Frame as tangible order energy creating visible resonance waves/healing energy that
+ *   flows to allies, rather than abstract spirit summoning
+ * - The order element production already exists, emphasize tangible manifestation
+ * - Consider: "Harmony Rattle" - tangible order energy waves visibly flowing from rattle
+ *   to allies, creating healing resonance (visible energy, not abstract spirits)
+ */
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { ShamanSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
@@ -7,15 +23,21 @@ import { roll } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { ShamanSkill } from "./index";
 
-export const spiritRattle = new ShamanSkill({
-  id: ShamanSkillId.SpiritRattle,
+export const holyRattle = new ShamanSkill({
+  id: ShamanSkillId.HolyRattle,
   name: {
-    en: "Spirit Rattle",
-    th: "กระดิ่งผี",
+    en: "Holy Rattle",
+    th: "กระดิ่งพระพรหม",
   },
   description: {
-    en: "Shake a bone charm, summoning erratic ghostly aid. Grants random allies (n) a spirit rattle buff for 1 + (0.5 * skillLevel) turns. Number of targets based on 1 + 1d(skillLevel): Character with Spirit Rattle buff automatically heals for 1d4 + willpower mod when take turn",
-    th: "เขย่ากระดิ่งแห่งวิญญาณ เรียกความช่วยเหลือจากผีแบบไม่เสถียร ให้บัฟ Spirit Rattle แก่เพื่อนร่วมทีมแบบสุ่ม (n) เป็นเวลา 1 + (0.5 * เลเวลสกิล) เทิร์น จำนวนเป้าหมายขึ้นอยู่กับ 1 + 1d(skillLevel): ผู้ที่มีบัพกระดิ่งวิญญาณจะรักษาตัวเอง 1d4 + will power mod เมื่อเข้าเทิร์น",
+    text: {
+      en: "Channel order energy through resonance, creating visible healing waves that flow to your allies.\nGrants <FORMULA> random allies <BuffSpiritRattle> for {5}3:2{/} turns.\nCharacters with <BuffSpiritRattle> heal for 1d4 + <WILmod> at the start of their turn.",
+      th: "ควบคุมพลังงาน order ผ่านการสั่นพ้อง สร้างคลื่นการรักษาที่มองเห็นได้ที่ไหลไปยังพันธมิตร\nให้ <FORMULA> พันธมิตรแบบสุ่ม <BuffSpiritRattle> เป็นเวลา {5}3:2{/} เทิร์น\nผู้ที่มี <BuffSpiritRattle> จะรักษาตัวเอง 1d4 + <WILmod> ที่เริ่มเทิร์น",
+    },
+    formula: {
+      en: "2-6 allies based on skill level",
+      th: "2-6 พันธมิตรขึ้นอยู่กับเลเวลสกิล",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -75,7 +97,7 @@ export const spiritRattle = new ShamanSkill({
     }
 
     for (const target of actualTargets) {
-      buffsAndDebuffsRepository.spiritRattle.appender(target, duration, false, 0);
+      buffsAndDebuffsRepository.spiritRattle.appender(target, { turnsAppending: duration });
     }
 
     // Apply buff to targets (TODO: implement control buff)

@@ -20,11 +20,17 @@ export const earthshatter = new BarbarianSkill({
     th: "สั่นสะเทือนพิภพ",
   },
   description: {
-    en: "Slam the ground to damage the enemy front line. Deals 1d8 + STR mod (1d10 at level 5) physical damage to each front-row foe. Targets roll DC8 Endurance save or become Dazed for 1 turn.",
-    th: "กระแทกพื้นสร้างความเสียหายให้ศัตรูแถวหน้า สร้างความเสียหาย 1d8 + STR mod (1d10 ที่เลเวล 5) ให้ศัตรูแถวหน้าทุกคน เป้าหมายทอย Endurance DC8 ไม่ผ่านจะติด Dazed 1 เทิร์น",
+    text: {
+      en: "Slam the ground with your weapon, sending a shock wave to the enemy line dealing damage all enemy in a line. \nDeals <FORMULA> blunt damage to each target. \nEach target [r]rolls DC8 ENDsave or becomes <DebuffDazed> for 1 turn.[/r]",
+      th: "กระแทกพื้นด้วยอาวุธอย่างรุนแรง ส่งคลื่นสั่นสะเทือนใส่ศัตรูแถวหน้า \nสร้างความเสียหาย <FORMULA> ให้ศัตรูแถวหน้าทุกคน \nเป้าหมายแต่ละคนทอย [r]DC8 ENDsave ไม่ผ่านจะติด <DebuffDazed> 1 เทิร์น[/r]",
+    },
+    formula: {
+      en: "({5}'1d10':'1d8'{/} + <STRmod>) × <SkillLevelMultiplier>",
+      th: "({5}'1d10':'1d8'{/} + <STRmod>) × <SkillLevelMultiplier>",
+    },
   },
   requirement: {},
-  equipmentNeeded: ["sword", "axe", "blade", "hammer", "spear", "bareHand"],
+  equipmentNeeded: ["sword","axe", "blade", "hammer", "spear", "bareHand"],
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
@@ -88,7 +94,7 @@ export const earthshatter = new BarbarianSkill({
       let extraTh = "";
       const saveRoll = target.rollSave("endurance");
       if (saveRoll < dc) {
-        debuffsRepository.dazed.appender(target, 1, false, 0);
+        debuffsRepository.dazed.appender(target, { turnsAppending: 1 });
         extraEn = " (Dazed!)";
         extraTh = " (มึนงง!)";
       }

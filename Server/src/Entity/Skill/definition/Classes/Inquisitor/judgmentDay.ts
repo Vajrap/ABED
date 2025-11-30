@@ -21,8 +21,14 @@ export const judgmentDay = new InquisitorSkill({
     th: "วันพิพากษา",
   },
   description: {
-    en: "Call down a concentrated pillar of radiant force. Deals 2d6 + (willpower + planar mod) * (1 + 0.15 * skill level) holy damage to single target. If target has Exposed debuff, deal +50% damage. Against undead/fiends, deal +1d8 bonus damage. At level 5, damage increases to 2d8 base.",
-    th: "เรียกเสาแสงศักดิ์สิทธิ์ที่เข้มข้น สร้างความเสียหายศักดิ์สิทธิ์ 2d6 + (willpower + planar mod) * (1 + 0.15 * เลเวลสกิล) ต่อเป้าหมายเดียว หากเป้าหมายมี Exposed debuff จะสร้างความเสียหายเพิ่ม +50% ต่อ undead/fiends จะสร้างความเสียหายเพิ่ม +1d8 ที่เลเวล 5 ความเสียหายพื้นฐานเพิ่มเป็น 2d8",
+    text: {
+      en: "Call down divine judgment upon your enemy, a pillar of pure radiance that burns away all impurity.\nDeal <FORMULA> holy damage.\n[r]Deal +50% damage[/r] if target has <DebuffExposed>.\n[r]Deal +1d8 bonus damage[/r] against undead or fiends.",
+      th: "เรียกการพิพากษาจากสวรรค์ใส่ศัตรู เสาแสงศักดิ์สิทธิ์ที่เผาผลาญความไม่บริสุทธิ์ทั้งหมด\nสร้างความเสียหายศักดิ์สิทธิ์ <FORMULA>\n[r]สร้างความเสียหายเพิ่ม +50%[/r] หากเป้าหมายมี <DebuffExposed>\n[r]สร้างความเสียหายเพิ่ม +1d8[/r] ต่อ undead หรือ fiends",
+    },
+    formula: {
+      en: "{5}'2d8':'2d6'{/} + (<WILmod> + <PlanarMod>) × (1 + 0.15 × skill level)",
+      th: "{5}'2d8':'2d6'{/} + (<WILmod> + <PlanarMod>) × (1 + 0.15 × เลเวลสกิล)",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -103,7 +109,7 @@ export const judgmentDay = new InquisitorSkill({
       damage: totalDamage + bonusDamage,
       hit: rollTwenty().total + controlMod,
       crit: rollTwenty().total + luckMod,
-      type: DamageType.holy,
+      type: DamageType.radiance,
       isMagic: true,
     };
 

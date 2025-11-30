@@ -19,8 +19,14 @@ export const cleave = new WarriorSkill({
     th: "ฟันกวาด",
   },
   description: {
-    en: "Deal 1x weapon damage + Strength mod * skillScalar * positionModifier to all enemies in the front most row. At level 5 damage increases to 1.2x weapon damage.",
-    th: "สร้างความเสียหาย 1 เท่าของอาวุธ + Strength mod * skillScalar * positionModifier ให้ศัตรูทั้งหมดในแถวหน้าสุด เมื่อเลเวล 5 ความเสียหายเพิ่มเป็น 1.2 เท่า",
+    text: {
+      en: "Swing your weapon in a wide arc, cutting through all enemies in the front row.\nDeal <FORMULA> damage to all enemies in the front row.",
+      th: "ฟันอาวุธในวงกว้าง ตัดผ่านศัตรูทั้งหมดในแถวหน้า\nสร้างความเสียหาย <FORMULA> ให้ศัตรูทั้งหมดในแถวหน้า",
+    },
+    formula: {
+      en: "({5}'1.2':'1.0'{/} × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "({5}'1.2':'1.0'{/} × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+    },
   },
   requirement: {},
   equipmentNeeded: [
