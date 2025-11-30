@@ -19,8 +19,10 @@ export const basicAttack = new Skill({
     th: "โจมตีปกติ",
   },
   description: {
-    en: "A basic attack, dealing damage equal to weapon's damage (+ modifier)",
-    th: "การโจมตีปกติ สร้างความเสียหายเท่ากับความเสียหายจากอาวุธ (+ modifier)",
+    text: {
+      en: "A basic attack, dealing damage equal to weapon's damage (+ modifier)",
+      th: "การโจมตีปกติ สร้างความเสียหายเท่ากับความเสียหายจากอาวุธ (+ modifier)",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
