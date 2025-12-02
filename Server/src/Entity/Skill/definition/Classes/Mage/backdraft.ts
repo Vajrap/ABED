@@ -118,7 +118,18 @@ export const backdraft = new MageSkill({
     }
 
     // Heal self based on removed burn stacks
-    const additionalHeal = skillLevel >= 5 ? roll(1).d(2).total : 0;
+    // At level < 5: totalBurnStacks * (0.1 * skillLevel) + 1 per stack
+    // At level >= 5: totalBurnStacks * (0.1 * skillLevel) + 1d2 per stack
+    let additionalHeal = 0;
+    if (skillLevel >= 5) {
+      // Roll 1d2 for each stack
+      for (let i = 0; i < totalBurnStacks; i++) {
+        additionalHeal += roll(1).d(2).total;
+      }
+    } else {
+      // +1 per stack at level < 5
+      additionalHeal = totalBurnStacks;
+    }
     const healAmount = Math.floor(
       totalBurnStacks * (0.1 * skillLevel) + additionalHeal,
     );

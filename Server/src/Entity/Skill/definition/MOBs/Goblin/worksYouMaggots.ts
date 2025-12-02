@@ -14,8 +14,10 @@ export const worksYouMaggots = new Skill({
   id: MobSkillId.WorksYouMaggots,
   name: { en: "Work You Maggots!", th: "ทำงานไอ้หนอน!" },
   description: {
-    en: "Target one ally 'Goblin' deal 1d3 true damage and add a Buff: Slave Driver to self equal to damage dealt; target get abGauge += 5 + skill level: consume 2 sp : produce 1 chaos",
-    th: "เลือกพันธมิตร 'ก๊อปลิน' หนึ่งตัว สร้างความเสียหายจริง 1d3 และเพิ่มบัฟ Slave Driver ให้ตัวเองเท่ากับความเสียหายที่ทำได้; เป้าหมายได้รับ abGauge += 5 + เลเวลสกิล: ใช้ 2 sp : สร้าง 1 chaos",
+    text: {
+      en: "Target one ally 'Goblin' deal 1d3 true damage and add a Buff: Slave Driver to self equal to damage dealt; target get abGauge += 5 + skill level: consume 2 sp : produce 1 chaos",
+      th: "เลือกพันธมิตร 'ก๊อปลิน' หนึ่งตัว สร้างความเสียหายจริง 1d3 และเพิ่มบัฟ Slave Driver ให้ตัวเองเท่ากับความเสียหายที่ทำได้; เป้าหมายได้รับ abGauge += 5 + เลเวลสกิล: ใช้ 2 sp : สร้าง 1 chaos",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

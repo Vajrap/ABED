@@ -59,7 +59,7 @@ export const retreatDash = new RogueSkill({
     buffsAndDebuffsRepository.retreat.appender(actor, { turnsAppending: skillLevel >= 5 ? 2 : 1 });
     let moved = false;
 
-    if (actor.position > 2) {
+    if (actor.position <= 2) {
       const allOccupiedPositions = actorParty.map((member) => member.position);
       for (const position of [3, 4, 5] as const) {
         if (!allOccupiedPositions.includes(position)) {

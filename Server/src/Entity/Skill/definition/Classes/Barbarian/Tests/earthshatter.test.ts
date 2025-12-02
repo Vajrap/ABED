@@ -110,7 +110,7 @@ describe("Earthshatter Skill", () => {
         damageType: "blunt",
         isHit: true,
         isCrit: false,
-      });
+      } as any);
 
       const dazedAppenderSpy = jest.spyOn(debuffsRepository.dazed, "appender");
 
@@ -181,7 +181,7 @@ describe("Earthshatter Skill", () => {
         damageType: "blunt",
         isHit: true,
         isCrit: false,
-      });
+      } as any);
 
       earthshatter.exec(
         actor,
@@ -231,7 +231,7 @@ describe("Earthshatter Skill", () => {
         damageType: "blunt",
         isHit: true,
         isCrit: false,
-      });
+      } as any);
 
       earthshatter.exec(
         actor,
@@ -287,7 +287,7 @@ describe("Earthshatter Skill", () => {
         damageType: "blunt",
         isHit: true,
         isCrit: false,
-      });
+      } as any);
 
       const dazedAppenderSpy = jest.spyOn(debuffsRepository.dazed, "appender");
 
@@ -337,7 +337,7 @@ describe("Earthshatter Skill", () => {
         damageType: "blunt",
         isHit: true,
         isCrit: false,
-      });
+      } as any);
 
       const dazedAppenderSpy = jest.spyOn(debuffsRepository.dazed, "appender");
 
@@ -385,7 +385,7 @@ describe("Earthshatter Skill", () => {
         damageType: "blunt",
         isHit: true,
         isCrit: false,
-      });
+      } as any);
 
       const dazedAppenderSpy = jest.spyOn(debuffsRepository.dazed, "appender");
 
@@ -434,7 +434,7 @@ describe("Earthshatter Skill", () => {
         damageType: "blunt",
         isHit: true,
         isCrit: false,
-      });
+      } as any);
 
       const result = earthshatter.exec(
         actor,

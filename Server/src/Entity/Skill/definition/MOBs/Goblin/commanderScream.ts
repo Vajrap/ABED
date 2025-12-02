@@ -12,8 +12,10 @@ export const commanderScream = new Skill({
   id: MobSkillId.CommanderScream,
   name: { en: "Commander Scream!", th: "คำสั่งกรีดร้อง!" },
   description: {
-    en: "Target all allies, each rolls DC15 willpower; on fail gain Fear 2t and Cowardly Charge 2t: consume 2 chaos, 2 sp: produce 1 earth",
-    th: "เลือกพันธมิตรทั้งหมด ทอย DC15 willpower ถ้าล้มเหลวได้ Fear 2 เทิร์น และ Cowardly Charge 2 เทิร์น: ใช้ 2 chaos, 2 sp: สร้าง 1 earth",
+    text: {
+      en: "Target all allies, each rolls DC15 willpower; on fail gain Fear 2t and Cowardly Charge 2t: consume 2 chaos, 2 sp: produce 1 earth",
+      th: "เลือกพันธมิตรทั้งหมด ทอย DC15 willpower ถ้าล้มเหลวได้ Fear 2 เทิร์น และ Cowardly Charge 2 เทิร์น: ใช้ 2 chaos, 2 sp: สร้าง 1 earth",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

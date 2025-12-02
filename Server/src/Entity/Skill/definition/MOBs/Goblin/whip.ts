@@ -16,8 +16,10 @@ export const whip = new Skill({
   id: MobSkillId.Whip,
   name: { en: "Whip!", th: "แส้!" },
   description: {
-    en: "Attack one enemy deal 1d6 damage + all (Slave Drive) stacks*2 * (1+(skillLevel*0.1)), after attack, remove slave driver stacks",
-    th: "โจมตีศัตรูหนึ่งตัว สร้างความเสียหาย 1d6 + (สแต็ค Slave Driver ทั้งหมด)*2 * (1+(เลเวลสกิล*0.1)), หลังโจมตี ลบสแต็ค Slave Driver ทั้งหมด",
+    text: {
+      en: "Attack one enemy deal 1d6 damage + all (Slave Drive) stacks*2 * (1+(skillLevel*0.1)), after attack, remove slave driver stacks",
+      th: "โจมตีศัตรูหนึ่งตัว สร้างความเสียหาย 1d6 + (สแต็ค Slave Driver ทั้งหมด)*2 * (1+(เลเวลสกิล*0.1)), หลังโจมตี ลบสแต็ค Slave Driver ทั้งหมด",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

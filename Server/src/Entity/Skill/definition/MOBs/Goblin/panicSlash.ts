@@ -18,8 +18,10 @@ export const panicSlash = new Skill({
     th: "ฟันแบบตื่นตระหนก",
   },
   description: {
-    en: "A reckless melee attack. Deals 1.0× physical damage (+skill Level) with a -4 hit roll penalty, but grants +2 crit roll instead.",
-    th: "การโจมตีระยะประชิดแบบไม่คิดหน้าคิดหลัง สร้างความเสียหายกายภาพ 1.0× (+เลเวบของสกิล) โอกาสโจมตีโดนลดลง 4 แต่โอกาสเกิดคริติคอลเพิ่มขึ้น 2",
+    text: {
+      en: "A reckless melee attack. Deals 1.0× physical damage (+skill Level) with a -4 hit roll penalty, but grants +2 crit roll instead.",
+      th: "การโจมตีระยะประชิดแบบไม่คิดหน้าคิดหลัง สร้างความเสียหายกายภาพ 1.0× (+เลเวบของสกิล) โอกาสโจมตีโดนลดลง 4 แต่โอกาสเกิดคริติคอลเพิ่มขึ้น 2",
+    },
   },
   requirement: {},
   equipmentNeeded: ["dagger", "sword", 'axe'], // Melee weapons

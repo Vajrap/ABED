@@ -20,8 +20,10 @@ export const throwPebble = new Skill({
     th: "ขว้างก้อนหิน",
   },
   description: {
-    en: "A simple ranged attack with a pebble. Deals 1d6 blunt damage. If hit, target must roll DC10 endurance saves or dazed.",
-    th: "การโจมตีระยะไกลด้วยก้อนหิน สร้างความเสียหาย blunt 1d6 หน่วย หากโจมตีถูก เป้าหมายจะต้องทอย DC10 endurance saves หรือติดสถานะสับสน",
+    text: {
+      en: "A simple ranged attack with a pebble. Deals 1d6 blunt damage. If hit, target must roll DC10 endurance saves or dazed.",
+      th: "การโจมตีระยะไกลด้วยก้อนหิน สร้างความเสียหาย blunt 1d6 หน่วย หากโจมตีถูก เป้าหมายจะต้องทอย DC10 endurance saves หรือติดสถานะสับสน",
+    },
   },
   requirement: {},
   equipmentNeeded: [],

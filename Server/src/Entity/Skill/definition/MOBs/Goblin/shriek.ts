@@ -18,8 +18,10 @@ export const shriek = new Skill({
     th: "กรีดร้อง",
   },
   description: {
-    en: "A panicked shriek all enemy must roll DC10 willpower save, if failed gain Minor Fear. the user also have roll D20, if the result is 15+ gain 1 turn of taunt.",
-    th: "กรีดร้องด้วยความตื่นตระหนก ศัตรูทั้งหมดต้องทอย DC10 willpower save, ถ้าล้มเหลวจะทำให้เกิด Minor Fear ผู้ใช้ทอย D20, ถ้าผลลัพธ์คือ 15+ จะได้รับสถานะยั่วยุ 1 เทิร์น",
+    text: {
+      en: "A panicked shriek all enemy must roll DC10 willpower save, if failed gain Minor Fear. the user also have roll D20, if the result is 15+ gain 1 turn of taunt.",
+      th: "กรีดร้องด้วยความตื่นตระหนก ศัตรูทั้งหมดต้องทอย DC10 willpower save, ถ้าล้มเหลวจะทำให้เกิด Minor Fear ผู้ใช้ทอย D20, ถ้าผลลัพธ์คือ 15+ จะได้รับสถานะยั่วยุ 1 เทิร์น",
+    },
   },
   requirement: {},
   equipmentNeeded: [], // No equipment needed for vocal skill
@@ -104,6 +106,7 @@ export const shriek = new Skill({
           value: 1,
           isPerm: false,
           permValue: 0,
+          counter: 0,
         });
       }
     }
