@@ -41,14 +41,16 @@ export const tacticalSlash = new NomadSkill({
     mp: 0,
     sp: 3,
     elements: [
-      { element: "fire", value: 1 },
+      { element: "neutral", value: 1 },
     ],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+      { element: "fire", min: 1, max: 1 },
+    ],
   },
   exec: (
     user: Character,

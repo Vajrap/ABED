@@ -41,13 +41,17 @@ export const tacticalShot = new NomadSkill({
     hp: 0,
     mp: 0,
     sp: 3,
-    elements: [],
+    elements: [
+        { element: "neutral", value: 1 },
+    ],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+        { element: "wind", min: 1, max: 1 },
+    ],
   },
   exec: (
     user: Character,
