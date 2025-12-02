@@ -35,6 +35,7 @@ import { duelingStance } from "./definitions/buffs/duelingStance";
 import { curseMarkActive } from "./definitions/buffs/curseMarkActive";
 import { charm } from "./definitions/buffs/charm";
 import { exposeWeaknessActive } from "./definitions/buffs/exposeWeaknessActive";
+import { precognition } from "./definitions/buffs/precognition";
 import { entangled } from "./definitions/debuffs/entangled";
 import { hexMark } from "./definitions/debuffs/hexMark";
 import { disruptPattern } from "./definitions/debuffs/disruptPattern";
@@ -43,6 +44,8 @@ import { healCooldown } from "./definitions/debuffs/healCooldown";
 import { massHealCooldown } from "./definitions/debuffs/massHealCooldown";
 import { mendSpiritCooldown } from "./definitions/debuffs/mendSpiritCooldown";
 import { critDef } from "./definitions/debuffs/critDef";
+import { bearTrap } from "./definitions/debuffs/bearTrap";
+import { blind } from "./definitions/debuffs/blind";
 
 export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.haste]: haste,
@@ -71,6 +74,7 @@ export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.curseMarkActive]: curseMarkActive,
   [BuffEnum.charm]: charm,
   [BuffEnum.exposeWeaknessActive]: exposeWeaknessActive,
+  [BuffEnum.precognition]: precognition,
 };
 
 export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
@@ -95,6 +99,12 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   
   // Stat Debuffs
   [DebuffEnum.critDef]: critDef,
+  
+  // Engineer
+  [DebuffEnum.bearTrap]: bearTrap,
+  
+  // Nomad
+  [DebuffEnum.blind]: blind,
 };
 
 export const buffsAndDebuffsRepository = {

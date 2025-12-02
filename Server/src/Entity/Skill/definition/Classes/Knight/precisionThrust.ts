@@ -11,7 +11,6 @@ import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { statMod } from "src/Utils/statMod";
 import type { ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
 
 const allowedWeapons: ProficiencyKey[] = ["sword", "spear"];
@@ -28,8 +27,8 @@ export const precisionThrust = new KnightSkill({
       th: "พุ่งแทงศัตรูแถวหน้าอย่างแม่นยำ หาช่องว่างที่สมบูรณ์แบบ\nสร้างความเสียหาย <FORMULA> พร้อมกับ [b]+3 hit[/b]\n[b]ได้รับ crit เพิ่ม[/b] หากเป้าหมายมีดีบัฟ",
     },
     formula: {
-      en: "(<WeaponDamage> + <STRmod>) × (1 + 0.1 × skill level) × <MeleeRangePenalty>",
-      th: "(<WeaponDamage> + <STRmod>) × (1 + 0.1 × เลเวลสกิล) × <MeleeRangePenalty>",
+      en: "<WeaponDamage> × (1 + 0.1 × skill level) × <MeleeRangePenalty>",
+      th: "<WeaponDamage> × (1 + 0.1 × เลเวลสกิล) × <MeleeRangePenalty>",
     },
   },
   requirement: {},
@@ -104,11 +103,11 @@ export const precisionThrust = new KnightSkill({
       target.position,
       weapon,
     );
-    const strengthMod = statMod(actor.attribute.getTotal("strength"));
+    // Note: getWeaponDamageOutput already includes attribute modifiers
     const scale = 1 + 0.1 * skillLevel;
 
     damageOutput.damage =
-      (damageOutput.damage + strengthMod) * scale * positionModifier;
+      damageOutput.damage * scale * positionModifier;
     damageOutput.hit += 3;
 
     const hasAnyDebuff = target.buffsAndDebuffs.debuffs.entry.size > 0;

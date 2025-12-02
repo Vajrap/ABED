@@ -54,7 +54,7 @@ describe("Retreat Dash Skill", () => {
 
       expect(appenderSpy).toHaveBeenCalledWith(
         actor,
-        { turnsAppending: 1 }
+        { turnsAppending: 2}
       );
     });
 
@@ -71,7 +71,7 @@ describe("Retreat Dash Skill", () => {
 
       expect(appenderSpy).toHaveBeenCalledWith(
         actor,
-        { turnsAppending: 2 }
+        { turnsAppending: 3 }
       );
     });
   });

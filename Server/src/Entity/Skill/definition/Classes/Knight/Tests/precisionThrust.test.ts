@@ -52,8 +52,10 @@ describe("Precision Thrust Skill", () => {
     targetParty = [target];
 
     // Mock helpers
+    // Note: getWeaponDamageOutput already includes attribute modifiers (STR mod = +3)
+    // So mock returns base weapon damage (10) + STR mod (3) = 13
     jest.spyOn(getWeaponDamageOutputModule, "getWeaponDamageOutput").mockImplementation(() => ({
-      damage: 10, // Base weapon damage
+      damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
       hit: 0,
       crit: 0,
       type: "piercing",
@@ -138,12 +140,11 @@ describe("Precision Thrust Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Formula: (WeaponDamage + STRmod) * (1 + 0.1 * skill level) * RangePenalty
-      // WeaponDamage = 10 (mocked)
-      // STRmod = 3 (STR 16)
+      // Formula: WeaponDamage * (1 + 0.1 * skill level) * RangePenalty
+      // WeaponDamage (from getWeaponDamageOutput) = 13 (includes STR mod already)
       // Skill Level = 1 -> Multiplier 1.1
       // RangePenalty = 1 (mocked)
-      // Expected: (10 + 3) * 1.1 * 1 = 14.3
+      // Expected: 13 * 1.1 * 1 = 14.3
       
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,
@@ -179,7 +180,7 @@ describe("Precision Thrust Skill", () => {
       );
 
       // Level 5 -> Multiplier 1.5
-      // Expected: (10 + 3) * 1.5 = 19.5
+      // Expected: 13 * 1.5 = 19.5
       
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,

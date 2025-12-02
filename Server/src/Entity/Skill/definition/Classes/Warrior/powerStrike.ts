@@ -10,7 +10,6 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
-import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WarriorSkill } from ".";
 
@@ -26,8 +25,8 @@ export const powerStrike = new WarriorSkill({
       th: "ควบคุมพลังทั้งหมดของคุณเข้าสู่การโจมตีครั้งเดียวที่ทำลายล้าง\nสร้างความเสียหาย <FORMULA>",
     },
     formula: {
-      en: "({5}'1.5':'1.3'{/} × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
-      th: "({5}'1.5':'1.3'{/} × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      en: "({5}'1.5':'1.3'{/} × <WeaponDamage>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "({5}'1.5':'1.3'{/} × <WeaponDamage>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
     },
   },
   requirement: {},
@@ -84,7 +83,6 @@ export const powerStrike = new WarriorSkill({
     const damageOutput = getWeaponDamageOutput(actor, weapon, damageType);
 
     const baseTimes = skillLevel >= 5 ? 1.5 : 1.3;
-    const strMod = statMod(actor.attribute.getTotal("strength"));
     const levelScalar = skillLevelMultiplier(skillLevel);
 
     const positionModifierValue = getPositionModifier(
@@ -93,8 +91,9 @@ export const powerStrike = new WarriorSkill({
       weapon,
     );
 
+    // Note: getWeaponDamageOutput already includes attribute modifiers
     damageOutput.damage =
-      (damageOutput.damage * baseTimes + strMod) *
+      (damageOutput.damage * baseTimes) *
       levelScalar *
       positionModifierValue;
 

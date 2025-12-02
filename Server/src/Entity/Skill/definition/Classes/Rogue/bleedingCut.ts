@@ -11,10 +11,8 @@ import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { RogueSkill } from "./index";
-import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { roll } from "src/Utils/Dice";
 
 export const bleedingCut = new RogueSkill({
@@ -29,8 +27,8 @@ export const bleedingCut = new RogueSkill({
       th: "ตัดศัตรูด้วยการตัดที่แม่นยำ ทำให้เลือดไหลไม่หยุด\nสร้างความเสียหายตัด <FORMULA>\nเป้าหมายต้องทอย [r]ENDsave DC{5}'12':'10'{/}[/r] หรือถูก <DebuffBleed> 1d3 สแตค",
     },
     formula: {
-      en: "(<WeaponDamage> + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
-      th: "(<WeaponDamage> + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      en: "<WeaponDamage> × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "<WeaponDamage> × <SkillLevelMultiplier> × <MeleeRangePenalty>",
     },
   },
   requirement: {},
@@ -86,11 +84,11 @@ export const bleedingCut = new RogueSkill({
       weapon,
     );
 
-    // Add dex mod with skill level scaling
-    const dexMod = statMod(actor.attribute.getTotal("dexterity"));
+    // Note: getWeaponDamageOutput already includes attribute modifiers
+    // Formula: WeaponDamage × SkillLevelMultiplier × PositionModifier
     const levelScalar = skillLevelMultiplier(skillLevel);
 
-    damageOutput.damage = ((damageOutput.damage + dexMod) * levelScalar) * positionModifierValue;
+    damageOutput.damage = (damageOutput.damage * levelScalar) * positionModifierValue;
     damageOutput.type = "slash" as any; // Force slash damage type
 
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);

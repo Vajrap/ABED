@@ -15,8 +15,17 @@ import { battleTypeConfig, type BattleType } from "./types";
 import { activateBreathingSkillTurnPassive } from "../BreathingSkill/activeBreathingSkill";
 import Report from "../../Utils/Reporter";
 import { BattleStatistics } from "./BattleStatistics";
-import { setBattleStatistics } from "./BattleContext";
+import { setBattleStatistics, setBattle, setCurrentBattleId } from "./BattleContext";
 import {traitRepository} from "src/Entity/Trait/repository";
+import { BasicSkillId } from "../Skill/enums";
+import { resolveDamage } from "./damageResolution";
+import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
+
+interface ActiveTrap {
+  damage: number;
+  setterId: string; // Who set the trap
+  setterPartyId: string; // Which party set it ("partyA" or "partyB")
+}
 
 export class Battle {
   id: string;
@@ -29,6 +38,7 @@ export class Battle {
   battleType: BattleType;
   allParticipants: Character[];
   battleStatistics: BattleStatistics;
+  activeTraps: ActiveTrap[] = []; // Battle-level traps (like Bear Trap)
   constructor(
     partyA: Party,
     partyB: Party,
@@ -81,14 +91,16 @@ export class Battle {
     );
     Report.debug("=====================================\n");
 
-    // Set battle statistics in context for resolveDamage to access
-    setBattleStatistics(this.battleStatistics);
+    // Set battle statistics and battle instance in context for skills to access
+    setBattleStatistics(this.battleStatistics, this.id);
+    setBattle(this, this.id);
 
     try {
       await this.battleLoop();
     } finally {
-      // Clear battle statistics from context when battle ends
-      setBattleStatistics(null);
+      // Clear battle statistics and battle instance from context when battle ends
+      setBattleStatistics(null, this.id);
+      setBattle(null, this.id);
     }
   }
 
@@ -317,6 +329,43 @@ export class Battle {
     const { skill, skillLevel } = getPlayableSkill(actor, actorParty);
     Report.debug(`  Selected Skill: ${skill.name.en} (Level ${skillLevel})`);
 
+    // Check for active traps - trigger if enemy uses physical attack
+    // Only check if actor is in the party that didn't set the trap
+    const actorPartyId = isPartyA ? "partyA" : "partyB";
+    
+    // Check if this is a physical attack (basicAttack is always physical)
+    // For now, we only check basicAttack. Can be enhanced later to check other physical skills.
+    const isPhysicalAttack = skill.id === BasicSkillId.Basic;
+    
+    if (isPhysicalAttack && this.activeTraps.length > 0) {
+      // Find a trap set by the opposing party
+      const trapIndex = this.activeTraps.findIndex(trap => trap.setterPartyId !== actorPartyId);
+      if (trapIndex !== -1) {
+        const trap = this.activeTraps[trapIndex]!;
+        
+        // Deal trap damage
+        const trapDamageOutput = {
+          damage: trap.damage,
+          hit: 999, // Auto-hit
+          crit: 0,
+          type: DamageType.pierce,
+          isMagic: false,
+          trueDamage: false, // Can be mitigated
+        };
+        
+        // Get the trap setter for damage attribution
+        const trapSetter = this.allParticipants.find(c => c.id === trap.setterId);
+        const attackerId = trapSetter?.id || actor.id; // Use trap setter if found, else fallback
+        
+        const trapResult = resolveDamage(attackerId, actor.id, trapDamageOutput, this.location.id);
+        
+        Report.debug(`  Bear Trap triggered! ${actor.name.en} takes ${trapResult.actualDamage} pierce damage!`);
+        
+        // Remove the trap (only one trap triggers per attack)
+        this.activeTraps.splice(trapIndex, 1);
+      }
+    }
+
     // Apply cooldown if skill has one
     if (skill.cooldown > 0) {
       actor.cooldowns.set(skill.id, skill.cooldown);
@@ -348,13 +397,21 @@ export class Battle {
           (char): char is Character => char !== "none",
         );
 
-    const turnResult = skill.exec(
-      actor,
-      userParty,
-      targetParty,
-      skillLevel,
-      this.location.id,
-    );
+    // Set current battle ID for skill execution context
+    setCurrentBattleId(this.id);
+    let turnResult: TurnResult;
+    try {
+      turnResult = skill.exec(
+        actor,
+        userParty,
+        targetParty,
+        skillLevel,
+        this.location.id,
+      );
+    } finally {
+      // Clear current battle ID after skill execution
+      setCurrentBattleId(null);
+    }
       
     // Produce Resource
 

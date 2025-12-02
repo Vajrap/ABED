@@ -26,8 +26,8 @@ export const bladeFlurry = new DuelistSkill({
       th: "ปล่อยชุดการโจมตีดาบอย่างรวดเร็ว \nสร้างความเสียหาย {5}'3':'2'{/} ครั้ง แต่ละครั้ง <FORMULA> เป็นความเสียหายตัด \nเป้าหมายสามารถเป็นคนเดียวกันหรือต่างกัน",
     },
     formula: {
-      en: "(([r]0.7[/r] × <WeaponDamage>) + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
-      th: "(([r]0.7[/r] × <WeaponDamage>) + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      en: "([r]0.7[/r] × <WeaponDamage> × <SkillLevelMultiplier>) × <MeleeRangePenalty>",
+      th: "([r]0.7[/r] × <WeaponDamage> × <SkillLevelMultiplier>) × <MeleeRangePenalty>",
     },
   },
   requirement: {},

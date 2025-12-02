@@ -77,7 +77,7 @@ describe("Reckless Swing Skill", () => {
       mockGetTarget(target);
       
       const mockWeaponDamage = {
-        damage: 10,
+        damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
         hit: 15,
         crit: 5,
         type: DamageType.slash,
@@ -123,7 +123,7 @@ describe("Reckless Swing Skill", () => {
       mockGetTarget(target);
       
       const mockWeaponDamage = {
-        damage: 10,
+        damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
         hit: 15,
         crit: 5,
         type: DamageType.slash,
@@ -158,7 +158,7 @@ describe("Reckless Swing Skill", () => {
       mockGetTarget(target);
       
       const mockWeaponDamage = {
-        damage: 10,
+        damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
         hit: 15,
         crit: 5,
         type: DamageType.slash,
@@ -193,7 +193,7 @@ describe("Reckless Swing Skill", () => {
       // Setup: weapon damage = 10, STR mod = +3 (from createTestActor), skill level = 1, positionMod = 1.0
       // Expected: (0.7 × 10 + 3) × (1 + 0.1 × 1) × 1.0 = (7 + 3) × 1.1 × 1.0 = 10 × 1.1 = 11
       const mockWeaponDamage = {
-        damage: 10,
+        damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
         hit: 15,
         crit: 5,
         type: DamageType.slash,
@@ -217,12 +217,12 @@ describe("Reckless Swing Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Check damage calculation: (0.7 × 10 + 3) × 1.1 × 1.0 = 11
+      // Check damage calculation: (0.7 × 13) × 1.1 × 1.0 = 9.1 × 1.1 = 10.01 -> 10
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,
         target.id,
         expect.objectContaining({
-          damage: 11, // Math.floor(11.0)
+          damage: 10, // Math.floor(11.0)
         }),
         DEFAULT_TEST_LOCATION,
       );
@@ -232,7 +232,7 @@ describe("Reckless Swing Skill", () => {
       mockGetTarget(target);
       
       const mockWeaponDamage = {
-        damage: 10,
+        damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
         hit: 15,
         crit: 5,
         type: DamageType.slash,
@@ -256,12 +256,12 @@ describe("Reckless Swing Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Check damage with position modifier: (0.7 × 10 + 3) × 1.1 × 1.5 = 11 × 1.5 = 16.5 → 16
+      // Check damage with position modifier: (0.7 × 13) × 1.1 × 1.5 = 9.1 × 1.1 × 1.5 = 15.015 → 15
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,
         target.id,
         expect.objectContaining({
-          damage: 16, // Math.floor(16.5)
+          damage: 15, // Math.floor(16.5)
         }),
         DEFAULT_TEST_LOCATION,
       );
@@ -271,7 +271,7 @@ describe("Reckless Swing Skill", () => {
       mockGetTarget(target);
       
       const mockWeaponDamage = {
-        damage: 10,
+        damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
         hit: 15,
         crit: 5,
         type: DamageType.slash,
@@ -315,7 +315,7 @@ describe("Reckless Swing Skill", () => {
       mockGetTarget(target);
       
       const mockWeaponDamage = {
-        damage: 10,
+        damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
         hit: 20, // High hit value
         crit: 5,
         type: DamageType.slash,
@@ -367,7 +367,7 @@ describe("Reckless Swing Skill", () => {
       mockGetTarget(target);
       
       const mockWeaponDamage = {
-        damage: 10,
+        damage: 13, // 10 (base) + 3 (STR mod from getWeaponDamageOutput)
         hit: 15,
         crit: 5,
         type: DamageType.slash,

@@ -10,7 +10,6 @@
 
 import { expect, describe, it, beforeEach, jest, afterEach } from "@jest/globals";
 import { divineStrike } from "../divineStrike";
-import { ActorEffect, TargetEffect } from "../../../../effects";
 import {
   setupSkillTestMocks,
   createTestActor,
@@ -23,7 +22,6 @@ import * as getTargetModule from "src/Entity/Battle/getTarget";
 import * as rollModule from "src/Utils/Dice";
 import * as getWeaponDamageOutputModule from "src/Utils/getWeaponDamgeOutput";
 import * as getPositionModifierModule from "src/Utils/getPositionModifier";
-import * as rollModule from "src/Utils/Dice";
 import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 
@@ -52,8 +50,9 @@ describe("Divine Strike Skill", () => {
     targetParty = [target];
 
     // Mock helpers
+    // Note: Divine Strike uses withAttributeBonus: false, so mock returns base weapon damage only
     jest.spyOn(getWeaponDamageOutputModule, "getWeaponDamageOutput").mockImplementation(() => ({
-      damage: 10,
+      damage: 10, // Base weapon damage (no attribute modifiers)
       hit: 0,
       crit: 0,
       type: "slashing",
@@ -118,20 +117,20 @@ describe("Divine Strike Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Formula: ((Weapon * 1.2) + (STR + WIL)) * Multiplier * Range
-      // Weapon = 10
+      // Formula: ((WeaponWithoutAtrMod * 1.2) + ((STR + WIL) / 2)) * Multiplier * Range
+      // Weapon = 10 (base, no mods)
       // STR = 3
       // WIL = 2
       // Multiplier (Lvl 1) = 1.1
       // Range = 1
-      // Base = (10 * 1.2) + (3 + 2) = 12 + 5 = 17
-      // Total = 17 * 1.1 * 1 = 18.7 -> floor(18.7) = 18
+      // Base = (10 * 1.2) + ((3 + 2) / 2) = 12 + 2.5 = 14.5
+      // Total = 14.5 * 1.1 * 1 = 15.95 -> floor(15.95) = 15
       
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,
         target.id,
         expect.objectContaining({
-          damage: 18,
+          damage: 15,
           type: DamageType.radiance,
         }),
         DEFAULT_TEST_LOCATION,
@@ -175,15 +174,15 @@ describe("Divine Strike Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Base Damage = 18 (from previous test)
+      // Base Damage = 15 (from previous test)
       // Bonus = 4
-      // Total = 22
+      // Total = 19
       
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,
         target.id,
         expect.objectContaining({
-          damage: 22,
+          damage: 19,
         }),
         DEFAULT_TEST_LOCATION,
       );
@@ -227,17 +226,19 @@ describe("Divine Strike Skill", () => {
       );
 
       // Base Calculation:
-      // Base = 17
+      // WeaponDamageWithoutAtrMod = 10
+      // STR mod = 3, WIL mod = 2
+      // Base = (10 * 1.2) + ((3 + 2) / 2) = 12 + 2.5 = 14.5
       // Multiplier (Lvl 5) = 1.5
-      // Base Total = 17 * 1.5 = 25.5 -> 25
+      // Base Total = 14.5 * 1.5 = 21.75 -> 21
       // Bonus = 7
-      // Total = 32
+      // Total = 28
       
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,
         target.id,
         expect.objectContaining({
-          damage: 32,
+          damage: 28,
         }),
         DEFAULT_TEST_LOCATION,
       );

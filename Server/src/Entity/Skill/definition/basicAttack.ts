@@ -23,6 +23,10 @@ export const basicAttack = new Skill({
       en: "A basic attack, dealing damage equal to weapon's damage (+ modifier)",
       th: "การโจมตีปกติ สร้างความเสียหายเท่ากับความเสียหายจากอาวุธ (+ modifier)",
     },
+    formula: {
+      en: "(Weapon damage + attribute modifier) × (1.0 + 0.1 per 2 character levels, max 1.5 at level 10)",
+      th: "(ความเสียหายจากอาวุธ + ค่า modifier) × (1.0 + 0.1 ทุก 2 ระดับตัวละคร, สูงสุด 1.5 ที่ระดับ 10)",
+    },
   },
   requirement: {},
   equipmentNeeded: [],
@@ -71,14 +75,18 @@ export const basicAttack = new Skill({
     const weapon = actor.getWeapon();
     const type = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, type);
-
+    
     const positionMidifier = getPositionModifier(
       actor.position,
       target.position,
       weapon,
     );
 
-    damageOutput.damage = damageOutput.damage * positionMidifier;
+    // Calculate level multiplier: 1.0 at level 1, +0.1 every 2 levels starting from level 2, max 1.5 at level 10+
+    // Level 1: 1.0, Level 2-3: 1.1, Level 4-5: 1.2, Level 6-7: 1.3, Level 8-9: 1.4, Level 10+: 1.5
+    const levelMultiplier = Math.min(1.0 + Math.floor(actor.level / 2) * 0.1, 1.5);
+
+    damageOutput.damage = Math.floor(damageOutput.damage * positionMidifier * levelMultiplier);
 
     const totalDamage = resolveDamage(
       actor.id,

@@ -12,6 +12,7 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { MageSkill } from "./index";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const fireBolt = new MageSkill({
   id: MageSkillId.FireBolt,
@@ -25,8 +26,8 @@ export const fireBolt = new MageSkill({
       th: "ปล่อยลูกไฟที่มุ่งเน้นพุ่งไปยังศัตรูเหมือนดาวตก\nสร้างความเสียหายไฟ <FORMULA>\nเมื่อโดน เป้าหมายต้องทอย [r]ENDsave DC8 + <PlanarMod>[/r] หรือถูก <DebuffBurn> 1–2 สแตค",
     },
     formula: {
-      en: "1d6 + <PlanarMod> + 0.5 × skill level",
-      th: "1d6 + <PlanarMod> + 0.5 × เลเวลสกิล",
+      en: "(1d6 + <PlanarMod>) × <SkillLevelMultiplier>",
+      th: "(1d6 + <PlanarMod>) × <SkillLevelMultiplier>",
     },
   },
   requirement: {},
@@ -81,11 +82,9 @@ export const fireBolt = new MageSkill({
     const burnDC = 8 + planarMod;
 
     // Calculate base damage
-    const baseDiceDamage = roll(1).d(6).total;
-    const skillLevelBonus = 0.5 * skillLevel;
     const totalDamage = Math.max(
       0,
-      baseDiceDamage + planarMod + skillLevelBonus,
+      (roll(1).d(6).total + planarMod) * skillLevelMultiplier(skillLevel),
     );
 
     // Hit comes from control mod

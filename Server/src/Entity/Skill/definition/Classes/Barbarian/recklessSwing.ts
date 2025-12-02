@@ -9,7 +9,6 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
-import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { BarbarianSkill } from "./index";
 
@@ -25,8 +24,8 @@ export const recklessSwing = new BarbarianSkill({
       th: "เหวี่ยงอาวุธฟาดไม่ยั้งใส่เป้าหมาย โจมตีต่อเนื่อง {5}'3':'2'{/} ครั้ง \nแต่ละครั้งสร้างความเสียหาย <FORMULA> ความแม่นยำในการโจมตีลดลง [r]2[/r]",
     },
     formula: {
-      en: "(([r]0.7[/r] × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier>) × <MeleeRangePenalty>",
-      th: "(([r]0.7[/r] × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier>) × <MeleeRangePenalty>",
+      en: "([r]0.7[/r] × <WeaponDamage> × <SkillLevelMultiplier>) × <MeleeRangePenalty>",
+      th: "([r]0.7[/r] × <WeaponDamage> × <SkillLevelMultiplier>) × <MeleeRangePenalty>",
     },
   },
   requirement: {},
@@ -75,7 +74,6 @@ export const recklessSwing = new BarbarianSkill({
     const weapon = actor.getWeapon();
     const damageTypeMode = 'physical';
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const strMod = statMod(actor.attribute.getTotal("strength"));
     const positionModifierValue = getPositionModifier(
       actor.position,
       target.position,
@@ -87,7 +85,8 @@ export const recklessSwing = new BarbarianSkill({
 
     for (let i = 0; i < hits; i++) {
       const weaponDamage = getWeaponDamageOutput(actor, weapon, damageTypeMode);
-      const rawDamage = (weaponDamage.damage * 0.7 + strMod);
+      // Note: getWeaponDamageOutput already includes attribute modifiers
+      const rawDamage = weaponDamage.damage * 0.7;
       const scaledDamage = Math.max(
         0,
         rawDamage * levelScalar * positionModifierValue,

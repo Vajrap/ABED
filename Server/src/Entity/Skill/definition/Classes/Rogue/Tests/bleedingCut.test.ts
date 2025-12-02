@@ -49,8 +49,10 @@ describe("Bleeding Cut Skill", () => {
     targetParty = [target];
 
     // Mock helpers
+    // Note: getWeaponDamageOutput already includes attribute modifiers (DEX mod = +3)
+    // So mock returns base weapon damage (10) + DEX mod (3) = 13
     jest.spyOn(getWeaponDamageOutputModule, "getWeaponDamageOutput").mockImplementation(() => ({
-      damage: 10,
+      damage: 13, // 10 (base) + 3 (DEX mod from getWeaponDamageOutput)
       hit: 0,
       crit: 0,
       type: "slashing",
@@ -87,12 +89,11 @@ describe("Bleeding Cut Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Formula: (Weapon + DEX) * Multiplier * Range
-      // Weapon = 10
-      // DEX = 3
+      // Formula: WeaponDamage * Multiplier * Range
+      // WeaponDamage (from getWeaponDamageOutput) = 13 (includes DEX mod already)
       // Multiplier (Lvl 1) = 1.1
       // Range = 1
-      // Total = (10 + 3) * 1.1 * 1 = 14.3 -> 14
+      // Total = 13 * 1.1 * 1 = 14.3 -> 14
       
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,

@@ -27,6 +27,7 @@ export enum BuffEnum {
   curseMarkActive = "curseMarkActive",
   charm = "charm",
   exposeWeaknessActive = "exposeWeaknessActive",
+  precognition = "precognition",
 }
 
 export enum DebuffEnum {
@@ -51,4 +52,10 @@ export enum DebuffEnum {
   
   // Stat Debuffs
   critDef = "critDef",
+  
+  // Engineer
+  bearTrap = "bearTrap",
+  
+  // Nomad
+  blind = "blind",
 }

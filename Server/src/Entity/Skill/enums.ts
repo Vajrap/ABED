@@ -48,7 +48,25 @@ export enum ClericSkillId {
   // HealingMastery = "HealingMastery", // Increase healing amount
 }
 
-export enum SeerSkillId {}
+export enum SeerSkillId {
+  Precognition = "Precognition",
+  // Rare
+  // Desc: See the future, gain Precognition buff for 1 turn:
+  // Procognition: next attacker that target you must roll their LUKsave vs DC10+<your LUKmod>+(skill level - 1) or it will surely miss, remove the buff after checking.
+  // At level 5 if the attacker miss, you gain 1 order
+  // At level 7 when used, roll a d20 + <LUKmod> if passed, gain 1 more turn of Precognition buff
+
+  ThreadSnip = "ThreadSnip",
+  // Uncommon
+  // Desc: Look into the planar thread and pulled it away from an enemy: Deal 1d4 + <CHAmod> to an enemy, roll D14 (-1 per skill level) dice. I passed, randomly steal 1 element from the enemy
+
+  PlanarEcho = "PlanarEcho",
+  // Common
+  // Cantrip
+  // Desc: Echo the planar energy around, dealing 1d6 + <CHAmod> * (1 + 0.1 * skill level) arcane damage to a target. If hit, the target must roll DC10 LUKsave or decrease AB gauge by 10.
+}
+
+
 
 export enum MageSkillId {
   ArcaneBolt = "ArcaneBolt",
@@ -440,6 +458,30 @@ export enum ScholarSkillId {
   // If target has ≥3 debuffs, damage becomes 1d6 (1d8 at lvl 5).
 }
 
-export enum EngineerSkillId {}
+export enum EngineerSkillId {
+  ExplosiveBolt = "ExplosiveBolt",
+  BearTrap = "BearTrap",
+}
 
-export enum NomadSkillId {}
+export enum NomadSkillId {
+  AdaptiveStrike = "AdaptiveStrike",
+  // Common
+  // Deal weapon damage + attribute modifier according to the weapon * (1.0 + 0.1 per 2 character levels, max 1.5 at level 10) (the same as basic attack) and change position, must change from front -> back or back -> front and have avalilable slot in the party, hit - 2 while attacking, this attack don't have range penalty.
+
+  TacticalSlash = "TacticalSlash",
+  // Uncommon
+  // Self row based: Adapt your stance to your current position
+  // Front row: engulf your weapon with fire and attack, dealing <FORMULA> fire damage. enemy must roll DC10 (DC12 at lvl 5) Endurance save or get burn for 1d3 turn.
+  // Back row: get retreat buff for 1 turns
+  // formula: (weapon damage + attribute modifier + 1d4) * (skillLevelMultiplier)
+  // must equip dagger or blade
+
+  TacticalShot = "TacticalShot",
+  // Uncommon
+  // Enemy row based: Strike adapts to enemy position
+  // Enemy in front row: Throw a hot sand from your hand into enemy eyes, dealing 1d2 true damage and enemy must roll DC10 (DC12 at lvl 5) AGI save or get blind for 1 turn.
+  // Blind (new debuff?) - 3 hit
+  // Enemy in back row: Launch a powerful shot, dealing <FORMULA> piercing damage. No range penalty.
+  // formula: (weapon damage + attribute modifier) * (skillLevelMultiplier + 0.3)
+  // must equip bow
+}

@@ -4,13 +4,12 @@
  * Tests for the Fire Bolt skill's exec() function, derived from description and formula:
  * - "Unleash a focused bolt" -> Single target
  * - "Deal <FORMULA> fire damage" -> Formula verification
- * - Formula: 1d6 + PlanarMod + 0.5 * SkillLevel
+ * - Formula: (1d6 + PlanarMod) × SkillLevelMultiplier
  * - "target must roll DC8 + <PlanarMod> ENDsave or get <DebuffBurn> 1–2 stacks"
  */
 
 import { expect, describe, it, beforeEach, jest, afterEach } from "@jest/globals";
 import { fireBolt } from "../fireBolt";
-import { ActorEffect, TargetEffect } from "../../../../effects";
 import {
   setupSkillTestMocks,
   createTestActor,
@@ -21,7 +20,6 @@ import {
 } from "../../../testHelpers";
 import * as getTargetModule from "src/Entity/Battle/getTarget";
 import * as rollModule from "src/Utils/Dice";
-import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 
@@ -100,11 +98,11 @@ describe("Fire Bolt Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Formula: 1d6 + PlanarMod + 0.5 * Level
+      // Formula: (1d6 + PlanarMod) × SkillLevelMultiplier
       // Dice = 4
       // PlanarMod = 2
-      // Level = 1 -> 0.5
-      // Total = 4 + 2 + 0.5 = 6.5 -> floor(6.5) = 6
+      // Level 1 multiplier = 1.1
+      // Total = (4 + 2) × 1.1 = 6.6 -> floor(6.6) = 6
       
       expect(resolveDamageSpy).toHaveBeenCalledWith(
         actor.id,

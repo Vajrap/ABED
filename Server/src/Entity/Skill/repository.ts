@@ -21,6 +21,9 @@ import {
   WarlockSkillId,
   DuelistSkillId,
   InquisitorSkillId,
+  SeerSkillId,
+  EngineerSkillId,
+  NomadSkillId
 } from "./enums";
 import type { Skill } from "./Skill";
 import { shriek } from "src/Entity/Skill/definition/MOBs/Goblin/shriek.ts";
@@ -97,6 +100,14 @@ import { radiantSmite } from "./definition/Classes/Inquisitor/radiantSmite";
 import { exposeWeakness } from "./definition/Classes/Inquisitor/exposeWeakness";
 import { judgmentDay } from "./definition/Classes/Inquisitor/judgmentDay";
 import { purgeMagic } from "./definition/Classes/Inquisitor/purgeMagic";
+import { precognition } from "./definition/Classes/Seer/precognition";
+import { threadSnip } from "./definition/Classes/Seer/threadSnip";
+import { planarEcho } from "./definition/Classes/Seer/planarEcho";
+import { explosiveBolt } from "./definition/Classes/Engineer/explosiveBolt";
+import { bearTrap } from "./definition/Classes/Engineer/bearTrap";
+import { adaptiveStrike } from "./definition/Classes/Nomad/adaptiveStrike";
+import { tacticalSlash } from "./definition/Classes/Nomad/tacticalSlash";
+import { tacticalShot } from "./definition/Classes/Nomad/tacticalShot";
 
 export const skillRepository: Record<SkillId, Skill> = {
   [BasicSkillId.Basic]: basicAttack,
@@ -174,6 +185,12 @@ export const skillRepository: Record<SkillId, Skill> = {
   [InquisitorSkillId.ExposeWeakness]: exposeWeakness,
   [InquisitorSkillId.PurgeMagic]: purgeMagic,
   [InquisitorSkillId.JudgmentDay]: judgmentDay,
+  [SeerSkillId.Precognition]: precognition,
+  [SeerSkillId.ThreadSnip]: threadSnip,
+  [SeerSkillId.PlanarEcho]: planarEcho,
+  [EngineerSkillId.ExplosiveBolt]: explosiveBolt,
+  [EngineerSkillId.BearTrap]: bearTrap,
+  [NomadSkillId.AdaptiveStrike]: adaptiveStrike,
+  [NomadSkillId.TacticalSlash]: tacticalSlash,
+  [NomadSkillId.TacticalShot]: tacticalShot,
 };
-
-// TODO: Seer, Nomad, Engineer

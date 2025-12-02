@@ -7,13 +7,11 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { BuffEnum, DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
-import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { RogueSkill } from "./index";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
-import { statMod } from "src/Utils/statMod";
 
 export const backstab = new RogueSkill({
   id: RogueSkillId.Backstab,
@@ -27,8 +25,8 @@ export const backstab = new RogueSkill({
       th: "ในขณะที่ซ่อนตัว ข้ามเข้าไปที่จุดที่ศัตรูมองไม่เห็น และทะลุจุดอ่อนของศัตรูที่หลัง\nสร้างความเสียหายแทง <FORMULA>\n[b]ได้รับ +{5}'5':'4'{/} crit[/b] หากเป้าหมายมี <DebuffFear> หรือ <DebuffDazed>",
     },
     formula: {
-      en: "({5}'1.5':'1.3'{/} × <WeaponDamage> + <DEXmod> × <SkillLevelMultiplier>",
-      th: "({5}'1.5':'1.3'{/} × <WeaponDamage> + <DEXmod> × <SkillLevelMultiplier>",
+      en: "({5}'1.5':'1.3'{/} × <WeaponDamage>) × <SkillLevelMultiplier>",
+      th: "({5}'1.5':'1.3'{/} × <WeaponDamage>) × <SkillLevelMultiplier>",
     },
   },
   requirement: {},
@@ -86,19 +84,11 @@ export const backstab = new RogueSkill({
     const damageOutput = getWeaponDamageOutput(actor, weapon, type);
     const levelScalar = skillLevelMultiplier(skillLevel);
     
-    // Formula: ({5}'1.5':'1.3'{/} × <WeaponDamage> + <DEXmod>) × <SkillLevelMultiplier>
-    // Note: getWeaponDamageOutput may include stat modifiers in damage depending on weapon
-    // For daggers, it typically includes DEXmod. To match formula exactly:
-    // (weaponMultiplier × baseWeaponDamage + DEXmod) × levelScalar
-    const dexMod = statMod(actor.attribute.getTotal("dexterity"));
+    // Formula: ({5}'1.5':'1.3'{/} × <WeaponDamage>) × <SkillLevelMultiplier>
+    // Note: getWeaponDamageOutput already includes attribute modifiers (DEX for daggers)
     const weaponMultiplier = skillLevel >= 5 ? 1.5 : 1.3;
     
-    // If getWeaponDamageOutput includes DEXmod, we need to extract base damage
-    // Otherwise, damageOutput.damage is already base damage
-    // We'll check if damage is significantly higher than expected base (indicating modifiers included)
-    // For simplicity, assume damageOutput.damage is base weapon damage (as per test mocks)
-    // Formula: (weaponMultiplier × WeaponDamage + DEXmod) × levelScalar
-    damageOutput.damage = (weaponMultiplier * damageOutput.damage + dexMod) * levelScalar;
+    damageOutput.damage = (weaponMultiplier * damageOutput.damage) * levelScalar;
 
     const additionCrit = skillLevel >= 5 ? 5 : 4;
     const hasFearOrDaze =

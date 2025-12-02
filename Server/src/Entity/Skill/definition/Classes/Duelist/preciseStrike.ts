@@ -26,8 +26,8 @@ export const preciseStrike = new DuelistSkill({
       th: "โจมตีด้วยดาบอย่างแม่นยำด้วยจังหวะที่สมบูรณ์แบบ \nสร้างความเสียหาย <FORMULA> เป็นความเสียหายตัด \n{5}\nได้รับ [g]+2 crit[/g]{/}",
     },
     formula: {
-      en: "((<WeaponDamage> × {5}'1.2':'1.0'{/}) + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
-      th: "((<WeaponDamage> × {5}'1.2':'1.0'{/}) + <DEXmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      en: "((<WeaponDamage> × {5}'1.2':'1.0'{/}) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "((<WeaponDamage> × {5}'1.2':'1.0'{/}) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
     },
   },
   requirement: {},
@@ -80,15 +80,16 @@ export const preciseStrike = new DuelistSkill({
     const damageOutput = getWeaponDamageOutput(actor, weapon, type);
     const positionModifier = getPositionModifier(actor.position, target.position, weapon);
 
-    const dexMod = statMod(actor.attribute.getTotal("dexterity"));
     const levelScalar = skillLevelMultiplier(skillLevel);
 
-    // Damage: weapon + DEX mod * skillScalar
+    // Damage: weapon × weaponMultiplier × skillScalar
+    // Note: getWeaponDamageOutput already includes attribute modifiers
     // At level 5: 1.2x weapon instead of 1.0x
     const weaponMultiplier = skillLevel >= 5 ? 1.2 : 1.0;
-    damageOutput.damage = Math.floor((((damageOutput.damage * weaponMultiplier) + dexMod) * levelScalar) * positionModifier);
+    damageOutput.damage = Math.floor((damageOutput.damage * weaponMultiplier * levelScalar) * positionModifier);
     
-    // +control mod to hit roll
+    // +DEX mod to hit roll (for precision)
+    const dexMod = statMod(actor.attribute.getTotal("dexterity"));
     damageOutput.hit += dexMod;
     
     // +2 crit at level 5

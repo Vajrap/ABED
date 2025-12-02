@@ -25,8 +25,8 @@ export const bash = new GuardianSkill({
       th: "ฟาดอาวุธด้วยแรงมหาศาล ทำลายการป้องกันของศัตรู\nสร้างความเสียหาย <FORMULA>\nเป้าหมายต้องทอย [r]DC8 + STRmod ENDsave[/r] หรือถูก <DebuffStun> 1 เทิร์น",
     },
     formula: {
-      en: "<WeaponDamage> + <STRmod> × <MeleeRangePenalty>",
-      th: "<WeaponDamage> + <STRmod> × <MeleeRangePenalty>",
+      en: "<WeaponDamage> × <MeleeRangePenalty>",
+      th: "<WeaponDamage> × <MeleeRangePenalty>",
     },
   },
   requirement: {},
@@ -82,17 +82,14 @@ export const bash = new GuardianSkill({
     const damageType = getWeaponDamageType(weapon.weaponType);
     const damageOutput = getWeaponDamageOutput(actor, weapon, damageType);
 
-    // Add strength modifier
-    const strengthMod = statMod(actor.attribute.getTotal("strength"));
-
+    // Note: getWeaponDamageOutput already includes attribute modifiers
     const positionModifierValue = getPositionModifier(
       actor.position,
       target.position,
       weapon,
     );
 
-    damageOutput.damage =
-      (damageOutput.damage + strengthMod) * positionModifierValue;
+    damageOutput.damage = damageOutput.damage * positionModifierValue;
 
     const totalDamage = resolveDamage(
       actor.id,

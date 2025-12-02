@@ -9,7 +9,6 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { WarriorSkill } from ".";
-import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const cleave = new WarriorSkill({
@@ -24,8 +23,8 @@ export const cleave = new WarriorSkill({
       th: "ฟันอาวุธในวงกว้าง ตัดผ่านศัตรูทั้งหมดในแถวหน้า\nสร้างความเสียหาย <FORMULA> ให้ศัตรูทั้งหมดในแถวหน้า",
     },
     formula: {
-      en: "({5}'1.2':'1.0'{/} × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
-      th: "({5}'1.2':'1.0'{/} × <WeaponDamage> + <STRmod>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      en: "({5}'1.2':'1.0'{/} × <WeaponDamage>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "({5}'1.2':'1.0'{/} × <WeaponDamage>) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
     },
   },
   requirement: {},
@@ -97,13 +96,13 @@ export const cleave = new WarriorSkill({
         weapon,
       );
 
-      // Cleave deals 1x weapon damage (1.2x at level 5) + str mod
+      // Cleave deals 1x weapon damage (1.2x at level 5)
+      // Note: getWeaponDamageOutput already includes attribute modifiers
       const baseTimes = skillLevel >= 5 ? 1.2 : 1.0;
-      const strMod = statMod(actor.attribute.getTotal("strength"));
       const levelScalar = skillLevelMultiplier(skillLevel);
 
       damageOutput.damage =
-        (damageOutput.damage * baseTimes + strMod) *
+        (damageOutput.damage * baseTimes) *
         levelScalar *
         positionModifierValue;
 

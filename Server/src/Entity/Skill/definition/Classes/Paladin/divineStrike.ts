@@ -44,8 +44,8 @@ export const divineStrike = new PaladinSkill({
       th: "ควบคุมความโกรธศักดิ์สิทธิ์ผ่านอาวุธ โจมตีด้วยความโกรธของคนชอบธรรม\nสร้างความเสียหายศักดิ์สิทธิ์ <FORMULA>\n[r]สร้างความเสียหายเพิ่ม +{5}'1d10':'1d6'{/}[/r] ต่อ undead หรือ fiends",
     },
     formula: {
-      en: "((<WeaponDamage> × 1.2) + (<STRmod> + <WILmod>)) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
-      th: "((<WeaponDamage> × 1.2) + (<STRmod> + <WILmod>)) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      en: "((<WeaponDamageWithoutAtrMod> × 1.2) + ((<STRmod> + <WILmod>) / 2)) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
+      th: "((<WeaponDamageWithoutAtrMod> × 1.2) + ((<STRmod> + <WILmod>) / 2)) × <SkillLevelMultiplier> × <MeleeRangePenalty>",
     },
   },
   requirement: {},
@@ -115,20 +115,24 @@ export const divineStrike = new PaladinSkill({
     }
 
     const damageType = getWeaponDamageType(weapon.weaponType);
-    const damageOutput = getWeaponDamageOutput(actor, weapon, damageType);
+    // Get base weapon damage without attribute modifiers
+    const damageOutput = getWeaponDamageOutput(actor, weapon, damageType, false);
     const positionModifier = getPositionModifier(
       actor.position,
       target.position,
       weapon,
     );
+    const levelScalar = skillLevelMultiplier(skillLevel);
+    
+    // Formula: ((WeaponDamageWithoutAtrMod × 1.2) + (STRmod + WILmod) / 2) × Multiplier
     const strMod = statMod(actor.attribute.getTotal("strength"));
     const willMod = statMod(actor.attribute.getTotal("willpower"));
-    const levelScalar = skillLevelMultiplier(skillLevel);
+    const combinedMod = (strMod + willMod) / 2;
 
-    // Deal (weapon damage * 1.2 + (str mod) + (will mod)) * (skill level multiplier) * (position modifier) holy damage
+    // Deal ((weapon damage * 1.2) + (STR+WIL)/2) * (skill level multiplier) * (position modifier) holy damage
     const holyDamageOutput = {
       damage: Math.floor(
-        (damageOutput.damage * 1.2 + strMod + willMod) *
+        (damageOutput.damage * 1.2 + combinedMod) *
           levelScalar *
           positionModifier,
       ),

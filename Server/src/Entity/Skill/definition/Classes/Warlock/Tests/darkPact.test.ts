@@ -40,6 +40,8 @@ describe("Dark Pact Skill", () => {
     actor.attribute.getStat("planar").base = 14;
     actor.attribute.getStat("control").base = 14; // +2 mod for hit
     actor.attribute.getStat("luck").base = 14; // +2 mod for crit
+    // Set HP base and current properly (max needs to be at least 100)
+    actor.vitals.hp.setBase(100);
     actor.vitals.hp.setCurrent(100); // Set HP for sacrifice
     
     target = createTestTarget({ id: "target-1", name: { en: "Enemy 1", th: "ศัตรู 1" } });
@@ -121,9 +123,12 @@ describe("Dark Pact Skill", () => {
         one: jest.fn(() => target),
       }) as any);
 
+      // Capture HP before consumption
+      const hpBeforeConsumption = actor.vitals.hp.current; // Should be 100
+      
       // Manually consume 10 HP (as the system would do)
       actor.vitals.hp.setCurrent(actor.vitals.hp.current - 10);
-      const initialHp = actor.vitals.hp.current;
+      const hpAfterConsumption = actor.vitals.hp.current; // Should be 90
 
       jest.spyOn(rollModule, "roll").mockImplementation(() => ({
         d: jest.fn(() => ({
@@ -153,7 +158,8 @@ describe("Dark Pact Skill", () => {
       );
 
       // System consumes 10, but code refunds 2, so net 8 HP loss
-      expect(actor.vitals.hp.current).toBe(initialHp - 8);
+      // Final HP should be: hpBeforeConsumption - 8 = 100 - 8 = 92
+      expect(actor.vitals.hp.current).toBe(hpBeforeConsumption - 8);
     });
   });
 

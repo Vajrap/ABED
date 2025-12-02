@@ -51,8 +51,10 @@ describe("Backstab Skill", () => {
     targetParty = [target];
 
     // Mock helpers
+    // Note: getWeaponDamageOutput already includes attribute modifiers (DEX mod = +3)
+    // So mock returns base weapon damage (10) + DEX mod (3) = 13
     jest.spyOn(getWeaponDamageOutputModule, "getWeaponDamageOutput").mockImplementation(() => ({
-      damage: 10, // Base weapon damage
+      damage: 13, // 10 (base) + 3 (DEX mod from getWeaponDamageOutput)
       hit: 0,
       crit: 0,
       type: "piercing",
@@ -87,17 +89,16 @@ describe("Backstab Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Formula: (1.3 * Weapon + DEX) * Multiplier
-      // Weapon = 10
-      // DEX = 3
+      // Formula: (1.3 * WeaponDamage) * Multiplier
+      // WeaponDamage (from getWeaponDamageOutput) = 13 (includes DEX mod already)
       // Multiplier (Lvl 1) = 1.1
-      // Expected: (1.3 * 10 + 3) * 1.1 = (13 + 3) * 1.1 = 16 * 1.1 = 17.6
+      // Expected: (1.3 * 13) * 1.1 = 16.9 * 1.1 = 18.59 -> 19
       
       // Verify damage is approximately 17 (17.6)
       expect(resolveDamageSpy).toHaveBeenCalled();
       const callArgs = resolveDamageSpy.mock.calls[0];
       const damageOutput = callArgs?.[2] as any;
-      expect(damageOutput.damage).toBeCloseTo(17, 0); // Allow 0.5 difference
+      expect(damageOutput.damage).toBeCloseTo(19, 0); // Allow 0.5 difference (18.59 rounded)
     });
   });
 
