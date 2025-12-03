@@ -79,7 +79,7 @@ describe("Bewitch Skill", () => {
       // Mock save roll to fail (roll 5, DC 10 + 2 = 12)
       jest.spyOn(target, "rollSave").mockReturnValue(5);
 
-      const charmSpy = jest.spyOn(buffsAndDebuffsRepository.charm, "appender");
+      const charmSpy = jest.spyOn(buffsAndDebuffsRepository.charmed, "appender");
 
       bewitch.exec(
         actor,
@@ -104,7 +104,7 @@ describe("Bewitch Skill", () => {
 
       jest.spyOn(target, "rollSave").mockReturnValue(5);
 
-      const charmSpy = jest.spyOn(buffsAndDebuffsRepository.charm, "appender");
+      const charmSpy = jest.spyOn(buffsAndDebuffsRepository.charmed, "appender");
 
       bewitch.exec(
         actor,
@@ -155,7 +155,7 @@ describe("Bewitch Skill", () => {
       // Mock save roll to pass (roll 15, DC 12)
       jest.spyOn(target, "rollSave").mockReturnValue(15);
 
-      const charmSpy = jest.spyOn(buffsAndDebuffsRepository.charm, "appender");
+      const charmSpy = jest.spyOn(buffsAndDebuffsRepository.charmed, "appender");
 
       bewitch.exec(
         actor,

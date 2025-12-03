@@ -9,31 +9,26 @@ export const hexed = new DebuffDef({
         en: "hexed",
         th: "สาปเน่าเปื่อย",
     },
+    description: {
+        en: "Reduces endurance by 2. Each turn, the target takes <FORMULA>.",
+        th: "ลดความอดทน 2 ในแต่ละเทิร์นเป้าหมายรับความเสียหาย <FORMULA>",
+    },
+    formula: "1d2 damage",
     appender: function (
         actor: Character,
         options: AppenderOptions,
     ): L10N {
-        const {
-            turnsAppending: value,
-            isPerm = false,
-            permanentCounter = 0,
-        } = options;
+        const { turnsAppending: value } = options;
         
         const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.hexed);
         if (!entry) {
             actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.hexed, {
                 value,
-                isPerm,
-                permValue: permanentCounter,
                 counter: 0,
             });
             actor.attribute.mutateBattle("endurance", -2);
         } else {
-            if (!entry.isPerm && isPerm) {
-                entry.isPerm = true;
-            }
             entry.value += value;
-            entry.permValue += permanentCounter;
         }
 
         return {

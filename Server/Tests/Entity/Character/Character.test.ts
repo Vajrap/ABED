@@ -284,19 +284,15 @@ describe("Character", () => {
       character = CharacterFactory.create().build();
     });
 
-    it("should remove non-permanent buffs with positive values", () => {
-      // Add non-permanent buff and debuff
+    it("should remove buffs with positive values", () => {
+      // Add buff and debuff
       character.buffsAndDebuffs.buffs.entry.set(BuffEnum.haste, {
         value: 3,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
 
       character.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, {
         value: 2,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
 
@@ -310,113 +306,20 @@ describe("Character", () => {
       expect(character.buffsAndDebuffs.debuffs.entry.size).toBe(0); // all removed
     });
 
-    it("should zero out kinetic values but keep permanent buffs", () => {
-      // Add permanent buff and debuff
-      character.buffsAndDebuffs.buffs.entry.set(BuffEnum.haste, {
-        value: 3,
-        isPerm: true,
-        permValue: 1,
-        counter: 0,
-      });
-
-      character.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, {
-        value: 2,
-        isPerm: true,
-        permValue: 5,
-        counter: 0,
-      });
-
-      expect(character.buffsAndDebuffs.buffs.entry.size).toBe(1);
-      expect(character.buffsAndDebuffs.debuffs.entry.size).toBe(1);
-
-      character.clearBuffAndDebuff();
-
-      expect(character.buffsAndDebuffs.buffs.entry.size).toBe(1); // kept
-      expect(character.buffsAndDebuffs.debuffs.entry.size).toBe(1); // kept
-
-      const hasteEntry = character.buffsAndDebuffs.buffs.entry.get(
-        BuffEnum.haste,
-      );
-      expect(hasteEntry?.value).toBe(0); // kinetic value cleared
-      expect(hasteEntry?.isPerm).toBe(true); // permanent flag kept
-      expect(hasteEntry?.permValue).toBe(1); // permanent value kept
-
-      const slowEntry = character.buffsAndDebuffs.debuffs.entry.get(
-        DebuffEnum.slow,
-      );
-      expect(slowEntry?.value).toBe(0);
-      expect(slowEntry?.isPerm).toBe(true);
-      expect(slowEntry?.permValue).toBe(5);
-    });
-
-    it("should handle mixed permanent and non-permanent buffs", () => {
-      // Mix of permanent and non-permanent
-      character.buffsAndDebuffs.buffs.entry.set(BuffEnum.haste, {
-        value: 3,
-        isPerm: false,
-        permValue: 0,
-        counter: 0,
-      });
-
-      character.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, {
-        value: 2,
-        isPerm: true,
-        permValue: 1,
-        counter: 0,
-      });
-
-      // Overwrite with permanent version
-      character.buffsAndDebuffs.buffs.entry.set(BuffEnum.haste, {
-        value: 1,
-        isPerm: true,
-        permValue: 1,
-        counter: 0,
-      });
-
-      expect(character.buffsAndDebuffs.buffs.entry.size).toBe(1);
-      expect(character.buffsAndDebuffs.debuffs.entry.size).toBe(1);
-
-      character.clearBuffAndDebuff();
-
-      expect(character.buffsAndDebuffs.buffs.entry.size).toBe(1); // permanent buff remains
-      expect(character.buffsAndDebuffs.debuffs.entry.size).toBe(1); // permanent debuff remains
-
-      const slowEntry = character.buffsAndDebuffs.debuffs.entry.get(
-        DebuffEnum.slow,
-      );
-      expect(slowEntry?.value).toBe(0);
-      expect(slowEntry?.isPerm).toBe(true);
-      expect(slowEntry?.permValue).toBe(1);
-
-      // Both permanent buffs should remain
-      expect(
-        character.buffsAndDebuffs.buffs.entry.has(BuffEnum.haste),
-      ).toBe(true);
-      expect(
-        character.buffsAndDebuffs.debuffs.entry.has(DebuffEnum.slow),
-      ).toBe(true);
-    });
-
     it("should ignore buffs with zero or negative values", () => {
       character.buffsAndDebuffs.buffs.entry.set(BuffEnum.haste, {
         value: 0,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
 
       character.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, {
         value: -1,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
 
       // Overwrite with positive value
       character.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, {
         value: 3,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
 

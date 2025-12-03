@@ -8,15 +8,18 @@ export const duelingStance = new BuffDef({
     en: "Dueling Stance",
     th: "ท่าดวล",
   },
+  description: {
+    en: "Gain <FORMULA>.",
+    th: "ได้รับ <FORMULA>",
+  },
+  formula: "pHIT +2, mHIT +2, dodge +2, pCRT +<COUNTER>, mCRT +<COUNTER>",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
     const {
       turnsAppending: value,
-      isPerm = options.isPerm || false,
-      permanentCounter = 0,
-      universalCounter = options.universalCounter || 0,
+      universalCounter = 0,
     } = options;
     
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.duelingStance);
@@ -28,15 +31,10 @@ export const duelingStance = new BuffDef({
       actor.battleStats.mutateBattle('mCRT', universalCounter);
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.duelingStance, {
         value: value,
-        isPerm: isPerm,
-        permValue: permanentCounter,
         counter: universalCounter,
       });
     } else {
       // won't mutate the universal counter when applied new stack, even if it's higher.
-      if (isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
     }
 
@@ -52,14 +50,12 @@ export const duelingStance = new BuffDef({
       if (entry.value > 0) {
         entry.value -= 1;
       } else if (entry.value === 0) {
-        if (!entry.isPerm) {
-          actor.battleStats.mutateBattle('pHIT', -2);
-          actor.battleStats.mutateBattle('mHIT', -2);
-          actor.battleStats.mutateBattle('dodge', -2);
-          actor.battleStats.mutateBattle('pCRT', -entry.counter);
-          actor.battleStats.mutateBattle('mCRT', -entry.counter);
-          actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.duelingStance);
-        }
+        actor.battleStats.mutateBattle('pHIT', -2);
+        actor.battleStats.mutateBattle('mHIT', -2);
+        actor.battleStats.mutateBattle('dodge', -2);
+        actor.battleStats.mutateBattle('pCRT', -entry.counter);
+        actor.battleStats.mutateBattle('mCRT', -entry.counter);
+        actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.duelingStance);
       }
     }
 

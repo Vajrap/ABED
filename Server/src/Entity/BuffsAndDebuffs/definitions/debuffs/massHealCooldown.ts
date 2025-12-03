@@ -8,6 +8,10 @@ export const massHealCooldown = new DebuffDef({
     en: "mass heal: cooldown",
     th: "mass heal: cooldown",
   },
+  description: {
+    en: "Mass Heal: cooldown",
+    th: "Mass Heal: cooldown",
+  },
   appender: function (actor: Character, options: AppenderOptions): L10N {
     const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(
@@ -16,8 +20,6 @@ export const massHealCooldown = new DebuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.massHealCooldown, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
     } else {

@@ -8,27 +8,24 @@ export const slaveDriver = new BuffDef({
     en: "slaveDriver",
     th: "ขับทาส",
   },
+  description: {
+    en: "Works You Maggots!",
+    th: "ทำงาน ไอ้พวกหนอนแมลง!",
+  },
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.slaveDriver);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.slaveDriver, {
         value: value,
-        isPerm: isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
     } else {
       entry.value += value;
-      entry.permValue += permanentCounter;
     }
 
     return {

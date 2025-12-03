@@ -56,7 +56,7 @@ export const duelingStance = new DuelistSkill({
   ): TurnResult => {
     // Apply Dueling Stance buff for 2 turns (3 at level 5)
     const duration = skillLevel >= 5 ? 3 : 2;
-    // Store level 5 indicator in permValue (1 = level 5+, 0 = not level 5)
+    // Store level 5 indicator in universalCounter (1 = level 5+, 0 = not level 5)
     const additionalCrit = skillLevel >= 5 ? 2 : 0;
 
     buffsAndDebuffsRepository.duelingStance.appender(actor, { 

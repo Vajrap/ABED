@@ -112,7 +112,7 @@ describe("Mist Step Skill", () => {
       actor.position = 1;
       
       // Add Slow debuff
-      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, { value: 2, permValue: 0 });
+      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, { value: 2, counter: 0 });
 
       const mutateBattleSpy = jest.spyOn(actor.attribute, "mutateBattle");
 

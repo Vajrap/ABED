@@ -22,7 +22,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:api": "jest Tests/API"
+    "test:api": "jest Tests/API",
+    "extract-l10n": "bun run scripts/extract-l10n.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

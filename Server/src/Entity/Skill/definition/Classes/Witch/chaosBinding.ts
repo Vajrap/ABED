@@ -48,7 +48,7 @@ export const chaosBinding = new WitchSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.common,
+  tier: TierEnum.uncommon,
   consume: {
     hp: 0,
     mp: 3,

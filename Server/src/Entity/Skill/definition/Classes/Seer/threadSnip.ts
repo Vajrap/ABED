@@ -37,13 +37,17 @@ export const threadSnip = new SeerSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+      { element: "wind", value: 1 },
+    ],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+      { element: "neutral", min: 0, max: 1 },
+    ],
   },
   exec: (user: Character, userParty: Character[], targetParty: Character[], skillLevel: number, location: LocationsEnum): TurnResult => {
     const target = getTarget(user, userParty, targetParty, "enemy").one();

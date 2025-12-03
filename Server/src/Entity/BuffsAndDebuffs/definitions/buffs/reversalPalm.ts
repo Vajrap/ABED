@@ -8,13 +8,17 @@ export const reversalPalm = new BuffDef({
     en: "Reversal Palm",
     th: "ฝ่ามือพลิก",
   },
+  description: {
+    en: "Ready to counter attacks. The skill level is stored in universalCounter and remains constant throughout the buff's duration.",
+    th: "พร้อมตอบโต้การโจมตี ระดับทักษะถูกเก็บใน universalCounter และคงที่ตลอดระยะเวลาของบัฟ",
+  },
+  formula: "Skill level stored in universalCounter (constant during buff duration)",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
     const {
       turnsAppending: value,
-      isPerm = false,
       universalCounter = 0,
     } = options;
     
@@ -22,14 +26,9 @@ export const reversalPalm = new BuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.reversalPalm, {
         value: value,
-        isPerm: isPerm,
-        permValue: 0,
         counter: universalCounter, // Store skill level in counter
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
       entry.counter += universalCounter;
     }

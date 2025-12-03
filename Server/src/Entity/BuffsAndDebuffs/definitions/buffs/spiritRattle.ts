@@ -10,6 +10,11 @@ export const spiritRattle = new BuffDef({
     en: "spiritRattle",
     th: "กระดิ่งวิญญาณ",
   },
+  description: {
+    en: "Heals the character each turn for <FORMULA>",
+    th: "รักษาตัวละครในแต่ละเทิร์น <FORMULA>",
+  },
+  formula: "1d4 + <WILmod>",
   appender: function (
     actor: Character,
     options: AppenderOptions,
@@ -19,8 +24,6 @@ export const spiritRattle = new BuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.spiritRattle, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
     } else {

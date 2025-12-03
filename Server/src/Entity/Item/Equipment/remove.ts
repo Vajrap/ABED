@@ -50,10 +50,9 @@ function modifyBuffsAndDebuffs(character: Character, equipped: Equipment) {
       const rec = entry.get(buffId as BuffEnum);
       if (!rec) continue; // This should not be the case, it's bugged.
 
-      rec.permValue = Math.max(0, rec.permValue - delta);
-      rec.isPerm = rec.permValue > 0;
+      rec.value = Math.max(0, rec.value - delta);
 
-      if (rec.permValue === 0 && rec.value === 0) {
+      if (rec.value === 0) {
         entry.delete(buffId as BuffEnum);
       } else {
         entry.set(buffId as BuffEnum, rec);
@@ -63,10 +62,9 @@ function modifyBuffsAndDebuffs(character: Character, equipped: Equipment) {
       const rec = entry.get(buffId as DebuffEnum);
       if (!rec) continue; // This should not be the case, it's bugged.
 
-      rec.permValue = Math.max(0, rec.permValue - delta);
-      rec.isPerm = rec.permValue > 0;
+      rec.value = Math.max(0, rec.value - delta);
 
-      if (rec.permValue === 0 && rec.value === 0) {
+      if (rec.value === 0) {
         entry.delete(buffId as DebuffEnum);
       } else {
         entry.set(buffId as DebuffEnum, rec);

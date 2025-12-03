@@ -8,36 +8,31 @@ export const haste = new BuffDef({
     en: "haste",
     th: "เร่งความเร็ว",
   },
+  description: {
+    en: "Increases agility by the haste value. While the buff is active, Character's AB guage gain will be doubled.",
+    th: "เพิ่มความคล่องแคล่วเท่ากับค่า haste ในขณะที่บัฟเปิดใช้งาน AB จะได้รับประโยชน์จากการทอยความสำเร็จการปกป้องทั้งหมด",
+  },
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value,} = options;
     
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.haste);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.haste, {
         value,
-        isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
-    } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
-      entry.value += value;
-      entry.permValue += permanentCounter;
+    } else { 
+      entry!.value += value;
     }
-
-    actor.attribute.mutateBattle("agility", value + permanentCounter);
+    
+    // adding to the existing haste or new haste affect the same amount of agility
+    actor.attribute.mutateBattle("agility", value );
     return {
-      en: `${actor.name.en} got hasted buff: agi goes up by ${value + permanentCounter}`,
-      th: `${actor.name.th} ได้รับ "เร่งความเร็ว": agi เพิ่มขึ้น ${value + permanentCounter} หน่วย`,
+      en: `${actor.name.en} got hasted buff: agi goes up by ${value }`,
+      th: `${actor.name.th} ได้รับ "เร่งความเร็ว": agi เพิ่มขึ้น ${value } หน่วย`,
     };
   },
 

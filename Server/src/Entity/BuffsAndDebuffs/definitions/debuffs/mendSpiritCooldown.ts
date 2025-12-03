@@ -8,6 +8,10 @@ export const mendSpiritCooldown = new DebuffDef({
     en: "mend spirit: cooldown",
     th: "mend spirit: cooldown",
   },
+  description: {
+    en: "Cooldown debuff for the Mend Spirit skill. Prevents using the skill until the cooldown expires.",
+    th: "ดีบัฟคูลดาวน์สำหรับทักษะ Mend Spirit ป้องกันการใช้ทักษะจนกว่าคูลดาวน์จะหมดอายุ",
+  },
   appender: function (actor: Character, options: AppenderOptions): L10N {
     const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(
@@ -16,8 +20,6 @@ export const mendSpiritCooldown = new DebuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.mendSpiritCooldown, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
     } else {

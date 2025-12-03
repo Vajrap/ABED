@@ -8,36 +8,30 @@ export const fear = new DebuffDef({
         en: "fear",
         th: "หวาดกลัว",
     },
+    description: {
+        en: "Reduces agility by the fear value. Each turn, the fear value decreases by 1 and agility is restored by 1.",
+        th: "ลดความคล่องแคล่วตามค่า fear ในแต่ละเทิร์นค่า fear ลดลง 1 และความคล่องแคล่วฟื้นฟู 1",
+    },
     appender: function (
         actor: Character,
         options: AppenderOptions,
     ): L10N {
-        const {
-            turnsAppending: value,
-            isPerm = false,
-            permanentCounter = 0,
-        } = options;
+        const { turnsAppending: value } = options;
         
         const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.fear);
         if (!entry) {
             actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.fear, {
                 value,
-                isPerm,
-                permValue: permanentCounter,
                 counter: 0,
             });
         } else {
-            if (!entry.isPerm && isPerm) {
-                entry.isPerm = true;
-            }
             entry.value += value;
-            entry.permValue += permanentCounter;
         }
 
-        actor.attribute.mutateBattle("agility", value + permanentCounter);
+        actor.attribute.mutateBattle("agility", -value);
         return {
-            en: `${actor.name.en} got hasted buff: agi goes up by ${value + permanentCounter}`,
-            th: `${actor.name.th} ได้รับ "เร่งความเร็ว": agi เพิ่มขึ้น ${value + permanentCounter} หน่วย`,
+            en: `${actor.name.en} got fear debuff: agi goes down by ${value}`,
+            th: `${actor.name.th} ได้รับ "หวาดกลัว": agi ลดลง ${value} หน่วย`,
         };
     },
 
@@ -53,8 +47,8 @@ export const fear = new DebuffDef({
         return {
             canAct: true,
             content: {
-                en: `${actor.name.en} hasted decreased: agi goes down by 1`,
-                th: `${actor.name.th} "เร่งความเร็ว" ลดลง: agi ลดลง 1 หน่วย`,
+                en: `${actor.name.en} fear decreased: agi goes up by 1`,
+                th: `${actor.name.th} "หวาดกลัว" ลดลง: agi เพิ่มขึ้น 1 หน่วย`,
             },
         };
     },

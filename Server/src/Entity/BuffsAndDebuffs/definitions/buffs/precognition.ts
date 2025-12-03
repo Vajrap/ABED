@@ -8,16 +8,19 @@ export const precognition = new BuffDef({
     en: "Precognition",
     th: "การคาดการณ์",
   },
+  description: {
+    en: "When attacked roll <FORMULA> if passed, the attack will miss. {<COUNTER===1>} With special effect, when the attack missed, you gain 1 order.{/}",
+    th: "เมื่อถูกโจมตี ทอย <FORMULA> หากสำเร็จ การโจมตีจะล้มเหลว {<COUNTER===1>} มีผลพิเศษพิเศษ เมื่อการโจมตีล้มเหลว คุณจะได้รับ 1 ออเดอร์{/}",
+  },
+  formula: "<LUKsave> vs DC 10",
   appender: function (actor: Character, options: AppenderOptions): L10N {
-    const { turnsAppending: value } = options;
+    const { turnsAppending: value, universalCounter: counter } = options;
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.precognition);
     let isFirst = false;
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.precognition, {
         value: value,
-        isPerm: false,
-        permValue: 0,
-        counter: 0,
+        counter: counter || 0,
       });
       isFirst = true;
     } else {

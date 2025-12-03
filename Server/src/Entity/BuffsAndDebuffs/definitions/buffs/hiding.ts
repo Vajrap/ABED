@@ -8,14 +8,16 @@ export const hiding = new BuffDef({
         en: "hiding",
         th: "ซ่อนตัว",
     },
+    description: {
+        en: "The character is hidden, making them harder to detect.",
+        th: "ตัวละครซ่อนตัว ทำให้ตรวจจับได้ยากขึ้น",
+    },
     appender: function (actor: Character, options: AppenderOptions): L10N {
         const { turnsAppending: value } = options;
         const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.hiding);
         if (!entry) {
             actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.hiding, {
                 value: value,
-                isPerm: false,
-                permValue: 0,
                 counter: 0,
             });
         } else {

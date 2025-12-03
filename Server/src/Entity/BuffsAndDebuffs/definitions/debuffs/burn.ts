@@ -8,6 +8,10 @@ export const burn = new DebuffDef({
     en: "burn",
     th: "เผาไหม้",
   },
+  description: {
+    en: "Take fire damage equal to stack number each turn",
+    th: "รับความเสียหายไฟเท่ากับจำนวนสแต็กแต่ละเทิร์น",
+  },
   appender: function (
     actor: Character,
     options: AppenderOptions,
@@ -17,8 +21,6 @@ export const burn = new DebuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.burn, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
     } else {

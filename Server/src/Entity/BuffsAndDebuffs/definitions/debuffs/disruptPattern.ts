@@ -8,6 +8,10 @@ export const disruptPattern = new DebuffDef({
     en: "disrupt pattern: cooldown",
     th: "disrupt pattern: cooldown",
   },
+  description: {
+    en: "Disrupt Pattern: cooldown",
+    th: "Disrupt Pattern: cooldown",
+  },
   appender: function (actor: Character, options: AppenderOptions): L10N {
     const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(
@@ -16,8 +20,6 @@ export const disruptPattern = new DebuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.disruptPattern, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
     } else {

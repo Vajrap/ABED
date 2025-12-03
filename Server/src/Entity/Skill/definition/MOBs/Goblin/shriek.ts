@@ -104,8 +104,6 @@ export const shriek = new Skill({
       } else {
         actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
           value: 1,
-          isPerm: false,
-          permValue: 0,
           counter: 0,
         });
       }

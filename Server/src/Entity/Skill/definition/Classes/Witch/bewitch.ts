@@ -80,9 +80,9 @@ export const bewitch = new WitchSkill({
     let bewitchMessage = "";
 
     if (willpowerSave < willpowerDC) {
-      // Save failed: apply charm buff to target
+      // Save failed: apply charmed debuff to target
       const charmDuration = skillLevel >= 5 ? 2 : 1;
-      buffsAndDebuffsRepository.charm.appender(target, { turnsAppending: charmDuration });
+      buffsAndDebuffsRepository.charmed.appender(target, { turnsAppending: charmDuration });
       bewitchMessage = ` ${target.name.en} is charmed!`;
       
       // At level 5, also apply hexed debuff

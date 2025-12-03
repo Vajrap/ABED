@@ -8,30 +8,24 @@ export const hexMark = new DebuffDef({
     en: "Hex Mark",
     th: "เครื่องหมายสาป",
   },
+  description: {
+    en: "The target is marked with a hex sigil. The mark value decreases by 1 each turn.",
+    th: "เป้าหมายถูกทำเครื่องหมายด้วยเครื่องหมายสาป ค่าเครื่องหมายลดลง 1 ในแต่ละเทิร์น",
+  },
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.hexMark);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.hexMark, {
         value: value,
-        isPerm: isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
-      entry.permValue = Math.max(entry.permValue, permanentCounter);
     }
 
     return {
@@ -45,7 +39,7 @@ export const hexMark = new DebuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
+      } else if (entry.value === 0 ) {
         actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.hexMark);
       }
     }

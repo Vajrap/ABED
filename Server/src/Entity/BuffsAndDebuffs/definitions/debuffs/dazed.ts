@@ -8,14 +8,17 @@ export const dazed = new DebuffDef({
         en: "dazed",
         th: "สับสน",
     },
+    description: {
+        en: "Reduces physical and magical hit chance by 2. When the debuff expires, the penalties are removed.",
+        th: "ลดโอกาสตีกายภาพและเวทมนตร์ 2 เมื่อดีบัฟหมดอายุ โทษจะถูกลบ",
+    },
+    formula: "pHIT -2, mHIT -2 (removed when debuff expires)",
     appender: function (actor: Character, options: AppenderOptions): L10N {
         const { turnsAppending: value } = options;
         const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.dazed);
         if (!entry) {
             actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.dazed, {
                 value: value,
-                isPerm: false,
-                permValue: 0,
                 counter: 0,
             });
             actor.battleStats.mutateBattle('pHIT', -2);

@@ -10,30 +10,25 @@ export const entangled = new DebuffDef({
     en: "Entangled",
     th: "พันกัน",
   },
+  description: {
+    en: "The target is entangled. Each turn, the target must roll <FORMULA> or skip their turn. On success, they break free.",
+    th: "เป้าหมายถูกพันกัน ในแต่ละเทิร์นเป้าหมายต้องทอย DC 10 Strength save หรือข้ามเทิร์น หากสำเร็จจะหลุดพ้น",
+  },
+  formula: "DC10 <STRsave>",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.entangled);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.entangled, {
         value: value,
-        isPerm: isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
-      entry.permValue += permanentCounter;
     }
 
     return {
@@ -54,7 +49,7 @@ export const entangled = new DebuffDef({
         skipped = true;
       }
       entry.value -= 1;
-      if (entry.value === 0 && entry.permValue === 0) {
+      if (entry.value === 0 ) {
         actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.entangled);
       }
     }

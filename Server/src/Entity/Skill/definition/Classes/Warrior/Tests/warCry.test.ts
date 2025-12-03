@@ -70,6 +70,7 @@ describe("War Cry Skill", () => {
 
     it("should affect at least self even with negative CHAmod", () => {
       actor.attribute.getStat("charisma").base = 6; // -2 mod
+      actor.attribute.getStat("leadership").base = 6; // -2 mod
       
       const warCrySpy = jest.spyOn(buffsAndDebuffsRepository.warCry, "appender");
 
@@ -81,7 +82,8 @@ describe("War Cry Skill", () => {
         DEFAULT_TEST_LOCATION,
       );
 
-      // Should affect at least self (Math.max(1, 1 + Math.floor(-2)) = 1)
+      // Should affect at least self (Math.max(1, 1 + Math.floor(leadershipMod)) = 1)
+      // With leadership mod -2: Math.max(1, 1 + Math.floor(-2)) = Math.max(1, 1 + -2) = Math.max(1, -1) = 1
       expect(warCrySpy).toHaveBeenCalledTimes(1);
     });
   });
@@ -128,7 +130,7 @@ describe("War Cry Skill", () => {
 
   describe("Buff Strength", () => {
     it("should calculate buff strength correctly", () => {
-      // Leadership 14 = +2 mod, so buff strength = 2 + floor(2/2) = 3
+      // Charisma 14 = +2 mod, so buff strength = Math.max(1, 2) = 2
       const warCrySpy = jest.spyOn(buffsAndDebuffsRepository.warCry, "appender");
 
       warCry.exec(
@@ -140,8 +142,8 @@ describe("War Cry Skill", () => {
       );
 
       const callArgs = warCrySpy.mock.calls[0];
-      // Buff strength stored in universalCounter
-      expect(callArgs?.[1]?.universalCounter).toBe(3);
+      // Buff strength stored in universalCounter (charisma mod, at least 1)
+      expect(callArgs?.[1]?.universalCounter).toBe(2);
     });
   });
 

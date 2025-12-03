@@ -16,8 +16,8 @@ export const warCry = new WarriorSkill({
   },
   description: {
     text: {
-      en: "Let out a mighty battle cry that inspires you and your allies to fight harder.\nAffects yourself + <CHAmod> closest allies.\nGain <BuffWarCry> for {5}'3':'2'{/} turns.",
-      th: "เปล่งเสียงร้องศึกที่ยิ่งใหญ่ที่ปลุกใจคุณและพันธมิตรให้ต่อสู้อย่างหนักขึ้น\nส่งผลต่อตัวเอง + <CHAmod> พันธมิตรที่ใกล้ที่สุด\nได้รับ <BuffWarCry> {5}'3':'2'{/} เทิร์น",
+      en: "Let out a mighty battle cry that inspires you and your allies to fight harder.\nAffects yourself + <LEADmod> closest allies.\nGain <BuffWarCry> for {5}'3':'2'{/} turns.",
+      th: "เปล่งเสียงร้องศึกที่ยิ่งใหญ่ที่ปลุกใจคุณและพันธมิตรให้ต่อสู้อย่างหนักขึ้น\nส่งผลต่อตัวเอง + <LEADmod> พันธมิตรที่ใกล้ที่สุด\nได้รับ <BuffWarCry> {5}'3':'2'{/} เทิร์น",
     },
   },
   requirement: {},
@@ -55,10 +55,11 @@ export const warCry = new WarriorSkill({
     const duration = skillLevel >= 5 ? 3 : 2;
     
     // Calculate buff strength: +2 + leadership mod/2
-    const buffStrength = 2 + Math.floor(leadershipMod / 2);
+    // += Cha mod, at least 1
+    const buffStrength = Math.max(1, charismaMod);
     
     // Determine which allies are affected: self + charisma mod closest allies
-    const numAlliesAffected = Math.max(1, 1 + Math.floor(charismaMod)); // At least self
+    const numAlliesAffected = Math.max(1, 1 + Math.floor(leadershipMod)); // At least self
     const alliesToAffect = actorParty
       .filter(ally => ally.id !== actor.id && !ally.vitals.isDead)
       .slice(0, numAlliesAffected - 1); // -1 because we're including self

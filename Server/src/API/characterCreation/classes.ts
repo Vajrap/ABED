@@ -42,6 +42,9 @@ import {
   WarriorSkillId,
   WarlockSkillId,
   WitchSkillId,
+  SeerSkillId,
+  NomadSkillId,
+  EngineerSkillId,
 } from "src/Entity/Skill/enums";
 import {
   CharacterEquipmentSlot,
@@ -81,7 +84,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "shield", value: +1 },
     ],
     startingSkills: [
-      ClericSkillId.Heal as SkillId,
+      ClericSkillId.Radiance,
+      ClericSkillId.Heal,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -105,7 +109,10 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "dagger", value: +2 },
       { key: "book", value: +1 },
     ],
-    startingSkills: [],
+    startingSkills: [
+      SeerSkillId.ThreadSnip,
+      SeerSkillId.PlanarEcho
+    ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
       [CharacterEquipmentSlot.body]: BodyId.MageRobe,
@@ -129,8 +136,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "book", value: +1 },
     ],
     startingSkills: [
-      MageSkillId.ArcaneBolt as SkillId,
-      MageSkillId.FireBolt as SkillId,
+      MageSkillId.ArcaneShield,
+      MageSkillId.ArcaneBolt,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -155,6 +162,7 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "wand", value: +1 },
     ],
     startingSkills: [
+      MysticSkillId.InnerVeil,
       MysticSkillId.MistStep as SkillId,
     ],
     startingEquipments: {
@@ -180,8 +188,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "blade", value: +1 },
     ],
     startingSkills: [
-      RogueSkillId.ThrowingKnives as SkillId,
-      RogueSkillId.RetreatDash as SkillId,
+      RogueSkillId.BleedingCut,
+      RogueSkillId.ThrowingKnives
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -206,7 +214,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "wand", value: +1 },
     ],
     startingSkills: [
-      SpellBladeSkillId.PlanarEdge as SkillId,
+      SpellBladeSkillId.WindSlash,
+      SpellBladeSkillId.PlanarEdge,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -231,8 +240,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "axe", value: +1 },
     ],
     startingSkills: [
-      ShamanSkillId.HexOfRot as SkillId,
-      ShamanSkillId.HolyRattle as SkillId,
+      ShamanSkillId.HexOfRot,
+      ShamanSkillId.MendSpirit,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -257,8 +266,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "bareHand", value: +1 },
     ],
     startingSkills: [
-      BarbarianSkillId.Rage as SkillId,
-      BarbarianSkillId.RecklessSwing as SkillId,
+      BarbarianSkillId.RecklessSwing,
+      BarbarianSkillId.Rage
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -283,8 +292,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "spear", value: +1 },
     ],
     startingSkills: [
-      WarriorSkillId.PowerStrike as SkillId,
-      WarriorSkillId.Cleave as SkillId,
+      WarriorSkillId.WarCry,
+      WarriorSkillId.PowerStrike,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -309,7 +318,7 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "sword", value: +1 },
     ],
     startingSkills: [
-      KnightSkillId.PrecisionThrust as SkillId,
+      KnightSkillId.PrecisionThrust,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -335,7 +344,6 @@ const classBonus: Record<ClassEnum, Bonus> = {
     ],
     startingSkills: [
       GuardianSkillId.ShieldUp as SkillId,
-      GuardianSkillId.Bash as SkillId,
       GuardianSkillId.Taunt as SkillId,
     ],
     startingEquipments: {
@@ -361,7 +369,7 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "sword", value: +1 },
     ],
     startingSkills: [
-      PaladinSkillId.DivineStrike as SkillId,
+      PaladinSkillId.DivineStrike,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -386,7 +394,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "bow", value: +1 },
     ],
     startingSkills: [
-      DruidSkillId.VineWhip as SkillId,
+      DruidSkillId.ThrowSpear,
+      DruidSkillId.VineWhip,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -400,7 +409,7 @@ const classBonus: Record<ClassEnum, Bonus> = {
       [CharacterEquipmentSlot.earL]: null,
       [CharacterEquipmentSlot.earR]: null,
       [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: StaffId.QuarterStaff,
+      [CharacterEquipmentSlot.rightHand]: SpearId.Javelin,
       [CharacterEquipmentSlot.leftHand]: null,
     },
   },
@@ -411,8 +420,9 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "blade", value: +1 },
     ],
     startingSkills: [
-      MonkSkillId.PalmStrike as SkillId,
-      MonkSkillId.Meditation as SkillId,
+      MonkSkillId.FlurryOfBlows,
+      MonkSkillId.PalmStrike,
+      MonkSkillId.Meditation,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -437,7 +447,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "bow", value: +1 },
     ],
     startingSkills: [
-      WarlockSkillId.ChaosBolt as SkillId,
+      WarlockSkillId.Corruption,
+      WarlockSkillId.ChaosBolt,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -462,8 +473,7 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "bow", value: +1 },
     ],
     startingSkills: [
-      DuelistSkillId.PreciseStrike as SkillId,
-      DuelistSkillId.BladeFlurry as SkillId,
+      DuelistSkillId.DuelingStance,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -514,7 +524,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "wand", value: +1 },
     ],
     startingSkills: [
-      InquisitorSkillId.RadiantSmite as SkillId,
+      InquisitorSkillId.ExposeWeakness,
+      InquisitorSkillId.RadiantSmite,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -539,7 +550,8 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "dagger", value: +1 },
     ],
     startingSkills: [
-      ScholarSkillId.DisruptPattern as SkillId,
+      ScholarSkillId.CognitiveOverload,
+      ScholarSkillId.DisruptPattern,
     ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
@@ -563,7 +575,10 @@ const classBonus: Record<ClassEnum, Bonus> = {
       { key: "hammer", value: +2 },
       { key: "bareHand", value: +1 },
     ],
-    startingSkills: [],
+    startingSkills: [
+      EngineerSkillId.ExplosiveBolt,
+      EngineerSkillId.BearTrap,
+    ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
       [CharacterEquipmentSlot.body]: BodyId.LeatherArmor,
@@ -582,11 +597,14 @@ const classBonus: Record<ClassEnum, Bonus> = {
   },
   [ClassEnum.Nomad]: {
     proficiencies: [
-      { key: "spear", value: +3 },
-      { key: "dagger", value: +2 },
-      { key: "hammer", value: +1 },
+      { key: "blade", value: +3 },
+      { key: "bow", value: +2 },
+      { key: "dagger", value: +1 },
     ],
-    startingSkills: [],
+    startingSkills: [
+      NomadSkillId.TacticalSlash,
+      NomadSkillId.AdaptiveStrike,
+    ],
     startingEquipments: {
       [CharacterEquipmentSlot.headWear]: null,
       [CharacterEquipmentSlot.body]: BodyId.LeatherArmor,
@@ -599,7 +617,7 @@ const classBonus: Record<ClassEnum, Bonus> = {
       [CharacterEquipmentSlot.earL]: null,
       [CharacterEquipmentSlot.earR]: null,
       [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: SpearId.Dory,
+      [CharacterEquipmentSlot.rightHand]: BladeId.Scimitar,
       [CharacterEquipmentSlot.leftHand]: null,
     },
   },

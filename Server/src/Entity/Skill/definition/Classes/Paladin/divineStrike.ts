@@ -50,7 +50,7 @@ export const divineStrike = new PaladinSkill({
   },
   requirement: {},
   equipmentNeeded: allowedWeapons,
-  tier: TierEnum.common,
+  tier: TierEnum.uncommon,
   consume: {
     hp: 0,
     mp: 0,

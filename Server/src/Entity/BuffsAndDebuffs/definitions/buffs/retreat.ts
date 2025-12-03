@@ -8,25 +8,25 @@ export const retreat = new BuffDef({
     en: "retreat",
     th: "ถอยก่อน",
   },
+  description: {
+    en: "Increases dodge by 3.",
+    th: "เพิ่มหลบหลีก 3",
+  },
   appender: function (actor: Character, options: AppenderOptions): L10N {
     const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.retreat);
-    let isFirst = false;
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.retreat, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
       actor.battleStats.mutateBattle("dodge", 3);
-      isFirst = true;
     } else {
       entry.value += value;
     }
 
     return {
-      en: `${actor.name.en} got retreat buff${value}${isFirst ? ", dodge in crease by 3" : "."}`,
+      en: `${actor.name.en} got retreat buff${value}, dodge in crease by 3`,
       th: `${actor.name.th} ได้รับ "ถอยก่อน" ${value} หน่วย `,
     };
   },

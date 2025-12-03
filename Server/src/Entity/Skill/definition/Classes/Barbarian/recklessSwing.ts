@@ -20,7 +20,7 @@ export const recklessSwing = new BarbarianSkill({
   },
   description: {
     text: {
-      en: "Swing your weapon recklessly attacking targeted enemy {5}'three':'two'{/} times, \neach dealing <FORMULA>. Hit roll suffer [r]-2[/r] penalty.",
+      en: "Swing your weapon recklessly attacking targeted enemy {5}'three':'two'{/} times, \neach dealing <FORMULA>. {5}\n :Hit roll suffer [r]-2[/r] penalty.{/}",
       th: "เหวี่ยงอาวุธฟาดไม่ยั้งใส่เป้าหมาย โจมตีต่อเนื่อง {5}'3':'2'{/} ครั้ง \nแต่ละครั้งสร้างความเสียหาย <FORMULA> ความแม่นยำในการโจมตีลดลง [r]2[/r]",
     },
     formula: {
@@ -30,7 +30,7 @@ export const recklessSwing = new BarbarianSkill({
   },
   requirement: {},
   equipmentNeeded: ["sword", "axe", "blade", "hammer", "spear", "bareHand"],
-  tier: TierEnum.common,
+  tier: TierEnum.uncommon,
   consume: {
     hp: 0,
     mp: 0,
@@ -85,7 +85,6 @@ export const recklessSwing = new BarbarianSkill({
 
     for (let i = 0; i < hits; i++) {
       const weaponDamage = getWeaponDamageOutput(actor, weapon, damageTypeMode);
-      // Note: getWeaponDamageOutput already includes attribute modifiers
       const rawDamage = weaponDamage.damage * 0.7;
       const scaledDamage = Math.max(
         0,
@@ -94,7 +93,7 @@ export const recklessSwing = new BarbarianSkill({
 
       const damageOutput = {
         damage: Math.floor(scaledDamage),
-        hit: weaponDamage.hit - 2,
+        hit: weaponDamage.hit - (skillLevel >= 5 ? 0 : 2),
         crit: weaponDamage.crit,
         type: weaponDamage.type,
         isMagic: false,

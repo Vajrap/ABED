@@ -54,7 +54,7 @@ export const precognition = new SeerSkill({
       }
     }
     
-    buffsAndDebuffsRepository.precognition.appender(user, { turnsAppending: turns });
+    buffsAndDebuffsRepository.precognition.appender(user, { turnsAppending: turns, universalCounter: skillLevel >= 5 ? 1 : 0 });
     
     return {
       content: {

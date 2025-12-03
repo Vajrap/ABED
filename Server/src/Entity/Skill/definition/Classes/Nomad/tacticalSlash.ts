@@ -6,14 +6,12 @@ import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { ActorEffect, TargetEffect } from "src/Entity/Skill/effects";
 import { getTarget } from "src/Entity/Battle/getTarget";
-import { statMod } from "src/Utils/statMod";
 import type { TurnResult } from "../../../types";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
-import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { debuffsRepository, buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 

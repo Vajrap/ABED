@@ -9,35 +9,30 @@ export const bleed = new DebuffDef({
     en: "Bleed",
     th: "เลือดไหล",
   },
+  description: {
+    en: "Taking <Formula> true damage each turn.",
+    th: "รับความเสียหาย <Formula> จริงในแต่ละเทิร์น",
+  },
+  formula: "1d3",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.bleed);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.bleed, {
         value: value,
-        isPerm: isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
-      entry.permValue += permanentCounter;
     }
 
     return {
-      en: `${actor.name.en} is bleeding! ${value + permanentCounter} stack(s)`,
-      th: `${actor.name.th} กำลังเลือดไหล! ${value + permanentCounter} หน่วย`,
+      en: `${actor.name.en} is bleeding! ${value} stack(s)`,
+      th: `${actor.name.th} กำลังเลือดไหล! ${value} หน่วย`,
     };
   },
 
@@ -45,24 +40,20 @@ export const bleed = new DebuffDef({
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.bleed);
     if (entry && entry.value > 0) {
       // Deal 1d3 damage per stack
-      const stacks = entry.value;
-      let totalDamage = 0;
-      for (let i = 0; i < stacks; i++) {
-        totalDamage += roll(1).d(3).total;
-      }
-      actor.vitals.decHp(totalDamage);
+      const damage = roll(1).d(3).total;
+      actor.vitals.decHp(damage);
       entry.value -= 1; // Reduce duration by 1 turn
       
       return {
         canAct: true,
         content: {
-          en: `${actor.name.en} bleeds for ${totalDamage} damage (${stacks} stack(s), ${entry.value} turn(s) remaining)`,
-          th: `${actor.name.th} เลือดไหล ${totalDamage} หน่วย (${stacks} หน่วย, เหลือ ${entry.value} เทิร์น)`,
+          en: `${actor.name.en} bleeds for ${damage} damage (remaining ${entry.value} turn(s))`,
+          th: `${actor.name.th} เลือดไหล ${damage} หน่วย (เหลือ ${entry.value} เทิร์น)`,
         },
       };
     }
     
-    if (entry && entry.value === 0 && entry.permValue === 0) {
+    if (entry && entry.value === 0) {
       actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.bleed);
     }
 

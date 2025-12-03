@@ -9,13 +9,17 @@ export const spellParry = new BuffDef({
     en: "Spell Parry",
     th: "ปัดเวท",
   },
+  description: {
+    en: "Reduces the next spell damage by <FORMULA>. And given self an Edge Charge. \nIf the amount of damage is 0, given 2 Edge Charge.",
+    th: "ลดความเสียหายเวทครั้งถัดไป <FORMULA> และให้ตัวเอง Edge Charge. \nหากความเสียหายเป็น 0, ให้ Edge Charge 2 หน่วย",
+  },
+  formula: "5 + <INTmod>",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
     const {
       turnsAppending: value,
-      isPerm = false,
       universalCounter = 0,
     } = options;
     
@@ -25,8 +29,6 @@ export const spellParry = new BuffDef({
       const reduction = 5 + intMod;
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.spellParry, {
         value: value,
-        isPerm: isPerm,
-        permValue: 0,
         counter: universalCounter, // Store reduction amount in counter
       });
       return {

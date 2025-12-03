@@ -33,7 +33,7 @@ import { regen } from "./definitions/buffs/regen";
 import { parry } from "./definitions/buffs/parry";
 import { duelingStance } from "./definitions/buffs/duelingStance";
 import { curseMarkActive } from "./definitions/buffs/curseMarkActive";
-import { charm } from "./definitions/buffs/charm";
+import { charmed } from "./definitions/debuffs/charmed";
 import { exposeWeaknessActive } from "./definitions/buffs/exposeWeaknessActive";
 import { precognition } from "./definitions/buffs/precognition";
 import { entangled } from "./definitions/debuffs/entangled";
@@ -72,7 +72,6 @@ export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.parry]: parry,
   [BuffEnum.duelingStance]: duelingStance,
   [BuffEnum.curseMarkActive]: curseMarkActive,
-  [BuffEnum.charm]: charm,
   [BuffEnum.exposeWeaknessActive]: exposeWeaknessActive,
   [BuffEnum.precognition]: precognition,
 };
@@ -89,6 +88,7 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   [DebuffEnum.stun]: stun,
   [DebuffEnum.entangled]: entangled,
   [DebuffEnum.hexMark]: hexMark,
+  [DebuffEnum.charmed]: charmed,
 
   // Cooldown
   [DebuffEnum.disruptPattern]: disruptPattern,

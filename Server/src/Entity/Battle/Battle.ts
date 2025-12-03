@@ -678,7 +678,7 @@ function resolveBuffAndDebuff(actor: Character): {
 
   // Loop twice, separate buffs and debuffs, shouldn't be a problem since two maps and one map might not be so differ in this aspoect
   for (const [buffsOrDebuffs, entry] of actor.buffsAndDebuffs.buffs.entry) {
-    if (entry.value === 0 && entry.permValue === 0) {
+    if (entry.value === 0) {
       return { ableToTakesTurn, reason };
     }
 
@@ -693,7 +693,7 @@ function resolveBuffAndDebuff(actor: Character): {
 
   for (const [debuffs, entry] of actor.buffsAndDebuffs.debuffs.entry) {
 
-    if (entry.value === 0 && entry.permValue === 0) {
+    if (entry.value === 0) {
       return { ableToTakesTurn, reason };
     }
 

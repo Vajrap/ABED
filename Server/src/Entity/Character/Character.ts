@@ -234,20 +234,12 @@ export class Character {
   clearBuffAndDebuff(): Character {
     for (const [key, value] of this.buffsAndDebuffs.debuffs.entry) {
       if (value.value > 0) {
-        if (!value.isPerm) {
-          this.buffsAndDebuffs.debuffs.entry.delete(key);
-        } else {
-          value.value = 0;
-        }
+        this.buffsAndDebuffs.debuffs.entry.delete(key);
       }
     }
     for (const [key, value] of this.buffsAndDebuffs.buffs.entry) {
       if (value.value > 0) {
-        if (!value.isPerm) {
-          this.buffsAndDebuffs.buffs.entry.delete(key);
-        } else {
-          value.value = 0;
-        }
+        this.buffsAndDebuffs.buffs.entry.delete(key);
       }
     }
     return this;
@@ -422,8 +414,6 @@ export type CharacterBreathingSkillObject = {
 
 type BuffAndDebuffRecord = {
   value: number;
-  isPerm: boolean;
-  permValue: number;
   counter: number;
 };
 

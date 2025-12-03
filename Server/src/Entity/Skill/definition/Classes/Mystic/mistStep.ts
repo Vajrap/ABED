@@ -53,7 +53,7 @@ export const mistStep = new MysticSkill({
       // Restore agility before removing (slow reduces agility)
       actor.attribute.mutateBattle(
         "agility",
-        slowEntry.value + slowEntry.permValue,
+        slowEntry.value,
       );
       actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.slow);
     }

@@ -8,6 +8,10 @@ export const arcaneShield = new BuffDef({
     en: "arcaneShield",
     th: "โล่เวทมนตร์",
   },
+  description: {
+    en: "A magical shield that protects the character. Each stack absorbs 1 point of damage.",
+    th: "โล่เวทมนตร์ที่ปกป้องตัวละคร สแต็กที่มีอยู่จะดูดซับ 1 หน่วยของความเสียหาย",
+  },
   appender: function (
     actor: Character,
     options: AppenderOptions,
@@ -17,8 +21,6 @@ export const arcaneShield = new BuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.arcaneShield, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
     } else {

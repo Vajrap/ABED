@@ -8,13 +8,17 @@ export const exposeWeaknessActive = new BuffDef({
     en: "Expose Weakness Active",
     th: "เปิดเผยจุดอ่อนใช้งาน",
   },
+  description: {
+    en: "Grants <Formula> bonus hit chance against exposed enemies. ",
+    th: "ให้โอกาสตีเพิ่มต่อศัตรูที่ถูกเปิดเผย <Formula> ",
+  },
+  formula: "<COUNTER> / 2",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
     const {
       turnsAppending: value,
-      isPerm = false,
       universalCounter = 0,
     } = options;
     
@@ -22,14 +26,9 @@ export const exposeWeaknessActive = new BuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.exposeWeaknessActive, {
         value: value,
-        isPerm: isPerm,
-        permValue: 0,
         counter: universalCounter, // Store WIL mod for hit bonus
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
       // Use higher WIL mod
       entry.counter = Math.max(entry.counter, universalCounter);

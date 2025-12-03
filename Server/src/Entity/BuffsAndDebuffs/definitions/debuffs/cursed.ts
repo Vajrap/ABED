@@ -8,14 +8,16 @@ export const cursed = new DebuffDef({
         en: "cursed",
         th: "ถูกสาป",
     },
+    description: {
+        en: "A curse that affects the target. The curse value decreases by 1 each turn.",
+        th: "คำสาปที่ส่งผลต่อเป้าหมาย ค่าคำสาปลดลง 1 ในแต่ละเทิร์น",
+    },
     appender: function (actor: Character, options: AppenderOptions): L10N {
         const { turnsAppending: value } = options;
         const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.cursed);
         if (!entry) {
             actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.cursed, {
                 value: value,
-                isPerm: false,
-                permValue: 0,
                 counter: 0,
             });
         } else {

@@ -8,22 +8,21 @@ export const cowardlyCharge = new BuffDef({
     en: "cowardlyCharge",
     th: "โจมตีแบบขี้ขลาด",
   },
+  description: {
+    en: "Increases <FORMULA>.",
+    th: "เพิ่ม <FORMULA>",
+  },
+  formula: "pATK +2, mATK +2",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.cowardlyCharge);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.cowardlyCharge, {
         value: value,
-        isPerm: isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
       // Add +2 pAtk and +2 mAtk when first applied
@@ -31,7 +30,6 @@ export const cowardlyCharge = new BuffDef({
       actor.battleStats.mutateBonus("mATK", 2);
     } else {
       entry.value += value;
-      entry.permValue += permanentCounter;
     }
 
     return {

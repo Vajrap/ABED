@@ -47,7 +47,7 @@ class TargetSelector {
   }
 
   getPossibleTargets(): Character[] {
-    const charmed = this.actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.charm)?.value ? true : false;
+    const charmed = this.actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.charmed)?.value ? true : false;
     const canResistCharm = rollTwenty().total + statMod(this.actor.attribute.getTotal("willpower")) > 15;
     
     // If charmed and can't resist, target wrong party

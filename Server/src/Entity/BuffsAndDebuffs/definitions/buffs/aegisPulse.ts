@@ -8,30 +8,24 @@ export const aegisPulse = new BuffDef({
     en: "Aegis Pulse",
     th: "คลื่นป้องกันศักดิ์สิทธิ์",
   },
+  description: {
+    en: "Lingering Aegis shield pulsing after Aegis Shield is depleted by damage.",
+    th: "คลื่นป้องกันศักดิ์สิทธิ์ที่คงอยู่หลังจากโล่ป้องกันศักดิ์สิทธิ์ถูกลดลงจากความเสียหาย",
+  },
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.aegisPulse);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.aegisPulse, {
         value: value,
-        isPerm: isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
-      entry.permValue += permanentCounter;
     }
 
     return {
@@ -44,8 +38,8 @@ export const aegisPulse = new BuffDef({
     // Aegis Pulse should be removed when it is used. Not depleted by itself.
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.aegisPulse);
     // Don't decrease value by itself - it's removed when the skill is used
-    // Only clean up if both value and permValue are 0
-    if (entry && entry.value === 0 && entry.permValue === 0) {
+    // Only clean up if value is 0
+    if (entry && entry.value === 0 ) {
       actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.aegisPulse);
     }
 

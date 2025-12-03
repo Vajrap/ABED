@@ -8,15 +8,16 @@ export const rage = new BuffDef({
     en: "Rage",
     th: "เดือดดาล",
   },
+  description: {
+    en: "Gain <FORMULA>.",
+    th: "ได้รับ <FORMULA>",
+  },
+  formula: "<pATK +2, pDEF -2, mDEF -2>",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.rage);
     if (!entry) {
@@ -26,16 +27,10 @@ export const rage = new BuffDef({
 
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.rage, {
         value,
-        isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
-      entry.permValue += permanentCounter;
     }
 
     return {
@@ -50,7 +45,7 @@ export const rage = new BuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
+      } else if (entry.value === 0 ) {
         actor.battleStats.mutateBattle("pATK", -2);
         actor.battleStats.mutateBattle("pDEF", 2);
         actor.battleStats.mutateBattle("mDEF", 2);

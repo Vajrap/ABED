@@ -39,7 +39,7 @@ export const bleedingCut = new RogueSkill({
     mp: 0,
     sp: 3,
     elements: [
-        {element: 'neutral', value: 1},
+        {element: 'wind', value: 1},
     ],
   },
   produce: {
@@ -47,7 +47,7 @@ export const bleedingCut = new RogueSkill({
     mp: 0,
     sp: 0,
     elements: [
-        {element: 'wind', min: 1, max: 1},
+        {element: 'neutral', min: 1, max: 1},
     ],
   },
   exec: (

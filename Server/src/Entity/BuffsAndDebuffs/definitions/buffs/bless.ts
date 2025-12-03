@@ -8,14 +8,16 @@ export const bless = new BuffDef({
         en: "bless",
         th: "อวยพร",
     },
+    description: {
+        en: "Gain <Advantage> on all saving rolls",
+        th: "ได้ประโยชน์จากการทอยความสำเร็จการปกป้องทั้งหมด",
+    },
     appender: function (actor: Character, options: AppenderOptions): L10N {
         const { turnsAppending: value } = options;
         const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.bless);
         if (!entry) {
             actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.bless, {
                 value: value,
-                isPerm: false,
-                permValue: 0,
                 counter: 0,
             });
         } else {

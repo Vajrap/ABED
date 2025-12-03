@@ -74,6 +74,7 @@ import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { ArmorClass } from "../Item/Equipment/Armor/Armor";
 import { bodyRepository } from "src/Entity/Item/Equipment/Armor/Body/repository";
 import type { Character } from "../Character/Character";
+import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 
 export interface DamageResult {
   actualDamage: number;
@@ -207,6 +208,30 @@ function checkHitAndDodge(
   context: DamageResolutionContext,
 ): DamageResult | null {
   const { target, damageOutput } = context;
+  // Precognition auto dodge
+  const precognition = target.buffsAndDebuffs.buffs.entry.get(
+    BuffEnum.precognition,
+  );
+  if (precognition && precognition.value > 0) {
+    const saveRoll = target.rollSave("luck");
+    const dc = 10;
+    const dodged = saveRoll >= dc;
+    if (dodged) {
+      if (precognition.counter === 1) {
+        // Gain 1 order
+        target.resources.order += 1;
+      }
+      // Remove precognition
+      target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.precognition);
+      // Return missed
+      return {
+        actualDamage: 0,
+        damageType: damageOutput.type,
+        isHit: false,
+        isCrit: false,
+      };
+    }
+  }
 
   // Calculate dodge chance
   let dodgeChance =
@@ -514,19 +539,15 @@ function checkCounterAttacks(
     if (saveRoll >= dc) {
       // Save passed: negate attack and counter-attack
       const skillLevel = parry.counter || 1;
-      const dexMod = statMod(target.attribute.getTotal("dexterity"));
       const levelScalar = skillLevelMultiplier(skillLevel);
-      const weaponDamge =
-        target.getWeapon().weaponData.damage.physicalDamageDice;
-      const counterDamage =
-        (roll(weaponDamge.dice).d(weaponDamge.face).total + dexMod) *
-        levelScalar;
+      const weapon = target.getWeapon();
+      const counterDamage = getWeaponDamageOutput(target, weapon, "physical").damage * levelScalar;
 
       const counterDamageOutput: DamageInput = {
         damage: Math.max(0, Math.floor(counterDamage)),
         hit: 999, // Auto-hit counter
         crit: 0,
-        type: DamageType.slash,
+        type: weapon.weaponData.damage.physicalDamageType,
         isMagic: false,
       };
 
@@ -598,8 +619,7 @@ function applyShieldsAndAbsorption(
     );
 
     // Grant Edge Charge: 1 if damage taken, 2 if 0 damage
-    const edgeChargeGain = damage === 0 ? 2 : 1;
-    buffsRepository.edgeCharge.appender(target, { turnsAppending: edgeChargeGain });
+    buffsRepository.edgeCharge.appender(target, { turnsAppending: 1 });
 
     // Remove Spell Parry buff (consumed)
     target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.spellParry);

@@ -8,13 +8,18 @@ export const parry = new BuffDef({
     en: "Parry",
     th: "ปัดป้อง",
   },
+  description: {
+    en: "When attacked by a non magical attack, roll DC13 CONsave, if passed, negate the attack and deal <Formula> damage back to the attacker. Remove once counter is used.",
+    th: "เมื่อถูกโจมตีด้วยการโจมตีที่ไม่ใช่เวท ทอย save DC13 CON หากสำเร็จ จะยกเลิกการโจมตีและสร้างความเสียหาย <Formula> ต่อผู้โจมตี ลบออกเมื่อตอบโต้ถูกใช้",
+  },
+  formula: "<WeaponDamage> × <SkillLevelMultiplier>",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
     const {
       turnsAppending: value,
-      isPerm = false,
+      
       universalCounter = 0,
     } = options;
     
@@ -22,22 +27,16 @@ export const parry = new BuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.parry, {
         value: value,
-        isPerm: isPerm,
-        permValue: 0,
         counter: universalCounter, // Store skill level in counter
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
-      // Use higher skill level
       entry.counter = Math.max(entry.counter, universalCounter);
     }
 
     return {
-      en: `${actor.name.en} assumes a defensive stance, ready to parry and counter!`,
-      th: `${actor.name.th} ใช้ท่าป้องกัน พร้อมปัดป้องและตอบโต้!`,
+      en: `${actor.name.en} gained Parry: ready to parry and counter!`,
+      th: `${actor.name.th} ได้รับ "ปัดป้อง": พร้อมปัดป้องและตอบโต้!`,
     };
   },
 

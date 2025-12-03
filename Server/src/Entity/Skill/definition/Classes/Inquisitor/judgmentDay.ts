@@ -32,7 +32,7 @@ export const judgmentDay = new InquisitorSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.uncommon,
+  tier: TierEnum.rare,
   consume: {
     hp: 0,
     mp: 4,

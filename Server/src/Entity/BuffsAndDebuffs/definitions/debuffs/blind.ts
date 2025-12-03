@@ -8,14 +8,17 @@ export const blind = new DebuffDef({
     en: "Blind",
     th: "ตาบอด",
   },
+  description: {
+    en: "Lose <FORMULA>.",
+    th: "สูญเสีย <FORMULA>",
+  },
+  formula: "-3 pHIT, -3 mHIT",
   appender: function (actor: Character, options: AppenderOptions): L10N {
     const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.blind);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.blind, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
       // Blind reduces hit roll by 3

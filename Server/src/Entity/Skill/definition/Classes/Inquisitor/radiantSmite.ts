@@ -26,8 +26,8 @@ export const radiantSmite = new InquisitorSkill({
       th: "รวมพลังพิพากษาจากสวรรค์เป็นลำแสงที่เผาผลาญผู้ชั่วร้าย\nสร้างความเสียหายศักดิ์สิทธิ์ <FORMULA>\n[r]สร้างความเสียหายเพิ่ม +1d4[/r] ต่อ undead หรือ fiends\n[r]สร้างความเสียหายเพิ่ม +1d4[/r] ต่อเป้าหมายที่มีความชั่วร้าย",
     },
     formula: {
-      en: "({5}'1d8':'1d6'{/} + (<WILmod> + <PlanarMod>) / 2) × <SkillLevelMultiplier>",
-      th: "({5}'1d8':'1d6'{/} + (<WILmod> + <PlanarMod>) / 2) × <SkillLevelMultiplier>",
+      en: "(1d6 + (<WILmod> + <PlanarMod>) / 2) × <SkillLevelMultiplier>",
+      th: "(1d6 + (<WILmod> + <PlanarMod>) / 2) × <SkillLevelMultiplier>",
     },
   },
   requirement: {},
@@ -82,7 +82,7 @@ export const radiantSmite = new InquisitorSkill({
 
     
     
-    const baseDiceDamage = roll(1).d(skillLevel >= 5 ? 8 : 6).total;
+    const baseDiceDamage = roll(1).d(6).total;
     const levelMultiplier = skillLevelMultiplier(skillLevel);
     const attributeMod = (willMod + planarMod) / 2;
     const totalDamage = Math.max(0, Math.floor((baseDiceDamage + attributeMod) * levelMultiplier));

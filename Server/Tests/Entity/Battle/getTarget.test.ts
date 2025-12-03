@@ -310,8 +310,6 @@ describe("getTarget", () => {
     it("should prioritize taunting targets", () => {
       target2.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
         value: 1,
-        isPerm: false,
-        permValue: 0,
         counter: 0
       });
 
@@ -325,8 +323,6 @@ describe("getTarget", () => {
     it("should bypass taunt when byPassTaunt() is called", () => {
       target1.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
         value: 1,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
 
@@ -343,8 +339,6 @@ describe("getTarget", () => {
     it("should bypass hiding when byPassHiding() is called", () => {
       target4.buffsAndDebuffs.buffs.entry.set(BuffEnum.hiding, {
         value: 1,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
 
@@ -410,8 +404,6 @@ describe("getTarget", () => {
     it("should combine row preference with taunt", () => {
       target3.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
         value: 1,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
 

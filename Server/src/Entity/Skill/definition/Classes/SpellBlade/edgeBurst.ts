@@ -85,8 +85,6 @@ export const edgeBurst = new SpellBladeSkill({
       // If no edge charge exists, create one (min 1 requirement)
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.edgeCharge, {
         value: 1,
-        isPerm: false,
-        permValue: 0,
         counter: 0
       });
       actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.edgeCharge);

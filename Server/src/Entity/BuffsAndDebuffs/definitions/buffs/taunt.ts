@@ -8,14 +8,17 @@ export const taunt = new BuffDef({
     en: "taunt",
     th: "ยั่วยุ",
   },
+  description: {
+    en: "Increases physical defense by 2. When the buff expires, the defense bonus is removed.",
+    th: "เพิ่มพลังป้องกันกายภาพ 2 เมื่อบัฟหมดอายุ โบนัสป้องกันจะถูกลบ",
+  },
+  formula: "pDEF +2 (removed when buff expires)",
   appender: function (actor: Character, options: AppenderOptions): L10N {
     const { turnsAppending: value } = options;
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.taunt);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
         value: value,
-        isPerm: false,
-        permValue: 0,
         counter: 0,
       });
       actor.battleStats.mutateBonus("pDEF", 2);

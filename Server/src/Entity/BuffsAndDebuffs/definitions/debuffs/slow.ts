@@ -8,36 +8,30 @@ export const slow = new DebuffDef({
     en: "slow",
     th: "เชื่องช้า",
   },
+  description: {
+    en: "Reduces agility equal to stack number. While the debuff is active, Character's AB guage gain will be halved.",
+    th: "ลดความคล่องแคล่วเท่ากับจำนวนสแต็ก ในขณะที่บัฟเปิดใช้งาน ความเร็วของ AB จะลดลงครึ่งหนึ่ง",
+  },
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.slow);
     if (!entry) {
       actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.slow, {
         value,
-        isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
-      entry.permValue += permanentCounter;
     }
 
-    actor.attribute.mutateBattle("agility", -(value + permanentCounter));
+    actor.attribute.mutateBattle("agility", -value);
     return {
-      en: `${actor.name.en} got slow buff: agi goes down by ${value + permanentCounter}`,
-      th: `${actor.name.th} ได้รับ "เชื่องช้า": agi ลดลง ${value + permanentCounter} หน่วย`,
+      en: `${actor.name.en} got slow buff: agi goes down by ${value}`,
+      th: `${actor.name.th} ได้รับ "เชื่องช้า": agi ลดลง ${value} หน่วย`,
     };
   },
 

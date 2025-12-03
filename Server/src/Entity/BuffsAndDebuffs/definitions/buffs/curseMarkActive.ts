@@ -8,13 +8,17 @@ export const curseMarkActive = new BuffDef({
     en: "Curse Mark Active",
     th: "เครื่องหมายคำสาปใช้งาน",
   },
+  description: {
+    en: "Grants bonus damage against marked enemies. The Intelligence modifier for bonus damage is stored in universalCounter and remains constant throughout the buff's duration.",
+    th: "ให้ความเสียหายเพิ่มต่อศัตรูที่ถูกทำเครื่องหมาย โมดิไฟเออร์ปัญญาสำหรับความเสียหายเพิ่มถูกเก็บใน universalCounter และคงที่ตลอดระยะเวลาของบัฟ",
+  },
+  formula: "Bonus damage = INT mod (stored in universalCounter, constant during buff duration)",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
     const {
       turnsAppending: value,
-      isPerm = false,
       universalCounter = 0,
     } = options;
     
@@ -22,14 +26,9 @@ export const curseMarkActive = new BuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.curseMarkActive, {
         value: value,
-        isPerm: isPerm,
-        permValue: 0,
         counter: universalCounter, // Store INT mod for bonus damage
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
       // Use higher INT mod
       entry.counter = Math.max(entry.counter, universalCounter);

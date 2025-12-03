@@ -30,7 +30,7 @@ export const throwSpear = new DruidSkill({
   },
   requirement: {},
   equipmentNeeded: ["spear"],
-  tier: TierEnum.rare,
+  tier: TierEnum.uncommon,
   consume: {
     hp: 0,
     mp: 0,

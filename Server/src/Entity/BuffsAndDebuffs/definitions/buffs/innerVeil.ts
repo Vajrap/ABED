@@ -8,33 +8,27 @@ export const innerVeil = new BuffDef({
     en: "Inner Veil",
     th: "ผ้าคลุมภายใน",
   },
+  description: {
+    en: "Increases dodge by 2",
+    th: "เพิ่มหลบหลีก 2",
+  },
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      isPerm = false,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.innerVeil);
     let isFirst = false;
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.innerVeil, {
         value: value,
-        isPerm: isPerm,
-        permValue: permanentCounter,
         counter: 0,
       });
       actor.battleStats.mutateBattle("dodge", 2);
       isFirst = true;
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
-      entry.permValue += permanentCounter;
     }
 
     return {
@@ -49,7 +43,7 @@ export const innerVeil = new BuffDef({
     if (entry) {
       if (entry.value > 0) {
         entry.value -= 1;
-      } else if (entry.value === 0 && entry.permValue === 0) {
+      } else if (entry.value === 0 ) {
         actor.battleStats.mutateBattle("dodge", -2);
         actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.innerVeil);
         isRemoved = true;

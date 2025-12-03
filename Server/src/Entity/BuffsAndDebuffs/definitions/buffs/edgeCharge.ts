@@ -10,25 +10,25 @@ export const edgeCharge = new BuffDef({
     en: "Edge Charge",
     th: "ประจุขอบ",
   },
+  description: {
+    en: "Edge Charge can stack to the maximum of 5. Consumed by skills like EdgeBurst.",
+    th: "สแต็กได้สูงสุด 5 สแต็กไม่ลดลงโดยอัตโนมัติและถูกใช้โดยทักษะเช่น EdgeBurst",
+  },
+  formula: "Max stacks = 5",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const {
-      turnsAppending: value,
-      permanentCounter = 0,
-    } = options;
+    const { turnsAppending: value } = options;
     
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.edgeCharge);
-    const totalStacks = value + permanentCounter;
+    const totalStacks = value;
     
     if (!entry) {
       // Cap at MAX_STACKS
       const actualStacks = Math.min(totalStacks, MAX_STACKS);
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.edgeCharge, {
         value: actualStacks,
-        isPerm: false, // Edge Charge has no duration limit, but we track it in value
-        permValue: 0,
         counter: 0,
       });
       return {

@@ -10,13 +10,17 @@ export const regen = new BuffDef({
     en: "Regeneration",
     th: "ฟื้นฟู",
   },
+  description: {
+    en: "Restores HP each turn. The heal amount is based on 1d4 + Willpower modifier + Vitality modifier. The Willpower modifier is stored in the universal counter and remains constant throughout the buff's duration.",
+    th: "ฟื้นฟู HP ในแต่ละเทิร์น ปริมาณการรักษาขึ้นอยู่กับ 1d4 + โมดิไฟเออร์ความตั้งใจ + โมดิไฟเออร์ความแข็งแกร่ง โมดิไฟเออร์ความตั้งใจถูกเก็บใน universal counter และคงที่ตลอดระยะเวลาของบัฟ",
+  },
+  formula: "Heal per turn = 1d4 + WIL mod (from universalCounter) + VIT mod",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
     const {
       turnsAppending: value,
-      isPerm = false,
       universalCounter = 0,
     } = options;
     
@@ -24,14 +28,9 @@ export const regen = new BuffDef({
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.regen, {
         value: value,
-        isPerm: isPerm,
-        permValue: 0,
         counter: universalCounter, // counter stores willpower mod
       });
     } else {
-      if (!entry.isPerm && isPerm) {
-        entry.isPerm = true;
-      }
       entry.value += value;
       // Keep the highest counter (willpower mod)
       if (universalCounter > entry.counter) {
