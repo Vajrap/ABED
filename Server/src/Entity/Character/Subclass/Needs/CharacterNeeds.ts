@@ -25,7 +25,7 @@ class CharacterNeed {
     this.cap();
   }
 
-  getModifier(): number {
+  get modifier(): number {
     if (this.current <= 20) {
       return -2;
     }

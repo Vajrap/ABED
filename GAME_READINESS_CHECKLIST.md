@@ -33,16 +33,20 @@
 ## ⚠️ Critical for Basic Gameplay
 
 ### 1. API Endpoints - Character Actions
-**Status:** Partially implemented
+**Status:** ✅ Fully implemented
 
-**Needed:**
-- [ ] Character action endpoint (rest, train, craft, etc.)
-- [ ] Battle initiation endpoint
-- [ ] Skill usage endpoint
-- [ ] Item usage endpoint
-- [ ] Location action endpoint
+**Current Implementation:**
+- [✅] Character action sequence endpoint (`/api/actions/update`) - Players set their CharacterActionSequence (CAS) for rest, train, craft, etc.
+- [✅] Location actions are handled via CAS - all location actions (Rest, Train, Craft, etc.) are set through the action sequence
 
-**Current:** Only basic character/party endpoints exist
+**Note:** 
+- **Battles are automatic** - They occur when parties encounter each other during game loop processing (`GameLoop.processEvents` → `locationManager.processEncounters`). No player-initiated battle endpoint needed (though BattleSimulatorService exists in playground for testing).
+- **Skills are automatic** - During battle, skills are selected automatically from the character's skill deck via `getPlayableSkill()`. No manual skill selection endpoint needed.
+- **Item management** - Equipment functions exist (`equip`, `removeEquipment` in `Server/src/Utils/equip.ts`) but **no API endpoints exist** for players to manage inventory/equipment. May need endpoints for:
+  - Equip item from inventory
+  - Unequip item to inventory
+  - View inventory
+  - Use consumable items (if applicable)
 
 ### 2. Battle Rewards & Looting
 **Status:** TODO marked in code
@@ -103,7 +107,18 @@
 - [ ] Bounty Board actions
 - [ ] School actions
 
-### 7. Item Shop System
+### 7. Item Management API
+**Status:** Functions exist, but no API endpoints
+
+**Location:** `Server/src/Utils/equip.ts`, `Server/src/Utils/removeEquipment.ts`
+
+**Needed:**
+- [ ] Equip item endpoint (use existing `equip` function)
+- [ ] Unequip item endpoint (use existing `removeEquipment` function)
+- [ ] Get inventory endpoint (expose character inventory/equipment data)
+- [ ] Use consumable item endpoint (if consumables are implemented)
+
+### 8. Item Shop System
 **Status:** Market exists, but no buy/sell interface
 
 **Needed:**
@@ -112,7 +127,7 @@
 - [ ] Sell item endpoint
 - [ ] Shop refresh logic
 
-### 8. Quest System
+### 9. Quest System
 **Status:** Enums defined, no implementation
 
 **Needed:**
@@ -127,7 +142,7 @@
 
 ## 🎮 Nice to Have (Future Features)
 
-### 9. Dialogue System
+### 10. Dialogue System
 **Status:** Enum defined, needs implementation
 
 **Needed:**
@@ -135,7 +150,7 @@
 - [ ] Dialogue tree system
 - [ ] Dialogue outcomes
 
-### 10. World Event Escalation
+### 11. World Event Escalation
 **Status:** Types exist, no checking logic
 
 **Needed:**
@@ -143,7 +158,7 @@
 - [ ] Climax event triggering
 - [ ] Escalation effects
 
-### 11. Storyline System
+### 12. Storyline System
 **Status:** Mentioned in TODOs
 
 **Needed:**
@@ -151,7 +166,7 @@
 - [ ] Storyline progression
 - [ ] Storyline-specific events
 
-### 12. Knowledge Exchange
+### 13. Knowledge Exchange
 **Status:** Logic commented out
 
 **Needed:**
@@ -197,9 +212,9 @@ To get the game running for basic gameplay:
 7. ⚠️ **Authentication** (password hashing needed)
 
 ### Important:
-8. ⚠️ **Location actions** (rest, train work, but gathering doesn't)
-9. ⚠️ **Item management** (equip, use items)
-10. ⚠️ **Party management** (create, join, leave)
+8. ✅ **Location actions** (fully implemented via `/api/actions/update` - rest, train, craft work; gathering actions need handlers)
+9. ⚠️ **Item management** (equip/remove functions exist, but may need API endpoints for inventory management)
+10. ⚠️ **Party management** (create, join, leave - need to verify endpoints exist)
 
 ### Nice to Have:
 11. Quest system
@@ -212,15 +227,15 @@ To get the game running for basic gameplay:
 ## 🚀 Quick Start Recommendations
 
 ### Priority 1: Get Basic Gameplay Working
-1. **Implement battle rewards** - Players need exp/gold from battles
-2. **Add character action API endpoints** - Players need to interact with the world
-3. **Fix password hashing** - Security issue
-4. **Add level up logic** - Character progression
+1. **Implement battle rewards** - Players need exp/gold from battles (TODO in `Battle.ts`)
+2. **Add level up logic** - Character progression (exp thresholds, stat increases)
+3. **Fix password hashing** - Security issue (TODO in `login/index.ts`)
+4. **Verify item/inventory API endpoints** - Check if equip/unequip endpoints exist, or add them
 
 ### Priority 2: Core Features
-5. **Item shop buy/sell** - Economy
-6. **Gathering actions** - Resource collection
-7. **Location action handlers** - Complete action system
+5. **Item management API endpoints** - Equip/unequip/inventory management
+6. **Item shop buy/sell** - Economy
+7. **Gathering actions** - Resource collection (handlers for Mining, WoodCutting, etc.)
 
 ### Priority 3: Polish
 8. **Quest system** - Content
@@ -238,11 +253,11 @@ To get the game running for basic gameplay:
 - Skills: ✅
 - Character creation: ✅
 
-**Gameplay Features:** 60% Complete ⚠️
-- Character actions: ⚠️ (partially done)
-- Battle rewards: ❌ (TODO)
-- Progression: ⚠️ (partially done)
-- Item management: ⚠️ (partially done)
+**Gameplay Features:** 70% Complete ⚠️
+- Character actions: ✅ (fully implemented via `/api/actions/update`)
+- Battle rewards: ❌ (TODO in code)
+- Progression: ⚠️ (partially done - level up logic needed)
+- Item management: ⚠️ (functions exist, may need API endpoints)
 
 **Content Systems:** 30% Complete ⚠️
 - Gathering/refining: ❌
@@ -256,11 +271,16 @@ To get the game running for basic gameplay:
 
 ## 🎯 Next Steps
 
-1. **Review API endpoints** - What's missing for basic gameplay?
-2. **Implement battle rewards** - Critical for progression
-3. **Add character action endpoints** - Players need to interact
-4. **Fix authentication** - Security
-5. **Test end-to-end flow** - Character creation → Battle → Rewards → Level up
+1. **Implement battle rewards** - Critical for progression (TODO in `Battle.ts` lines 281, 491)
+2. **Add level up logic** - Character progression (exp thresholds, stat increases, skill points)
+3. **Verify/add item management endpoints** - Check if equip/unequip/inventory endpoints exist
+4. **Fix password hashing** - Security issue (TODO in `login/index.ts`)
+5. **Test end-to-end flow** - Character creation → Set actions → Game loop processes → Battle (automatic) → Rewards → Level up
 
-The game has a solid foundation! The main gaps are in API endpoints for player actions and battle rewards/progression systems.
+**Note on Game Mechanics:**
+- **Battles are automatic** - Occur when parties encounter during game loop processing. No player-initiated battle needed.
+- **Skills are automatic** - Selected from character's skill deck during battle turns. No manual skill selection.
+- **Location actions** - Fully implemented via `/api/actions/update` endpoint where players set their CharacterActionSequence.
+
+The game has a solid foundation! The main gaps are battle rewards and character progression systems.
 

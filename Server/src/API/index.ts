@@ -4,6 +4,7 @@ import { registerRoutes } from "./register";
 import { authRoutes } from "./auth";
 import { characterRoutes } from "./character";
 import { partyRoutes } from "./party";
+import { actionsRoutes } from "./actions";
 import { networkTestRoutes } from "./networkTest";
 import { playgroundRoutes } from "../playground/api";
 
@@ -16,5 +17,6 @@ apiRoutes.use("/register", registerRoutes);
 apiRoutes.use("/auth", authRoutes);
 apiRoutes.use("/character", characterRoutes);
 apiRoutes.use("/party", partyRoutes);
+apiRoutes.use("/actions", actionsRoutes);
 apiRoutes.use("/network-test", networkTestRoutes);
 apiRoutes.use("/playground", playgroundRoutes);

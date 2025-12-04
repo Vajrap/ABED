@@ -19,6 +19,7 @@ export enum restEnums {
 // Input on character scope
 export enum ActionInput {
   None = "None",
+  Socialize = "Socialize",
   Travel = "Travel",
   RailTravel = "Rail Travel",
 
@@ -194,6 +195,7 @@ export type CharacterAction =
   | { type: ActionInput.Craft; itemId: ItemId }
 
   // Other actions
+  | { type: ActionInput.Socialize }
   | { type: ActionInput.Read }
   | { type: ActionInput.Stroll }
   | { type: ActionInput.Tavern }

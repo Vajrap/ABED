@@ -286,10 +286,10 @@ class TravelManager {
       if (character !== "none") {
         // Mood might not decrease
         const moodDec = pace === "bold" ? 8 : pace === "measured" ? 5 : 0;
-        character.needs.decrease("mood", roll(1).d(4).total + moodDec - 1);
+        character.needs.decMood(roll(1).d(4).total + moodDec - 1);
 
         const energyDec = pace === "bold" ? 20 : pace === "measured" ? 15 : 10;
-        character.needs.decrease("energy", roll(1).d(6).total + energyDec);
+        character.needs.decEnergy(roll(1).d(6).total + energyDec);
       }
     }
 

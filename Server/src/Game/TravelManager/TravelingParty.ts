@@ -65,14 +65,14 @@ export class TravelingParty {
   getAverageEnergy(): number {
     const energy = this.party.characters
       .filter((c) => c !== "none")
-      .reduce((sum, c) => sum + c.needs.energy, 0);
+      .reduce((sum, c) => sum + c.needs.energy.current, 0);
     return energy / this.party.characters.length;
   }
 
   getAverageSatiety(): number {
     const satiety = this.party.characters
       .filter((c) => c !== "none")
-      .reduce((sum, c) => sum + c.needs.satiety, 0);
+      .reduce((sum, c) => sum + c.needs.satiety.current, 0);
     return satiety / this.party.characters.length;
   }
 
@@ -98,7 +98,7 @@ export class TravelingParty {
   getAverageMood(): number {
     const mood = this.party.characters
       .filter((c) => c !== "none")
-      .reduce((sum, c) => sum + c.needs.mood, 0);
+      .reduce((sum, c) => sum + c.needs.mood.current, 0);
     return mood / this.party.characters.length;
   }
 
@@ -108,9 +108,9 @@ export class TravelingParty {
       .reduce(
         (sum, c) =>
           sum +
-          (c.needs.getBonus("mood") +
-            c.needs.getBonus("energy") +
-            c.needs.getBonus("satiety")) /
+          (c.needs.mood.modifier +
+            c.needs.energy.modifier +
+            c.needs.satiety.modifier) /
             3,
         0,
       );
