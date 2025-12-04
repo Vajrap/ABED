@@ -130,8 +130,19 @@ function extractL10N(code: string, pattern: string): L10N | null {
 
 /**
  * Extract formula string from code
+ * Handles both direct formula: "..." and nested description.formula: { en: "...", th: "..." }
  */
 function extractFormula(code: string): string | undefined {
+  // Try nested description.formula.en pattern first (for skills)
+  // Pattern: formula: { en: "...", ... }
+  // Use a more flexible pattern that handles multiline
+  const nestedFormulaPattern = /formula:\s*{\s*en:\s*["\`]([^"\`]+)["\`]/s;
+  const nestedMatch = code.match(nestedFormulaPattern);
+  if (nestedMatch && nestedMatch[1] !== undefined) {
+    return nestedMatch[1];
+  }
+  
+  // Fallback to direct formula: "..." pattern (for buffs/debuffs)
   const formulaMatch = code.match(/formula:\s*["\`]([^"\`]+)["\`]/);
   return formulaMatch && formulaMatch[1] !== undefined ? formulaMatch[1] : undefined;
 }

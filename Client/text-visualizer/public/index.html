@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L10N Text Visualizer</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>L10N Text Visualizer</h1>
+      <p>Preview how skills and buffs/debuffs text will render in the frontend</p>
+    </header>
+
+    <div class="controls">
+      <label>
+        Language:
+        <select id="language">
+          <option value="en">English</option>
+          <option value="th">Thai</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="skills">Skills</button>
+      <button class="tab" data-tab="buffs">Buffs</button>
+      <button class="tab" data-tab="debuffs">Debuffs</button>
+    </div>
+
+    <div id="content" class="content">
+      <div class="loading">Loading...</div>
+    </div>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
+

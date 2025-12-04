@@ -1,0 +1,632 @@
+/**
+ * Text Visualizer App
+ * Renders L10N text with markup parsing
+ */
+
+import { renderText, renderFormula, getStatColorClass, escapeHtml } from './textParser.js';
+
+let character = null;
+let l10nData = null;
+let currentLanguage = 'en';
+let currentTab = 'skills';
+
+// Initialize
+async function init() {
+  try {
+    const [charRes, l10nRes] = await Promise.all([
+      fetch('/api/character'),
+      fetch('/api/l10n'),
+    ]);
+    
+    character = await charRes.json();
+    l10nData = await l10nRes.json();
+    
+    setupEventListeners();
+    render();
+  } catch (error) {
+    console.error('Failed to load data:', error);
+    document.getElementById('content').innerHTML = '<div class="error">Failed to load data</div>';
+  }
+}
+
+function setupEventListeners() {
+  // Language selector
+  document.getElementById('language').addEventListener('change', (e) => {
+    currentLanguage = e.target.value;
+    render();
+  });
+  
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentTab = tab.dataset.tab;
+      render();
+    });
+  });
+}
+
+function render() {
+  if (!character || !l10nData) return;
+  
+  const content = document.getElementById('content');
+  
+  if (currentTab === 'skills') {
+    content.innerHTML = renderSkills();
+  } else if (currentTab === 'buffs') {
+    content.innerHTML = renderBuffs();
+  } else if (currentTab === 'debuffs') {
+    content.innerHTML = renderDebuffs();
+  }
+  
+  // Tooltips are handled by event delegation, so no need to re-setup
+}
+
+function renderSkills() {
+  const skills = character.skills
+    .map(skill => {
+      // The L10N data uses enum values as keys (e.g., "Basic", "Earthshatter")
+      // but our skill IDs are like "BasicSkillId.Basic", so extract the enum value
+      let skillKey = skill.id;
+      if (skill.id.includes('.')) {
+        skillKey = skill.id.split('.').pop();
+      }
+      
+      // Try to find the skill in L10N data
+      // The keys in skillsL10N are the enum values, not the full enum paths
+      const skillData = l10nData.skills[skillKey];
+      if (!skillData) {
+        // Try alternative lookup - maybe the key is different
+        console.warn(`Skill not found: ${skillKey} (from ${skill.id})`);
+        return null;
+      }
+      
+      return {
+        id: skill.id,
+        skillKey: skillKey,
+        name: skillData.name[currentLanguage],
+        description: skillData.description[currentLanguage],
+        formula: skillData.formula,
+        level: skill.level,
+      };
+    })
+    .filter(Boolean);
+  
+  if (skills.length === 0) {
+    console.error('No skills found!', {
+      totalSkills: character.skills.length,
+      sampleSkill: character.skills[0],
+      l10nKeys: Object.keys(l10nData.skills).slice(0, 5),
+    });
+  }
+  
+  if (skills.length === 0) {
+    return '<div class="error">No skills found. Check console for details.</div>';
+  }
+  
+  return `
+    <div class="item-grid">
+      ${skills.map(skill => {
+        const renderedFormula = skill.formula ? renderFormula(skill.formula, { counter: 0, skillLevel: skill.level, character, showValues: true }) : null;
+        return `
+        <div class="item-card">
+          <div class="item-header">
+            <div class="item-name">${escapeHtml(skill.name)}</div>
+            <div class="item-meta">
+              <div><strong>Level:</strong> ${skill.level}</div>
+              <div style="font-size: 0.75em; color: #95a5a6; margin-top: 4px; font-family: monospace;">${skill.id}</div>
+            </div>
+          </div>
+          <div class="item-description">
+            ${renderText(skill.description, {
+              skillLevel: skill.level,
+              formula: skill.formula,
+              counter: 0,
+              isSkill: true,
+              character,
+              l10nData,
+              currentLanguage,
+              renderBuffDebuffTooltip: createBuffDebuffTooltip,
+            })}
+          </div>
+          ${skill.formula ? `<div class="item-formula"><strong>Formula:</strong> ${escapeHtml(skill.formula)}</div>` : ''}
+        </div>
+      `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderBuffs() {
+  const buffs = character.buffs
+    .map(buff => {
+      const buffData = l10nData.buffs[buff.id];
+      if (!buffData) return null;
+      
+      return {
+        id: buff.id,
+        name: buffData.name[currentLanguage],
+        description: buffData.description[currentLanguage],
+        formula: buffData.formula,
+        value: buff.value,
+        counter: buff.counter,
+      };
+    })
+    .filter(Boolean);
+  
+  return `
+    <div class="item-grid">
+      ${buffs.map(buff => `
+        <div class="item-card">
+          <div class="item-header">
+            <div class="item-name">${escapeHtml(buff.name)}</div>
+            <div class="item-meta">
+              <div>Value: ${buff.value}</div>
+              <div>Counter: ${buff.counter}</div>
+              <div style="font-size: 0.75em; color: #95a5a6;">${buff.id}</div>
+            </div>
+          </div>
+          <div class="item-description">
+            ${renderText(buff.description, {
+              skillLevel: 0,
+              formula: buff.formula,
+              counter: buff.counter,
+              isSkill: false,
+              character,
+              l10nData,
+              currentLanguage,
+              renderBuffDebuffTooltip: createBuffDebuffTooltip,
+            })}
+          </div>
+          ${buff.formula ? `<div class="item-formula"><strong>Formula:</strong> ${escapeHtml(buff.formula)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderDebuffs() {
+  const debuffs = character.debuffs
+    .map(debuff => {
+      const debuffData = l10nData.debuffs[debuff.id];
+      if (!debuffData) return null;
+      
+      return {
+        id: debuff.id,
+        name: debuffData.name[currentLanguage],
+        description: debuffData.description[currentLanguage],
+        formula: debuffData.formula,
+        value: debuff.value,
+        counter: debuff.counter,
+      };
+    })
+    .filter(Boolean);
+  
+  return `
+    <div class="item-grid">
+      ${debuffs.map(debuff => `
+        <div class="item-card">
+          <div class="item-header">
+            <div class="item-name">${escapeHtml(debuff.name)}</div>
+            <div class="item-meta">
+              <div>Value: ${debuff.value}</div>
+              <div>Counter: ${debuff.counter}</div>
+              <div style="font-size: 0.75em; color: #95a5a6;">${debuff.id}</div>
+            </div>
+          </div>
+          <div class="item-description">
+            ${renderText(debuff.description, {
+              skillLevel: 0,
+              formula: debuff.formula,
+              counter: debuff.counter,
+              isSkill: false,
+              character,
+              l10nData,
+              currentLanguage,
+              renderBuffDebuffTooltip: createBuffDebuffTooltip,
+            })}
+          </div>
+          ${debuff.formula ? `<div class="item-formula"><strong>Formula:</strong> ${escapeHtml(debuff.formula)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/**
+ * Create buff/debuff tooltip HTML
+ * This is specific to the visualizer - the parser module doesn't handle tooltip creation
+ */
+function createBuffDebuffTooltip(type, id, name, renderedDescription) {
+  // Store HTML in data attribute using base64 to avoid escaping issues
+  // Note: No formula in tooltip, just the description
+  const tooltipId = `tooltip-${type}-${id}`;
+  const encodedHtml = btoa(unescape(encodeURIComponent(renderedDescription)));
+  const tagClass = type === 'buff' ? 'buff-tag' : 'debuff-tag';
+  return `<span class="${tagClass} tooltip-html" data-tooltip-id="${tooltipId}" data-tooltip-html="${encodedHtml}">${escapeHtml(name)}</span>`;
+}
+
+// OLD FUNCTIONS REMOVED - now in textParser.js module
+// The following functions have been moved to textParser.js:
+// - renderText() -> import from textParser.js
+// - renderFormula() -> import from textParser.js  
+// - getStatColorClass() -> import from textParser.js
+// - escapeHtml() -> import from textParser.js
+function renderText(text, skillLevel = 0, formula = null, counter = 0, isSkill = false) {
+  if (!text) return '';
+  
+  let rendered = text;
+  
+  // IMPORTANT: Process conditionals BEFORE converting \n to <br> and BEFORE color tags
+  // This handles cases like {5}\n text{/} and [b]{5}'value':'value'{/}[/b]
+  
+  // Format 1: {n}'value_if_n+':'value_if_below'{/} - Ternary conditional
+  // Example: {5}'three':'two'{/} shows "three" if level >= 5, "two" otherwise
+  // Must use non-greedy matching and handle any characters including special chars
+  rendered = rendered.replace(/\{(\d+)\}'([^']+?)':'([^']+?)'\{\/\}/g, (match, level, valueIfMet, valueIfNot) => {
+    const levelThreshold = parseInt(level);
+    if (isSkill && skillLevel >= levelThreshold) {
+      return valueIfMet;
+    }
+    return valueIfNot;
+  });
+  
+  // Format 2: {n}text{/} - Direct conditional (show if level >= n)
+  // Example: {5}text{/} shows "text" only if skill level >= 5
+  // This is for skills only - checks if skillLevel >= the number
+  // Use [\s\S] to match any character including newlines
+  rendered = rendered.replace(/\{(\d+)\}([\s\S]*?)\{\/\}/g, (match, level, content) => {
+    const levelThreshold = parseInt(level);
+    if (isSkill && skillLevel >= levelThreshold) {
+      // Trim leading/trailing whitespace/newlines to avoid empty lines
+      return content.replace(/^\s*\n+|\n+\s*$/g, '').trim();
+    }
+    // For buffs/debuffs, this pattern doesn't apply (they use COUNTER conditionals)
+    return '';
+  });
+  
+  // Counter conditionals: {COUNTER>=1}text{/}
+  rendered = rendered.replace(/\{COUNTER>=(\d+)\}([\s\S]*?)\{\/\}/g, (match, threshold, content) => {
+    if (counter >= parseInt(threshold)) {
+      // Trim leading/trailing whitespace/newlines to avoid empty lines
+      return content.replace(/^\s*\n+|\n+\s*$/g, '').trim();
+    }
+    return '';
+  });
+  
+  // Counter conditionals: {COUNTER===1}text{/}
+  rendered = rendered.replace(/\{COUNTER===(\d+)\}([\s\S]*?)\{\/\}/g, (match, value, content) => {
+    if (counter === parseInt(value)) {
+      // Trim leading/trailing whitespace/newlines to avoid empty lines
+      return content.replace(/^\s*\n+|\n+\s*$/g, '').trim();
+    }
+    return '';
+  });
+  
+  // Replace <FORMULA> with actual rendered formula (after conditionals are processed)
+  // Wrap it in a green capsule/pill for visibility
+  if (formula) {
+    const renderedFormula = renderFormula(formula, counter, skillLevel, true);
+    rendered = rendered.replace(/<FORMULA>/g, `<span class="formula-capsule">${renderedFormula}</span>`);
+  }
+  
+  // Color tags: [r]text[/r] = red, [g]text[/g] = green, [b]text[/b] = blue
+  rendered = rendered.replace(/\[r\](.*?)\[\/r\]/g, '<span class="text-red">$1</span>');
+  rendered = rendered.replace(/\[g\](.*?)\[\/g\]/g, '<span class="text-green">$1</span>');
+  rendered = rendered.replace(/\[b\](.*?)\[\/b\]/g, '<span class="text-blue">$1</span>');
+  
+  // Bold: [bold]text[/bold]
+  rendered = rendered.replace(/\[bold\](.*?)\[\/bold\]/g, '<span class="text-bold">$1</span>');
+  
+  // Buff tags: <BuffName> - with rich tooltip showing parsed description
+  rendered = rendered.replace(/<Buff(\w+)>/g, (match, buffName) => {
+    const buffId = buffName.charAt(0).toLowerCase() + buffName.slice(1);
+    const buffData = l10nData.buffs[buffId];
+    if (buffData) {
+      // Find the buff in character's active buffs to get counter value
+      const activeBuff = character.buffs.find(b => b.id === buffId);
+      const counter = activeBuff ? activeBuff.counter : 0;
+      
+      // Render the description with the same parser as skill descriptions
+      const renderedDescription = renderText(
+        buffData.description[currentLanguage] || '',
+        0, // skillLevel (not applicable for buffs)
+        buffData.formula || null,
+        counter,
+        false // isSkill = false
+      );
+      
+      // Create tooltip HTML with rendered description
+      const tooltipHtml = buffData.formula 
+        ? `${renderedDescription}<br><br><strong>Formula:</strong> ${escapeHtml(buffData.formula)}`
+        : renderedDescription;
+      
+      // Store HTML in data attribute using base64 to avoid escaping issues
+      const tooltipId = `tooltip-buff-${buffId}`;
+      const encodedHtml = btoa(unescape(encodeURIComponent(tooltipHtml)));
+      return `<span class="buff-tag tooltip-html" data-tooltip-id="${tooltipId}" data-tooltip-html="${encodedHtml}">${escapeHtml(buffData.name[currentLanguage])}</span>`;
+    }
+    return match;
+  });
+  
+  // Debuff tags: <DebuffName> - with rich tooltip showing parsed description
+  rendered = rendered.replace(/<Debuff(\w+)>/g, (match, debuffName) => {
+    const debuffId = debuffName.charAt(0).toLowerCase() + debuffName.slice(1);
+    const debuffData = l10nData.debuffs[debuffId];
+    if (debuffData) {
+      // Find the debuff in character's active debuffs to get counter value
+      const activeDebuff = character.debuffs.find(d => d.id === debuffId);
+      const counter = activeDebuff ? activeDebuff.counter : 0;
+      
+      // Render the description with the same parser as skill descriptions
+      const renderedDescription = renderText(
+        debuffData.description[currentLanguage] || '',
+        0, // skillLevel (not applicable for debuffs)
+        debuffData.formula || null,
+        counter,
+        false // isSkill = false
+      );
+      
+      // Create tooltip HTML with rendered description
+      const tooltipHtml = debuffData.formula 
+        ? `${renderedDescription}<br><br><strong>Formula:</strong> ${escapeHtml(debuffData.formula)}`
+        : renderedDescription;
+      
+      // Store HTML in data attribute using base64 to avoid escaping issues
+      const tooltipId = `tooltip-debuff-${debuffId}`;
+      const encodedHtml = btoa(unescape(encodeURIComponent(tooltipHtml)));
+      return `<span class="debuff-tag tooltip-html" data-tooltip-id="${tooltipId}" data-tooltip-html="${encodedHtml}">${escapeHtml(debuffData.name[currentLanguage])}</span>`;
+    }
+    return match;
+  });
+  
+  // Stat modifiers: <STRmod>, <DEXmod>, etc. - show number with color and tooltip
+  rendered = rendered.replace(/<(\w+)mod>/gi, (match, statName) => {
+    const stat = statName.toLowerCase();
+    const statValue = character.stats[stat] || 0;
+    const mod = Math.floor((statValue - 10) / 2);
+    // Show number without + prefix (but keep - for negative)
+    const modStr = mod >= 0 ? `${mod}` : `${mod}`;
+    // Color based on stat type
+    const statColorClass = getStatColorClass(stat);
+    return `<span class="stat-mod ${statColorClass} tooltip" data-tooltip="From ${statName.toUpperCase()}">${modStr}</span>`;
+  });
+  
+  // Save modifiers: <CONsave>, <STRsave>, etc. - show actual value with tooltip
+  rendered = rendered.replace(/<(\w+)save>/gi, (match, statName) => {
+    const stat = statName.toLowerCase();
+    const statValue = character.stats[stat] || 0;
+    const mod = Math.floor((statValue - 10) / 2);
+    const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
+    return `<span class="tooltip" data-tooltip="${stat.toUpperCase()} save: ${modStr} (${statValue})">${stat.toUpperCase()}save</span>`;
+  });
+  
+  // Weapon damage: <WeaponDamage> - show actual value
+  rendered = rendered.replace(/<WeaponDamage>/g, () => {
+    return `<span class="tooltip" data-tooltip="Current weapon damage: ${character.weaponDamage}">${character.weaponDamage}</span>`;
+  });
+  
+  // Skill level multiplier: <SkillLevelMultiplier> - show actual calculated value
+  rendered = rendered.replace(/<SkillLevelMultiplier>/gi, () => {
+    if (isSkill && skillLevel > 0) {
+      const multiplier = (1 + 0.1 * skillLevel).toFixed(1);
+      return `<span class="tooltip" data-tooltip="Skill Level Multiplier: (1 + 0.1 × ${skillLevel}) = ${multiplier}">${multiplier}×</span>`;
+    }
+    return '<span class="tooltip" data-tooltip="Skill Level Multiplier">skill level multiplier</span>';
+  });
+  
+  // Counter: <COUNTER> - show actual value
+  rendered = rendered.replace(/<COUNTER>/g, counter.toString());
+  
+  // Control mod: <ControlMod>
+  rendered = rendered.replace(/<ControlMod>/gi, () => {
+    const mod = Math.floor((character.stats.control - 10) / 2);
+    const modStr = mod >= 0 ? `+${mod}` : `${mod}`;
+    return `<span class="tooltip" data-tooltip="Control modifier: ${modStr} (${character.stats.control})">${modStr}</span>`;
+  });
+  
+  // Planar mod: <PlanarMod> (usually INT or CHA based)
+  rendered = rendered.replace(/<PlanarMod>/gi, () => {
+    const intMod = Math.floor((character.stats.intelligence - 10) / 2);
+    const chaMod = Math.floor((character.stats.charisma - 10) / 2);
+    const planarMod = Math.max(intMod, chaMod);
+    const modStr = planarMod >= 0 ? `+${planarMod}` : `${planarMod}`;
+    return `<span class="tooltip" data-tooltip="Planar modifier: ${modStr} (max of INT/CHA)">${modStr}</span>`;
+  });
+  
+  // Convert newlines to <br> (AFTER all conditionals are processed)
+  rendered = rendered.replace(/\n/g, '<br>');
+  
+  return rendered;
+}
+
+/**
+ * Render formula with replacements
+ * showValues: if true, shows actual calculated values instead of placeholders
+ */
+function renderFormula(formula, counter = 0, skillLevel = 0, showValues = false) {
+  if (!formula) return '';
+  
+  let rendered = formula;
+  
+  // Process conditionals in formula FIRST (before other replacements)
+  // Format 1: {n}'value_if_n+':'value_if_below'{/} - Ternary conditional
+  rendered = rendered.replace(/\{(\d+)\}'([^']+?)':'([^']+?)'\{\/\}/g, (match, level, valueIfMet, valueIfNot) => {
+    const levelThreshold = parseInt(level);
+    return skillLevel >= levelThreshold ? valueIfMet : valueIfNot;
+  });
+  
+  // Format 2: {n}text{/} - Direct conditional
+  rendered = rendered.replace(/\{(\d+)\}([\s\S]*?)\{\/\}/g, (match, level, content) => {
+    const levelThreshold = parseInt(level);
+    if (skillLevel >= levelThreshold) {
+      return content.replace(/^\s*\n+|\n+\s*$/g, '').trim();
+    }
+    return '';
+  });
+  
+  // Replace <COUNTER> in formula
+  rendered = rendered.replace(/<COUNTER>/g, counter.toString());
+  
+  // Replace stat mods - show number without + prefix, with color and tooltip
+  rendered = rendered.replace(/<(\w+)mod>/gi, (match, statName) => {
+    const stat = statName.toLowerCase();
+    const statValue = character.stats[stat] || 0;
+    const mod = Math.floor((statValue - 10) / 2);
+    // Show number without + prefix (but keep - for negative)
+    const modStr = mod >= 0 ? `${mod}` : `${mod}`;
+    // Color based on stat type
+    const statColorClass = getStatColorClass(stat);
+    return `<span class="stat-mod ${statColorClass} tooltip" data-tooltip="From ${statName.toUpperCase()}">${modStr}</span>`;
+  });
+  
+  // Replace weapon damage
+  rendered = rendered.replace(/<WeaponDamage>/g, () => {
+    if (showValues) {
+      return character.weaponDamage.toString();
+    }
+    return `<span class="tooltip" data-tooltip="Current weapon damage: ${character.weaponDamage}">WeaponDamage</span>`;
+  });
+  
+  // Replace skill level multiplier
+  rendered = rendered.replace(/<SkillLevelMultiplier>/gi, () => {
+    if (showValues && skillLevel > 0) {
+      const multiplier = (1 + 0.1 * skillLevel).toFixed(1);
+      return multiplier;
+    }
+    if (skillLevel > 0) {
+      const multiplier = (1 + 0.1 * skillLevel).toFixed(1);
+      return `<span class="tooltip" data-tooltip="Skill Level Multiplier: (1 + 0.1 × ${skillLevel}) = ${multiplier}">SkillLevelMultiplier</span>`;
+    }
+    return 'SkillLevelMultiplier';
+  });
+  
+  // Replace ControlMod
+  rendered = rendered.replace(/<ControlMod>/gi, () => {
+    const mod = Math.floor((character.stats.control - 10) / 2);
+    const modStr = mod >= 0 ? `${mod}` : `${mod}`;
+    const statColorClass = getStatColorClass('control');
+    return `<span class="stat-mod ${statColorClass} tooltip" data-tooltip="From CONTROL">${modStr}</span>`;
+  });
+  
+  // Replace PlanarMod
+  rendered = rendered.replace(/<PlanarMod>/gi, () => {
+    const intMod = Math.floor((character.stats.intelligence - 10) / 2);
+    const chaMod = Math.floor((character.stats.charisma - 10) / 2);
+    const planarMod = Math.max(intMod, chaMod);
+    const modStr = planarMod >= 0 ? `${planarMod}` : `${planarMod}`;
+    return `<span class="stat-mod stat-int tooltip" data-tooltip="From PLANAR (max of INT/CHA)">${modStr}</span>`;
+  });
+  
+  // Calculate and show final value if showValues is true
+  if (showValues) {
+    try {
+      // Create a safe evaluation context
+      const evalStr = rendered
+        .replace(/×/g, '*')
+        .replace(/\s+/g, '')
+        .replace(/([+\-]?\d+\.?\d*)\s*\*\s*([+\-]?\d+\.?\d*)/g, (m, a, b) => {
+          return (parseFloat(a) * parseFloat(b)).toString();
+        })
+        .replace(/([+\-]?\d+\.?\d*)\s*\+\s*([+\-]?\d+\.?\d*)/g, (m, a, b) => {
+          return (parseFloat(a) + parseFloat(b)).toString();
+        })
+        .replace(/([+\-]?\d+\.?\d*)\s*-\s*([+\-]?\d+\.?\d*)/g, (m, a, b) => {
+          return (parseFloat(a) - parseFloat(b)).toString();
+        });
+      
+      // If it's a simple numeric expression, show the result
+      if (/^[+\-]?\d+\.?\d*$/.test(evalStr)) {
+        const result = parseFloat(evalStr);
+        rendered = `${rendered} = <strong>${result}</strong>`;
+      }
+    } catch (e) {
+      // Ignore evaluation errors
+    }
+  }
+  
+  // Don't escape HTML if we have tooltips or spans
+  if (rendered.includes('<span') || rendered.includes('<strong')) {
+    return rendered;
+  }
+  
+  return escapeHtml(rendered);
+}
+*/
+
+// Setup tooltip HTML rendering for buffs/debuffs
+// Use event delegation so it works with dynamically created content
+let tooltipSetupDone = false;
+
+function setupTooltipHTML() {
+  if (tooltipSetupDone) return; // Only set up once
+  tooltipSetupDone = true;
+  
+  // Use event delegation for dynamically created tooltips
+  document.addEventListener('mouseenter', (e) => {
+    const element = e.target.closest('.tooltip-html');
+    if (element) {
+      const encodedHtml = element.getAttribute('data-tooltip-html');
+      if (encodedHtml) {
+        // Decode base64 HTML
+        try {
+          const tooltipHtml = decodeURIComponent(escape(atob(encodedHtml)));
+          
+          // Create tooltip element
+          let tooltip = element.querySelector('.tooltip-content');
+          if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.className = 'tooltip-content';
+            tooltip.style.cssText = `
+              position: absolute;
+              bottom: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+              padding: 12px 16px;
+              background: #2c3e50;
+              color: white;
+              border-radius: 6px;
+              font-size: 0.9em;
+              max-width: 400px;
+              min-width: 200px;
+              z-index: 1000;
+              margin-bottom: 8px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+              line-height: 1.5;
+              word-wrap: break-word;
+              white-space: normal;
+              pointer-events: none;
+            `;
+            const computedStyle = getComputedStyle(element);
+            if (computedStyle.position === 'static') {
+              element.style.position = 'relative';
+            }
+            element.appendChild(tooltip);
+          }
+          tooltip.innerHTML = tooltipHtml;
+          tooltip.style.display = 'block';
+        } catch (e) {
+          console.error('Error decoding tooltip HTML:', e);
+        }
+      }
+    }
+  }, true);
+  
+  document.addEventListener('mouseleave', (e) => {
+    const element = e.target.closest('.tooltip-html');
+    if (element) {
+      const tooltip = element.querySelector('.tooltip-content');
+      if (tooltip) {
+        tooltip.style.display = 'none';
+      }
+    }
+  }, true);
+}
+
+// Start the app
+init().then(() => {
+  // Setup tooltips after content is loaded
+  setupTooltipHTML();
+});
+
