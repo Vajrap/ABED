@@ -1,4 +1,4 @@
-export enum MOBs {
+export enum MOBEnum {
   // Goblins
   goblinScout = "goblinScout",
   goblinWarrior = "goblinWarrior",

@@ -1,5 +1,5 @@
 import { Character } from "src/Entity/Character/Character.ts";
-import { MOBs } from "src/Entity/Character/MOBs/enums.ts";
+import { MOBEnum } from "src/Entity/Character/MOBs/enums.ts";
 import { CharacterNeeds } from "src/Entity/Character/Subclass/Needs/CharacterNeeds.ts";
 import {
   CharacterEquipmentSlot,
@@ -40,6 +40,7 @@ import {
 } from "src/Entity/Item";
 import { TraitEnum } from "src/Entity/Trait/enum.ts";
 import { rollTwenty } from "src/Utils/Dice";
+import { MOB } from ".";
 
 const goblinTraits: Map<TraitEnum, number> = new Map([
   [TraitEnum.GoblinCunning, 1],
@@ -59,7 +60,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
   const mp = scaleByDifficulty(20, difficulty);
   const sp = scaleByDifficulty(20, difficulty);
 
-  const character = new Character({
+  const character = new MOB({
     actionSequence: defaultActionSequence(),
     alignment: new CharacterAlignment({}),
     artisans: new CharacterArtisans({}),
@@ -80,7 +81,7 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.goblinScout}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.goblinScout}_${Bun.randomUUIDv7()}`,
     level: difficulty + 1 - 1,
     name: {
       en: "Goblin Scout",
@@ -198,7 +199,7 @@ export function goblinWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
   const mp = scaleByDifficulty(10, difficulty);
   const sp = scaleByDifficulty(20, difficulty);
 
-  const character = new Character({
+  const character = new MOB({
     actionSequence: defaultActionSequence(),
     alignment: new CharacterAlignment({}),
     artisans: new CharacterArtisans({}),
@@ -219,7 +220,7 @@ export function goblinWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.goblinWarrior}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.goblinWarrior}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Goblin Warrior",
@@ -310,7 +311,7 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
   const mp = scaleByDifficulty(35, difficulty);
   const sp = scaleByDifficulty(10, difficulty);
 
-  const character = new Character({
+  const character = new MOB({
     actionSequence: defaultActionSequence(),
     alignment: new CharacterAlignment({}),
     artisans: new CharacterArtisans({}),
@@ -331,7 +332,7 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.goblinMage}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.goblinMage}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Goblin Mage",
@@ -427,7 +428,7 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
   const mp = scaleByDifficulty(25, difficulty);
   const sp = scaleByDifficulty(15, difficulty);
 
-  const character = new Character({
+  const character = new MOB({
     actionSequence: defaultActionSequence(),
     alignment: new CharacterAlignment({}),
     artisans: new CharacterArtisans({}),
@@ -448,7 +449,7 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.goblinCleric}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.goblinCleric}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Goblin Cleric",
@@ -521,7 +522,7 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
   const mp = scaleByDifficulty(10, difficulty);
   const sp = scaleByDifficulty(25, difficulty);
 
-  const character = new Character({
+  const character = new MOB({
     actionSequence: defaultActionSequence(),
     alignment: new CharacterAlignment({}),
     artisans: new CharacterArtisans({}),
@@ -542,7 +543,7 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(), // left intentionally empty
     fame: new CharacterFame(),
-    id: `${MOBs.goblinCaptain}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.goblinCaptain}_${Bun.randomUUIDv7()}`,
     level: difficulty + 2, // Slightly higher than standard mobs
     name: {
       en: "Goblin Captain",

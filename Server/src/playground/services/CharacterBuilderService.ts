@@ -51,7 +51,7 @@ import {
   BarbarianSkillId,
   WarlockSkillId,
 } from "src/Entity/Skill/enums";
-import { MOBs } from "src/Entity/Character/MOBs/enums";
+import { MOBEnum } from "src/Entity/Character/MOBs/enums";
 import {
   AxeId,
   BladeId,
@@ -75,17 +75,17 @@ export class CharacterBuilderService {
   private static getMOBIdForClass(
     className: ClassEnum,
     race: RaceEnum,
-  ): MOBs | null {
+  ): MOBEnum | null {
     // Map race to lowercase prefix (Human -> human, Elven -> elven, etc.)
     const racePrefix =
       race.charAt(0).toLowerCase() + race.slice(1).toLowerCase();
     // Class name should match exactly (Warrior, Mage, Cleric, etc.)
     const classSuffix = className;
-    const mobKey = `${racePrefix}${classSuffix}` as keyof typeof MOBs;
+    const mobKey = `${racePrefix}${classSuffix}` as keyof typeof MOBEnum;
 
     // Check if this MOB exists in the enum and repository
-    if (mobKey in MOBs) {
-      const mobId = MOBs[mobKey as keyof typeof MOBs];
+    if (mobKey in MOBEnum) {
+      const mobId = MOBEnum[mobKey as keyof typeof MOBEnum];
       if (mobId in mobRepository) {
         return mobId;
       }

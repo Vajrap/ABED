@@ -1,5 +1,5 @@
 import { Character } from "src/Entity/Character/Character.ts";
-import { MOBs } from "src/Entity/Character/MOBs/enums.ts";
+import { MOBEnum } from "src/Entity/Character/MOBs/enums.ts";
 import { CharacterNeeds } from "src/Entity/Character/Subclass/Needs/CharacterNeeds.ts";
 import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums.ts";
 import {
@@ -48,7 +48,7 @@ export function orcWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcWarrior}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcWarrior}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Warrior",
@@ -147,7 +147,7 @@ export function orcRanger(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcRanger}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcRanger}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Ranger",
@@ -246,7 +246,7 @@ export function orcMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcMage}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcMage}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Mage",
@@ -345,7 +345,7 @@ export function orcCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcCleric}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcCleric}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Cleric",
@@ -447,7 +447,7 @@ export function orcPaladin(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcPaladin}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcPaladin}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Paladin",
@@ -546,7 +546,7 @@ export function orcWarlock(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcWarlock}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcWarlock}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Warlock",
@@ -645,7 +645,7 @@ export function orcBarbarian(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcBarbarian}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcBarbarian}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Barbarian",
@@ -744,7 +744,7 @@ export function orcSorcerer(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcSorcerer}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcSorcerer}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Sorcerer",
@@ -843,7 +843,7 @@ export function orcRogue(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcRogue}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcRogue}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Rogue",
@@ -942,7 +942,7 @@ export function orcDruid(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.orcDruid}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.orcDruid}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Druid",

@@ -1,5 +1,5 @@
 import { Character } from "src/Entity/Character/Character.ts";
-import { MOBs } from "src/Entity/Character/MOBs/enums.ts";
+import { MOBEnum } from "src/Entity/Character/MOBs/enums.ts";
 import { CharacterNeeds } from "src/Entity/Character/Subclass/Needs/CharacterNeeds.ts";
 import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums.ts";
 import {
@@ -48,7 +48,7 @@ export function halflingWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingWarrior}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingWarrior}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Warrior",
@@ -147,7 +147,7 @@ export function halflingRanger(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingRanger}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingRanger}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Ranger",
@@ -246,7 +246,7 @@ export function halflingMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingMage}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingMage}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Mage",
@@ -345,7 +345,7 @@ export function halflingCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingCleric}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingCleric}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Cleric",
@@ -447,7 +447,7 @@ export function halflingPaladin(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingPaladin}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingPaladin}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Paladin",
@@ -546,7 +546,7 @@ export function halflingWarlock(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingWarlock}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingWarlock}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Warlock",
@@ -645,7 +645,7 @@ export function halflingBarbarian(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingBarbarian}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingBarbarian}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Barbarian",
@@ -744,7 +744,7 @@ export function halflingSorcerer(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingSorcerer}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingSorcerer}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Sorcerer",
@@ -843,7 +843,7 @@ export function halflingRogue(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingRogue}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingRogue}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Rogue",
@@ -942,7 +942,7 @@ export function halflingDruid(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.halflingDruid}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.halflingDruid}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Druid",

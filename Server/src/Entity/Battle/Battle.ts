@@ -5,11 +5,16 @@ import { roll } from "../../Utils/Dice";
 import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
 import { buffsAndDebuffsRepository, buffsRepository, debuffsRepository } from "../BuffsAndDebuffs/repository";
 import type { Character } from "../Character/Character";
-import { trainAttribute } from "../Character/Subclass/Stats/train";
+import { trainAttribute, trainProficiency } from "../Character/Subclass/Stats/train";
+import { skillRepository } from "../Skill/repository";
+import { getExpNeededForSkill } from "../Location/Events/handlers/train/getExpNeeded";
+import { gainStatTracker } from "../Location/Events/handlers/train/statTracker";
+import { rollTwenty } from "../../Utils/Dice";
+import type { SkillId } from "../Skill/enums";
 import type { Location } from "../Location/Location";
 import type { Party } from "../Party/Party";
 import type { TurnResult } from "../Skill/types";
-import { BattleReport } from "./BattleReport";
+import { BattleReport, type BattleRewards } from "./BattleReport";
 import { getPlayableSkill } from "./getPlayableSkill";
 import { battleTypeConfig, type BattleType } from "./types";
 import { activateBreathingSkillTurnPassive } from "../BreathingSkill/activeBreathingSkill";
@@ -20,6 +25,8 @@ import {traitRepository} from "src/Entity/Trait/repository";
 import { BasicSkillId } from "../Skill/enums";
 import { resolveDamage } from "./damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
+import { handleTrainSkill } from "../Location/Events/handlers/train/skill";
+import { dropProcess } from "./dropProcess";
 
 interface ActiveTrap {
   damage: number;
@@ -277,7 +284,15 @@ export class Battle {
                   `Winning party: ${battleStatus.winner?.leader.name.en}'s party`,
               );
 
-              this.handleBattleEnd(battleStatus);
+              const dropResults = this.handleBattleEnd(battleStatus);
+              
+              // Build rewards from drop results and exp
+              const rewards = this.buildRewards(
+                battleStatus.winner,
+                battleStatus.defeated,
+                dropResults,
+              );
+
               this.battleReport.setOutcome(
                   battleStatus.winner ? battleStatus.winner.partyID : "",
                   {
@@ -290,8 +305,7 @@ export class Battle {
                               ? "การต่อสู้จบลงด้วยการเสมอกัน"
                               : `ปาร์ตี้ของ ${battleStatus.winner?.leader.name.th} ชนะในการต่อสู้!`,
                   },
-                  // TODO: Rewards calculation placeholder
-                  {},
+                  rewards,
               );
               break;
           }
@@ -466,7 +480,7 @@ export class Battle {
     status: BattleStatus;
     winner?: Party;
     defeated?: Party;
-  }) {
+  }): ReturnType<typeof dropProcess> | null {
     for (const actor of this.allParticipants) {
       actor.clearBuffAndDebuff();
       actor.attribute.clearBattle();
@@ -486,7 +500,10 @@ export class Battle {
       );
     }
 
-    if (battleType.allowLoot) {
+    // Process loot and drops, return results for reporting
+    let dropResults: ReturnType<typeof dropProcess> | null = null;
+    if (battleType.allowLoot && battleStatus.winner && battleStatus.defeated) {
+      dropResults = dropProcess(battleStatus.winner, battleStatus.defeated, this.battleType);
     }
 
     if (!battleType.allowDeath) {
@@ -504,6 +521,8 @@ export class Battle {
         actor.vitals.incSp(actor.vitals.sp.max);
       }
     }
+
+    return dropResults;
   }
 
   private battleEndedCalc(
@@ -533,26 +552,70 @@ export class Battle {
       defeatedParty,
     );
 
+    const trainCharacter = (character: Character, exp: number) => {
+      // 1. Train attributes (existing system)
+      for (let i = 0; i < timesOfTraining; i++) {
+        let trainedAttribute =
+          possibleAttributesToBeTrained[
+            Math.floor(Math.random() * possibleAttributesToBeTrained.length)
+          ];
+        if (trainedAttribute) {
+          trainAttribute(character, trainedAttribute, exp);
+        }
+      }
+
+      // 2. Train skills that were used in battle
+      for (const skill of character.activeSkills) {
+        const skillDef = skillRepository[skill.id];
+        const expNeeded = getExpNeededForSkill(skill.level, skillDef.tier);
+          const expGained =
+            rollTwenty().total +
+            statMod(character.attribute.getStat("intelligence").total);
+
+          skill.exp += expGained;
+          if (skill.exp >= expNeeded) {
+            skill.exp -= expNeeded;
+            skill.level += 1;
+            const statTrackGain = Math.max(statMod(skill.level), 0) + 1;
+            gainStatTracker(character, statTrackGain);
+          }
+      }
+
+      for (const skill of character.conditionalSkills) {
+        const skillDef = skillRepository[skill.id];
+        const expNeeded = getExpNeededForSkill(skill.level, skillDef.tier);
+          const expGained =
+            rollTwenty().total +
+            statMod(character.attribute.getStat("intelligence").total);
+
+          skill.exp += expGained;
+          if (skill.exp >= expNeeded) {
+            skill.exp -= expNeeded;
+            skill.level += 1;
+            const statTrackGain = Math.max(statMod(skill.level), 0) + 1;
+            gainStatTracker(character, statTrackGain);
+          }
+      }
+
+      // 3. Train proficiency of the weapon they're wielding
+      const weapon = character.getWeapon();
+      if (weapon) {
+        trainProficiency(character, weapon.weaponType, exp);
+      }
+    };
+
     const trainCharacters = (party: Party, exp: number) => {
       for (const character of party.characters.filter(
         (c) => c !== undefined && c !== "none",
       ) as Character[]) {
-        for (let i = 0; i < timesOfTraining; i++) {
-          let trainedAttribute =
-            possibleAttributesToBeTrained[
-              Math.floor(Math.random() * possibleAttributesToBeTrained.length)
-            ];
-          if (trainedAttribute) {
-            trainAttribute(character, trainedAttribute, exp);
-          }
-        }
+        trainCharacter(character, exp);
       }
     };
 
     trainCharacters(winnerParty, winnerExp);
     trainCharacters(defeatedParty, loserExp);
 
-    // TODO: Implement looting system
+    // Note: dropProcess is now called in handleBattleEnd to capture results for reporting
   }
 
   private getPartyStrength(party: Party): number {
@@ -612,6 +675,69 @@ export class Battle {
     }
 
     return { winnerExp, loserExp };
+  }
+
+  /**
+   * Build rewards object from drop results and experience
+   * Maps drop process results to BattleRewards format
+   */
+  private buildRewards(
+    winnerParty?: Party,
+    defeatedParty?: Party,
+    dropResults: ReturnType<typeof dropProcess> | null = null,
+  ): Record<string, BattleRewards> {
+    const rewards: Record<string, BattleRewards> = {};
+
+    // Calculate experience for rewards
+    let winnerExp = 0;
+    let loserExp = 0;
+    if (winnerParty && defeatedParty) {
+      const expCalc = this.experienceCalculation(
+        BattleStatus.END,
+        winnerParty,
+        defeatedParty,
+      );
+      winnerExp = expCalc.winnerExp;
+      loserExp = expCalc.loserExp;
+    }
+
+    // Build rewards for winning party
+    if (winnerParty && dropResults) {
+      const winningCharacters = winnerParty.getCharacters();
+      
+      for (const character of winningCharacters) {
+        // Find drop result for this character
+        const dropResult = dropResults.winner.find(
+          (r) => r.characterId === character.id,
+        );
+
+        rewards[character.id] = {
+          characterId: character.id,
+          characterName: character.name,
+          expGained: winnerExp,
+          itemsLooted: (dropResult?.itemsGained || []).map(item => ({
+            itemId: String(item.itemId),
+            quantity: item.quantity,
+          })),
+        };
+      }
+    }
+
+    // Build rewards for losing party (they get less exp, no items)
+    if (defeatedParty) {
+      const losingCharacters = defeatedParty.getCharacters();
+      
+      for (const character of losingCharacters) {
+        rewards[character.id] = {
+          characterId: character.id,
+          characterName: character.name,
+          expGained: loserExp,
+          itemsLooted: [], // Losers don't get items
+        };
+      }
+    }
+
+    return rewards;
   }
 }
 

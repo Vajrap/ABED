@@ -43,7 +43,6 @@ export function handleTrainSkill(
 
     if (character.level >= 20) continue;
 
-    // TODO:
     const skillObj = skillRepository.get(target); // This should give us skill object, not done yet
     if (!skillObj) continue;
     if (skill.level >= skillObj.maxLevel) continue;

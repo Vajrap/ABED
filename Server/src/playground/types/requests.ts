@@ -7,14 +7,14 @@ import type { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import type { SkillId } from "src/Entity/Skill/enums";
 import type { EquipmentId } from "src/Entity/Item/Equipment/types";
 import type { BattleType } from "src/Entity/Battle/types";
-import type { MOBs } from "src/Entity/Character/MOBs/enums";
+import type { MOBEnum } from "src/Entity/Character/MOBs/enums";
 
 /**
  * Character configuration for battle simulation
  */
 export interface CharacterConfig {
   type: 'mob' | 'custom';
-  mobId?: MOBs;  // If using predefined MOB
+  mobId?: MOBEnum;  // If using predefined MOB
   race?: RaceEnum;
   class?: ClassEnum;
   level: 1 | 2 | 3 | 4 | 5;

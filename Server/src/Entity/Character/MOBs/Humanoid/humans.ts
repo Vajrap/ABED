@@ -1,5 +1,5 @@
 import { Character } from "src/Entity/Character/Character.ts";
-import { MOBs } from "src/Entity/Character/MOBs/enums.ts";
+import { MOBEnum } from "src/Entity/Character/MOBs/enums.ts";
 import { CharacterNeeds } from "src/Entity/Character/Subclass/Needs/CharacterNeeds.ts";
 import { CharacterEquipmentSlot, CharacterType } from "src/InterFacesEnumsAndTypes/Enums.ts";
 import {
@@ -51,7 +51,7 @@ export function humanWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanWarrior}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanWarrior}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Warrior",
@@ -123,7 +123,7 @@ export function humanMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanMage}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanMage}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Mage",
@@ -219,7 +219,7 @@ export function humanCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanCleric}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanCleric}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Cleric",
@@ -295,7 +295,7 @@ export function humanPaladin(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanPaladin}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanPaladin}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Paladin",
@@ -373,7 +373,7 @@ export function humanWarlock(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanWarlock}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanWarlock}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Warlock",
@@ -469,7 +469,7 @@ export function humanBarbarian(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanBarbarian}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanBarbarian}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Barbarian",
@@ -545,7 +545,7 @@ export function humanSorcerer(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanSorcerer}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanSorcerer}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Sorcerer",
@@ -641,7 +641,7 @@ export function humanRogue(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanRogue}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanRogue}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Rogue",
@@ -737,7 +737,7 @@ export function humanDruid(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.humanDruid}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.humanDruid}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Druid",

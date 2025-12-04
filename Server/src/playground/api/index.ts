@@ -4,7 +4,7 @@ import { PresetService } from '../services/PresetService';
 import type { SimulateBattleRequest, SavePresetRequest } from '../types/requests';
 import type { BattleMetadataResponse, PresetsResponse } from '../types/responses';
 import { RaceEnum, ClassEnum, CharacterEquipmentSlot } from 'src/InterFacesEnumsAndTypes/Enums';
-import { MOBs } from 'src/Entity/Character/MOBs/enums';
+import { MOBEnum } from 'src/Entity/Character/MOBs/enums';
 import { LocationsEnum } from 'src/InterFacesEnumsAndTypes/Enums/Location';
 import { BattleType } from 'src/Entity/Battle/types';
 import { skillRepository } from 'src/Entity/Skill/repository';

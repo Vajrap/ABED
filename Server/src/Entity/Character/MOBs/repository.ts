@@ -1,4 +1,4 @@
-import { MOBs } from "src/Entity/Character/MOBs/enums.ts";
+import { MOBEnum } from "src/Entity/Character/MOBs/enums.ts";
 import { Character } from "src/Entity/Character/Character.ts";
 import { goblinScout, goblinWarrior, goblinMage, goblinCaptain, goblinCleric } from "./goblins";
 import {
@@ -60,10 +60,11 @@ import {
   dwarfRogue,
   dwarfDruid,
 } from "./Humanoid/dwarfs";
+import { MOB } from ".";
 
 export const mobRepository: Record<
-  MOBs,
-  (difficulty: 1 | 2 | 3 | 4 | 5) => Character
+  MOBEnum,
+  (difficulty: 1 | 2 | 3 | 4 | 5) => MOB
 > = {
   // Goblins
   goblinScout: goblinScout,

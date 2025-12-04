@@ -1,5 +1,5 @@
 import { Character } from "src/Entity/Character/Character.ts";
-import { MOBs } from "src/Entity/Character/MOBs/enums.ts";
+import { MOBEnum } from "src/Entity/Character/MOBs/enums.ts";
 import { CharacterNeeds } from "src/Entity/Character/Subclass/Needs/CharacterNeeds.ts";
 import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums.ts";
 import {
@@ -48,7 +48,7 @@ export function elvenWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenWarrior}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenWarrior}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Warrior",
@@ -147,7 +147,7 @@ export function elvenRanger(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenRanger}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenRanger}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Ranger",
@@ -246,7 +246,7 @@ export function elvenMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenMage}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenMage}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Mage",
@@ -345,7 +345,7 @@ export function elvenCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenCleric}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenCleric}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Cleric",
@@ -447,7 +447,7 @@ export function elvenPaladin(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenPaladin}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenPaladin}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Paladin",
@@ -546,7 +546,7 @@ export function elvenWarlock(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenWarlock}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenWarlock}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Warlock",
@@ -645,7 +645,7 @@ export function elvenBarbarian(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenBarbarian}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenBarbarian}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Barbarian",
@@ -744,7 +744,7 @@ export function elvenSorcerer(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenSorcerer}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenSorcerer}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Sorcerer",
@@ -843,7 +843,7 @@ export function elvenRogue(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenRogue}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenRogue}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Rogue",
@@ -942,7 +942,7 @@ export function elvenDruid(difficulty: 1 | 2 | 3 | 4 | 5) {
     battleStats: new CharacterBattleStats(),
     elements: new CharacterElements(),
     fame: new CharacterFame(),
-    id: `${MOBs.elvenDruid}_${Bun.randomUUIDv7()}`,
+    id: `${MOBEnum.elvenDruid}_${Bun.randomUUIDv7()}`,
     level: difficulty,
     name: {
       en: "Human Druid",
