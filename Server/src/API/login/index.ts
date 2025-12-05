@@ -75,10 +75,16 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
       token,
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     Report.error("Login error", {
-      error,
+      error: errorMessage,
       username: req.body?.username,
+      fullError: error,
     });
-    return res.json({ success: false, messageKey: "loginPage.networkError" });
+    return res.json({ 
+      success: false, 
+      messageKey: "loginPage.networkError",
+      error: errorMessage // Include error for debugging (remove in production)
+    });
   }
 });

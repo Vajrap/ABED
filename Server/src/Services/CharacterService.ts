@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../Database/connection";
 import { characters, type InsertCharacter } from "../Database/Schema";
 import { RACES, type RaceKey } from "../Game/CharacterCreation/Races";
@@ -255,13 +255,32 @@ export class CharacterService {
    * Get the user's character (returns null if no character exists)
    */
   static async getUserCharacter(userId: string): Promise<any | null> {
-    const [character] = await db
-      .select()
-      .from(characters)
-      .where(eq(characters.userId, userId))
-      .limit(1);
+    try {
+      const [character] = await db
+        .select()
+        .from(characters)
+        .where(eq(characters.userId, userId))
+        .limit(1);
 
-    return character || null;
+      return character || null;
+    } catch (error) {
+      // If party_id column doesn't exist yet (during migration), use raw SQL
+      // This handles the migration transition period
+      try {
+        const result = await db.execute(sql`
+          SELECT * FROM characters WHERE user_id = ${userId} LIMIT 1
+        `);
+        
+        if (result.rows && result.rows.length > 0) {
+          return result.rows[0];
+        }
+      } catch (fallbackError) {
+        // If raw SQL also fails, log and return null
+        console.error("Error fetching character (fallback also failed):", fallbackError);
+      }
+      
+      return null;
+    }
   }
 
   static async isCharacterNameAvailable(name: string): Promise<boolean> {

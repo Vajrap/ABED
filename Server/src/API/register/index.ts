@@ -38,9 +38,17 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
     }
 
     // Create new user
-    const newUser = await UserService.createUser({
-      ...validatedBody,
-    });
+    // Extract lastNewsReceived separately as UserService.createUser doesn't accept it
+    const { lastNewsReceived, ...userDataForCreation } = validatedBody;
+    const newUser = await UserService.createUser(userDataForCreation);
+    
+    // Update lastNewsReceived if provided (optional field)
+    if (lastNewsReceived) {
+      await UserService.updateUser(newUser.id, { 
+        lastNewsReceived,
+        updatedBy: "system"
+      });
+    }
 
     Report.info("New user registered", {
       userId: newUser.id,
@@ -48,10 +56,17 @@ registerRoutes.post("/", async (req: Request, res: Response) => {
     });
     return res.json({ success: true, userId: newUser.id, username: newUser.username });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     Report.error("Registration error", {
-      error,
+      error: errorMessage,
       username: req.body?.username,
+      fullError: error,
     });
-    return res.json({ success: false, messageKey: "registerPage.networkError" });
+    // Return more specific error message for debugging
+    return res.json({ 
+      success: false, 
+      messageKey: "registerPage.networkError",
+      error: errorMessage // Include error for debugging (remove in production)
+    });
   }
 });

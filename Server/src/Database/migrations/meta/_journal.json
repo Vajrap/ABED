@@ -50,6 +50,20 @@
       "when": 1763102321546,
       "tag": "0006_omniscient_terror",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1764951000000,
+      "tag": "0007_add_username_to_users",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1764951500000,
+      "tag": "0008_add_party_id_to_characters",
+      "breakpoints": true
     }
   ]
 }

@@ -49,40 +49,17 @@ import {
 import {
   CharacterEquipmentSlot,
   ClassEnum,
-  ProficiencyKey,
 } from "src/InterFacesEnumsAndTypes/Enums";
+import { ClassBonus } from "./types";
 
-type Bonus = {
-  proficiencies: ProficiencyBonus;
-  startingSkills: StartingSkills;
-  startingEquipments: StartingEquipments;
-};
 
-type ProficiencyBonus = { key: ProficiencyKey; value: number }[];
-type StartingSkills = SkillId[];
-type StartingEquipments = {
-  [CharacterEquipmentSlot.headWear]: HeadWearId | null;
-  [CharacterEquipmentSlot.body]: BodyId | null;
-  [CharacterEquipmentSlot.leg]: LegId | null;
-  [CharacterEquipmentSlot.hand]: HandId | null;
-  [CharacterEquipmentSlot.foot]: FootId | null;
-  [CharacterEquipmentSlot.util]: UtilId | null;
-  [CharacterEquipmentSlot.ringL]: RingId | null;
-  [CharacterEquipmentSlot.ringR]: RingId | null;
-  [CharacterEquipmentSlot.earL]: EarId | null;
-  [CharacterEquipmentSlot.earR]: EarId | null;
-  [CharacterEquipmentSlot.neck]: NeckId | null;
-  [CharacterEquipmentSlot.rightHand]: WeaponId | null;
-  [CharacterEquipmentSlot.leftHand]: WeaponId | null;
-};
-
-const classBonus: Record<ClassEnum, Bonus> = {
+const classBonus: Record<ClassEnum, ClassBonus> = {
   [ClassEnum.Cleric]: {
-    proficiencies: [
-      { key: "book", value: +3 },
-      { key: "hammer", value: +2 },
-      { key: "shield", value: +1 },
-    ],
+    proficiencies: {
+      three: "book",
+      two: "hammer",
+      one: "shield",
+    },
     startingSkills: [
       ClericSkillId.Radiance,
       ClericSkillId.Heal,
@@ -104,11 +81,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Seer]: {
-    proficiencies: [
-      { key: "orb", value: +3 },
-      { key: "dagger", value: +2 },
-      { key: "book", value: +1 },
-    ],
+    proficiencies: {
+      three: "orb",
+      two: "dagger",
+      one: "book",
+    },
     startingSkills: [
       SeerSkillId.ThreadSnip,
       SeerSkillId.PlanarEcho
@@ -130,11 +107,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Mage]: {
-    proficiencies: [
-      { key: "wand", value: +3 },
-      { key: "staff", value: +2 },
-      { key: "book", value: +1 },
-    ],
+    proficiencies: {
+      three: "wand",
+      two: "staff",
+      one: "book",
+    },
     startingSkills: [
       MageSkillId.ArcaneShield,
       MageSkillId.ArcaneBolt,
@@ -156,11 +133,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Mystic]: {
-    proficiencies: [
-      { key: "orb", value: +3 },
-      { key: "bareHand", value: +2 },
-      { key: "wand", value: +1 },
-    ],
+    proficiencies: {
+      three: "orb",
+      two: "bareHand",
+      one: "wand",
+    },
     startingSkills: [
       MysticSkillId.InnerVeil,
       MysticSkillId.MistStep as SkillId,
@@ -182,11 +159,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Rogue]: {
-    proficiencies: [
-      { key: "dagger", value: +3 },
-      { key: "bow", value: +2 },
-      { key: "blade", value: +1 },
-    ],
+    proficiencies: {
+      three: "dagger",
+      two: "bow",
+      one: "blade",
+    },
     startingSkills: [
       RogueSkillId.BleedingCut,
       RogueSkillId.ThrowingKnives
@@ -208,11 +185,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.SpellBlade]: {
-    proficiencies: [
-      { key: "sword", value: +3 },
-      { key: "blade", value: +2 },
-      { key: "wand", value: +1 },
-    ],
+    proficiencies: {
+      three: "sword",
+      two: "blade",
+      one: "wand",
+    },
     startingSkills: [
       SpellBladeSkillId.WindSlash,
       SpellBladeSkillId.PlanarEdge,
@@ -234,11 +211,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Shaman]: {
-    proficiencies: [
-      { key: "staff", value: +3 },
-      { key: "spear", value: +2 },
-      { key: "axe", value: +1 },
-    ],
+    proficiencies: {
+      three: "staff",
+      two: "spear",
+      one: "axe",
+    },
     startingSkills: [
       ShamanSkillId.HexOfRot,
       ShamanSkillId.MendSpirit,
@@ -260,11 +237,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Barbarian]: {
-    proficiencies: [
-      { key: "axe", value: +3 },
-      { key: "hammer", value: +2 },
-      { key: "bareHand", value: +1 },
-    ],
+    proficiencies: {
+      three: "axe",
+      two: "hammer",
+      one: "bareHand",
+    },
     startingSkills: [
       BarbarianSkillId.RecklessSwing,
       BarbarianSkillId.Rage
@@ -286,11 +263,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Warrior]: {
-    proficiencies: [
-      { key: "blade", value: +3 },
-      { key: "sword", value: +2 },
-      { key: "spear", value: +1 },
-    ],
+    proficiencies: {
+      three: "blade",
+      two: "sword",
+      one: "spear",
+    },
     startingSkills: [
       WarriorSkillId.WarCry,
       WarriorSkillId.PowerStrike,
@@ -312,11 +289,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Knight]: {
-    proficiencies: [
-      { key: "spear", value: +3 },
-      { key: "shield", value: +2 },
-      { key: "sword", value: +1 },
-    ],
+    proficiencies: {
+      three: "spear",
+      two: "shield",
+      one: "sword",
+    },
     startingSkills: [
       KnightSkillId.PrecisionThrust,
     ],
@@ -337,11 +314,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Guardian]: {
-    proficiencies: [
-      { key: "shield", value: +3 },
-      { key: "hammer", value: +2 },
-      { key: "axe", value: +1 },
-    ],
+    proficiencies: {
+      three: "shield",
+      two: "hammer",
+      one: "axe",
+    },
     startingSkills: [
       GuardianSkillId.ShieldUp as SkillId,
       GuardianSkillId.Taunt as SkillId,
@@ -363,11 +340,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Paladin]: {
-    proficiencies: [
-      { key: "hammer", value: +3 },
-      { key: "shield", value: +2 },
-      { key: "sword", value: +1 },
-    ],
+    proficiencies: {
+      three: "hammer",
+      two: "shield",
+      one: "sword",
+    },
     startingSkills: [
       PaladinSkillId.DivineStrike,
     ],
@@ -388,11 +365,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Druid]: {
-    proficiencies: [
-      { key: "staff", value: +3 },
-      { key: "spear", value: +2 },
-      { key: "bow", value: +1 },
-    ],
+    proficiencies: {
+      three: "staff",
+      two: "spear",
+      one: "bow",
+    },
     startingSkills: [
       DruidSkillId.ThrowSpear,
       DruidSkillId.VineWhip,
@@ -414,11 +391,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Monk]: {
-    proficiencies: [
-      { key: "bareHand", value: +3 },
-      { key: "staff", value: +2 },
-      { key: "blade", value: +1 },
-    ],
+    proficiencies: {
+      three: "bareHand",
+      two: "staff",
+      one: "blade",
+    },
     startingSkills: [
       MonkSkillId.FlurryOfBlows,
       MonkSkillId.PalmStrike,
@@ -441,11 +418,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Warlock]: {
-    proficiencies: [
-      { key: "orb", value: +3 },
-      { key: "axe", value: +2 },
-      { key: "bow", value: +1 },
-    ],
+    proficiencies: {
+      three: "orb",
+      two: "axe",
+      one: "bow",
+    },
     startingSkills: [
       WarlockSkillId.Corruption,
       WarlockSkillId.ChaosBolt,
@@ -467,11 +444,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Duelist]: {
-    proficiencies: [
-      { key: "sword", value: +3 },
-      { key: "shield", value: +2 },
-      { key: "bow", value: +1 },
-    ],
+    proficiencies: {
+      three: "sword",
+      two: "shield",
+      one: "bow",
+    },
     startingSkills: [
       DuelistSkillId.DuelingStance,
     ],
@@ -492,11 +469,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Witch]: {
-    proficiencies: [
-      { key: "wand", value: +3 },
-      { key: "book", value: +2 },
-      { key: "dagger", value: +1 },
-    ],
+    proficiencies: {
+      three: "wand",
+      two: "book",
+      one: "dagger",
+    },
     startingSkills: [
       WitchSkillId.PoisonDart as SkillId,
       WitchSkillId.ChaosBinding as SkillId,
@@ -518,11 +495,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Inquisitor]: {
-    proficiencies: [
-      { key: "book", value: +3 },
-      { key: "bow", value: +2 },
-      { key: "wand", value: +1 },
-    ],
+    proficiencies: {
+      three: "book",
+      two: "bow",
+      one: "wand",
+    },
     startingSkills: [
       InquisitorSkillId.ExposeWeakness,
       InquisitorSkillId.RadiantSmite,
@@ -544,11 +521,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Scholar]: {
-    proficiencies: [
-      { key: "book", value: +3 },
-      { key: "sword", value: +2 },
-      { key: "dagger", value: +1 },
-    ],
+    proficiencies: {
+      three: "book",
+      two: "sword",
+      one: "dagger",
+    },
     startingSkills: [
       ScholarSkillId.CognitiveOverload,
       ScholarSkillId.DisruptPattern,
@@ -570,11 +547,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Engineer]: {
-    proficiencies: [
-      { key: "bow", value: +3 },
-      { key: "hammer", value: +2 },
-      { key: "bareHand", value: +1 },
-    ],
+    proficiencies: {
+      three: "bow",
+      two: "hammer",
+      one: "bareHand",
+    },
     startingSkills: [
       EngineerSkillId.ExplosiveBolt,
       EngineerSkillId.BearTrap,
@@ -596,11 +573,11 @@ const classBonus: Record<ClassEnum, Bonus> = {
     },
   },
   [ClassEnum.Nomad]: {
-    proficiencies: [
-      { key: "blade", value: +3 },
-      { key: "bow", value: +2 },
-      { key: "dagger", value: +1 },
-    ],
+    proficiencies: {
+      three: "blade",
+      two: "bow",
+      one: "dagger",
+    },
     startingSkills: [
       NomadSkillId.TacticalSlash,
       NomadSkillId.AdaptiveStrike,
@@ -624,4 +601,3 @@ const classBonus: Record<ClassEnum, Bonus> = {
 };
 
 export { classBonus };
-export type { Bonus, ProficiencyBonus, StartingSkills, StartingEquipments };

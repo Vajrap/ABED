@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { db } from "../connection";
 import { users, type User, type InsertUser } from "../Schema/user";
 
@@ -9,20 +9,24 @@ export class UserService {
   static async createUser(
     userData: Omit<InsertUser, "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy" | "lastNewsReceived">,
   ): Promise<User> {
-    const newUser = await db
-      .insert(users)
-      .values({
-        ...userData,
-        createdBy: "system",
-        updatedBy: "system",
-      })
-      .returning();
+    // Use raw SQL to handle character_id column which may still exist in DB but not in schema
+    // This allows backward compatibility during migration
+    // Provide default for last_news_received if not specified
+    const lastNewsReceived = userData.lastNewsReceived ?? 'news_000';
+    const result = await db.execute(sql`
+      INSERT INTO users (username, password, email, last_news_received, character_id, created_by, updated_by)
+      VALUES (${userData.username}, ${userData.password}, ${userData.email ?? null}, ${lastNewsReceived}, ${userData.username}, 'system', 'system')
+      RETURNING *
+    `);
 
-    if (!newUser[0]) {
+    // Fetch the created user using Drizzle to get proper typing
+    const [createdUser] = await db.select().from(users).where(eq(users.username, userData.username)).limit(1);
+
+    if (!createdUser) {
       throw new Error("Failed to create user");
     }
 
-    return newUser[0];
+    return createdUser;
   }
 
   /**
@@ -51,13 +55,46 @@ export class UserService {
    * Get user by username
    */
   static async getUserByUsername(username: string): Promise<User | null> {
-    const user = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, username))
-      .limit(1);
+    try {
+      // Try to get by username (new schema)
+      const user = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, username))
+        .limit(1);
 
-    return user[0] || null;
+      if (user[0]) {
+        return user[0];
+      }
+    } catch (error) {
+      // If username column doesn't exist yet (during migration), try character_id
+      // This is a fallback for backward compatibility
+      try {
+        const result = await db.execute(sql`
+          SELECT * FROM users WHERE character_id = ${username} LIMIT 1
+        `);
+        if (result.rows && result.rows.length > 0) {
+          // Map character_id result to User type
+          const row = result.rows[0] as any;
+          return {
+            id: row.id,
+            username: row.username || row.character_id, // Use username if exists, else character_id
+            password: row.password,
+            email: row.email,
+            lastNewsReceived: row.last_news_received,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+            createdBy: row.created_by,
+            updatedBy: row.updated_by,
+          } as User;
+        }
+      } catch (fallbackError) {
+        // Both methods failed, re-throw original error
+        throw error;
+      }
+    }
+    
+    return null;
   }
 
   /**

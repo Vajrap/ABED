@@ -41,8 +41,9 @@ const SCAN_DIRECTORIES = [
   "Server/src/Entity/BuffsAndDebuffs/definitions",
 ];
 
-// Output directory in Client (relative to project root)
+// Output directories in Client (relative to project root)
 const CLIENT_L10N_DIR = "Client/L10N";
+const WEBAPP_L10N_DIR = "Client/webapp/src/L10N";
 
 // Enum files to copy (relative to project root)
 const ENUM_FILES = [
@@ -420,6 +421,15 @@ async function generateSkillsFile(skills: Map<string, TextObject>) {
   const outputPath = join(PROJECT_ROOT, CLIENT_L10N_DIR, "skills.ts");
   await writeFile(outputPath, lines.join("\n"), "utf-8");
   console.log(`✓ Generated ${CLIENT_L10N_DIR}/skills.ts with ${skills.size} skills`);
+  
+  // Also copy to webapp directory
+  const webappOutputDir = join(PROJECT_ROOT, WEBAPP_L10N_DIR);
+  if (!existsSync(webappOutputDir)) {
+    await mkdir(webappOutputDir, { recursive: true });
+  }
+  const webappOutputPath = join(webappOutputDir, "skills.ts");
+  await writeFile(webappOutputPath, lines.join("\n"), "utf-8");
+  console.log(`✓ Generated ${WEBAPP_L10N_DIR}/skills.ts with ${skills.size} skills`);
 }
 
 /**
@@ -498,6 +508,15 @@ async function generateBuffsDebuffsFile(
   const outputPath = join(PROJECT_ROOT, CLIENT_L10N_DIR, "buffsAndDebuffs.ts");
   await writeFile(outputPath, lines.join("\n"), "utf-8");
   console.log(`✓ Generated ${CLIENT_L10N_DIR}/buffsAndDebuffs.ts with ${buffs.size} buffs and ${debuffs.size} debuffs`);
+  
+  // Also copy to webapp directory
+  const webappOutputDir = join(PROJECT_ROOT, WEBAPP_L10N_DIR);
+  if (!existsSync(webappOutputDir)) {
+    await mkdir(webappOutputDir, { recursive: true });
+  }
+  const webappOutputPath = join(webappOutputDir, "buffsAndDebuffs.ts");
+  await writeFile(webappOutputPath, lines.join("\n"), "utf-8");
+  console.log(`✓ Generated ${WEBAPP_L10N_DIR}/buffsAndDebuffs.ts with ${buffs.size} buffs and ${debuffs.size} debuffs`);
 }
 
 /**
@@ -513,9 +532,20 @@ async function copyEnumFiles() {
         .replace(/from\s+["']src\//g, 'from "./')
         .replace(/from\s+["']\.\.\/\.\.\/\.\.\//g, 'from "./');
       
+      // Copy to Client/L10N
       const destPath = join(PROJECT_ROOT, dest);
       await writeFile(destPath, cleanedContent, "utf-8");
       console.log(`✓ Copied ${src} -> ${dest}`);
+      
+      // Also copy to webapp
+      const fileName = dest.split("/").pop()!;
+      const webappOutputDir = join(PROJECT_ROOT, WEBAPP_L10N_DIR);
+      if (!existsSync(webappOutputDir)) {
+        await mkdir(webappOutputDir, { recursive: true });
+      }
+      const webappDestPath = join(webappOutputDir, fileName);
+      await writeFile(webappDestPath, cleanedContent, "utf-8");
+      console.log(`✓ Copied ${src} -> ${WEBAPP_L10N_DIR}/${fileName}`);
     } catch (error) {
       console.error(`Error copying ${src}:`, error);
     }
@@ -568,6 +598,11 @@ async function main() {
   console.log(`   - ${CLIENT_L10N_DIR}/buffsAndDebuffs.ts`);
   console.log(`   - ${CLIENT_L10N_DIR}/skillEnums.ts`);
   console.log(`   - ${CLIENT_L10N_DIR}/buffDebuffEnums.ts`);
+  console.log(`\n📦 Also copied to webapp:`);
+  console.log(`   - ${WEBAPP_L10N_DIR}/skills.ts`);
+  console.log(`   - ${WEBAPP_L10N_DIR}/buffsAndDebuffs.ts`);
+  console.log(`   - ${WEBAPP_L10N_DIR}/skillEnums.ts`);
+  console.log(`   - ${WEBAPP_L10N_DIR}/buffDebuffEnums.ts`);
 }
 
 main().catch(console.error);

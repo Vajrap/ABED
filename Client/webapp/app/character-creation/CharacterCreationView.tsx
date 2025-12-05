@@ -1,0 +1,694 @@
+"use client";
+
+import React from "react";
+import { useRouter } from "next/navigation";
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  IconButton,
+  Chip,
+  Stack,
+  Alert,
+  CircularProgress,
+  Divider,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import {
+  ArrowBack,
+  NavigateBefore,
+  NavigateNext,
+  PersonAdd,
+} from "@mui/icons-material";
+import { useCharacterCreationLogic } from "./useCharacterCreationLogic";
+import { useLocalization, L10N } from "@/localization";
+import { skillsL10N } from "@/L10N/skills";
+import * as skillEnums from "@/L10N/skillEnums";
+import { TextRenderer } from "@/utils/TextRenderer";
+import { renderText, type RenderTextOptions } from "@/utils/textRenderer";
+
+// Helper function to get skill L10N by mapping skill name + class to enum value
+// This function searches across all skill enum types since skills are stored by their enum value (not class prefix)
+function getSkillL10N(skillId: string, classValue: string, language: "en" | "th" = "en") {
+  try {
+    // Map class name to enum type for context (but we'll search all enums)
+    const classEnumMap: Record<string, keyof typeof skillEnums> = {
+      Cleric: "ClericSkillId",
+      Seer: "SeerSkillId",
+      Mage: "MageSkillId",
+      Mystic: "MysticSkillId",
+      Rogue: "RogueSkillId",
+      SpellBlade: "SpellBladeSkillId",
+      Shaman: "ShamanSkillId",
+      Barbarian: "BarbarianSkillId",
+      Warrior: "WarriorSkillId",
+      Knight: "KnightSkillId",
+      Guardian: "GuardianSkillId",
+      Paladin: "PaladinSkillId",
+      Druid: "DruidSkillId",
+      Monk: "MonkSkillId",
+      Warlock: "WarlockSkillId",
+      Duelist: "DuelistSkillId",
+      Witch: "WitchSkillId",
+      Inquisitor: "InquisitorSkillId",
+      Scholar: "ScholarSkillId",
+      Engineer: "EngineerSkillId",
+      Nomad: "NomadSkillId",
+    };
+    
+    // First, try to get the enum type for the class
+    const normalizedClass = classValue.charAt(0).toUpperCase() + classValue.slice(1);
+    const enumTypeName = classEnumMap[classValue] || classEnumMap[normalizedClass as keyof typeof classEnumMap];
+    
+    // Try to get the skill from the class-specific enum first
+    if (enumTypeName) {
+      const enumType = skillEnums[enumTypeName] as Record<string, string>;
+      if (enumType) {
+        const enumValue = enumType[skillId];
+        if (enumValue) {
+          const skillData = skillsL10N[enumValue as keyof typeof skillsL10N];
+          if (skillData) {
+            return {
+              name: skillData.name?.[language] || skillData.name?.en || skillId,
+              description: skillData.description?.[language] || skillData.description?.en || "",
+              formula: skillData.formula,
+            };
+          }
+        }
+      }
+    }
+    
+    // If not found in class-specific enum, search all skill enums
+    // This handles cases where the skill might be in a different enum
+    const allEnumNames: (keyof typeof skillEnums)[] = [
+      "BasicSkillId", "MobSkillId", "ClericSkillId", "SeerSkillId", "ScholarSkillId",
+      "MageSkillId", "MysticSkillId", "RogueSkillId", "SpellBladeSkillId", "ShamanSkillId",
+      "BarbarianSkillId", "WarriorSkillId", "KnightSkillId", "GuardianSkillId", "PaladinSkillId",
+      "DruidSkillId", "MonkSkillId", "WarlockSkillId", "DuelistSkillId", "WitchSkillId",
+      "InquisitorSkillId", "EngineerSkillId", "NomadSkillId",
+    ];
+    
+    for (const enumName of allEnumNames) {
+      const enumType = skillEnums[enumName] as Record<string, string>;
+      if (enumType) {
+        const enumValue = enumType[skillId];
+        if (enumValue) {
+          const skillData = skillsL10N[enumValue as keyof typeof skillsL10N];
+          if (skillData) {
+            return {
+              name: skillData.name?.[language] || skillData.name?.en || skillId,
+              description: skillData.description?.[language] || skillData.description?.en || "",
+              formula: skillData.formula,
+            };
+          }
+        }
+      }
+    }
+    
+    // If still not found, the skill doesn't exist in L10N
+    return null;
+  } catch (error) {
+    // L10N files not available yet or import failed
+    console.warn(`Failed to get skill L10N for ${skillId} (${classValue}):`, error);
+    return null;
+  }
+}
+
+const CharacterCreationContainer = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  background: `var(--gradient-mystical)`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: theme.spacing(2),
+}));
+
+const CharacterCreationPaper = styled(Paper)(({ theme }) => ({
+  maxWidth: "800px",
+  width: "90vw",
+  padding: theme.spacing(4),
+  borderRadius: theme.spacing(2),
+  boxShadow: `var(--shadow-mystical)`,
+  background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255,255,255,0.2)',
+}));
+
+const TitleBox = styled(Box)(({ theme }) => ({
+  textAlign: "center",
+  marginBottom: theme.spacing(4),
+}));
+
+const FormSection = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(3),
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  fontWeight: 600,
+  color: theme.palette.primary.main,
+}));
+
+const GenderToggleBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  gap: theme.spacing(1),
+  marginBottom: theme.spacing(2),
+}));
+
+const GenderButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
+  flex: 1,
+  padding: theme.spacing(1.5),
+  borderRadius: theme.spacing(1),
+  textTransform: "none",
+  fontWeight: 600,
+  backgroundColor: active ? theme.palette.primary.main : theme.palette.grey[100],
+  color: active ? theme.palette.primary.contrastText : theme.palette.text.primary,
+  "&:hover": {
+    backgroundColor: active ? theme.palette.primary.dark : theme.palette.grey[200],
+  },
+}));
+
+const PortraitBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+}));
+
+const PortraitPlaceholder = styled(Box)(({ theme }) => ({
+  width: 120,
+  height: 120,
+  borderRadius: theme.spacing(2),
+  backgroundColor: theme.palette.grey[200],
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  border: `2px solid ${theme.palette.grey[300]}`,
+  fontSize: "0.875rem",
+  color: theme.palette.grey[600],
+}));
+
+const DescriptionBox = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.grey[50],
+  borderRadius: theme.spacing(1),
+  marginTop: theme.spacing(1),
+  minHeight: 60,
+  display: "flex",
+  alignItems: "center",
+}));
+
+const ActionButtons = styled(Box)(({ theme }) => ({
+  display: "flex",
+  gap: theme.spacing(2),
+  marginTop: theme.spacing(4),
+  justifyContent: "space-between",
+}));
+
+// Helper function to get localized name with fallback
+const getLocalizedRaceName = (t: any, raceId: string): string => {
+  const raceKey = raceId.toLowerCase();
+  try {
+    return t(L10N.character.races[raceKey as keyof typeof L10N.character.races]?.name || { en: raceId, th: raceId });
+  } catch {
+    return raceId;
+  }
+};
+
+const getLocalizedRaceDescription = (t: any, raceId: string): string => {
+  const raceKey = raceId.toLowerCase();
+  try {
+    return t(L10N.character.races[raceKey as keyof typeof L10N.character.races]?.description || { en: `A ${raceId} character`, th: `ตัวละคร${raceId}` });
+  } catch {
+    return `A ${raceId} character`;
+  }
+};
+
+const getLocalizedClassName = (t: any, classId: string): string => {
+  const classKey = classId.toLowerCase();
+  try {
+    return t(L10N.character.classes[classKey as keyof typeof L10N.character.classes]?.name || { en: classId, th: classId });
+  } catch {
+    return classId;
+  }
+};
+
+const getLocalizedClassDescription = (t: any, classId: string): string => {
+  const classKey = classId.toLowerCase();
+  try {
+    return t(L10N.character.classes[classKey as keyof typeof L10N.character.classes]?.description || { en: `A ${classId} class`, th: `อาชีพ${classId}` });
+  } catch {
+    return `A ${classId} class`;
+  }
+};
+
+const getLocalizedBackgroundName = (t: any, backgroundId: string): string => {
+  // Map "retainor" to "noble" for L10N
+  const backgroundKey = backgroundId === "retainor" ? "noble" : backgroundId.toLowerCase();
+  try {
+    return t(L10N.character.backgrounds[backgroundKey as keyof typeof L10N.character.backgrounds]?.name || { en: backgroundId, th: backgroundId });
+  } catch {
+    return backgroundId;
+  }
+};
+
+const getLocalizedBackgroundDescription = (t: any, backgroundId: string): string => {
+  const backgroundKey = backgroundId === "retainor" ? "noble" : backgroundId.toLowerCase();
+  try {
+    return t(L10N.character.backgrounds[backgroundKey as keyof typeof L10N.character.backgrounds]?.description || { en: `A ${backgroundId} background`, th: `ภูมิหลัง${backgroundId}` });
+  } catch {
+    return `A ${backgroundId} background`;
+  }
+};
+
+export default function CharacterCreationView() {
+  const router = useRouter();
+  const { t, language } = useLocalization();
+  const {
+    isLoading,
+    isFetchingMetadata,
+    error,
+    nameCheckMessage,
+    metadata,
+    stats,
+    formData,
+    portraitIndex,
+    updateField,
+    updatePortraitIndex,
+    createCharacter,
+    isFormValid,
+    getAvailablePortraits,
+  } = useCharacterCreationLogic();
+
+  const handleCreateCharacter = async () => {
+    const success = await createCharacter();
+    if (success) {
+      router.push("/game");
+    }
+  };
+
+  const handleBackToTitle = () => {
+    router.push("/login");
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter" && isFormValid() && !isLoading) {
+      handleCreateCharacter();
+    }
+  };
+
+  // No need for calculateCharacterStats - stats come from the hook now
+
+  if (isFetchingMetadata) {
+    return (
+      <CharacterCreationContainer>
+        <Paper sx={{ p: 4, textAlign: "center" }}>
+          <CircularProgress />
+          <Typography sx={{ mt: 2 }}>Loading character creation options...</Typography>
+        </Paper>
+      </CharacterCreationContainer>
+    );
+  }
+
+  if (!metadata) {
+    return (
+      <CharacterCreationContainer>
+        <Paper sx={{ p: 4, textAlign: "center" }}>
+          <Alert severity="error">Failed to load character creation options. Please refresh the page.</Alert>
+        </Paper>
+      </CharacterCreationContainer>
+    );
+  }
+
+  const availablePortraits = getAvailablePortraits();
+
+  return (
+    <CharacterCreationContainer>
+      <Box sx={{ display: 'flex', gap: 3, width: '100%', maxWidth: '1400px' }}>
+        <CharacterCreationPaper elevation={8} sx={{ flex: 1 }}>
+          <TitleBox>
+            <Typography variant="h3" component="h1" gutterBottom>
+              {t(L10N.characterCreation.title)}
+            </Typography>
+          </TitleBox>
+
+          {/* Character Name and Portrait */}
+          <FormSection>
+            <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
+              {/* Name Input */}
+              <Box sx={{ flex: 1 }}>
+                <SectionTitle variant="h6">{t(L10N.characterCreation.name)}</SectionTitle>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  placeholder={t(L10N.characterCreation.namePlaceholder)}
+                  value={formData.name}
+                  onChange={(e) => updateField("name", e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  inputProps={{ maxLength: 20 }}
+                  error={formData.name.length > 20 || (formData.name.length > 0 && formData.name.length < 3)}
+                  helperText={
+                    formData.name.length > 20
+                      ? t(L10N.characterCreation.nameTooLong)
+                      : formData.name.length > 0 && formData.name.length < 3
+                      ? t(L10N.characterCreation.nameMinLength)
+                      : formData.name.length > 0 && !/^[a-zA-Z\u0E00-\u0E7F\s]+$/.test(formData.name)
+                      ? t(L10N.characterCreation.nameInvalidChars)
+                      : formData.name.length === 0
+                      ? t(L10N.characterCreation.nameTooShort)
+                      : ""
+                  }
+                />
+                {nameCheckMessage && (
+                  <Typography
+                    variant="caption"
+                    color={nameCheckMessage.includes("available") ? "success.main" : "error.main"}
+                    sx={{ mt: 1, display: "block" }}
+                  >
+                    {nameCheckMessage}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Portrait Selector */}
+              <Box sx={{ flex: 1 }}>
+                <SectionTitle variant="h6">{t(L10N.characterCreation.portrait)}</SectionTitle>
+                <PortraitBox>
+                  <IconButton
+                    onClick={() => updatePortraitIndex("prev")}
+                    disabled={isLoading || availablePortraits.length === 0}
+                  >
+                    <NavigateBefore />
+                  </IconButton>
+                  <PortraitPlaceholder>
+                    {formData.portrait || "No portrait"}
+                  </PortraitPlaceholder>
+                  <IconButton
+                    onClick={() => updatePortraitIndex("next")}
+                    disabled={isLoading || availablePortraits.length === 0}
+                  >
+                    <NavigateNext />
+                  </IconButton>
+                </PortraitBox>
+              </Box>
+            </Box>
+          </FormSection>
+
+          {/* Gender Selection */}
+          <FormSection>
+            <SectionTitle variant="h6">{t(L10N.characterCreation.gender)}</SectionTitle>
+            <GenderToggleBox>
+              <GenderButton
+                active={formData.gender === "MALE"}
+                onClick={() => updateField("gender", "MALE")}
+                disabled={isLoading}
+              >
+                {t(L10N.characterCreation.male)}
+              </GenderButton>
+              <GenderButton
+                active={formData.gender === "FEMALE"}
+                onClick={() => updateField("gender", "FEMALE")}
+                disabled={isLoading}
+              >
+                {t(L10N.characterCreation.female)}
+              </GenderButton>
+            </GenderToggleBox>
+          </FormSection>
+
+          {/* Race Selection */}
+          <FormSection>
+            <SectionTitle variant="h6">{t(L10N.characterCreation.race)}</SectionTitle>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {metadata.races.map((race) => (
+                <Chip
+                  key={race.id}
+                  label={getLocalizedRaceName(t, race.id)}
+                  onClick={() => updateField("race", race.id)}
+                  color={formData.race === race.id ? "primary" : "default"}
+                  variant={formData.race === race.id ? "filled" : "outlined"}
+                  sx={{ marginBottom: 1 }}
+                />
+              ))}
+            </Stack>
+            {formData.race && (
+              <DescriptionBox>
+                <Typography variant="body2" color="text.secondary">
+                  {getLocalizedRaceDescription(t, formData.race)}
+                </Typography>
+              </DescriptionBox>
+            )}
+          </FormSection>
+
+          {/* Class Selection */}
+          <FormSection>
+            <SectionTitle variant="h6">{t(L10N.characterCreation.class)}</SectionTitle>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {metadata.classes.map((classItem) => (
+                <Chip
+                  key={classItem.id}
+                  label={getLocalizedClassName(t, classItem.id)}
+                  onClick={() => updateField("class", classItem.id)}
+                  color={formData.class === classItem.id ? "primary" : "default"}
+                  variant={formData.class === classItem.id ? "filled" : "outlined"}
+                  sx={{ marginBottom: 1 }}
+                />
+              ))}
+            </Stack>
+            {formData.class && (
+              <DescriptionBox>
+                <Typography variant="body2" color="text.secondary">
+                  {getLocalizedClassDescription(t, formData.class)}
+                </Typography>
+              </DescriptionBox>
+            )}
+          </FormSection>
+
+          {/* Background Selection */}
+          <FormSection>
+            <SectionTitle variant="h6">{t(L10N.characterCreation.background)}</SectionTitle>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {metadata.backgrounds.map((background) => (
+                <Chip
+                  key={background.id}
+                  label={getLocalizedBackgroundName(t, background.id)}
+                  onClick={() => updateField("background", background.id)}
+                  color={formData.background === background.id ? "primary" : "default"}
+                  variant={formData.background === background.id ? "filled" : "outlined"}
+                  sx={{ marginBottom: 1 }}
+                />
+              ))}
+            </Stack>
+            {formData.background && (
+              <DescriptionBox>
+                <Typography variant="body2" color="text.secondary">
+                  {getLocalizedBackgroundDescription(t, formData.background)}
+                </Typography>
+              </DescriptionBox>
+            )}
+          </FormSection>
+
+          {/* Error Display */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {typeof error === "string" ? error : t(error)}
+            </Alert>
+          )}
+
+          {/* Action Buttons */}
+          <ActionButtons>
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              onClick={handleBackToTitle}
+              disabled={isLoading}
+            >
+              {t(L10N.characterCreation.backToTitle)}
+            </Button>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={handleCreateCharacter}
+              disabled={!isFormValid() || isLoading}
+              startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <PersonAdd />}
+            >
+              {isLoading ? t(L10N.characterCreation.creating) : t(L10N.characterCreation.createCharacter)}
+            </Button>
+          </ActionButtons>
+        </CharacterCreationPaper>
+
+        {/* Right Panel - Character Stats */}
+        <Paper elevation={8} sx={{ width: '400px', maxHeight: '95vh', overflow: 'auto' }}>
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+              Character Stats
+            </Typography>
+            <Divider sx={{ mb: 3 }} />
+            
+            {stats && formData.race && formData.class && formData.background ? (
+              <Box>
+                {/* Vitals */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Vitals</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography variant="body2">HP: {stats.vitals.maxHP}</Typography>
+                    <Typography variant="body2">SP: {stats.vitals.maxSP}</Typography>
+                    <Typography variant="body2">MP: {stats.vitals.maxMP}</Typography>
+                    <Typography variant="body2">Planar Aptitude: {stats.vitals.planarAptitude}</Typography>
+                  </Box>
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                {/* Attributes - Show all without scrolling */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Attributes</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    {Object.entries(stats.attributes).map(([key, value]) => (
+                      <Typography key={key} variant="body2">
+                        {key.charAt(0).toUpperCase() + key.slice(1)}: {value.base}
+                        {value.bonus !== 0 && (
+                          <span style={{ color: value.bonus > 0 ? 'green' : 'red' }}>
+                            {value.bonus > 0 ? ` +${value.bonus}` : ` ${value.bonus}`}
+                          </span>
+                        )}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                {/* Proficiencies */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Proficiencies</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    {Object.entries(stats.proficiencies)
+                      .filter(([_, value]) => value.base > 8) // Only show proficiencies > 8
+                      .map(([key, value]) => (
+                        <Typography key={key} variant="body2">
+                          {key.charAt(0).toUpperCase() + key.slice(1)}: {value.base}
+                        </Typography>
+                      ))}
+                  </Box>
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                {/* Artisan Skills */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Artisan Skills</Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    {Object.entries(stats.artisans)
+                      .filter(([_, value]) => value.base > 8) // Only show artisan skills > 8
+                      .map(([key, value]) => (
+                        <Typography key={key} variant="body2">
+                          {key.charAt(0).toUpperCase() + key.slice(1)}: {value.base}
+                        </Typography>
+                      ))}
+                  </Box>
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                {/* Starting Skills */}
+                {stats.startingSkills.length > 0 && (
+                  <>
+                    <Box sx={{ mb: 3 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Starting Skills</Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                        {stats.startingSkills.map((skillId) => {
+                          const skillL10N = getSkillL10N(skillId, formData.class, language || "en");
+                          if (!skillL10N) {
+                            return (
+                              <Box key={skillId}>
+                                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                                  {skillId}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', display: 'block', mt: 0.5 }}>
+                                  Skill description not available
+                                </Typography>
+                              </Box>
+                            );
+                          }
+
+                          // Render description with text parser
+                          // useFormulaCapsule: false means formulas render as plain text (no border/capsule)
+                          const renderOptions: RenderTextOptions = {
+                            skillLevel: 1, // Default to level 1 for starting skills
+                            formula: skillL10N.formula || null,
+                            counter: 0,
+                            isSkill: true,
+                            character: null, // No character stats for preview
+                            l10nData: null, // No buff/debuff data for preview
+                            currentLanguage: (language || "en") as "en" | "th",
+                            renderBuffDebuffTooltip: null, // No tooltips for preview
+                            useFormulaCapsule: false, // Render formulas as plain text, not in a capsule
+                          };
+
+                          return (
+                            <Box key={skillId}>
+                              <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                                {skillL10N.name}
+                              </Typography>
+                              <TextRenderer
+                                text={skillL10N.description}
+                                options={renderOptions}
+                                variant="caption"
+                                component="div"
+                                sx={{
+                                  color: "text.secondary",
+                                  fontStyle: 'italic',
+                                  lineHeight: 1.6,
+                                }}
+                              />
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    </Box>
+                    <Divider sx={{ my: 2 }} />
+                  </>
+                )}
+
+                {/* Starting Equipment */}
+                {stats.startingEquipments.length > 0 && (
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Starting Equipment</Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      {stats.startingEquipments.map((equip, index) => {
+                        // Format slot name for display
+                        const slotName = equip.slot
+                          .replace(/([A-Z])/g, ' $1')
+                          .replace(/^./, (str) => str.toUpperCase())
+                          .trim();
+                        return (
+                          <Box key={`${equip.slot}-${index}`}>
+                            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                              {slotName}: {equip.item}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                              {/* Equipment descriptions will be available after item L10N extraction */}
+                              Equipment description not available
+                            </Typography>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                Select race, class, and background to see stats preview.
+              </Typography>
+            )}
+          </Box>
+        </Paper>
+      </Box>
+    </CharacterCreationContainer>
+  );
+}
+
