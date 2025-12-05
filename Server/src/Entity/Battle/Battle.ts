@@ -2,10 +2,21 @@ import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums";
 import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 import { statMod } from "../../Utils/statMod";
 import { roll } from "../../Utils/Dice";
-import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
-import { buffsAndDebuffsRepository, buffsRepository, debuffsRepository } from "../BuffsAndDebuffs/repository";
+import {
+  BuffAndDebuffEnum,
+  BuffEnum,
+  DebuffEnum,
+} from "../BuffsAndDebuffs/enum";
+import {
+  buffsAndDebuffsRepository,
+  buffsRepository,
+  debuffsRepository,
+} from "../BuffsAndDebuffs/repository";
 import type { Character } from "../Character/Character";
-import { trainAttribute, trainProficiency } from "../Character/Subclass/Stats/train";
+import {
+  trainAttribute,
+  trainProficiency,
+} from "../Character/Subclass/Stats/train";
 import { skillRepository } from "../Skill/repository";
 import { getExpNeededForSkill } from "../Location/Events/handlers/train/getExpNeeded";
 import { gainStatTracker } from "../Location/Events/handlers/train/statTracker";
@@ -20,8 +31,12 @@ import { battleTypeConfig, type BattleType } from "./types";
 import { activateBreathingSkillTurnPassive } from "../BreathingSkill/activeBreathingSkill";
 import Report from "../../Utils/Reporter";
 import { BattleStatistics } from "./BattleStatistics";
-import { setBattleStatistics, setBattle, setCurrentBattleId } from "./BattleContext";
-import {traitRepository} from "src/Entity/Trait/repository";
+import {
+  setBattleStatistics,
+  setBattle,
+  setCurrentBattleId,
+} from "./BattleContext";
+import { traitRepository } from "src/Entity/Trait/repository";
 import { BasicSkillId } from "../Skill/enums";
 import { resolveDamage } from "./damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
@@ -153,31 +168,38 @@ export class Battle {
             `${actor.name.en} (HP: ${actor.vitals.hp.current}/${actor.vitals.hp.max}) takes turn`,
           );
 
-          const alliesParty = this.partyA.characters.includes(actor) ? this.partyA : this.partyB;
-          const enemiesParty = alliesParty === this.partyA ? this.partyB : this.partyA;
-          const allies = alliesParty.characters.map((c) => {return c})
-          const enemies = enemiesParty.characters.map((e) => {return e})
+          const alliesParty = this.partyA.characters.includes(actor)
+            ? this.partyA
+            : this.partyB;
+          const enemiesParty =
+            alliesParty === this.partyA ? this.partyB : this.partyA;
+          const allies = alliesParty.characters.map((c) => {
+            return c;
+          });
+          const enemies = enemiesParty.characters.map((e) => {
+            return e;
+          });
 
           for (const [trait, amount] of actor.traits) {
-              traitRepository[trait].config.beforeTurn?.(
-                  actor,
-                  amount,
-                  allies,
-                  enemies,
-              )
+            traitRepository[trait].config.beforeTurn?.(
+              actor,
+              amount,
+              allies,
+              enemies,
+            );
           }
 
           const canTakeTurn = resolveBuffAndDebuff(actor);
           if (canTakeTurn.ableToTakesTurn) {
             const traitContext = new Map();
             for (const [trait, value] of actor.traits) {
-                traitRepository[trait].config.onTurn?.(
-                    actor,
-                    value,
-                    allies,
-                    enemies,
-                    traitContext,
-                );
+              traitRepository[trait].config.onTurn?.(
+                actor,
+                value,
+                allies,
+                enemies,
+                traitContext,
+              );
             }
             // Record HP before turn for all characters (to track healing to others)
             const hpBeforeTurn = new Map<string, number>();
@@ -191,13 +213,13 @@ export class Battle {
             const actorTurnResult = this.startActorTurn(actor);
 
             for (const [trait, value] of actor.traits) {
-                traitRepository[trait].config.onEndTurn?.(
-                    actor,
-                    value,
-                    allies,
-                    enemies,
-                    traitContext,
-                );
+              traitRepository[trait].config.onEndTurn?.(
+                actor,
+                value,
+                allies,
+                enemies,
+                traitContext,
+              );
             }
 
             // Record HP after turn and calculate healing for all characters
@@ -232,7 +254,6 @@ export class Battle {
               }
             }
 
-
             Report.debug(`→ ${actorTurnResult.content.en}`);
             this.battleReport.addTurnResult(actorTurnResult);
 
@@ -260,54 +281,54 @@ export class Battle {
             battleStatus.status === BattleStatus.END ||
             battleStatus.status === BattleStatus.DRAW_END
           ) {
-              this.isOngoing = false;
+            this.isOngoing = false;
 
-              // Log remaining HP for all characters
-              Report.debug(`\n--- Battle End ---`);
-              Report.debug(`Party A survivors:`);
-              this.partyA.characters
-                  .filter((c) => c !== "none")
-                  .forEach((c) => {
-                      Report.debug(
-                          `  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? " (DEAD)" : ""}`,
-                      );
-                  });
-              Report.debug(`Party B survivors:`);
-              this.partyB.characters
-                  .filter((c) => c !== "none")
-                  .forEach((c) => {
-                      Report.debug(
-                          `  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? " (DEAD)" : ""}`,
-                      );
-                  });
-              Report.debug(
-                  `Winning party: ${battleStatus.winner?.leader.name.en}'s party`,
-              );
+            // Log remaining HP for all characters
+            Report.debug(`\n--- Battle End ---`);
+            Report.debug(`Party A survivors:`);
+            this.partyA.characters
+              .filter((c) => c !== "none")
+              .forEach((c) => {
+                Report.debug(
+                  `  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? " (DEAD)" : ""}`,
+                );
+              });
+            Report.debug(`Party B survivors:`);
+            this.partyB.characters
+              .filter((c) => c !== "none")
+              .forEach((c) => {
+                Report.debug(
+                  `  - ${c.name.en}: HP ${c.vitals.hp.current}/${c.vitals.hp.max}${c.vitals.isDead ? " (DEAD)" : ""}`,
+                );
+              });
+            Report.debug(
+              `Winning party: ${battleStatus.winner?.leader.name.en}'s party`,
+            );
 
-              const dropResults = this.handleBattleEnd(battleStatus);
-              
-              // Build rewards from drop results and exp
-              const rewards = this.buildRewards(
-                battleStatus.winner,
-                battleStatus.defeated,
-                dropResults,
-              );
+            const dropResults = this.handleBattleEnd(battleStatus);
 
-              this.battleReport.setOutcome(
-                  battleStatus.winner ? battleStatus.winner.partyID : "",
-                  {
-                      en:
-                          battleStatus.status === BattleStatus.DRAW_END
-                              ? "A battle ended in a draw"
-                              : `${battleStatus.winner?.leader.name.en} 's party win the battle!`,
-                      th:
-                          battleStatus.status === BattleStatus.DRAW_END
-                              ? "การต่อสู้จบลงด้วยการเสมอกัน"
-                              : `ปาร์ตี้ของ ${battleStatus.winner?.leader.name.th} ชนะในการต่อสู้!`,
-                  },
-                  rewards,
-              );
-              break;
+            // Build rewards from drop results and exp
+            const rewards = this.buildRewards(
+              battleStatus.winner,
+              battleStatus.defeated,
+              dropResults,
+            );
+
+            this.battleReport.setOutcome(
+              battleStatus.winner ? battleStatus.winner.partyID : "",
+              {
+                en:
+                  battleStatus.status === BattleStatus.DRAW_END
+                    ? "A battle ended in a draw"
+                    : `${battleStatus.winner?.leader.name.en} 's party win the battle!`,
+                th:
+                  battleStatus.status === BattleStatus.DRAW_END
+                    ? "การต่อสู้จบลงด้วยการเสมอกัน"
+                    : `ปาร์ตี้ของ ${battleStatus.winner?.leader.name.th} ชนะในการต่อสู้!`,
+              },
+              rewards,
+            );
+            break;
           }
         }
       }
@@ -346,17 +367,19 @@ export class Battle {
     // Check for active traps - trigger if enemy uses physical attack
     // Only check if actor is in the party that didn't set the trap
     const actorPartyId = isPartyA ? "partyA" : "partyB";
-    
+
     // Check if this is a physical attack (basicAttack is always physical)
     // For now, we only check basicAttack. Can be enhanced later to check other physical skills.
     const isPhysicalAttack = skill.id === BasicSkillId.Basic;
-    
+
     if (isPhysicalAttack && this.activeTraps.length > 0) {
       // Find a trap set by the opposing party
-      const trapIndex = this.activeTraps.findIndex(trap => trap.setterPartyId !== actorPartyId);
+      const trapIndex = this.activeTraps.findIndex(
+        (trap) => trap.setterPartyId !== actorPartyId,
+      );
       if (trapIndex !== -1) {
         const trap = this.activeTraps[trapIndex]!;
-        
+
         // Deal trap damage
         const trapDamageOutput = {
           damage: trap.damage,
@@ -366,15 +389,24 @@ export class Battle {
           isMagic: false,
           trueDamage: false, // Can be mitigated
         };
-        
+
         // Get the trap setter for damage attribution
-        const trapSetter = this.allParticipants.find(c => c.id === trap.setterId);
+        const trapSetter = this.allParticipants.find(
+          (c) => c.id === trap.setterId,
+        );
         const attackerId = trapSetter?.id || actor.id; // Use trap setter if found, else fallback
-        
-        const trapResult = resolveDamage(attackerId, actor.id, trapDamageOutput, this.location.id);
-        
-        Report.debug(`  Bear Trap triggered! ${actor.name.en} takes ${trapResult.actualDamage} pierce damage!`);
-        
+
+        const trapResult = resolveDamage(
+          attackerId,
+          actor.id,
+          trapDamageOutput,
+          this.location.id,
+        );
+
+        Report.debug(
+          `  Bear Trap triggered! ${actor.name.en} takes ${trapResult.actualDamage} pierce damage!`,
+        );
+
         // Remove the trap (only one trap triggers per attack)
         this.activeTraps.splice(trapIndex, 1);
       }
@@ -426,7 +458,7 @@ export class Battle {
       // Clear current battle ID after skill execution
       setCurrentBattleId(null);
     }
-      
+
     // Produce Resource
 
     for (const produce of skill.produce.elements) {
@@ -503,7 +535,11 @@ export class Battle {
     // Process loot and drops, return results for reporting
     let dropResults: ReturnType<typeof dropProcess> | null = null;
     if (battleType.allowLoot && battleStatus.winner && battleStatus.defeated) {
-      dropResults = dropProcess(battleStatus.winner, battleStatus.defeated, this.battleType);
+      dropResults = dropProcess(
+        battleStatus.winner,
+        battleStatus.defeated,
+        this.battleType,
+      );
     }
 
     if (!battleType.allowDeath) {
@@ -568,33 +604,33 @@ export class Battle {
       for (const skill of character.activeSkills) {
         const skillDef = skillRepository[skill.id];
         const expNeeded = getExpNeededForSkill(skill.level, skillDef.tier);
-          const expGained =
-            rollTwenty().total +
-            statMod(character.attribute.getStat("intelligence").total);
+        const expGained =
+          rollTwenty().total +
+          statMod(character.attribute.getStat("intelligence").total);
 
-          skill.exp += expGained;
-          if (skill.exp >= expNeeded) {
-            skill.exp -= expNeeded;
-            skill.level += 1;
-            const statTrackGain = Math.max(statMod(skill.level), 0) + 1;
-            gainStatTracker(character, statTrackGain);
-          }
+        skill.exp += expGained;
+        if (skill.exp >= expNeeded) {
+          skill.exp -= expNeeded;
+          skill.level += 1;
+          const statTrackGain = Math.max(statMod(skill.level), 0) + 1;
+          gainStatTracker(character, statTrackGain);
+        }
       }
 
       for (const skill of character.conditionalSkills) {
         const skillDef = skillRepository[skill.id];
         const expNeeded = getExpNeededForSkill(skill.level, skillDef.tier);
-          const expGained =
-            rollTwenty().total +
-            statMod(character.attribute.getStat("intelligence").total);
+        const expGained =
+          rollTwenty().total +
+          statMod(character.attribute.getStat("intelligence").total);
 
-          skill.exp += expGained;
-          if (skill.exp >= expNeeded) {
-            skill.exp -= expNeeded;
-            skill.level += 1;
-            const statTrackGain = Math.max(statMod(skill.level), 0) + 1;
-            gainStatTracker(character, statTrackGain);
-          }
+        skill.exp += expGained;
+        if (skill.exp >= expNeeded) {
+          skill.exp -= expNeeded;
+          skill.level += 1;
+          const statTrackGain = Math.max(statMod(skill.level), 0) + 1;
+          gainStatTracker(character, statTrackGain);
+        }
       }
 
       // 3. Train proficiency of the weapon they're wielding
@@ -704,7 +740,7 @@ export class Battle {
     // Build rewards for winning party
     if (winnerParty && dropResults) {
       const winningCharacters = winnerParty.getCharacters();
-      
+
       for (const character of winningCharacters) {
         // Find drop result for this character
         const dropResult = dropResults.winner.find(
@@ -715,7 +751,7 @@ export class Battle {
           characterId: character.id,
           characterName: character.name,
           expGained: winnerExp,
-          itemsLooted: (dropResult?.itemsGained || []).map(item => ({
+          itemsLooted: (dropResult?.itemsGained || []).map((item) => ({
             itemId: String(item.itemId),
             quantity: item.quantity,
           })),
@@ -726,7 +762,7 @@ export class Battle {
     // Build rewards for losing party (they get less exp, no items)
     if (defeatedParty) {
       const losingCharacters = defeatedParty.getCharacters();
-      
+
       for (const character of losingCharacters) {
         rewards[character.id] = {
           characterId: character.id,
@@ -768,7 +804,7 @@ function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
     speedMultiplier -= 0.5;
   }
 
-  abGaugeIncrement*=speedMultiplier;
+  abGaugeIncrement *= speedMultiplier;
 
   if (advancingPaceEntry) {
     abGaugeIncrement += roll(1).d(4).total;
@@ -808,25 +844,18 @@ function resolveBuffAndDebuff(actor: Character): {
       return { ableToTakesTurn, reason };
     }
 
-    if (
-      !buffsRepository[buffsOrDebuffs].resolver(actor) &&
-      ableToTakesTurn
-    ) {
+    if (!buffsRepository[buffsOrDebuffs].resolver(actor) && ableToTakesTurn) {
       ableToTakesTurn = false;
       reason = buffsOrDebuffs;
     }
   }
 
   for (const [debuffs, entry] of actor.buffsAndDebuffs.debuffs.entry) {
-
     if (entry.value === 0) {
       return { ableToTakesTurn, reason };
     }
 
-    if (
-      !debuffsRepository[debuffs].resolver(actor) &&
-      ableToTakesTurn
-    ) {
+    if (!debuffsRepository[debuffs].resolver(actor) && ableToTakesTurn) {
       ableToTakesTurn = false;
       reason = debuffs;
     }

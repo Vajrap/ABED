@@ -1,4 +1,4 @@
-import express, { type Request, type Response } from 'express';
+import express, { type Request, type Response } from "express";
 import { isBodyValid } from "../../Utils/isBodyValid";
 import Report from "../../Utils/Reporter";
 import { UserService, UserLoginSchema } from "../../Entity/User/index";
@@ -38,18 +38,24 @@ loginRoutes.post("/", async (req: Request, res: Response) => {
         userId: user.id,
         username: user.username,
       });
-      return res.json({ success: false, messageKey: "loginPage.invalidCredentials" });
+      return res.json({
+        success: false,
+        messageKey: "loginPage.invalidCredentials",
+      });
     }
 
     // Extract client information for session tracking
     const userAgent = req.headers["user-agent"] || "Unknown";
-    const ipAddress = req.headers["x-forwarded-for"] as string || req.headers["x-real-ip"] as string || "Unknown";
+    const ipAddress =
+      (req.headers["x-forwarded-for"] as string) ||
+      (req.headers["x-real-ip"] as string) ||
+      "Unknown";
 
     // Create new session (this will invalidate other sessions)
     const { session, token } = await SessionService.createSession(
       user.id,
       userAgent,
-      ipAddress
+      ipAddress,
     );
 
     // Check if user has a character (don't send character data, just a flag)

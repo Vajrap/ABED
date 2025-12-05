@@ -1,8 +1,8 @@
 export enum CharacterRoleEnum {
-  Tester = "Tester",
-  TesterCombo = "TesterCombo",
+  None = "None",
   Fighter = "Fighter",
   Cleric = "Cleric",
   Rogue = "Rogue",
   Mage = "Mage",
+  
 }

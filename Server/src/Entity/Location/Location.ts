@@ -644,15 +644,21 @@ function pairEncounterCandidates(candidates: Party[]): [Party, Party][] {
   return pairs;
 }
 
-// TODO:
 function resolveEncounters(pairs: [Party, Party][]): News[] {
   const news: News[] = [];
   for (const [a, b] of pairs) {
-    // Placeholder - replace with actual logic
-    // const result = checkAndTriggerEncounterEvent(a, b);
-    // if (result) news.push(result);
+    const result = checkAndTriggerEncounterEvent(a, b);
+    if (result) news.push(result);
   }
   return news;
+}
+
+// TODO:
+function checkAndTriggerEncounterEvent(partyA: Party, partyB: Party): News | null {
+  // What we need to do here is:
+  // 1. Check if the parties are hostile or neutral, there should be party type somewhere
+
+  return null;
 }
 
 function pushNewsToScope(result: NewsDistribution, news: News) {

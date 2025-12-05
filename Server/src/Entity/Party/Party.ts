@@ -118,7 +118,17 @@ export class Party {
 
   private setType() {
     // TODO party type logic taken all in the party and find common ground
-    this.behavior.type = PartyType.wanderer;
+    let targetType = PartyType.wanderer;
+    /*
+    Might need to consider these things:
+    - Character's Title? and add them into score.
+      title: CharacterTitle = new CharacterTitle();
+        possibleEpithets: CharacterEpithetEnum[] = [];
+        possibleRoles: CharacterRoleEnum[] = [];
+      
+    */
+
+    this.behavior.type = targetType;
   }
 
   isAllDead(): boolean {
