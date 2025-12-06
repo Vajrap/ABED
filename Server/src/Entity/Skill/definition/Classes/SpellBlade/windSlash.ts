@@ -1,5 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SpellBladeSkillId } from "../../../enums";
+import { SpellbladeSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../../../types";
@@ -10,7 +10,7 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
-import { SpellBladeSkill } from "./index";
+import { SpellbladeSkill } from "./index";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
@@ -18,8 +18,8 @@ import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 
-export const windSlash = new SpellBladeSkill({
-  id: SpellBladeSkillId.WindSlash,
+export const windSlash = new SpellbladeSkill({
+  id: SpellbladeSkillId.WindSlash,
   name: {
     en: "Wind Slash",
     th: "ฟันลม",

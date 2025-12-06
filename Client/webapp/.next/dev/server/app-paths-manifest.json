@@ -1,8 +1,7 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/test-login/route": "app/api/test-login/route.js",
-  "/api/test-register/route": "app/api/test-register/route.js",
   "/character-creation/page": "app/character-creation/page.js",
+  "/game/mock/page": "app/game/mock/page.js",
   "/game/page": "app/game/page.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",

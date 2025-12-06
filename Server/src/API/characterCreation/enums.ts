@@ -18,3 +18,27 @@ export enum PlayableBackgroundEnum {
   FolkHero = "FolkHero",
   CityGuard = "CityGuard",
 }
+
+export enum PlayableClassEnum {
+  Cleric = "Cleric",
+  Seer = "Seer",
+  Mage = "Mage",
+  Mystic = "Mystic",
+  Rogue = "Rogue",
+  Spellblade = "Spellblade",
+  Shaman = "Shaman",
+  Barbarian = "Barbarian",
+  Warrior = "Warrior",
+  Knight = "Knight",
+  Guardian = "Guardian",
+  Paladin = "Paladin",
+  Druid = "Druid",
+  Monk = "Monk",
+  Warlock = "Warlock",
+  Duelist = "Duelist",
+  Witch = "Witch",
+  Inquisitor = "Inquisitor",
+  Scholar = "Scholar",
+  Engineer = "Engineer",
+  Nomad = "Nomad",
+}

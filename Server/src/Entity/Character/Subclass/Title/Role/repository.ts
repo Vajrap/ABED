@@ -26,10 +26,16 @@ const role_mage = new Role(
     {en: "test", th: "test"},
 );
 
+const role_scholar = new Role(
+  CharacterRoleEnum.Scholar,
+    {en: "test", th: "test"},
+);
+
 export const roleRepository: Map<CharacterRoleEnum, Role> = new Map([
   [CharacterRoleEnum.None, role_none],
   [CharacterRoleEnum.Fighter, role_fighter],
   [CharacterRoleEnum.Cleric, role_cleric],
   [CharacterRoleEnum.Rogue, role_rogue],
   [CharacterRoleEnum.Mage, role_mage],
+  [CharacterRoleEnum.Scholar, role_scholar],
 ]);

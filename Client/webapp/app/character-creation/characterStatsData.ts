@@ -315,7 +315,7 @@ export const CLASS_STATS: Record<string, ClassStatData> = {
       leftHand: null,
     },
   },
-  SpellBlade: {
+  Spellblade: {
     proficiencies: proficienciesFromTiers({ three: "sword", two: "blade", one: "wand" }),
     startingSkills: ["WindSlash", "PlanarEdge"],
     startingEquipments: {
@@ -324,7 +324,7 @@ export const CLASS_STATS: Record<string, ClassStatData> = {
       leftHand: null,
     },
   },
-  spellBlade: {
+  spellblade: {
     proficiencies: proficienciesFromTiers({ three: "sword", two: "blade", one: "wand" }),
     startingSkills: ["WindSlash", "PlanarEdge"],
     startingEquipments: {

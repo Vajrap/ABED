@@ -1,3 +1,4 @@
+import { EquipmentId, ItemId } from "src/Entity/Item";
 import {
 	BodyId,
 	EarId,
@@ -18,30 +19,32 @@ import {
 	AttributeKey,
 } from "src/InterFacesEnumsAndTypes/Enums";
 
+import { CharacterRoleEnum } from "src/Entity/Character/Subclass/Title/Role/enum";
+import { CharacterEpithetEnum } from "src/Entity/Character/Subclass/Title/Epithet/enum";
+
 export type ClassBonus = {
 	proficiencies: ProficiencyBonus;
 	startingSkills: StartingSkills;
 	startingEquipments: StartingEquipments;
+	role: CharacterRoleEnum;
 };
 
+export type BackgroundBonus = {
+	artisans: ArtisanBonus;
+	startingItems: { item: ItemId; quantity: number }[];
+	epithet: CharacterEpithetEnum;
+	alignment: { good: number; evil: number };
+};
 
 export type ArtisanBonus = { three: ArtisanKey; two: ArtisanKey; one: ArtisanKey };
 export type ProficiencyBonus = { three: ProficiencyKey; two: ProficiencyKey; one: ProficiencyKey };
 export type AttributeBonus = { three: AttributeKey; two: AttributeKey; one: AttributeKey };
 
 export type StartingSkills = SkillId[];
-export type StartingEquipments = {
-	[CharacterEquipmentSlot.headWear]: HeadWearId | null;
-	[CharacterEquipmentSlot.body]: BodyId | null;
-	[CharacterEquipmentSlot.leg]: LegId | null;
-	[CharacterEquipmentSlot.hand]: HandId | null;
-	[CharacterEquipmentSlot.foot]: FootId | null;
-	[CharacterEquipmentSlot.util]: UtilId | null;
-	[CharacterEquipmentSlot.ringL]: RingId | null;
-	[CharacterEquipmentSlot.ringR]: RingId | null;
-	[CharacterEquipmentSlot.earL]: EarId | null;
-	[CharacterEquipmentSlot.earR]: EarId | null;
-	[CharacterEquipmentSlot.neck]: NeckId | null;
-	[CharacterEquipmentSlot.rightHand]: WeaponId | null;
-	[CharacterEquipmentSlot.leftHand]: WeaponId | null;
+
+type StartingEquipment = {
+  id: EquipmentId;
+  slot: CharacterEquipmentSlot;
 };
+
+export type StartingEquipments = StartingEquipment[];

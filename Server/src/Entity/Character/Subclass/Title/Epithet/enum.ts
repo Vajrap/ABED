@@ -6,6 +6,12 @@ export enum CharacterEpithetEnum {
   Scholar = "Scholar",
   Artisan = "Artisan",
   Soldier = "Soldier",
+  Noble = "Noble",
+  Adventurer = "Adventurer",
+  Criminal = "Criminal",
+  Hermit = "Hermit",
+  FolkHero = "FolkHero",
+  CityGuard = "CityGuard",
 
   // Kingdoms adj.
   OceanTide = 'OceanTide',

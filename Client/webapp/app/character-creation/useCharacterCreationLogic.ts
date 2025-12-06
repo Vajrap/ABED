@@ -3,29 +3,104 @@
 import { useState, useEffect } from "react";
 import type { LocalizedText } from "@/types/localization";
 import { characterService } from "@/services/characterService";
-import { L10N } from "@/localization";
-import { calculateCharacterStats, type CalculatedStats } from "./characterStatsData";
+import { L10N, getLocalizedText, getCurrentLanguage } from "@/localization";
+import { calculateCharacterStats, type CalculatedStats, RACE_STATS, CLASS_STATS, BACKGROUND_STATS } from "./characterStatsData";
 
-// Metadata types
-export interface RaceMetadata {
-  id: string;
-  name: string;
+// Helper function to get unique race IDs (handle case variations)
+export function getAvailableRaces(): Array<{ id: string; name: string }> {
+  const raceSet = new Set<string>();
+  const races: Array<{ id: string; name: string }> = [];
+  
+  Object.keys(RACE_STATS).forEach(key => {
+    // Use capitalized version as canonical ID
+    const canonicalId = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
+    if (!raceSet.has(canonicalId)) {
+      raceSet.add(canonicalId);
+      races.push({ id: canonicalId, name: canonicalId });
+    }
+  });
+  
+  return races.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export interface ClassMetadata {
-  id: string;
-  name: string;
+// Mapping from frontend display names to backend enum values
+// Backend enum uses "Spellblade" (non-capital B) for consistency
+const CLASS_ENUM_MAP: Record<string, string> = {
+  Cleric: "Cleric",
+  Seer: "Seer",
+  Mage: "Mage",
+  Mystic: "Mystic",
+  Rogue: "Rogue",
+  SpellBlade: "Spellblade", // Standardized to non-capital B
+  spellBlade: "Spellblade",
+  Spellblade: "Spellblade",
+  spellblade: "Spellblade",
+  Shaman: "Shaman",
+  Barbarian: "Barbarian",
+  Warrior: "Warrior",
+  Knight: "Knight",
+  Guardian: "Guardian",
+  Paladin: "Paladin",
+  Druid: "Druid",
+  Monk: "Monk",
+  Warlock: "Warlock",
+  Duelist: "Duelist",
+  Witch: "Witch",
+  Inquisitor: "Inquisitor",
+  Scholar: "Scholar",
+  Engineer: "Engineer",
+  Nomad: "Nomad",
+};
+
+// Helper function to normalize class name to backend enum format
+function normalizeToEnumValue(key: string): string {
+  // Check if we have a direct mapping
+  if (CLASS_ENUM_MAP[key]) {
+    return CLASS_ENUM_MAP[key];
+  }
+  
+  // Handle special case: Spellblade (non-capital B) for consistency
+  if (key.toLowerCase() === "spellblade") {
+    return "Spellblade";
+  }
+  
+  // For other classes, use standard capitalization
+  return key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
 }
 
-export interface BackgroundMetadata {
-  id: string;
-  name: string;
+// Helper function to get unique class IDs and map to backend enum values
+export function getAvailableClasses(): Array<{ id: string; name: string }> {
+  const classSet = new Set<string>();
+  const classes: Array<{ id: string; name: string }> = [];
+  
+  Object.keys(CLASS_STATS).forEach(key => {
+    // Normalize to backend enum value
+    const enumValue = normalizeToEnumValue(key);
+    
+    if (!classSet.has(enumValue)) {
+      classSet.add(enumValue);
+      // Use enum value as both id and display name (they match)
+      classes.push({ id: enumValue, name: enumValue });
+    }
+  });
+  
+  return classes.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export interface CharacterCreationMetadata {
-  races: RaceMetadata[];
-  classes: ClassMetadata[];
-  backgrounds: BackgroundMetadata[];
+// Helper function to get unique background IDs
+export function getAvailableBackgrounds(): Array<{ id: string; name: string }> {
+  const backgroundSet = new Set<string>();
+  const backgrounds: Array<{ id: string; name: string }> = [];
+  
+  Object.keys(BACKGROUND_STATS).forEach(key => {
+    const canonicalId = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
+    if (!backgroundSet.has(canonicalId)) {
+      backgroundSet.add(canonicalId);
+      backgrounds.push({ id: canonicalId, name: canonicalId });
+    }
+  });
+  
+  return backgrounds.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export interface CharacterCreationFormData {
@@ -37,19 +112,10 @@ export interface CharacterCreationFormData {
   background: string;
 }
 
-export interface CharacterStats {
-  attributes: Record<string, { base: number; bonus: number }>;
-  proficiencies: Record<string, { base: number; bonus: number }>;
-  artisans: Record<string, { base: number; bonus: number }>;
-  vitals: { maxHP: number; maxSP: number; maxMP: number; planarAptitude: number };
-}
-
 export interface CharacterCreationState {
   isLoading: boolean;
-  isFetchingMetadata: boolean;
-  error: string | LocalizedText | null;
+  error: string | null;
   nameCheckMessage: string | null;
-  metadata: CharacterCreationMetadata | null;
   stats: CalculatedStats | null;
   formData: CharacterCreationFormData;
   portraitIndex: number;
@@ -64,48 +130,33 @@ const getPortraits = (race: string, gender: "MALE" | "FEMALE"): string[] => {
   const raceKey = race.toLowerCase();
   
   // Generate portrait IDs based on race and gender
-  // This is a simplified version - you may want to fetch actual portraits from backend
   return [`${prefix}_${raceKey}01`, `${prefix}_${raceKey}02`, `${prefix}_${raceKey}03`];
 };
+
+// Default values
+const DEFAULT_RACE = "Human";
+const DEFAULT_CLASS = "Cleric";
+const DEFAULT_BACKGROUND = "Noble";
+const DEFAULT_GENDER: "MALE" | "FEMALE" = "MALE";
 
 export function useCharacterCreationLogic() {
   const [state, setState] = useState<CharacterCreationState>({
     isLoading: false,
-    isFetchingMetadata: true,
     error: null,
     nameCheckMessage: null,
-    metadata: null,
     stats: null,
     formData: {
       name: "",
-      gender: "MALE",
-      race: "",
-      portrait: "",
-      class: "",
-      background: "",
+      gender: DEFAULT_GENDER,
+      race: DEFAULT_RACE,
+      portrait: getPortraits(DEFAULT_RACE, DEFAULT_GENDER)[0] || "",
+      class: DEFAULT_CLASS,
+      background: DEFAULT_BACKGROUND,
     },
     portraitIndex: 0,
   });
 
-  // Fetch metadata on mount
-  useEffect(() => {
-    fetchMetadata();
-  }, []);
-
-  // Update portrait when race or gender changes
-  useEffect(() => {
-    if (state.formData.race) {
-      const portraits = getPortraits(state.formData.race, state.formData.gender);
-      if (portraits.length > 0) {
-        setState((prev) => ({
-          ...prev,
-          formData: { ...prev.formData, portrait: portraits[prev.portraitIndex % portraits.length] },
-        }));
-      }
-    }
-  }, [state.formData.race, state.formData.gender, state.portraitIndex]);
-
-  // Calculate stats locally when race, class, or background changes
+  // Calculate stats when race, class, or background changes
   useEffect(() => {
     if (state.formData.race && state.formData.class && state.formData.background) {
       const calculatedStats = calculateCharacterStats(
@@ -125,48 +176,18 @@ export function useCharacterCreationLogic() {
     }
   }, [state.formData.race, state.formData.class, state.formData.background]);
 
-  // Fetch available races, classes, and backgrounds
-  const fetchMetadata = async () => {
-    setState((prev) => ({ ...prev, isFetchingMetadata: true }));
-
-    try {
-      // Fetch metadata from backend API using characterService
-      const data = await characterService.getMetadata();
-
-      if (!data.success || !data.races || !data.classes || !data.backgrounds) {
-        throw new Error("Invalid metadata response");
+  // Update portrait when race or gender changes
+  useEffect(() => {
+    if (state.formData.race) {
+      const portraits = getPortraits(state.formData.race, state.formData.gender);
+      if (portraits.length > 0) {
+        setState((prev) => ({
+          ...prev,
+          formData: { ...prev.formData, portrait: portraits[prev.portraitIndex % portraits.length] },
+        }));
       }
-
-      const metadata: CharacterCreationMetadata = {
-        races: data.races,
-        classes: data.classes,
-        backgrounds: data.backgrounds,
-      };
-
-      setState((prev) => ({
-        ...prev,
-        metadata,
-        isFetchingMetadata: false,
-        // Set defaults once metadata is loaded
-        formData: prev.formData.race
-          ? prev.formData
-          : {
-              ...prev.formData,
-              race: metadata.races[0]?.id || "",
-              class: metadata.classes[0]?.id || "",
-              background: metadata.backgrounds[0]?.id || "",
-              portrait: getPortraits(metadata.races[0]?.id || "", prev.formData.gender)[0] || "",
-            },
-      }));
-    } catch (error) {
-      console.error("Failed to fetch character metadata:", error);
-      setState((prev) => ({
-        ...prev,
-        isFetchingMetadata: false,
-        error: "Failed to load character creation options",
-      }));
     }
-  };
+  }, [state.formData.race, state.formData.gender, state.portraitIndex]);
 
   // Update form field
   const updateField = <K extends keyof CharacterCreationFormData>(
@@ -205,69 +226,31 @@ export function useCharacterCreationLogic() {
     });
   };
 
-  // Validate form
-  const validateForm = (): boolean => {
-    const { name, race, class: classValue, background } = state.formData;
-
-    if (!name.trim()) {
-      setState((prev) => ({
-        ...prev,
-        error: L10N.characterCreation.nameRequired,
-      }));
-      return false;
-    }
-
-    if (!/^[a-zA-Z\u0E00-\u0E7F\s]+$/.test(name)) {
-      setState((prev) => ({
-        ...prev,
-        error: L10N.characterCreation.nameInvalidFormat,
-      }));
-      return false;
-    }
-
-    if (name.length > 20) {
-      setState((prev) => ({
-        ...prev,
-        error: L10N.characterCreation.nameMaxLength,
-      }));
-      return false;
-    }
-
-    if (name.trim().length < 3) {
-      setState((prev) => ({
-        ...prev,
-        error: L10N.characterCreation.nameMinLength,
-      }));
-      return false;
-    }
-
-    if (!race || !classValue || !background) {
-      setState((prev) => ({
-        ...prev,
-        error: "Please select race, class, and background",
-      }));
-      return false;
-    }
-
-    return true;
-  };
-
   // Create character
   const createCharacter = async (): Promise<boolean> => {
-    if (!validateForm()) {
+    // Validate name is provided
+    if (!state.formData.name.trim()) {
+      setState((prev) => ({
+        ...prev,
+        error: getLocalizedText(L10N.characterCreation.nameRequired, getCurrentLanguage()),
+      }));
       return false;
     }
 
     setState((prev) => ({ ...prev, isLoading: true, error: null, nameCheckMessage: null }));
 
     try {
+      // Map frontend class name to backend enum value
+      // Map frontend class name to backend enum value
+      const normalizedClass = normalizeToEnumValue(state.formData.class);
+      
       const requestData = {
         name: state.formData.name.trim(),
         gender: state.formData.gender,
         race: state.formData.race,
         portrait: state.formData.portrait,
         background: state.formData.background,
-        startingClass: state.formData.class, // Backend expects "startingClass"
+        startingClass: normalizedClass, // Use enum value for backend (e.g., "Spellblade")
       };
 
       const response = await characterService.createCharacter(requestData);
@@ -283,13 +266,13 @@ export function useCharacterCreationLogic() {
         ) {
           setState((prev) => ({
             ...prev,
-            nameCheckMessage: L10N.characterCreation.nameTaken,
+            nameCheckMessage: getLocalizedText(L10N.characterCreation.nameTaken, getCurrentLanguage()),
             isLoading: false,
           }));
         } else {
           setState((prev) => ({
             ...prev,
-            error: response.message || L10N.characterCreation.creationFailed,
+            error: getLocalizedText(L10N.characterCreation.creationFailed, getCurrentLanguage()),
             isLoading: false,
           }));
         }
@@ -298,24 +281,18 @@ export function useCharacterCreationLogic() {
     } catch (error) {
       setState((prev) => ({
         ...prev,
-        error: L10N.characterCreation.creationFailed,
+        error: getLocalizedText(L10N.characterCreation.creationFailed, getCurrentLanguage()),
         isLoading: false,
       }));
       return false;
     }
   };
 
-  // Check if form is valid
+  // Check if form is valid (only name is required)
   const isFormValid = (): boolean => {
-    const { name, race, class: classValue, background } = state.formData;
-    return (
-      name.trim().length >= 3 &&
-      name.trim().length <= 20 &&
-      /^[a-zA-Z\u0E00-\u0E7F\s]+$/.test(name) &&
-      !!race &&
-      !!classValue &&
-      !!background
-    );
+    return state.formData.name.trim().length >= 3 &&
+           state.formData.name.trim().length <= 20 &&
+           /^[a-zA-Z\u0E00-\u0E7F\s]+$/.test(state.formData.name);
   };
 
   // Get available portraits for current race/gender
@@ -331,6 +308,9 @@ export function useCharacterCreationLogic() {
     createCharacter,
     isFormValid,
     getAvailablePortraits,
+    // Available options from local data
+    availableRaces: getAvailableRaces(),
+    availableClasses: getAvailableClasses(),
+    availableBackgrounds: getAvailableBackgrounds(),
   };
 }
-

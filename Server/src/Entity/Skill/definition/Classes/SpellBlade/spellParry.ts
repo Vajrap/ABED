@@ -1,15 +1,15 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SpellBladeSkillId } from "../../../enums";
+import { SpellbladeSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { SpellBladeSkill } from "./index";
+import { SpellbladeSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
-export const spellParry = new SpellBladeSkill({
-  id: SpellBladeSkillId.SpellParry,
+export const spellParry = new SpellbladeSkill({
+  id: SpellbladeSkillId.SpellParry,
   name: {
     en: "Spell Parry",
     th: "ปัดเวท",

@@ -1,5 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SpellBladeSkillId } from "../../../enums";
+import { SpellbladeSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../../../types";
@@ -12,14 +12,14 @@ import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
-import { SpellBladeSkill } from "./index";
+import { SpellbladeSkill } from "./index";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
 
-export const edgeBurst = new SpellBladeSkill({
-  id: SpellBladeSkillId.EdgeBurst,
+export const edgeBurst = new SpellbladeSkill({
+  id: SpellbladeSkillId.EdgeBurst,
   name: {
     en: "Edge Burst",
     th: "ระเบิดขอบ",

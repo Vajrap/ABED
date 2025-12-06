@@ -3,8 +3,8 @@ import { ClassEnum } from "src/InterFacesEnumsAndTypes/Enums";
 
 type SkillConfig = ConstructorParameters<typeof Skill>[0];
 
-export class SpellBladeSkill extends Skill {
+export class SpellbladeSkill extends Skill {
   constructor(data: SkillConfig) {
-    super({ ...data, class: ClassEnum.SpellBlade });
+    super({ ...data, class: ClassEnum.Spellblade });
   }
 }

@@ -13,3 +13,9 @@ export type { ActionScheduleModalProps } from "./ActionScheduleModal";
 export { ActionSelectionModal } from "./ActionSelectionModal";
 export type { ActionSelectionModalProps } from "./ActionSelectionModal";
 
+export { EquipmentSlot } from "./EquipmentSlot";
+export type { EquipmentSlotProps } from "./EquipmentSlot";
+
+export { CharacterStatsModal } from "./CharacterStatsModal";
+export type { CharacterStatsModalProps } from "./CharacterStatsModal";
+

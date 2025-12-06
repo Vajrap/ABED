@@ -16,7 +16,7 @@ This document analyzes the balance of all classes at character creation, examini
 
 | Skills | Classes | Details |
 |--------|---------|---------|
-| **1 skill** | 8 classes | Cleric, Mystic, SpellBlade, Knight, Paladin, Druid, Warlock, Inquisitor, Scholar |
+| **1 skill** | 8 classes | Cleric, Mystic, Spellblade, Knight, Paladin, Druid, Warlock, Inquisitor, Scholar |
 | **2 skills** | 11 classes | Seer, Mage, Rogue, Shaman, Barbarian, Warrior, Monk, Duelist, Witch, Engineer, Nomad |
 | **3 skills** | 1 class | Guardian |
 
@@ -29,7 +29,7 @@ This document analyzes the balance of all classes at character creation, examini
 | **Mage** | 2 | ArcaneBolt (common), FireBolt (common) |
 | **Mystic** | 1 | MistStep (common) |
 | **Rogue** | 2 | ThrowingKnives (common), RetreatDash (common) |
-| **SpellBlade** | 1 | PlanarEdge (common) |
+| **Spellblade** | 1 | PlanarEdge (common) |
 | **Shaman** | 2 | HexOfRot (common), HolyRattle (common) |
 | **Barbarian** | 2 | Rage (common), RecklessSwing (common) |
 | **Warrior** | 2 | PowerStrike (common), Cleave (common) |
@@ -68,7 +68,7 @@ Classes with uncommon skills:
 |------------|---------|-------|
 | **MageRobe** | Seer, Mage, Mystic, Warlock, Witch, Inquisitor, Scholar | 7 |
 | **Robe** | Cleric, Shaman | 2 |
-| **LeatherArmor** | Rogue, SpellBlade, Duelist, Engineer, Nomad | 5 |
+| **LeatherArmor** | Rogue, Spellblade, Duelist, Engineer, Nomad | 5 |
 | **PaddedArmor** | Warrior | 1 |
 | **ChainShirt** | Knight, Guardian | 2 |
 | **StuddedLeatherArmor** | Paladin | 1 |
@@ -83,7 +83,7 @@ Classes with uncommon skills:
 | **Orb** | Seer, Mystic, Warlock | 3 |
 | **Wand** | Mage, Witch | 2 |
 | **Dagger** | Rogue | 1 |
-| **Sword** | SpellBlade, Duelist | 2 |
+| **Sword** | Spellblade, Duelist | 2 |
 | **Blade** | Warrior, Nomad | 2 |
 | **Axe** | Barbarian | 1 |
 | **Spear** | Knight | 1 |
@@ -137,7 +137,7 @@ Classes with uncommon skills:
    - If not, consider reducing to 2 skills or giving other classes more options
 
 2. **Consider Single-Skill Classes**
-   - Classes with only 1 skill: Cleric, Mystic, SpellBlade, Knight, Paladin, Druid, Warlock, Inquisitor, Scholar
+   - Classes with only 1 skill: Cleric, Mystic, Spellblade, Knight, Paladin, Druid, Warlock, Inquisitor, Scholar
    - Evaluate if they need a second starting skill for better early-game experience
 
 ### Medium Priority

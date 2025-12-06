@@ -106,7 +106,8 @@ fi
 
 # Start backend services
 print_status "Starting backend services with Docker..."
-docker-compose up postgres loki promtail grafana -d
+docker-compose up postgres -d
+# docker-compose up postgres loki promtail grafana -d  # Commented out: not using monitoring services for now
 
 # Wait for PostgreSQL to be ready
 print_status "Waiting for PostgreSQL to be ready..."
@@ -173,8 +174,8 @@ echo -e "${GREEN}📊 Service Status:${NC}"
 echo "  🎯 Frontend:  http://localhost:3016 (John 3:16!)"
 echo "  🚀 Backend:   http://localhost:7890"
 echo "  🗄️  Database:  localhost:40316 (John 3:16!)"
-echo "  📈 Grafana:   http://localhost:3000"
-echo "  📋 Loki:      http://localhost:3100"
+# echo "  📈 Grafana:   http://localhost:3000"  # Commented out: not using for now
+# echo "  📋 Loki:      http://localhost:3100"  # Commented out: not using for now
 echo ""
 echo -e "${BLUE}🎮 Ready to develop ABED!${NC}"
 echo "  • Login page with authentication"

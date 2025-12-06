@@ -4,5 +4,5 @@ export enum CharacterRoleEnum {
   Cleric = "Cleric",
   Rogue = "Rogue",
   Mage = "Mage",
-  
+  Scholar = "Scholar",
 }

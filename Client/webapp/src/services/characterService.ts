@@ -15,7 +15,7 @@ class CharacterService {
 
   async createCharacter(characterData: CharacterCreationRequest): Promise<CharacterCreationResponse> {
     try {
-      const response = await restHandler.post<CharacterCreationRequest, CharacterResponse>("/api/character/create", characterData, true);
+      const response = await restHandler.post<CharacterCreationRequest, CharacterResponse>("/api/characterCreation/create", characterData, true);
 
       return response;
     } catch (error) {

@@ -15,7 +15,7 @@ import {
   ScholarSkillId,
   ShamanSkillId,
   SkillId,
-  SpellBladeSkillId,
+  SpellbladeSkillId,
   WarriorSkillId,
   WitchSkillId,
   WarlockSkillId,
@@ -66,10 +66,10 @@ import { mistStep } from "./definition/Classes/Mystic/mistStep";
 import { planarAbsorption } from "./definition/Classes/Mystic/planarAbsorption";
 import { innerVeil } from "./definition/Classes/Mystic/innerVeil";
 import { reversalPalm } from "./definition/Classes/Mystic/reversalPalm";
-import { planarEdge } from "./definition/Classes/SpellBlade/planarEdge";
-import { windSlash } from "./definition/Classes/SpellBlade/windSlash";
-import { spellParry } from "./definition/Classes/SpellBlade/spellParry";
-import { edgeBurst } from "./definition/Classes/SpellBlade/edgeBurst";
+import { planarEdge } from "./definition/Classes/Spellblade/planarEdge";
+import { windSlash } from "./definition/Classes/Spellblade/windSlash";
+import { spellParry } from "./definition/Classes/Spellblade/spellParry";
+import { edgeBurst } from "./definition/Classes/Spellblade/edgeBurst";
 import { rage } from "./definition/Classes/Barbarian/rage";
 import { recklessSwing } from "./definition/Classes/Barbarian/recklessSwing";
 import { earthshatter } from "./definition/Classes/Barbarian/earthshatter";
@@ -151,10 +151,10 @@ export const skillRepository: Record<SkillId, Skill> = {
   [MysticSkillId.PlanarAbsorption]: planarAbsorption,
   [MysticSkillId.InnerVeil]: innerVeil,
   [MysticSkillId.ReversalPalm]: reversalPalm,
-  [SpellBladeSkillId.PlanarEdge]: planarEdge,
-  [SpellBladeSkillId.WindSlash]: windSlash,
-  [SpellBladeSkillId.SpellParry]: spellParry,
-  [SpellBladeSkillId.EdgeBurst]: edgeBurst,
+  [SpellbladeSkillId.PlanarEdge]: planarEdge,
+  [SpellbladeSkillId.WindSlash]: windSlash,
+  [SpellbladeSkillId.SpellParry]: spellParry,
+  [SpellbladeSkillId.EdgeBurst]: edgeBurst,
   [BarbarianSkillId.Rage]: rage,
   [BarbarianSkillId.RecklessSwing]: recklessSwing,
   [BarbarianSkillId.Earthshatter]: earthshatter,

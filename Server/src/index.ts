@@ -8,47 +8,14 @@ if (typeof Bun !== 'undefined' && typeof (Bun as any).randomUUIDv7 !== 'function
 import { Game } from "./Game";
 import Report from "./Utils/Reporter";
 import { initializeDatabase, shutdownDatabase } from "./Database/init";
-import { apiRoutes } from "./API";
+import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
 import dotenv from "dotenv";
-import express from 'express';
-import cors from 'cors';
+import { characterCreationRoutes } from "./API/characterCreation";
+import { loginRoutes } from "./API/login";
+import { registerRoutes } from "./API/register";
 
 dotenv.config();
-
-export const app = express();
-
-// CORS configuration
-app.use(cors({
-  origin: function(_, callback){callback(null, true)},
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
-  optionsSuccessStatus: 204
-}));
-
-// Body parsing middleware
-app.use(express.json());
-
-// Request logging middleware
-app.use((req, res, next) => {
-  Report.debug("Incoming request", {
-    method: req.method,
-    url: req.url,
-    ip: req.ip,
-  });
-  next();
-});
-
-// API routes
-app.use('/api', apiRoutes);
-
-// Error handling middleware
-app.use((err: any, req: any, res: any, next: any) => {
-  Report.error("Unhandled error in request pipeline", {
-    error: err,
-    path: req?.url,
-  });
-  res.status(500).json({ error: 'Internal Server Error' });
-});
 
 const PORT = process.env.PORT || 7890;
 
@@ -60,20 +27,62 @@ async function startServer() {
     const game = new Game();
     await game.start();
 
-    // Start the server
-    const server = app.listen(PORT, () => {
-      Report.info(`Server running on port ${PORT}`);
-      Report.info("🎉 Server startup completed successfully");
-      Report.info(`🚀 Server is running on http://localhost:${PORT}`);
-    });
+    // Create Elysia app with /api prefix
+    const app = new Elysia()
+      .use(
+        cors({
+          origin: true,
+          methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+          credentials: true,
+        })
+      )
+      // Request logging middleware
+      .onBeforeHandle(({ request, set }) => {
+        Report.debug("Incoming request", {
+          method: request.method,
+          url: request.url,
+        });
+      })
+      // Health check route
+      .get("/api/health", () => {
+        return { status: "ok", message: "Server is running" };
+      })
+      // Mount API routes under /api prefix
+      .group("/api", (app) => 
+        app
+          .use(loginRoutes)
+          .use(registerRoutes)
+          .use(characterCreationRoutes)
+      )
+      // Global error handler
+      .onError(({ code, error, set }) => {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        Report.error("Unhandled error in request pipeline", {
+          error: errorMessage,
+          code,
+          stack: errorStack,
+        });
+        set.status = 500;
+        return { error: 'Internal Server Error' };
+      })
+      .listen(PORT, () => {
+        Report.info(`🚀 Elysia server running on port ${PORT}`);
+        Report.info("🎉 Server startup completed successfully");
+        Report.info(`🚀 Server is running on http://localhost:${PORT}`);
+      });
 
     // Handle graceful shutdown
     process.on('SIGINT', async () => {
       Report.info('🛑 Shutting down server...');
-      server.close(async () => {
-        await shutdownDatabase();
-        process.exit(0);
-      });
+      await shutdownDatabase();
+      process.exit(0);
+    });
+
+    process.on('SIGTERM', async () => {
+      Report.info('🛑 Shutting down server...');
+      await shutdownDatabase();
+      process.exit(0);
     });
 
   } catch (error) {

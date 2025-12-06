@@ -127,6 +127,25 @@ const BackButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const CreateAccountButton = styled(Button)(({ theme }) => ({
+  background: theme.palette.primary.main, // Solid purple background
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText, // White text for contrast
+  fontWeight: 600,
+  "&:hover:not(:disabled)": {
+    background: theme.palette.primary.dark, // Darker purple on hover
+    backgroundColor: theme.palette.primary.dark,
+    transform: "translateY(-2px)",
+    boxShadow: `0 6px 12px ${theme.palette.primary.main}40`,
+  },
+  "&:disabled": {
+    background: theme.palette.grey[300],
+    backgroundColor: theme.palette.grey[300],
+    color: theme.palette.grey[600],
+    opacity: 0.7,
+  },
+}));
+
 export default function RegisterView() {
   const router = useRouter();
   const registerLogic = useRegisterLogic();
@@ -434,7 +453,7 @@ export default function RegisterView() {
               </FormBox>
 
               <ButtonGroup>
-                <Button
+                <CreateAccountButton
                   variant="contained"
                   size="large"
                   fullWidth
@@ -452,20 +471,12 @@ export default function RegisterView() {
                   sx={{
                     py: 1.5,
                     fontSize: "1.1rem",
-                    fontWeight: 600,
-                    background:
-                      "linear-gradient(135deg, var(--color-mystical-violet), var(--color-spark-blue))",
-                    "&:hover": {
-                      background:
-                        "linear-gradient(135deg, var(--color-mystical-violet), var(--color-spark-blue))",
-                      transform: "translateY(-2px)",
-                    },
                   }}
                 >
                   {registerLogic.isLoading
                     ? "Creating Account..."
                     : t(L10N.registerPage.registerButton)}
-                </Button>
+                </CreateAccountButton>
 
                 <BackButton
                   variant="outlined"

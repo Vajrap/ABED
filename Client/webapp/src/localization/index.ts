@@ -898,7 +898,7 @@ Thank you for joining the ABED community. May your adventures be legendary!`,
         description: { en: "A stealthy character skilled in stealth and precision", th: "ตัวละครลับๆ ล่อๆ ที่เชี่ยวชาญในการซ่อนตัวและความแม่นยำ" },
       },
       spellblade: {
-        name: { en: "SpellBlade", th: "ดาบเวทย์" },
+        name: { en: "Spellblade", th: "ดาบเวทย์" },
         description: { en: "A warrior who wields both blade and magic", th: "นักรบผู้ใช้ทั้งดาบและเวทมนตร์" },
       },
       shaman: {

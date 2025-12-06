@@ -7,7 +7,7 @@ export type SkillId =
   | MageSkillId
   | MysticSkillId
   | RogueSkillId
-  | SpellBladeSkillId
+  | SpellbladeSkillId
   | ShamanSkillId
   | BarbarianSkillId
   | WarriorSkillId
@@ -149,7 +149,7 @@ export enum RogueSkillId {
   // at level 5, base DC = 8, front row penalty = 3
 }
 
-export enum SpellBladeSkillId {
+export enum SpellbladeSkillId {
   PlanarEdge = "PlanarEdge",
   // Cantrip, auto attack, core idea for spell blade
   // Dealing arcane damage, melee (see positionModifier)

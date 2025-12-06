@@ -31,7 +31,7 @@
 - [ ] Page loads correctly
 - [ ] **Metadata loads** - Should fetch races, classes, and backgrounds from `/api/character/metadata`
 - [ ] **All 6 races display** - Human, Elven, Orc, Dwarf, Halfling, Vulpine
-- [ ] **All 20 classes display** - Cleric, Seer, Mage, Mystic, Rogue, SpellBlade, Shaman, Barbarian, Warrior, Knight, Guardian, Paladin, Druid, Monk, Warlock, Duelist, Witch, Inquisitor, Scholar, Engineer, Nomad
+- [ ] **All 20 classes display** - Cleric, Seer, Mage, Mystic, Rogue, Spellblade, Shaman, Barbarian, Warrior, Knight, Guardian, Paladin, Druid, Monk, Warlock, Duelist, Witch, Inquisitor, Scholar, Engineer, Nomad
 - [ ] All 6 backgrounds display - Retainer, Peasant, Merchant, Scholar, Artisan, Soldier
 - [ ] Name field validation works (min 3, max 20, English/Thai only)
 - [ ] Gender selection works (Male/Female)

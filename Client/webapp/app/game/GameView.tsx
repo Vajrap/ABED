@@ -8,15 +8,22 @@ import {
   PartyMemberCard,
 } from "@/components/GameView";
 import { ActionScheduleModal } from "@/components/GameView/ActionScheduleModal";
+import { CharacterStatsModal } from "@/components/GameView/CharacterStatsModal";
+import { MockPartyMember } from "@/data/mockPartyData";
 
-export default function GameView() {
+interface GameViewProps {
+  mockPartyData?: MockPartyMember[]; // Optional mock data for UI development
+}
+
+export default function GameView({ mockPartyData }: GameViewProps = {} as GameViewProps) {
   const theme = useTheme();
   const router = useRouter();
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(0);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
 
-  // Mock party data (will be fetched from API later)
-  const mockParty = [
+  // Use provided mock data, or default mock data, or will be fetched from API later
+  const mockParty = mockPartyData || [
     { name: "Hero", level: 5, portrait: null, isPlayer: true },
     { name: "Warrior", level: 4, portrait: null, isPlayer: false },
     { name: "Mage", level: 3, portrait: null, isPlayer: false },
@@ -28,6 +35,16 @@ export default function GameView() {
   const handleScheduleSave = (schedule: Record<string, string>) => {
     console.log("Schedule saved:", schedule);
     // TODO: Send schedule to backend
+  };
+
+  const handleTravelClick = () => {
+    console.log("Travel clicked - open travel planning modal");
+    // TODO: Open travel planning modal
+  };
+
+  const handleRailTravelClick = () => {
+    console.log("Rail travel clicked - open rail travel modal");
+    // TODO: Open rail travel modal
   };
 
   const handleLogout = () => {
@@ -58,11 +75,10 @@ export default function GameView() {
         {/* Left: Sidebar */}
         <GameSidebar
           onScheduleClick={() => setScheduleModalOpen(true)}
-          onStatsClick={() => console.log("Stats clicked")}
+          onStatsClick={() => setStatsModalOpen(true)}
           onSkillsClick={() => console.log("Skills clicked")}
           onInventoryClick={() => console.log("Inventory clicked")}
           onNewsClick={() => console.log("News clicked")}
-          onTravelClick={() => console.log("Travel clicked")}
           onSettingsClick={() => console.log("Settings clicked")}
           onLogoutClick={handleLogout}
         />
@@ -125,6 +141,16 @@ export default function GameView() {
         open={scheduleModalOpen}
         onClose={() => setScheduleModalOpen(false)}
         onSave={handleScheduleSave}
+        onTravelClick={handleTravelClick}
+        onRailTravelClick={handleRailTravelClick}
+        hasRailStation={true} // TODO: Get from party/location data - for now, leave active
+      />
+
+      {/* Character Stats Modal */}
+      <CharacterStatsModal
+        open={statsModalOpen}
+        onClose={() => setStatsModalOpen(false)}
+        character={mockParty[selectedMemberIndex] || null}
       />
     </Box>
   );

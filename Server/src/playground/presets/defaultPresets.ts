@@ -58,7 +58,7 @@ export const defaultPresets: PresetInfo[] = [
   {
     id: 'magic-hybrid-party',
     name: 'Magic & Hybrid Focus',
-    description: 'Party C from playground: Mage, Warlock, Witch, Inquisitor, SpellBlade, Mystic',
+    description: 'Party C from playground: Mage, Warlock, Witch, Inquisitor, Spellblade, Mystic',
     isDefault: true,
     partyA: [
       { type: 'mob', mobId: MOBEnum.goblinCaptain, level: 3, name: { en: 'Goblin Captain', th: 'ก๊อปลินกัปตัน' }, position: 0 },
@@ -70,7 +70,7 @@ export const defaultPresets: PresetInfo[] = [
       { type: 'custom', race: RaceEnum.Human, class: ClassEnum.Warlock, level: 3, name: { en: 'Human Warlock', th: 'วาร์ล็อคมนุษย์' }, position: 1 },
       { type: 'custom', race: RaceEnum.Elven, class: ClassEnum.Witch, level: 3, name: { en: 'Elven Witch', th: 'แม่มดเอลฟ์' }, position: 2 },
       { type: 'custom', race: RaceEnum.Human, class: ClassEnum.Inquisitor, level: 3, name: { en: 'Human Inquisitor', th: 'นักสืบมนุษย์' }, position: 3 },
-      { type: 'custom', race: RaceEnum.Elven, class: ClassEnum.SpellBlade, level: 3, name: { en: 'Elven SpellBlade', th: 'ดาบเวทย์เอลฟ์' }, position: 4 },
+      { type: 'custom', race: RaceEnum.Elven, class: ClassEnum.Spellblade, level: 3, name: { en: 'Elven Spellblade', th: 'ดาบเวทย์เอลฟ์' }, position: 4 },
       { type: 'custom', race: RaceEnum.Halfling, class: ClassEnum.Mystic, level: 3, name: { en: 'Halfling Mystic', th: 'นักลึกลับฮาล์ฟลิ่ง' }, position: 5 },
     ],
     location: LocationsEnum.WaywardInn,

@@ -1381,7 +1381,7 @@ Thank you for joining the ABED community. May your adventures be legendary!`,
             },
             spellblade: {
                 name: {
-                    en: "SpellBlade",
+                    en: "Spellblade",
                     th: "ดาบเวทย์"
                 },
                 description: {
@@ -1812,7 +1812,8 @@ _c5 = CustomSwitch;
 const LanguageSwitcher = ()=>{
     _s();
     const [isExpanded, setIsExpanded] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const [currentLang, setCurrentLang] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$localization$2f$index$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCurrentLanguage"])());
+    const [currentLang, setCurrentLang] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("en"); // Default to "en" for SSR hydration
+    const [isMounted, setIsMounted] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [, setForceUpdate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
     // Force re-render when language changes to update all components
     const handleLanguageChange = (newLanguage)=>{
@@ -1820,18 +1821,24 @@ const LanguageSwitcher = ()=>{
         setCurrentLang(newLanguage);
         setForceUpdate((prev)=>prev + 1);
         // Trigger a custom event that other components can listen to
-        window.dispatchEvent(new CustomEvent("languageChanged", {
-            detail: newLanguage
-        }));
-        // Store preference in localStorage
-        localStorage.setItem("preferred-language", newLanguage);
+        if ("TURBOPACK compile-time truthy", 1) {
+            window.dispatchEvent(new CustomEvent("languageChanged", {
+                detail: newLanguage
+            }));
+            // Store preference in localStorage
+            localStorage.setItem("preferred-language", newLanguage);
+        }
     };
-    // Load saved language preference on mount
+    // Load saved language preference on mount (client-side only)
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "LanguageSwitcher.useEffect": ()=>{
+            setIsMounted(true);
             const savedLanguage = localStorage.getItem("preferred-language");
             if (savedLanguage && (savedLanguage === "en" || savedLanguage === "th")) {
                 handleLanguageChange(savedLanguage);
+            } else {
+                // Initialize with default if no saved preference
+                setCurrentLang((0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$localization$2f$index$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getCurrentLanguage"])());
             }
         }
     }["LanguageSwitcher.useEffect"], []);
@@ -1848,6 +1855,10 @@ const LanguageSwitcher = ()=>{
     const getLanguageFlag = (lang)=>{
         return lang === "en" ? "🇺🇸" : "🇹🇭";
     };
+    // Don't render until mounted to avoid hydration mismatch
+    if (!isMounted) {
+        return null;
+    }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(FloatingLanguageSwitcher, {
         elevation: 8,
         children: !isExpanded ? // Compact view
@@ -1867,22 +1878,22 @@ const LanguageSwitcher = ()=>{
                     },
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$Language$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                        lineNumber: 207,
+                        lineNumber: 218,
                         columnNumber: 15
                     }, ("TURBOPACK compile-time value", void 0))
                 }, void 0, false, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                    lineNumber: 196,
+                    lineNumber: 207,
                     columnNumber: 13
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                lineNumber: 192,
+                lineNumber: 203,
                 columnNumber: 11
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-            lineNumber: 191,
+            lineNumber: 202,
             columnNumber: 9
         }, ("TURBOPACK compile-time value", void 0)) : // Expanded view
         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Fade$2f$Fade$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Fade$3e$__["Fade"], {
@@ -1906,7 +1917,7 @@ const LanguageSwitcher = ()=>{
                                         fontSize: "small"
                                     }, void 0, false, {
                                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                        lineNumber: 223,
+                                        lineNumber: 234,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1916,13 +1927,13 @@ const LanguageSwitcher = ()=>{
                                         children: "Language"
                                     }, void 0, false, {
                                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                        lineNumber: 224,
+                                        lineNumber: 235,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                lineNumber: 222,
+                                lineNumber: 233,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$IconButton$2f$IconButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconButton$3e$__["IconButton"], {
@@ -1933,18 +1944,18 @@ const LanguageSwitcher = ()=>{
                                 },
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$Language$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                    lineNumber: 237,
+                                    lineNumber: 248,
                                     columnNumber: 17
                                 }, ("TURBOPACK compile-time value", void 0))
                             }, void 0, false, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                lineNumber: 232,
+                                lineNumber: 243,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                        lineNumber: 216,
+                        lineNumber: 227,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LanguageToggle, {
@@ -1965,7 +1976,7 @@ const LanguageSwitcher = ()=>{
                                             children: getLanguageFlag("en")
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                            lineNumber: 245,
+                                            lineNumber: 256,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LanguageLabel, {
@@ -1977,13 +1988,13 @@ const LanguageSwitcher = ()=>{
                                             children: "EN"
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                            lineNumber: 252,
+                                            lineNumber: 263,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                    lineNumber: 244,
+                                    lineNumber: 255,
                                     columnNumber: 17
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(CustomSwitch, {
@@ -1992,7 +2003,7 @@ const LanguageSwitcher = ()=>{
                                     size: "small"
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                    lineNumber: 266,
+                                    lineNumber: 277,
                                     columnNumber: 17
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2007,7 +2018,7 @@ const LanguageSwitcher = ()=>{
                                             children: getLanguageFlag("th")
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                            lineNumber: 273,
+                                            lineNumber: 284,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LanguageLabel, {
@@ -2019,24 +2030,24 @@ const LanguageSwitcher = ()=>{
                                             children: "TH"
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                            lineNumber: 280,
+                                            lineNumber: 291,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                                    lineNumber: 272,
+                                    lineNumber: 283,
                                     columnNumber: 17
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                            lineNumber: 243,
+                            lineNumber: 254,
                             columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                        lineNumber: 242,
+                        lineNumber: 253,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2048,32 +2059,32 @@ const LanguageSwitcher = ()=>{
                             children: getLanguageDisplayName(currentLang)
                         }, void 0, false, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                            lineNumber: 298,
+                            lineNumber: 309,
                             columnNumber: 15
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                        lineNumber: 297,
+                        lineNumber: 308,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-                lineNumber: 214,
+                lineNumber: 225,
                 columnNumber: 11
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-            lineNumber: 213,
+            lineNumber: 224,
             columnNumber: 9
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx",
-        lineNumber: 188,
+        lineNumber: 199,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
-_s(LanguageSwitcher, "juaZaHh68VC8Rlv/W8cwmmLXrBU=");
+_s(LanguageSwitcher, "mKioQMs4DS5lPs+Cmelg1uiMMtw=");
 _c6 = LanguageSwitcher;
 const __TURBOPACK__default__export__ = LanguageSwitcher;
 var _c, _c1, _c2, _c3, _c4, _c5, _c6;

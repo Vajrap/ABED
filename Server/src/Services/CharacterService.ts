@@ -1,10 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "../Database/connection";
 import { characters, type InsertCharacter } from "../Database/Schema";
-import { RACES, type RaceKey } from "../Game/CharacterCreation/Races";
-import { CLASSES, type ClassKey } from "../Game/CharacterCreation/Classes";
-import { BACKGROUNDS, type BackgroundKey } from "../Game/CharacterCreation/Backgrounds";
-import { ATTRIBUTE_KEYS, CharacterType, PROFICIENCY_KEYS, ARTISAN_KEYS } from "../InterFacesEnumsAndTypes/Enums";
+import { CharacterType,RaceEnum } from "../InterFacesEnumsAndTypes/Enums";
 import { Character } from "../Entity/Character/Character";
 import { CharacterAlignment } from "../Entity/Character/Subclass/Alignment/CharacterAlignment";
 import { CharacterArtisans } from "../Entity/Character/Subclass/Stats/CharacterArtisans";
@@ -22,14 +19,21 @@ import { PartyService } from "./PartyService";
 import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import { partyManager } from "../Game/PartyManager";
 import { characterManager } from "../Game/CharacterManager";
+import { PlayableBackgroundEnum, PlayableClassEnum, PlayableRaceEnum } from "src/API/characterCreation/enums";
+import { classBonus } from "src/API/characterCreation/classes";
+import { backgroundBonus } from "src/API/characterCreation/background";
+import { racesBonus } from "src/API/characterCreation/races";
+import { equip } from "src/Utils/equip";
+import { activeEpithet } from "src/Entity/Character/Subclass/Title/logics/active";
+import { activeRole } from "src/Entity/Character/Subclass/Title/logics/active";
 
 export interface CharacterCreationData {
   name: string;
   gender: "MALE" | "FEMALE" | "NONE";
-  race: RaceKey;
+  race: PlayableRaceEnum;
   portrait: string; // e.g., "m_human01"
-  background: BackgroundKey;
-  startingClass: ClassKey;
+  background: PlayableBackgroundEnum;
+  startingClass: PlayableClassEnum;
 }
 
 export class CharacterService {
@@ -141,29 +145,14 @@ export class CharacterService {
     userId: string,
     characterData: CharacterCreationData
   ): Character {
-    // Validate inputs
-    if (!RACES[characterData.race]) {
-      throw new Error(`Invalid race: ${characterData.race}`);
-    }
-    if (!CLASSES[characterData.startingClass]) {
-      throw new Error(`Invalid class: ${characterData.startingClass}`);
-    }
-    if (!BACKGROUNDS[characterData.background]) {
-      throw new Error(`Invalid background: ${characterData.background}`);
-    }
+    // TODO: Update CharacterService.createCharacter to use new enum-based structures
+    // The old RACES/CLASSES/BACKGROUNDS structures have been removed
+    // Need to refactor to use racesBonus, classBonus, backgroundBonus from API/characterCreation    
+    const raceDef = racesBonus[characterData.race];
+    const classDef = classBonus[characterData.startingClass];
+    const backgroundDef = backgroundBonus[characterData.background];
 
-    // Get race, class, and background definitions
-    const raceDef = RACES[characterData.race];
-    const classDef = CLASSES[characterData.startingClass];
-    const backgroundDef = BACKGROUNDS[characterData.background];
-
-    if (!raceDef || !classDef || !backgroundDef) {
-      throw new Error("Invalid race, class, or background definition");
-    }
-
-    // Create character data (matching Character entity structure)
-    const newCharacter = new Character({
-      // random uuid as string
+    const character = new Character({
       id: randomUUID(),
       name: { en: characterData.name, th: characterData.name },
       type: CharacterType.humanoid,
@@ -173,8 +162,6 @@ export class CharacterService {
       background: characterData.background,
 
       alignment: new CharacterAlignment({}),
-
-      // Character systems
       artisans: new CharacterArtisans(),
       attribute: new CharacterAttributes(),
       proficiencies: new CharacterProficiencies(),
@@ -186,51 +173,62 @@ export class CharacterService {
       vitals: new CharacterVitals({}),
       fame: new CharacterFame(),
       actionSequence: defaultActionSequence(),
-    })
+    });
 
-    newCharacter.userId = userId;
+    character.userId = userId;
 
     // Race
-    newCharacter.race = raceDef.name;
-    newCharacter.planarAptitude.aptitude = raceDef.planarAptitude;
-    newCharacter.vitals.hp.setBase(raceDef.baseHP);
-    newCharacter.vitals.sp.setBase(raceDef.baseSP);
-    newCharacter.vitals.mp.setBase(raceDef.baseMP);
-
-    for (const attrKey of ATTRIBUTE_KEYS) {
-      newCharacter.attribute.setBase(attrKey, raceDef.attributes[attrKey]);
-    }
+    character.race = characterData.race as unknown as RaceEnum;
+    character.planarAptitude.aptitude = raceDef.planarAptitude;
+    character.vitals.hp.setBase(raceDef.baseHP);
+    character.vitals.sp.setBase(raceDef.baseSP);
+    character.vitals.mp.setBase(raceDef.baseMP);
+    character.attribute.mutateBase(raceDef.attributes.three, 3);
+    character.attribute.mutateBase(raceDef.attributes.two, 2);
+    character.attribute.mutateBase(raceDef.attributes.one, 1);
 
     // Class
-    newCharacter.title.role = classDef.role;
-    for (const profKey of PROFICIENCY_KEYS) {
-      newCharacter.proficiencies.setBase(profKey, classDef.proficiencies[profKey]);
-    }
-    newCharacter.activeSkills = classDef.startingSkills.map(skill => {
-      return {
+    character.proficiencies.mutateBase(classDef.proficiencies.three, 3);
+    character.proficiencies.mutateBase(classDef.proficiencies.two, 2);
+    character.proficiencies.mutateBase(classDef.proficiencies.one, 1);
+    for (const skill of classDef.startingSkills) {
+      character.activeSkills.push({
         id: skill,
         level: 1,
-        exp: 0,
-      }
-    })
-    for (const item of classDef.startingItems) {
-      newCharacter.addItemToInventory(item.id, item.quantity);
+        exp: 0
+      })
     }
-    newCharacter.addRole(classDef.role);
+    for (const item of classDef.startingEquipments) {
+      character.inventory.set(item.id, 1);
+      equip(character, item.id, item.slot);
+    }
 
     // Background
-    for (const artisanKey of ARTISAN_KEYS) {
-      newCharacter.artisans.setBase(artisanKey, backgroundDef.artisanBonuses[artisanKey]);
-    }
-    newCharacter.title.epithet = backgroundDef.epithet;
+    character.artisans.mutateBase(backgroundDef.artisans.three, 3);
+    character.artisans.mutateBase(backgroundDef.artisans.two, 2);
+    character.artisans.mutateBase(backgroundDef.artisans.one, 1);
+    
+    // Add epithet to available list and set it
+    character.addEpithet(backgroundDef.epithet);
+    activeEpithet(character, backgroundDef.epithet);
+    
+    // Set alignment from background
+    character.alignment.good = backgroundDef.alignment.good;
+    character.alignment.evil = backgroundDef.alignment.evil;
+    
+    // Add role to available list and set it
+    character.addRole(classDef.role);
+    activeRole(character, classDef.role);
+    
+    // Add starting items from background
     for (const item of backgroundDef.startingItems) {
-      newCharacter.addItemToInventory(item.id, item.quantity);
+      const currentQuantity = character.inventory.get(item.item) || 0;
+      character.inventory.set(item.item, currentQuantity + item.quantity);
     }
-    newCharacter.addEpithet(backgroundDef.epithet);
 
-    addBaseVitals(newCharacter);
+    addBaseVitals(character);
 
-    return newCharacter;
+    return character;
   }
 
   static async saveCharacterToDatabase(character: InsertCharacter): Promise<{ character: InsertCharacter; id: string }> {
@@ -250,10 +248,11 @@ export class CharacterService {
 
     return { character: savedCharacter, id: savedCharacter.id };
   }
-
+  
   /**
    * Get the user's character (returns null if no character exists)
    */
+
   static async getUserCharacter(userId: string): Promise<any | null> {
     try {
       const [character] = await db

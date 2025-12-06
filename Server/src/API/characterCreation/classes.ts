@@ -1,14 +1,5 @@
 import {
   BodyId,
-  EarId,
-  FootId,
-  HandId,
-  HeadWearId,
-  LegId,
-  NeckId,
-  RingId,
-  UtilId,
-  WeaponId,
   AxeId,
   BladeId,
   BookWId,
@@ -38,7 +29,7 @@ import {
   RogueSkillId,
   ScholarSkillId,
   ShamanSkillId,
-  SpellBladeSkillId,
+  SpellbladeSkillId,
   WarriorSkillId,
   WarlockSkillId,
   WitchSkillId,
@@ -51,6 +42,7 @@ import {
   ClassEnum,
 } from "src/InterFacesEnumsAndTypes/Enums";
 import { ClassBonus } from "./types";
+import { CharacterRoleEnum } from "src/Entity/Character/Subclass/Title/Role/enum";
 
 
 const classBonus: Record<ClassEnum, ClassBonus> = {
@@ -61,24 +53,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "shield",
     },
     startingSkills: [
-      ClericSkillId.Radiance,
       ClericSkillId.Heal,
+      ClericSkillId.Radiance,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.Robe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: StaffId.QuarterStaff,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.Robe, slot: CharacterEquipmentSlot.body },
+      { id: StaffId.QuarterStaff, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Cleric,
   },
   [ClassEnum.Seer]: {
     proficiencies: {
@@ -87,24 +69,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "book",
     },
     startingSkills: [
+      SeerSkillId.PlanarEcho,
       SeerSkillId.ThreadSnip,
-      SeerSkillId.PlanarEcho
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.MageRobe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: OrbId.Orb,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.MageRobe, slot: CharacterEquipmentSlot.body },
+      { id: OrbId.Orb, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Mage,
   },
   [ClassEnum.Mage]: {
     proficiencies: {
@@ -113,24 +85,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "book",
     },
     startingSkills: [
-      MageSkillId.ArcaneShield,
       MageSkillId.ArcaneBolt,
+      MageSkillId.ArcaneShield,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.MageRobe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: WandId.Wand,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.MageRobe, slot: CharacterEquipmentSlot.body },
+      { id: WandId.Wand, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Mage,
   },
   [ClassEnum.Mystic]: {
     proficiencies: {
@@ -139,24 +101,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "wand",
     },
     startingSkills: [
+      MysticSkillId.MistStep,
       MysticSkillId.InnerVeil,
-      MysticSkillId.MistStep as SkillId,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.MageRobe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: OrbId.Orb,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.MageRobe, slot: CharacterEquipmentSlot.body },
+      { id: OrbId.Orb, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Mage,
   },
   [ClassEnum.Rogue]: {
     proficiencies: {
@@ -165,50 +117,30 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "blade",
     },
     startingSkills: [
+      RogueSkillId.ThrowingKnives,
       RogueSkillId.BleedingCut,
-      RogueSkillId.ThrowingKnives
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.LeatherArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: DaggerId.Knife,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.LeatherArmor, slot: CharacterEquipmentSlot.body },
+      { id: DaggerId.Knife, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Rogue,
   },
-  [ClassEnum.SpellBlade]: {
+  [ClassEnum.Spellblade]: {
     proficiencies: {
       three: "sword",
       two: "blade",
       one: "wand",
     },
     startingSkills: [
-      SpellBladeSkillId.WindSlash,
-      SpellBladeSkillId.PlanarEdge,
+      SpellbladeSkillId.PlanarEdge,
+      SpellbladeSkillId.WindSlash,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.LeatherArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: SwordId.ShortSword,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.LeatherArmor, slot: CharacterEquipmentSlot.body },
+      { id: SwordId.ShortSword, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Mage,
   },
   [ClassEnum.Shaman]: {
     proficiencies: {
@@ -217,24 +149,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "axe",
     },
     startingSkills: [
-      ShamanSkillId.HexOfRot,
       ShamanSkillId.MendSpirit,
+      ShamanSkillId.HexOfRot,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.Robe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: StaffId.QuarterStaff,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.Robe, slot: CharacterEquipmentSlot.body },
+      { id: StaffId.QuarterStaff, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Cleric,
   },
   [ClassEnum.Barbarian]: {
     proficiencies: {
@@ -243,24 +165,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "bareHand",
     },
     startingSkills: [
+      BarbarianSkillId.Rage,
       BarbarianSkillId.RecklessSwing,
-      BarbarianSkillId.Rage
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.LeatherArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: AxeId.Axe,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [ 
+      { id: BodyId.LeatherArmor, slot: CharacterEquipmentSlot.body },
+      { id: AxeId.Axe, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Fighter,
   },
   [ClassEnum.Warrior]: {
     proficiencies: {
@@ -269,24 +181,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "spear",
     },
     startingSkills: [
-      WarriorSkillId.WarCry,
       WarriorSkillId.PowerStrike,
+      WarriorSkillId.WarCry,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.PaddedArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: BladeId.Scimitar,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.PaddedArmor, slot: CharacterEquipmentSlot.body },
+      { id: BladeId.Scimitar, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Fighter,
   },
   [ClassEnum.Knight]: {
     proficiencies: {
@@ -297,21 +199,12 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
     startingSkills: [
       KnightSkillId.PrecisionThrust,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.ChainShirt,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: SpearId.Dory,
-      [CharacterEquipmentSlot.leftHand]: ShieldId.Buckler,
-    },
+    startingEquipments: [
+      { id: BodyId.ChainShirt, slot: CharacterEquipmentSlot.body },
+      { id: SpearId.Dory, slot: CharacterEquipmentSlot.rightHand },
+      { id: ShieldId.Buckler, slot: CharacterEquipmentSlot.leftHand },
+    ],
+    role: CharacterRoleEnum.Fighter,
   },
   [ClassEnum.Guardian]: {
     proficiencies: {
@@ -320,24 +213,15 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "axe",
     },
     startingSkills: [
-      GuardianSkillId.ShieldUp as SkillId,
-      GuardianSkillId.Taunt as SkillId,
+      GuardianSkillId.Taunt,
+      GuardianSkillId.ShieldUp,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.ChainShirt,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: HammerId.Hammer,
-      [CharacterEquipmentSlot.leftHand]: ShieldId.Buckler,
-    },
+    startingEquipments: [
+      { id: BodyId.ChainShirt, slot: CharacterEquipmentSlot.body },
+      { id: HammerId.Hammer, slot: CharacterEquipmentSlot.rightHand },
+      { id: ShieldId.Buckler, slot: CharacterEquipmentSlot.leftHand },
+    ],
+    role: CharacterRoleEnum.Fighter,
   },
   [ClassEnum.Paladin]: {
     proficiencies: {
@@ -348,21 +232,12 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
     startingSkills: [
       PaladinSkillId.DivineStrike,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.StuddedLeatherArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: HammerId.Hammer,
-      [CharacterEquipmentSlot.leftHand]: ShieldId.Buckler,
-    },
+    startingEquipments: [
+      { id: BodyId.StuddedLeatherArmor, slot: CharacterEquipmentSlot.body },
+      { id: HammerId.Hammer, slot: CharacterEquipmentSlot.rightHand },
+      { id: ShieldId.Buckler, slot: CharacterEquipmentSlot.leftHand },
+    ],
+    role: CharacterRoleEnum.Cleric,
   },
   [ClassEnum.Druid]: {
     proficiencies: {
@@ -371,24 +246,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "bow",
     },
     startingSkills: [
-      DruidSkillId.ThrowSpear,
       DruidSkillId.VineWhip,
+      DruidSkillId.ThrowSpear,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.HideArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: SpearId.Javelin,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.HideArmor, slot: CharacterEquipmentSlot.body },
+      { id: SpearId.Javelin, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Cleric,
   },
   [ClassEnum.Monk]: {
     proficiencies: {
@@ -397,25 +262,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "blade",
     },
     startingSkills: [
-      MonkSkillId.FlurryOfBlows,
-      MonkSkillId.PalmStrike,
       MonkSkillId.Meditation,
+      MonkSkillId.PalmStrike,
+      MonkSkillId.FlurryOfBlows,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.Tunic,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: null,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.Tunic, slot: CharacterEquipmentSlot.body },
+    ],
+    role: CharacterRoleEnum.Fighter,
   },
   [ClassEnum.Warlock]: {
     proficiencies: {
@@ -424,24 +278,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "bow",
     },
     startingSkills: [
-      WarlockSkillId.Corruption,
       WarlockSkillId.ChaosBolt,
+      WarlockSkillId.Corruption,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.MageRobe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: OrbId.Orb,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.MageRobe, slot: CharacterEquipmentSlot.body },
+      { id: OrbId.Orb, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Mage,
   },
   [ClassEnum.Duelist]: {
     proficiencies: {
@@ -452,21 +296,12 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
     startingSkills: [
       DuelistSkillId.DuelingStance,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.LeatherArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: SwordId.ShortSword,
-      [CharacterEquipmentSlot.leftHand]: ShieldId.Buckler,
-    },
+    startingEquipments: [
+      { id: BodyId.LeatherArmor, slot: CharacterEquipmentSlot.body },
+      { id: SwordId.ShortSword, slot: CharacterEquipmentSlot.rightHand },
+      { id: ShieldId.Buckler, slot: CharacterEquipmentSlot.leftHand },
+    ],
+    role: CharacterRoleEnum.Fighter,
   },
   [ClassEnum.Witch]: {
     proficiencies: {
@@ -475,24 +310,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "dagger",
     },
     startingSkills: [
-      WitchSkillId.PoisonDart as SkillId,
-      WitchSkillId.ChaosBinding as SkillId,
+      WitchSkillId.ChaosBinding, 
+      WitchSkillId.PoisonDart, 
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.MageRobe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: WandId.Wand,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.MageRobe, slot: CharacterEquipmentSlot.body },
+      { id: WandId.Wand, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Mage,
   },
   [ClassEnum.Inquisitor]: {
     proficiencies: {
@@ -501,24 +326,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "wand",
     },
     startingSkills: [
-      InquisitorSkillId.ExposeWeakness,
       InquisitorSkillId.RadiantSmite,
+      InquisitorSkillId.ExposeWeakness,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.MageRobe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: BookWId.Bible,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.MageRobe, slot: CharacterEquipmentSlot.body },
+      { id: BookWId.Bible, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Cleric,
   },
   [ClassEnum.Scholar]: {
     proficiencies: {
@@ -527,24 +342,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "dagger",
     },
     startingSkills: [
-      ScholarSkillId.CognitiveOverload,
       ScholarSkillId.DisruptPattern,
+      ScholarSkillId.CognitiveOverload,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.MageRobe,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: BookWId.Codex,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.MageRobe, slot: CharacterEquipmentSlot.body },
+      { id: BookWId.Codex, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Scholar,
   },
   [ClassEnum.Engineer]: {
     proficiencies: {
@@ -553,24 +358,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "bareHand",
     },
     startingSkills: [
-      EngineerSkillId.ExplosiveBolt,
       EngineerSkillId.BearTrap,
+      EngineerSkillId.ExplosiveBolt,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.LeatherArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: BowId.ShortBow,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.LeatherArmor, slot: CharacterEquipmentSlot.body },
+      { id: BowId.ShortBow, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Fighter,
   },
   [ClassEnum.Nomad]: {
     proficiencies: {
@@ -579,24 +374,14 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
       one: "dagger",
     },
     startingSkills: [
-      NomadSkillId.TacticalSlash,
       NomadSkillId.AdaptiveStrike,
+      NomadSkillId.TacticalSlash,
     ],
-    startingEquipments: {
-      [CharacterEquipmentSlot.headWear]: null,
-      [CharacterEquipmentSlot.body]: BodyId.LeatherArmor,
-      [CharacterEquipmentSlot.leg]: null,
-      [CharacterEquipmentSlot.hand]: null,
-      [CharacterEquipmentSlot.foot]: null,
-      [CharacterEquipmentSlot.util]: null,
-      [CharacterEquipmentSlot.ringL]: null,
-      [CharacterEquipmentSlot.ringR]: null,
-      [CharacterEquipmentSlot.earL]: null,
-      [CharacterEquipmentSlot.earR]: null,
-      [CharacterEquipmentSlot.neck]: null,
-      [CharacterEquipmentSlot.rightHand]: BladeId.Scimitar,
-      [CharacterEquipmentSlot.leftHand]: null,
-    },
+    startingEquipments: [
+      { id: BodyId.LeatherArmor, slot: CharacterEquipmentSlot.body },
+      { id: BladeId.Scimitar, slot: CharacterEquipmentSlot.rightHand },
+    ],
+    role: CharacterRoleEnum.Fighter,
   },
 };
 

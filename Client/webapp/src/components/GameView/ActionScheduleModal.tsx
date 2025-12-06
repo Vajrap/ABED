@@ -15,6 +15,8 @@ import {
   WbTwilight,
   NightsStay,
   WbSunnyTwoTone,
+  DirectionsWalk,
+  Train,
 } from "@mui/icons-material";
 import { ActionSelectionModal } from "./ActionSelectionModal";
 import { getActionById } from "@/config/actions";
@@ -31,6 +33,9 @@ export interface ActionScheduleModalProps {
   open: boolean;
   onClose: () => void;
   onSave?: (schedule: Record<string, string>) => void;
+  onTravelClick?: () => void;
+  onRailTravelClick?: () => void;
+  hasRailStation?: boolean; // Whether current location has a rail station
 }
 
 /**
@@ -41,6 +46,9 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
   open,
   onClose,
   onSave,
+  onTravelClick,
+  onRailTravelClick,
+  hasRailStation = true, // Default to true for now (can be disabled later)
 }) => {
   const theme = useTheme();
   const [schedule, setSchedule] = useState<Record<string, string>>({});
@@ -238,7 +246,9 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
             padding: 3,
             paddingTop: 2,
             gap: 2,
+            display: "flex",
             justifyContent: "space-between",
+            flexWrap: "wrap",
           }}
         >
           <Button
@@ -258,6 +268,54 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
           >
             Cancel
           </Button>
+
+          {/* Travel Buttons - Between Cancel and Save */}
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              onClick={onTravelClick}
+              variant="outlined"
+              startIcon={<DirectionsWalk />}
+              sx={{
+                fontFamily: "Crimson Text, serif",
+                fontSize: "1.05rem",
+                textTransform: "none",
+                px: 3,
+                color: theme.palette.primary.main,
+                border: `2px solid ${theme.palette.primary.main}`,
+                "&:hover": {
+                  border: `2px solid ${theme.palette.primary.dark}`,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                },
+              }}
+            >
+              Travel
+            </Button>
+            <Button
+              onClick={onRailTravelClick}
+              variant="outlined"
+              startIcon={<Train />}
+              disabled={!hasRailStation}
+              sx={{
+                fontFamily: "Crimson Text, serif",
+                fontSize: "1.05rem",
+                textTransform: "none",
+                px: 3,
+                color: theme.palette.primary.main,
+                border: `2px solid ${hasRailStation ? theme.palette.primary.main : theme.palette.text.disabled}`,
+                "&:hover": {
+                  border: `2px solid ${hasRailStation ? theme.palette.primary.dark : theme.palette.text.disabled}`,
+                  backgroundColor: hasRailStation ? alpha(theme.palette.primary.main, 0.1) : "transparent",
+                },
+                "&.Mui-disabled": {
+                  border: `2px solid ${theme.palette.text.disabled}`,
+                  color: theme.palette.text.disabled,
+                },
+              }}
+            >
+              Rail
+            </Button>
+          </Box>
+
           <Button
             onClick={handleSave}
             variant="contained"

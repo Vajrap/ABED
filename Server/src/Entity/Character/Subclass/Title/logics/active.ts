@@ -64,6 +64,15 @@ function swapPart<K extends PartKind>(
 
 // Thin, readable API
 export function activeRole(char: Character, role: CharacterRoleEnum): void {
+  // Validate that the character has this role available
+  if (!char.possibleRoles.includes(role)) {
+    Report.warn(`Attempted to activate role ${role} that character does not have access to`, {
+      characterId: char.id,
+      availableRoles: char.possibleRoles,
+      requestedRole: role,
+    });
+    return;
+  }
   swapPart(char, "role", role);
 }
 export function deactiveRole(char: Character): void {
@@ -73,6 +82,15 @@ export function activeEpithet(
   char: Character,
   epithet: CharacterEpithetEnum,
 ): void {
+  // Validate that the character has this epithet available
+  if (!char.possibleEpithets.includes(epithet)) {
+    Report.warn(`Attempted to activate epithet ${epithet} that character does not have access to`, {
+      characterId: char.id,
+      availableEpithets: char.possibleEpithets,
+      requestedEpithet: epithet,
+    });
+    return;
+  }
   swapPart(char, "epithet", epithet);
 }
 export function deactiveEpithet(char: Character): void {

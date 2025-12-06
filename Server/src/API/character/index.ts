@@ -162,24 +162,24 @@ characterRoutes.get("/preview", async (req: Request, res: Response) => {
       const attributes: Record<string, { base: number; bonus: number }> = {};
       for (const key of ATTRIBUTE_KEYS) {
         attributes[key] = {
-          base: tempCharacter.attribute.getBase(key),
-          bonus: tempCharacter.attribute.getBonus(key),
+          base: tempCharacter.attribute.getStat(key).base,
+          bonus: tempCharacter.attribute.getStat(key).bonus,
         };
       }
 
       const proficiencies: Record<string, { base: number; bonus: number }> = {};
       for (const key of PROFICIENCY_KEYS) {
         proficiencies[key] = {
-          base: tempCharacter.proficiencies.getBase(key),
-          bonus: tempCharacter.proficiencies.getBonus(key),
+          base: tempCharacter.proficiencies.getStat(key).base,
+          bonus: tempCharacter.proficiencies.getStat(key).bonus,
         };
       }
 
       const artisans: Record<string, { base: number; bonus: number }> = {};
       for (const key of ARTISAN_KEYS) {
         artisans[key] = {
-          base: tempCharacter.artisans.getBase(key),
-          bonus: tempCharacter.artisans.getBonus(key),
+          base: tempCharacter.artisans.getStat(key).base,
+          bonus: tempCharacter.artisans.getStat(key).bonus,
         };
       }
 

@@ -297,7 +297,7 @@ export enum ClassEnum {
   Mage = "Mage",
   Mystic = "Mystic",
   Rogue = "Rogue",
-  SpellBlade = "SpellBlade",
+  Spellblade = "Spellblade",
   Shaman = "Shaman",
   Barbarian = "Barbarian",
   Warrior = "Warrior",

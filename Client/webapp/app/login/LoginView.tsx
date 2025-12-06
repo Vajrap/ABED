@@ -281,6 +281,7 @@ export default function LoginView() {
           <Typography variant="body2" color="text.secondary">
             {t(L10N.loginPage.newToRealm)}{" "}
             <Typography
+              component="span"
               variant="body2"
               onClick={handleRegisterClick}
               sx={{

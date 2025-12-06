@@ -1,5 +1,5 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
-import { SpellBladeSkillId } from "../../../enums";
+import { SpellbladeSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
@@ -10,15 +10,15 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
-import { SpellBladeSkill } from "./index";
+import { SpellbladeSkill } from "./index";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
 
-export const planarEdge = new SpellBladeSkill({
-  id: SpellBladeSkillId.PlanarEdge,
+export const planarEdge = new SpellbladeSkill({
+  id: SpellbladeSkillId.PlanarEdge,
   name: {
     en: "Planar Edge",
     th: "ขอบแห่งระนาบ",

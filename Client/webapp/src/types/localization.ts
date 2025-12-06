@@ -236,12 +236,30 @@ export interface CharacterL10N {
     orc: RaceL10N;
     dwarf: RaceL10N;
     halfling: RaceL10N;
+    vulpine: RaceL10N;
   };
   classes: {
-    fighter: ClassL10N;
+    barbarian: ClassL10N;
     cleric: ClassL10N;
-    rogue: ClassL10N;
+    druid: ClassL10N;
+    duelist: ClassL10N;
+    guardian: ClassL10N;
+    inquisitor: ClassL10N;
+    knight: ClassL10N;
     mage: ClassL10N;
+    monk: ClassL10N;
+    mystic: ClassL10N;
+    paladin: ClassL10N;
+    rogue: ClassL10N;
+    scholar: ClassL10N;
+    shaman: ClassL10N;
+    spellblade: ClassL10N;
+    warrior: ClassL10N;
+    warlock: ClassL10N;
+    witch: ClassL10N;
+    seer: ClassL10N;
+    nomad: ClassL10N;
+    engineer: ClassL10N;
   };
   backgrounds: {
     noble: BackgroundL10N;

@@ -26,7 +26,6 @@ import { useCharacterCreationLogic } from "./useCharacterCreationLogic";
 import { useLocalization, L10N } from "@/localization";
 import { skillsL10N } from "@/L10N/skills";
 import * as skillEnums from "@/L10N/skillEnums";
-import { TextRenderer } from "@/utils/TextRenderer";
 import { renderText, type RenderTextOptions } from "@/utils/textRenderer";
 
 // Helper function to get skill L10N by mapping skill name + class to enum value
@@ -40,7 +39,7 @@ function getSkillL10N(skillId: string, classValue: string, language: "en" | "th"
       Mage: "MageSkillId",
       Mystic: "MysticSkillId",
       Rogue: "RogueSkillId",
-      SpellBlade: "SpellBladeSkillId",
+      Spellblade: "SpellbladeSkillId",
       Shaman: "ShamanSkillId",
       Barbarian: "BarbarianSkillId",
       Warrior: "WarriorSkillId",
@@ -84,7 +83,7 @@ function getSkillL10N(skillId: string, classValue: string, language: "en" | "th"
     // This handles cases where the skill might be in a different enum
     const allEnumNames: (keyof typeof skillEnums)[] = [
       "BasicSkillId", "MobSkillId", "ClericSkillId", "SeerSkillId", "ScholarSkillId",
-      "MageSkillId", "MysticSkillId", "RogueSkillId", "SpellBladeSkillId", "ShamanSkillId",
+      "MageSkillId", "MysticSkillId", "RogueSkillId", "SpellbladeSkillId", "ShamanSkillId",
       "BarbarianSkillId", "WarriorSkillId", "KnightSkillId", "GuardianSkillId", "PaladinSkillId",
       "DruidSkillId", "MonkSkillId", "WarlockSkillId", "DuelistSkillId", "WitchSkillId",
       "InquisitorSkillId", "EngineerSkillId", "NomadSkillId",
@@ -157,7 +156,9 @@ const GenderToggleBox = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const GenderButton = styled(Button)<{ active?: boolean }>(({ theme, active }) => ({
+const GenderButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>(({ theme, active }) => ({
   flex: 1,
   padding: theme.spacing(1.5),
   borderRadius: theme.spacing(1),
@@ -206,6 +207,25 @@ const ActionButtons = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   marginTop: theme.spacing(4),
   justifyContent: "space-between",
+}));
+
+const CreateCharacterButton = styled(Button)(({ theme }) => ({
+  background: theme.palette.primary.main, // Override any gradient
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  fontWeight: 600,
+  "&:hover:not(:disabled)": {
+    background: theme.palette.primary.dark, // Override any gradient on hover
+    backgroundColor: theme.palette.primary.dark,
+    transform: "translateY(-1px)",
+    boxShadow: `0 6px 12px ${theme.palette.primary.main}40`,
+  },
+  "&:disabled": {
+    background: theme.palette.grey[300], // Override any gradient when disabled
+    backgroundColor: theme.palette.grey[300],
+    color: theme.palette.grey[600],
+    opacity: 0.7,
+  },
 }));
 
 // Helper function to get localized name with fallback
@@ -266,13 +286,11 @@ const getLocalizedBackgroundDescription = (t: any, backgroundId: string): string
 
 export default function CharacterCreationView() {
   const router = useRouter();
-  const { t, language } = useLocalization();
+  const { t, currentLanguage } = useLocalization();
   const {
     isLoading,
-    isFetchingMetadata,
     error,
     nameCheckMessage,
-    metadata,
     stats,
     formData,
     portraitIndex,
@@ -281,6 +299,9 @@ export default function CharacterCreationView() {
     createCharacter,
     isFormValid,
     getAvailablePortraits,
+    availableRaces,
+    availableClasses,
+    availableBackgrounds,
   } = useCharacterCreationLogic();
 
   const handleCreateCharacter = async () => {
@@ -300,28 +321,7 @@ export default function CharacterCreationView() {
     }
   };
 
-  // No need for calculateCharacterStats - stats come from the hook now
-
-  if (isFetchingMetadata) {
-    return (
-      <CharacterCreationContainer>
-        <Paper sx={{ p: 4, textAlign: "center" }}>
-          <CircularProgress />
-          <Typography sx={{ mt: 2 }}>Loading character creation options...</Typography>
-        </Paper>
-      </CharacterCreationContainer>
-    );
-  }
-
-  if (!metadata) {
-    return (
-      <CharacterCreationContainer>
-        <Paper sx={{ p: 4, textAlign: "center" }}>
-          <Alert severity="error">Failed to load character creation options. Please refresh the page.</Alert>
-        </Paper>
-      </CharacterCreationContainer>
-    );
-  }
+  // Stats are calculated locally when race, class, or background changes
 
   const availablePortraits = getAvailablePortraits();
 
@@ -422,7 +422,7 @@ export default function CharacterCreationView() {
           <FormSection>
             <SectionTitle variant="h6">{t(L10N.characterCreation.race)}</SectionTitle>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {metadata.races.map((race) => (
+              {availableRaces.map((race) => (
                 <Chip
                   key={race.id}
                   label={getLocalizedRaceName(t, race.id)}
@@ -446,7 +446,7 @@ export default function CharacterCreationView() {
           <FormSection>
             <SectionTitle variant="h6">{t(L10N.characterCreation.class)}</SectionTitle>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {metadata.classes.map((classItem) => (
+              {availableClasses.map((classItem) => (
                 <Chip
                   key={classItem.id}
                   label={getLocalizedClassName(t, classItem.id)}
@@ -470,7 +470,7 @@ export default function CharacterCreationView() {
           <FormSection>
             <SectionTitle variant="h6">{t(L10N.characterCreation.background)}</SectionTitle>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {metadata.backgrounds.map((background) => (
+              {availableBackgrounds.map((background) => (
                 <Chip
                   key={background.id}
                   label={getLocalizedBackgroundName(t, background.id)}
@@ -507,7 +507,7 @@ export default function CharacterCreationView() {
             >
               {t(L10N.characterCreation.backToTitle)}
             </Button>
-            <Button
+            <CreateCharacterButton
               variant="contained"
               size="large"
               onClick={handleCreateCharacter}
@@ -515,7 +515,7 @@ export default function CharacterCreationView() {
               startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <PersonAdd />}
             >
               {isLoading ? t(L10N.characterCreation.creating) : t(L10N.characterCreation.createCharacter)}
-            </Button>
+            </CreateCharacterButton>
           </ActionButtons>
         </CharacterCreationPaper>
 
@@ -600,7 +600,7 @@ export default function CharacterCreationView() {
                       <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Starting Skills</Typography>
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                         {stats.startingSkills.map((skillId) => {
-                          const skillL10N = getSkillL10N(skillId, formData.class, language || "en");
+                          const skillL10N = getSkillL10N(skillId, formData.class, currentLanguage || "en");
                           if (!skillL10N) {
                             return (
                               <Box key={skillId}>
@@ -623,7 +623,7 @@ export default function CharacterCreationView() {
                             isSkill: true,
                             character: null, // No character stats for preview
                             l10nData: null, // No buff/debuff data for preview
-                            currentLanguage: (language || "en") as "en" | "th",
+                            currentLanguage: (currentLanguage || "en") as "en" | "th",
                             renderBuffDebuffTooltip: null, // No tooltips for preview
                             useFormulaCapsule: false, // Render formulas as plain text, not in a capsule
                           };
@@ -633,15 +633,16 @@ export default function CharacterCreationView() {
                               <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5 }}>
                                 {skillL10N.name}
                               </Typography>
-                              <TextRenderer
-                                text={skillL10N.description}
-                                options={renderOptions}
+                              <Typography
                                 variant="caption"
                                 component="div"
                                 sx={{
                                   color: "text.secondary",
                                   fontStyle: 'italic',
                                   lineHeight: 1.6,
+                                }}
+                                dangerouslySetInnerHTML={{
+                                  __html: renderText(skillL10N.description, renderOptions),
                                 }}
                               />
                             </Box>

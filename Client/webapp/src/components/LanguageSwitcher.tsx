@@ -138,8 +138,8 @@ const CustomSwitch = styled(Switch)(({ theme }) => ({
 
 export const LanguageSwitcher: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [currentLang, setCurrentLang] =
-    useState<LanguageType>(getCurrentLanguage());
+  const [currentLang, setCurrentLang] = useState<LanguageType>("en"); // Default to "en" for SSR hydration
+  const [isMounted, setIsMounted] = useState(false);
   const [, setForceUpdate] = useState(0);
 
   // Force re-render when language changes to update all components
@@ -149,21 +149,27 @@ export const LanguageSwitcher: React.FC = () => {
     setForceUpdate((prev) => prev + 1);
 
     // Trigger a custom event that other components can listen to
-    window.dispatchEvent(
-      new CustomEvent("languageChanged", { detail: newLanguage }),
-    );
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("languageChanged", { detail: newLanguage }),
+      );
 
-    // Store preference in localStorage
-    localStorage.setItem("preferred-language", newLanguage);
+      // Store preference in localStorage
+      localStorage.setItem("preferred-language", newLanguage);
+    }
   };
 
-  // Load saved language preference on mount
+  // Load saved language preference on mount (client-side only)
   useEffect(() => {
+    setIsMounted(true);
     const savedLanguage = localStorage.getItem(
       "preferred-language",
     ) as LanguageType;
     if (savedLanguage && (savedLanguage === "en" || savedLanguage === "th")) {
       handleLanguageChange(savedLanguage);
+    } else {
+      // Initialize with default if no saved preference
+      setCurrentLang(getCurrentLanguage());
     }
   }, []);
 
@@ -183,6 +189,11 @@ export const LanguageSwitcher: React.FC = () => {
   const getLanguageFlag = (lang: LanguageType) => {
     return lang === "en" ? "🇺🇸" : "🇹🇭";
   };
+
+  // Don't render until mounted to avoid hydration mismatch
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <FloatingLanguageSwitcher elevation={8}>

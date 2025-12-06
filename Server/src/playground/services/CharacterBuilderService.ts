@@ -37,7 +37,7 @@ import {
   WitchSkillId,
   InquisitorSkillId,
   ScholarSkillId,
-  SpellBladeSkillId,
+  SpellbladeSkillId,
   MysticSkillId,
   ShamanSkillId,
   KnightSkillId,
@@ -338,7 +338,7 @@ export class CharacterBuilderService {
         });
         break;
 
-      case ClassEnum.SpellBlade:
+      case ClassEnum.Spellblade:
         hp = scaleByDifficulty(20, difficulty);
         mp = scaleByDifficulty(25, difficulty);
         sp = scaleByDifficulty(15, difficulty);
@@ -354,17 +354,17 @@ export class CharacterBuilderService {
           wand: 4,
         });
         activeSkills.push({
-          id: SpellBladeSkillId.EdgeBurst,
+          id: SpellbladeSkillId.EdgeBurst,
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });
         activeSkills.push({
-          id: SpellBladeSkillId.SpellParry,
+          id: SpellbladeSkillId.SpellParry,
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });
         activeSkills.push({
-          id: SpellBladeSkillId.PlanarEdge,
+          id: SpellbladeSkillId.PlanarEdge,
           level: difficulty,
           exp: 0,
         });

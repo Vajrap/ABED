@@ -10,7 +10,7 @@ import {
   MageSkillId,
   MysticSkillId,
   RogueSkillId,
-  SpellBladeSkillId,
+  SpellbladeSkillId,
   ShamanSkillId,
   BarbarianSkillId,
   WarriorSkillId,
@@ -360,21 +360,21 @@ export const skillsL10N: Record<SkillId, SkillTextObject> = {
     description: { en: "Mend an ally's wounds with unstable spiritual energy that flows unpredictably.\nHeal a random injured ally for <FORMULA> HP.\nRoll D20: if 11+, [r]heal is halved[/r] and target [b]gains +1 chaos[/b] instead of full healing.", th: "ช่อมแผลของพันธมิตรด้วยพลังงานจิตที่ไม่เสถียรที่ไหลอย่างคาดเดาไม่ได้\nรักษาพันธมิตรที่บาดเจ็บแบบสุ่ม <FORMULA> HP\nทอย D20: หาก 11+ [r]การรักษาลดลงครึ่งหนึ่ง[/r] และเป้าหมาย [b]ได้รับ +1 chaos[/b] แทนการรักษาเต็มจำนวน" },
     formula: "(1d4 + <WILmod>) × <SkillLevelMultiplier>",
   },
-  [SpellBladeSkillId.EdgeBurst]: {
+  [SpellbladeSkillId.EdgeBurst]: {
     name: { en: "Edge Burst", th: "ระเบิดขอบ" },
     description: { en: "Unleash all accumulated edge charges in a devastating burst of arcane energy.\nConsume ALL <BuffEdgeCharge> stacks (min 1).\nDeal <FORMULA> arcane damage.\nDamage increases with each edge charge consumed.", th: "ปลดปล่อย edge charge ที่สะสมไว้ทั้งหมดในระเบิดพลังงานอาร์เคนที่ทำลายล้าง\nใช้สแตค <BuffEdgeCharge> ทั้งหมด (อย่างน้อย 1)\nสร้างความเสียหายอาร์เคน <FORMULA>\nความเสียหายเพิ่มขึ้นตามจำนวน edge charge ที่ใช้" },
     formula: "(<WeaponDamage> or Planar Edge dice if no weapon) + <PlanarMod> + (1d2 per <BuffEdgeCharge> stack) × <SkillLevelMultiplier>",
   },
-  [SpellBladeSkillId.PlanarEdge]: {
+  [SpellbladeSkillId.PlanarEdge]: {
     name: { en: "Planar Edge", th: "ขอบแห่งระนาบ" },
     description: { en: "Channel planar energy into your weapon's edge, creating a blade of pure arcane power.\nDeal <FORMULA> arcane damage.\n[b]Gain 1 <BuffEdgeCharge>[/b] (max 5 stacks).\nThis skill Damage dice is based on weapon's physical damage dice or if you don't equip any weapon the damage dice will be (1d6, 1d6, 1d8, 1d8 or 2d4) based on skill level.", th: "ควบคุมพลังงานระนาบเข้าสู่ขอบอาวุธ สร้างใบมีดจากพลังอาร์เคนบริสุทธิ์\nสร้างความเสียหายอาร์เคน <FORMULA>\n[b]ได้รับ <BuffEdgeCharge> 1 สแตค[/b] (สูงสุด 5 สแตค)\nลูกเต๋าความเสียหายของสกิลนี้ขึ้นอยู่กับความเสียหายกายภาพของอาวุธที่ถือ แต่ถ้าหากไม่ได้ถืออาวุธอยู่ ลูกเต๋าความเสียหายจะเป็น (1d6, 1d6, 1d8, 1d8, 2d4) ขึ้นอยู่กับเลเวลของสกิล" },
     formula: "(Damage Dice + <PlanarMod> + <BuffEdgeCharge> stacks) × <SkillLevelMultiplier>",
   },
-  [SpellBladeSkillId.SpellParry]: {
+  [SpellbladeSkillId.SpellParry]: {
     name: { en: "Spell Parry", th: "ปัดเวท" },
     description: { en: "Weave a defensive barrier of planar energy that deflects incoming spells.\nGain <BuffSpellParry> for {5}2:1{/} turn.\nReduces next spell's damage by 5 + <INTmod>.\nIf attacked by a spell, [b]gain 1 <BuffEdgeCharge>[/b] (2 if 0 damage taken).\n{5}\n[b]Gain 1 <BuffEdgeCharge>[/b] when used.{/}", th: "ถักทอเกราะป้องกันจากพลังงานระนาบที่เบี่ยงเบนเวทมนตร์ที่เข้ามา\nได้รับ <BuffSpellParry> {5}2:1{/} เทิร์น\nลดความเสียหายเวทครั้งถัดไป 5 + <INTmod>\nหากถูกโจมตีด้วยเวท [b]ได้รับ <BuffEdgeCharge> 1 สแตค[/b] (2 สแตคหากไม่ได้รับความเสียหาย)\n{5}\n[b]ได้รับ <BuffEdgeCharge> 1 สแตค[/b] เมื่อใช้{/}" },
   },
-  [SpellBladeSkillId.WindSlash]: {
+  [SpellbladeSkillId.WindSlash]: {
     name: { en: "Wind Slash", th: "ฟันลม" },
     description: { en: "Slice through the air with a blade of wind-infused arcane energy.\nDeal <FORMULA> wind damage.\nTarget must [r]roll DC7 + <PlanarMod> ENDsave[/r] or get <DebuffBleed> for 1d2 turns.\n{5}\nIf <BuffEdgeCharge> stacks > 0, [r]deal +0.5 damage per stack[/r] (rounded down).{/}", th: "ฟันผ่านอากาศด้วยใบมีดพลังงานอาร์เคนที่ผสมลม\nสร้างความเสียหายลม <FORMULA>\nเป้าหมายต้องทอย [r]ENDsave DC7 + <PlanarMod>[/r] หรือถูก <DebuffBleed> 1d2 เทิร์น\n{5}\nหากสแตค <BuffEdgeCharge> > 0 [r]สร้างความเสียหายเพิ่ม +0.5 ต่อสแตค[/r] (ปัดลง){/}" },
     formula: "Planar Edge damage × <SkillLevelMultiplier>",

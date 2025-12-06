@@ -5,7 +5,6 @@ import {
   AutoAwesome,
   Inventory,
   Article,
-  Explore,
   CalendarMonth,
   Settings,
   Logout,
@@ -18,7 +17,6 @@ export interface GameSidebarProps {
   onSkillsClick?: () => void;
   onInventoryClick?: () => void;
   onNewsClick?: () => void;
-  onTravelClick?: () => void;
   onSettingsClick?: () => void;
   onLogoutClick?: () => void;
 }
@@ -33,7 +31,6 @@ export const GameSidebar: React.FC<GameSidebarProps> = ({
   onSkillsClick,
   onInventoryClick,
   onNewsClick,
-  onTravelClick,
   onSettingsClick,
   onLogoutClick,
 }) => {
@@ -121,13 +118,6 @@ export const GameSidebar: React.FC<GameSidebarProps> = ({
         text="News"
         onClick={() => handleButtonClick("news", onNewsClick)}
         active={activeButton === "news"}
-      />
-
-      <GameViewIcon
-        icon={Explore}
-        text="Travel"
-        onClick={() => handleButtonClick("travel", onTravelClick)}
-        active={activeButton === "travel"}
       />
 
       {/* Spacer to push bottom buttons down */}
