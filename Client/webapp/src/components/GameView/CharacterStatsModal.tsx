@@ -8,7 +8,6 @@ import {
   Box,
   Typography,
   Grid,
-  Divider,
   alpha,
   useTheme,
   Paper,
@@ -18,12 +17,12 @@ import {
 } from "@mui/material";
 import { HelpOutline } from "@mui/icons-material";
 import { EquipmentSlot } from "./EquipmentSlot";
-import { MockPartyMember, MockEquipment } from "@/data/mockPartyData";
+import { CharacterStatsView, EquipmentDisplay } from "@/types/game";
 
 export interface CharacterStatsModalProps {
   open: boolean;
   onClose: () => void;
-  character: MockPartyMember | null;
+  character: CharacterStatsView | null;
 }
 
 /**
@@ -43,11 +42,25 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
   }
 
   // Organize equipment by slot for easy lookup
-  const equipmentBySlot: Record<string, MockEquipment> = {};
+  // Handle both array format (EquipmentDisplay[]) and object format (Record<slot, ItemId>)
+  const equipmentBySlot: Record<string, EquipmentDisplay> = {};
   if (character.equipment) {
-    character.equipment.forEach((eq) => {
-      equipmentBySlot[eq.slot] = eq;
-    });
+    if (Array.isArray(character.equipment)) {
+      // Array format: EquipmentDisplay[]
+      character.equipment.forEach((eq) => {
+        equipmentBySlot[eq.slot] = eq;
+      });
+    } else {
+      // Object format: Record<CharacterEquipmentSlot, ItemId>
+      // Convert to EquipmentDisplay format (just ItemId for now, will be resolved later)
+      Object.entries(character.equipment).forEach(([slot, itemId]) => {
+        equipmentBySlot[slot] = {
+          slot,
+          itemId: itemId as string,
+          id: itemId as string, // For compatibility
+        };
+      });
+    }
   }
 
   // Helper function to format stat value

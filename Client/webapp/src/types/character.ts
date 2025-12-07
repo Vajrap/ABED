@@ -1,8 +1,8 @@
 /**
  * Character Type Definitions for Frontend
  * 
- * These types match the backend CharacterInterface.
- * The backend sends simplified/mapped character data to the frontend.
+ * Character creation and character-specific types.
+ * For API contract types (matching backend), see @/types/api
  */
 
 // Basic stat structure (used in many character systems)

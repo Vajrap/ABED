@@ -1,60 +1,35 @@
 /**
  * Mock party data for UI development
  * Comprehensive structure with all fields needed for UI display
+ * 
+ * NOTE: MockPartyMember extends CharacterStatsView for compatibility.
+ * In production, use CharacterStatsView from @/types/game
  */
 
 import { ClericSkillId, MageSkillId, SkillId, WarriorSkillId } from "@/L10N/skillEnums";
+import type { CharacterStatsView, EquipmentDisplay } from "@/types/game";
 
 // ============================================
 // Type Definitions
 // ============================================
 
-export interface MockPartyMember {
-  name: string | null;
-  level: number | null;
-  portrait: string | null;
+// Mock equipment type (extends EquipmentDisplay with mock-specific fields)
+export interface MockEquipment extends EquipmentDisplay {
+  // Mock data includes these fields directly
+  // In production, these would be resolved from ItemId via L10N
+  name: string;
+  desc: string;
+  weight: number;
+  cost: number;
+}
+
+// Mock party member (extends CharacterStatsView for production compatibility)
+// Only adds party-specific fields; inherits all character stats from CharacterStatsView
+export interface MockPartyMember extends CharacterStatsView {
+  // Party-specific field (not in CharacterStatsView)
   isPlayer: boolean;
   
-  // Full character data for UI
-  id?: string;
-  gender?: "MALE" | "FEMALE" | "NONE";
-  race?: string;
-  type?: string;
-  background?: string;
-  
-  // Stats
-  attributes?: Record<string, { base: number; bonus: number }>;
-  battleStats?: Record<string, { base: number; bonus: number }>;
-  elements?: Record<string, { base: number; bonus: number }>;
-  proficiencies?: Record<string, { base: number; bonus: number }>;
-  artisans?: Record<string, { base: number; bonus: number }>;
-  
-  // Alignment
-  alignment?: { good: number; evil: number };
-  
-  // Title system
-  epithet?: string;
-  role?: string;
-  title?: string;
-  possibleEpithets?: string[];
-  possibleRoles?: string[];
-  
-  // Vitals & Needs
-  vitals?: {
-    hp: { current: number; max: number };
-    mp: { current: number; max: number };
-    sp: { current: number; max: number };
-  };
-  needs?: {
-    mood: number;
-    energy: number;
-    satiety: number;
-  };
-  
-  // Planar
-  planarAptitude?: number;
-  
-  // Skills - All 3 decks
+  // Mock-specific skill structures (CharacterStatsView doesn't include skills)
   activeSkills?: MockSkill[];
   conditionalSkills?: MockSkill[];
   conditionalSkillsCondition?: {
@@ -63,8 +38,10 @@ export interface MockPartyMember {
   };
   breathingSkills?: MockSkill[];
   
-  // Inventory & Equipment
+  // Mock-specific inventory structure
   inventory?: MockInventoryItem[];
+  
+  // Equipment - uses MockEquipment which extends EquipmentDisplay
   equipment?: MockEquipment[];
 }
 
@@ -86,37 +63,7 @@ export interface MockInventoryItem {
   quantity: number;
 }
 
-export interface MockEquipment {
-  slot: string; // CharacterEquipmentSlot
-  id: string; // EquipmentId enum
-  // TODO: TO BE REMOVED
-  // Actually we'll get name and desc from FE side L10N. but right now we didn't have the L10N for equipment yet.
-  name: string;
-  desc: string;
-  weight: number;
-  cost: number;
-  
-  // Weapon stats (if weapon)
-  weaponStats?: {
-    pDice?: string; // Physical damage dice (e.g., "1d6")
-    mDice?: string; // Magical damage dice (e.g., "1d4")
-    pDmg?: number; // Physical damage stat bonus
-    mDmg?: number; // Magical damage stat bonus
-    pHit?: number; // Physical hit stat bonus
-    mHit?: number; // Magical hit stat bonus
-    pCrit?: number; // Physical crit stat bonus
-    mCrit?: number; // Magical crit stat bonus
-    weaponType?: string;
-    handle?: number; // 1 or 2 handed
-  };
-  
-  // Armor stats (if armor)
-  armorStats?: {
-    pDEF?: number; // Physical defense
-    mDEF?: number; // Magical defense
-    dodgeBonus?: number;
-  };
-}
+// MockEquipment interface is now defined above as extending EquipmentDisplay
 
 // ============================================
 // Mock Data

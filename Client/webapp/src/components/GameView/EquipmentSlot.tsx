@@ -1,12 +1,13 @@
 import React from "react";
 import { Box, Tooltip, Typography, alpha, useTheme } from "@mui/material";
-import { MockEquipment } from "@/data/mockPartyData";
+import { EquipmentDisplay } from "@/types/game";
 
 export interface EquipmentSlotProps {
   slot: string; // CharacterEquipmentSlot
-  equipment?: MockEquipment;
+  equipment?: EquipmentDisplay;
   label?: string; // Optional label to display (e.g., "Head", "Body")
   size?: "small" | "medium" | "large";
+  
 }
 
 /**
@@ -42,10 +43,10 @@ export const EquipmentSlot: React.FC<EquipmentSlotProps> = ({
           mb: 1,
         }}
       >
-        {equipment.name}
+        {equipment.name || equipment.itemId || equipment.id || "Unknown Item"}
       </Typography>
       
-      {equipment.desc && (
+      {(equipment.description || equipment.desc) && (
         <Typography
           sx={{
             fontFamily: "Crimson Text, serif",
@@ -55,7 +56,7 @@ export const EquipmentSlot: React.FC<EquipmentSlotProps> = ({
             whiteSpace: "pre-wrap",
           }}
         >
-          {equipment.desc}
+          {equipment.description || equipment.desc}
         </Typography>
       )}
 
@@ -226,7 +227,7 @@ export const EquipmentSlot: React.FC<EquipmentSlotProps> = ({
                 lineHeight: 1.2,
               }}
             >
-              {equipment.name.split(" ")[0]}
+              {(equipment.name || equipment.itemId || equipment.id || "Item")?.split(" ")[0]}
             </Typography>
           ) : (
             <Typography
