@@ -484,7 +484,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
             <Box
               onClick={() => setIsFullscreen(true)}
               sx={{
-                padding: 1.5,
+                padding: 1,
                 borderBottom: `1px solid ${
                   isLoverChat
                     ? alpha("#ff69b4", 0.3)
@@ -542,7 +542,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
               <Typography
                 sx={{
                   fontFamily: "Cinzel, serif",
-                  fontSize: "1rem",
+                  fontSize: "0.9rem",
                   fontWeight: 600,
                   color: theme.palette.text.primary,
                   textTransform: "capitalize",
@@ -578,7 +578,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
               sx={{
                 flex: 1,
                 overflowY: "auto",
-                padding: 2,
+                padding: 1.5,
                 backgroundColor: isLoverChat
                   ? alpha("#ff69b4", 0.05)
                   : "transparent",
@@ -680,7 +680,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                     <Box
                       key={message.id}
                       sx={{
-                        mb: 2,
+                        mb: 0.75,
                         display: "flex",
                         flexDirection: "column",
                         alignItems: isCurrentUser ? "flex-end" : "flex-start",
@@ -689,7 +689,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                       <Box
                         sx={{
                           maxWidth: "70%",
-                          padding: 1.5,
+                          padding: 0.75,
                           backgroundColor: messageBgColor,
                           borderRadius: 1,
                           border: `1px solid ${messageBorderColor}`,
@@ -703,17 +703,18 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                             sx={{
                               display: "flex",
                               alignItems: "center",
-                              gap: 1,
-                              mb: 0.5,
+                              gap: 0.75,
+                              mb: 0.25,
                             }}
                           >
                             {message.senderPortrait && (
                               <Avatar
                                 src={`/img/portraits/${message.senderPortrait}.png`}
                                 sx={{
-                                  width: 32,
-                                  height: 32,
+                                  width: 24,
+                                  height: 24,
                                   border: `1px solid ${theme.palette.secondary.main}`,
+                                  fontSize: "0.75rem",
                                 }}
                               >
                                 {message.senderName.charAt(0)}
@@ -722,9 +723,10 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                             <Typography
                               sx={{
                                 fontFamily: "Cinzel, serif",
-                                fontSize: "0.9rem",
+                                fontSize: "0.8rem",
                                 fontWeight: 600,
                                 color: theme.palette.primary.main,
+                                lineHeight: 1.2,
                               }}
                             >
                               {message.senderName}
@@ -732,8 +734,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                             <Typography
                               sx={{
                                 fontFamily: "Crimson Text, serif",
-                                fontSize: "0.75rem",
+                                fontSize: "0.7rem",
                                 color: theme.palette.text.disabled,
+                                lineHeight: 1.2,
                               }}
                             >
                               {formatTime(message.timestamp)}
@@ -744,10 +747,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                           <Typography
                             sx={{
                               fontFamily: "Crimson Text, serif",
-                              fontSize: "0.75rem",
+                              fontSize: "0.7rem",
                               color: theme.palette.text.disabled,
-                              mb: 0.5,
+                              mb: 0.25,
                               textAlign: "right",
+                              lineHeight: 1.2,
                             }}
                           >
                             {formatTime(message.timestamp)}
@@ -756,12 +760,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                         <Typography
                           sx={{
                             fontFamily: "Crimson Text, serif",
-                            fontSize: "0.9rem",
+                            fontSize: "0.85rem",
                             color: isCurrentUser
                               ? theme.palette.text.primary
                               : theme.palette.text.primary,
-                            ml: !isCurrentUser && message.senderPortrait ? 5 : 0,
+                            ml: !isCurrentUser && message.senderPortrait ? 3.5 : 0,
                             textAlign: isCurrentUser ? "right" : "left",
+                            lineHeight: 1.3,
                           }}
                         >
                           {message.content}

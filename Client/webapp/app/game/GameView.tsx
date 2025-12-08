@@ -173,7 +173,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
               position: "absolute",
               top: 24,
               right: 24,
-              zIndex: 100,
+              zIndex: 5, // Lower z-index so fullscreen chat (9999) appears above
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-end",
@@ -199,7 +199,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
               padding: 4,
               paddingTop: 6, // Extra padding to account for negative top of image
               position: "relative",
-              zIndex: 20,
+              zIndex: 5, // Lower z-index so fullscreen chat (9999) appears above
             }}
           >
             {mockParty

@@ -6214,7 +6214,7 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                                     onClick: ()=>setIsFullscreen(true),
                                     sx: {
-                                        padding: 1.5,
+                                        padding: 1,
                                         borderBottom: `1px solid ${isLoverChat ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#ff69b4", 0.3) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.divider, 0.2)}`,
                                         backgroundColor: isLoverChat ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#ff69b4", 0.1) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.background.paper, 0.5),
                                         display: "flex",
@@ -6271,7 +6271,7 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                             sx: {
                                                 fontFamily: "Cinzel, serif",
-                                                fontSize: "1rem",
+                                                fontSize: "0.9rem",
                                                 fontWeight: 600,
                                                 color: theme.palette.text.primary,
                                                 textTransform: "capitalize",
@@ -6320,7 +6320,7 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                     sx: {
                                         flex: 1,
                                         overflowY: "auto",
-                                        padding: 2,
+                                        padding: 1.5,
                                         backgroundColor: isLoverChat ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#ff69b4", 0.05) : "transparent",
                                         backgroundImage: isLoverChat ? `radial-gradient(circle at 20% 50%, ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#ff69b4", 0.1)} 0%, transparent 50%),
                      radial-gradient(circle at 80% 80%, ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#ffb6c1", 0.1)} 0%, transparent 50%),
@@ -6406,7 +6406,7 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                             const messageBorderColor = isLoverChat ? isCurrentUser ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#ff69b4", 0.5) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#ffb6c1", 0.4) : isCurrentUser ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.primary.main, 0.4) : (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.divider, 0.2);
                                             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                                                 sx: {
-                                                    mb: 2,
+                                                    mb: 0.75,
                                                     display: "flex",
                                                     flexDirection: "column",
                                                     alignItems: isCurrentUser ? "flex-end" : "flex-start"
@@ -6414,7 +6414,7 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                                                     sx: {
                                                         maxWidth: "70%",
-                                                        padding: 1.5,
+                                                        padding: 0.75,
                                                         backgroundColor: messageBgColor,
                                                         borderRadius: 1,
                                                         border: `1px solid ${messageBorderColor}`,
@@ -6425,16 +6425,17 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                                             sx: {
                                                                 display: "flex",
                                                                 alignItems: "center",
-                                                                gap: 1,
-                                                                mb: 0.5
+                                                                gap: 0.75,
+                                                                mb: 0.25
                                                             },
                                                             children: [
                                                                 message.senderPortrait && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Avatar$2f$Avatar$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Avatar$3e$__["Avatar"], {
                                                                     src: `/img/portraits/${message.senderPortrait}.png`,
                                                                     sx: {
-                                                                        width: 32,
-                                                                        height: 32,
-                                                                        border: `1px solid ${theme.palette.secondary.main}`
+                                                                        width: 24,
+                                                                        height: 24,
+                                                                        border: `1px solid ${theme.palette.secondary.main}`,
+                                                                        fontSize: "0.75rem"
                                                                     },
                                                                     children: message.senderName.charAt(0)
                                                                 }, void 0, false, {
@@ -6445,26 +6446,28 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                                                     sx: {
                                                                         fontFamily: "Cinzel, serif",
-                                                                        fontSize: "0.9rem",
+                                                                        fontSize: "0.8rem",
                                                                         fontWeight: 600,
-                                                                        color: theme.palette.primary.main
+                                                                        color: theme.palette.primary.main,
+                                                                        lineHeight: 1.2
                                                                     },
                                                                     children: message.senderName
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                                                    lineNumber: 722,
+                                                                    lineNumber: 723,
                                                                     columnNumber: 29
                                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                                                     sx: {
                                                                         fontFamily: "Crimson Text, serif",
-                                                                        fontSize: "0.75rem",
-                                                                        color: theme.palette.text.disabled
+                                                                        fontSize: "0.7rem",
+                                                                        color: theme.palette.text.disabled,
+                                                                        lineHeight: 1.2
                                                                     },
                                                                     children: formatTime(message.timestamp)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                                                    lineNumber: 732,
+                                                                    lineNumber: 734,
                                                                     columnNumber: 29
                                                                 }, ("TURBOPACK compile-time value", void 0))
                                                             ]
@@ -6476,29 +6479,31 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                                         isCurrentUser && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                                             sx: {
                                                                 fontFamily: "Crimson Text, serif",
-                                                                fontSize: "0.75rem",
+                                                                fontSize: "0.7rem",
                                                                 color: theme.palette.text.disabled,
-                                                                mb: 0.5,
-                                                                textAlign: "right"
+                                                                mb: 0.25,
+                                                                textAlign: "right",
+                                                                lineHeight: 1.2
                                                             },
                                                             children: formatTime(message.timestamp)
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                                            lineNumber: 744,
+                                                            lineNumber: 747,
                                                             columnNumber: 27
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                                             sx: {
                                                                 fontFamily: "Crimson Text, serif",
-                                                                fontSize: "0.9rem",
+                                                                fontSize: "0.85rem",
                                                                 color: isCurrentUser ? theme.palette.text.primary : theme.palette.text.primary,
-                                                                ml: !isCurrentUser && message.senderPortrait ? 5 : 0,
-                                                                textAlign: isCurrentUser ? "right" : "left"
+                                                                ml: !isCurrentUser && message.senderPortrait ? 3.5 : 0,
+                                                                textAlign: isCurrentUser ? "right" : "left",
+                                                                lineHeight: 1.3
                                                             },
                                                             children: message.content
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                                            lineNumber: 756,
+                                                            lineNumber: 760,
                                                             columnNumber: 25
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
@@ -6517,7 +6522,7 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                             ref: messagesEndRef
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                            lineNumber: 775,
+                                            lineNumber: 780,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
@@ -6583,28 +6588,28 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                                         },
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$Send$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                                            lineNumber: 861,
+                                                            lineNumber: 866,
                                                             columnNumber: 29
                                                         }, void 0)
                                                     }, void 0, false, {
                                                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                                        lineNumber: 844,
+                                                        lineNumber: 849,
                                                         columnNumber: 27
                                                     }, void 0)
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                                    lineNumber: 843,
+                                                    lineNumber: 848,
                                                     columnNumber: 25
                                                 }, void 0)
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                            lineNumber: 801,
+                                            lineNumber: 806,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0))
                                     }, void 0, false, {
                                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                        lineNumber: 788,
+                                        lineNumber: 793,
                                         columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0));
                                 })()
@@ -6659,12 +6664,12 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                             },
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$ArrowBack$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                lineNumber: 917,
+                                lineNumber: 922,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                            lineNumber: 907,
+                            lineNumber: 912,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -6679,7 +6684,7 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                             children: selectedFriendId ? __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$data$2f$mockChatData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockFriends"].find((f)=>f.id === selectedFriendId)?.name || "Chat" : selectedChatType === "social" ? "Friends" : `${selectedChatType} Chat`
                         }, void 0, false, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                            lineNumber: 920,
+                            lineNumber: 925,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$IconButton$2f$IconButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconButton$3e$__["IconButton"], {
@@ -6698,18 +6703,18 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                                lineNumber: 948,
+                                lineNumber: 953,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         }, void 0, false, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                            lineNumber: 937,
+                            lineNumber: 942,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                    lineNumber: 896,
+                    lineNumber: 901,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -6720,13 +6725,13 @@ const ChatPanel = ({ currentUserId = "mock-character-001" })=>{
                     children: chatContent
                 }, void 0, false, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-                    lineNumber: 953,
+                    lineNumber: 958,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             ]
         }, void 0, true, {
             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/ChatPanel.tsx",
-            lineNumber: 882,
+            lineNumber: 887,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0));
     }
@@ -7299,7 +7304,7 @@ function GameView({ mockPartyData } = {}) {
                                     position: "absolute",
                                     top: 24,
                                     right: 24,
-                                    zIndex: 100,
+                                    zIndex: 5,
                                     display: "flex",
                                     flexDirection: "column",
                                     alignItems: "flex-end",
@@ -7338,7 +7343,7 @@ function GameView({ mockPartyData } = {}) {
                                     padding: 4,
                                     paddingTop: 6,
                                     position: "relative",
-                                    zIndex: 20
+                                    zIndex: 5
                                 },
                                 children: mockParty.map((member, originalIndex)=>({
                                         member,
