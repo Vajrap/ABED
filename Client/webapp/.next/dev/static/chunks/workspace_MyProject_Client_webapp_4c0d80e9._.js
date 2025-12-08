@@ -125,7 +125,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Cl
 var _s = __turbopack_context__.k.signature();
 ;
 ;
-const PartyMemberCard = ({ portrait, name, level, isPlayer = false, isSelected = false, isEmpty = false, onClick })=>{
+const PartyMemberCard = ({ portrait, name, title, level, isPlayer = false, isSelected = false, isEmpty = false, onClick })=>{
     _s();
     const theme = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$styles$2f$useTheme$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__useTheme$3e$__["useTheme"])();
     // Determine glow color based on state
@@ -136,21 +136,21 @@ const PartyMemberCard = ({ portrait, name, level, isPlayer = false, isSelected =
         onClick: onClick,
         sx: {
             position: "relative",
-            width: 120,
+            width: 80,
             cursor: "pointer",
             transition: "all 0.25s ease-out",
             "&:hover": {
-                transform: "translateY(-4px) scale(1.03)"
+                transform: "translateY(-2px) scale(1.05)"
             },
             "&:active": {
-                transform: "translateY(-2px) scale(1.01)"
+                transform: "translateY(-1px) scale(1.02)"
             }
         },
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                 sx: {
-                    width: 120,
-                    height: 120,
+                    width: 80,
+                    height: 80,
                     borderRadius: "50%",
                     border: isEmpty ? `3px dashed ${theme.palette.text.disabled}` : `3px solid ${glowColor}`,
                     backgroundColor: isEmpty ? (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#fff", 0.3) : theme.palette.background.paper,
@@ -187,7 +187,7 @@ const PartyMemberCard = ({ portrait, name, level, isPlayer = false, isSelected =
                         }
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                        lineNumber: 98,
+                        lineNumber: 100,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)) : portrait ? // Character portrait image
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -209,113 +209,80 @@ const PartyMemberCard = ({ portrait, name, level, isPlayer = false, isSelected =
                             }
                         }, void 0, false, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                            lineNumber: 117,
+                            lineNumber: 119,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                        lineNumber: 107,
+                        lineNumber: 109,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)) : // Fallback - show initials or placeholder
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                         sx: {
                             fontFamily: "Cinzel, serif",
-                            fontSize: "2.5rem",
+                            fontSize: "1.75rem",
                             fontWeight: 700,
                             color: theme.palette.text.secondary
                         },
                         children: name?.charAt(0) || "?"
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                        lineNumber: 129,
+                        lineNumber: 131,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     isPlayer && !isEmpty && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                         sx: {
                             position: "absolute",
-                            top: -8,
-                            right: -8,
-                            width: 32,
-                            height: 32,
+                            top: -4,
+                            right: -4,
+                            width: 24,
+                            height: 24,
                             borderRadius: "50%",
                             backgroundColor: theme.palette.primary.main,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             border: `2px solid ${theme.palette.background.paper}`,
-                            boxShadow: `0 0 16px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.primary.main, 0.6)}`
+                            boxShadow: `0 0 12px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.primary.main, 0.6)}`
                         },
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                             sx: {
                                 color: "#fff",
-                                fontSize: "1.2rem",
+                                fontSize: "0.9rem",
                                 lineHeight: 1
                             },
                             children: "⭐"
                         }, void 0, false, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                            lineNumber: 159,
+                            lineNumber: 161,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                        lineNumber: 143,
-                        columnNumber: 11
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    !isEmpty && level !== undefined && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
-                        sx: {
-                            position: "absolute",
-                            bottom: -8,
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            backgroundColor: theme.palette.secondary.main,
-                            color: "#fff",
-                            padding: "4px 12px",
-                            borderRadius: 2,
-                            border: `2px solid ${theme.palette.background.paper}`,
-                            boxShadow: `0 2px 8px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#000", 0.2)}`
-                        },
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
-                            sx: {
-                                fontFamily: "Crimson Text, serif",
-                                fontSize: "0.9rem",
-                                fontWeight: 700,
-                                letterSpacing: "0.5px"
-                            },
-                            children: [
-                                "Lv ",
-                                level
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                            lineNumber: 187,
-                            columnNumber: 13
-                        }, ("TURBOPACK compile-time value", void 0))
-                    }, void 0, false, {
-                        fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                        lineNumber: 173,
+                        lineNumber: 145,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                lineNumber: 57,
+                lineNumber: 59,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             !isEmpty && name && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                 sx: {
                     textAlign: "center",
                     fontFamily: "Crimson Text, serif",
-                    fontSize: "1rem",
-                    fontWeight: 600,
+                    fontSize: "0.8rem",
+                    fontWeight: 500,
                     color: isPlayer ? theme.palette.primary.main : theme.palette.text.primary,
-                    mt: 2,
-                    textShadow: isPlayer ? `0 0 8px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.primary.main, 0.4)}` : "none"
+                    mt: 1.5,
+                    lineHeight: 1.2,
+                    textShadow: isPlayer ? `0 0 6px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.primary.main, 0.4)}` : "none"
                 },
                 children: name
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                lineNumber: 203,
+                lineNumber: 176,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)),
             isEmpty && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -331,13 +298,13 @@ const PartyMemberCard = ({ portrait, name, level, isPlayer = false, isSelected =
                 children: "Recruit"
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-                lineNumber: 222,
+                lineNumber: 196,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx",
-        lineNumber: 39,
+        lineNumber: 41,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -365,7 +332,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Cl
 var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__ = __turbopack_context__.i("[project]/workspace/MyProject/Client/webapp/node_modules/@mui/material/Box/Box.js [app-client] (ecmascript) <export default as Box>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/workspace/MyProject/Client/webapp/node_modules/@mui/system/esm/colorManipulator.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$styles$2f$useTheme$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__useTheme$3e$__ = __turbopack_context__.i("[project]/workspace/MyProject/Client/webapp/node_modules/@mui/material/styles/useTheme.js [app-client] (ecmascript) <export default as useTheme>");
-var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$Assessment$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/workspace/MyProject/Client/webapp/node_modules/@mui/icons-material/Assessment.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$AutoAwesome$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/workspace/MyProject/Client/webapp/node_modules/@mui/icons-material/AutoAwesome.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$Inventory$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/workspace/MyProject/Client/webapp/node_modules/@mui/icons-material/Inventory.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$Article$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/workspace/MyProject/Client/webapp/node_modules/@mui/icons-material/Article.js [app-client] (ecmascript)");
@@ -384,8 +350,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-;
-const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventoryClick, onNewsClick, onSettingsClick, onLogoutClick })=>{
+const GameSidebar = ({ onScheduleClick, onSkillsClick, onInventoryClick, onNewsClick, onSettingsClick, onLogoutClick })=>{
     _s();
     const theme = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$styles$2f$useTheme$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__useTheme$3e$__["useTheme"])();
     const [activeButton, setActiveButton] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
@@ -419,7 +384,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 active: activeButton === "schedule"
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 66,
+                lineNumber: 63,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -431,17 +396,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 }
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 74,
-                columnNumber: 7
-            }, ("TURBOPACK compile-time value", void 0)),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameViewIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameViewIcon"], {
-                icon: __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$icons$2d$material$2f$Assessment$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"],
-                text: "Stats",
-                onClick: ()=>handleButtonClick("stats", onStatsClick),
-                active: activeButton === "stats"
-            }, void 0, false, {
-                fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 84,
+                lineNumber: 71,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameViewIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameViewIcon"], {
@@ -451,7 +406,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 active: activeButton === "skills"
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 91,
+                lineNumber: 81,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameViewIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameViewIcon"], {
@@ -461,7 +416,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 active: activeButton === "inventory"
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 98,
+                lineNumber: 88,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -473,7 +428,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 }
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 106,
+                lineNumber: 96,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameViewIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameViewIcon"], {
@@ -483,7 +438,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 active: activeButton === "news"
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 116,
+                lineNumber: 106,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -492,7 +447,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 }
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 124,
+                lineNumber: 114,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -504,7 +459,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 }
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 127,
+                lineNumber: 117,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameViewIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameViewIcon"], {
@@ -514,7 +469,7 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 active: activeButton === "settings"
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 137,
+                lineNumber: 127,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameViewIcon$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameViewIcon"], {
@@ -524,13 +479,13 @@ const GameSidebar = ({ onScheduleClick, onStatsClick, onSkillsClick, onInventory
                 active: activeButton === "logout"
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-                lineNumber: 144,
+                lineNumber: 134,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx",
-        lineNumber: 48,
+        lineNumber: 45,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -1399,13 +1354,13 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                     color: theme.palette.primary.main,
                     mb: 1
                 },
-                children: equipment.name
+                children: equipment.name || equipment.itemId || equipment.id || "Unknown Item"
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                lineNumber: 36,
+                lineNumber: 37,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
-            equipment.desc && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
+            (equipment.description || equipment.desc) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                 sx: {
                     fontFamily: "Crimson Text, serif",
                     fontSize: "0.85rem",
@@ -1413,10 +1368,10 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                     mb: 1.5,
                     whiteSpace: "pre-wrap"
                 },
-                children: equipment.desc
+                children: equipment.description || equipment.desc
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                lineNumber: 49,
+                lineNumber: 50,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)),
             equipment.weaponStats && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1435,7 +1390,7 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                         children: "Weapon Stats"
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                        lineNumber: 65,
+                        lineNumber: 66,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1457,7 +1412,7 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                                lineNumber: 78,
+                                lineNumber: 79,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             equipment.weaponStats.mDice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1471,7 +1426,7 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                                lineNumber: 83,
+                                lineNumber: 84,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             equipment.weaponStats.weaponType && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1485,7 +1440,7 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                                lineNumber: 88,
+                                lineNumber: 89,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             equipment.weaponStats.handle && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1499,19 +1454,19 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                                lineNumber: 93,
+                                lineNumber: 94,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                        lineNumber: 76,
+                        lineNumber: 77,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                lineNumber: 64,
+                lineNumber: 65,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)),
             equipment.armorStats && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1530,7 +1485,7 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                         children: "Armor Stats"
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                        lineNumber: 104,
+                        lineNumber: 105,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1552,7 +1507,7 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                                lineNumber: 117,
+                                lineNumber: 118,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             equipment.armorStats.mDEF !== undefined && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1566,7 +1521,7 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                                lineNumber: 122,
+                                lineNumber: 123,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             equipment.armorStats.dodgeBonus !== undefined && equipment.armorStats.dodgeBonus !== 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1581,19 +1536,19 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                                lineNumber: 127,
+                                lineNumber: 128,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                        lineNumber: 115,
+                        lineNumber: 116,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                lineNumber: 103,
+                lineNumber: 104,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1616,18 +1571,18 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                     ]
                 }, void 0, true, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                    lineNumber: 137,
+                    lineNumber: 138,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                lineNumber: 136,
+                lineNumber: 137,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-        lineNumber: 35,
+        lineNumber: 36,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0)) : null;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1700,10 +1655,10 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                             px: 0.5,
                             lineHeight: 1.2
                         },
-                        children: equipment.name.split(" ")[0]
+                        children: (equipment.name || equipment.itemId || equipment.id || "Item")?.split(" ")[0]
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                        lineNumber: 218,
+                        lineNumber: 219,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                         sx: {
@@ -1715,17 +1670,17 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                         children: "+"
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                        lineNumber: 232,
+                        lineNumber: 233,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0))
                 }, void 0, false, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                    lineNumber: 174,
+                    lineNumber: 175,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                lineNumber: 153,
+                lineNumber: 154,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             label && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1738,13 +1693,13 @@ const EquipmentSlot = ({ slot, equipment, label, size = "medium" })=>{
                 children: label
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-                lineNumber: 247,
+                lineNumber: 248,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx",
-        lineNumber: 145,
+        lineNumber: 146,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -1795,11 +1750,25 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
         return null;
     }
     // Organize equipment by slot for easy lookup
+    // Handle both array format (EquipmentDisplay[]) and object format (Record<slot, ItemId>)
     const equipmentBySlot = {};
     if (character.equipment) {
-        character.equipment.forEach((eq)=>{
-            equipmentBySlot[eq.slot] = eq;
-        });
+        if (Array.isArray(character.equipment)) {
+            // Array format: EquipmentDisplay[]
+            character.equipment.forEach((eq)=>{
+                equipmentBySlot[eq.slot] = eq;
+            });
+        } else {
+            // Object format: Record<CharacterEquipmentSlot, ItemId>
+            // Convert to EquipmentDisplay format (just ItemId for now, will be resolved later)
+            Object.entries(character.equipment).forEach(([slot, itemId])=>{
+                equipmentBySlot[slot] = {
+                    slot,
+                    itemId: itemId,
+                    id: itemId
+                };
+            });
+        }
     }
     // Helper function to format stat value
     const formatStat = (stat)=>{
@@ -1841,7 +1810,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                lineNumber: 83,
+                                lineNumber: 96,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1854,23 +1823,23 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                 children: formatStat(value)
                             }, void 0, false, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                lineNumber: 93,
+                                lineNumber: 106,
                                 columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                        lineNumber: 74,
+                        lineNumber: 87,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0))
                 }, key, false, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                    lineNumber: 73,
+                    lineNumber: 86,
                     columnNumber: 11
                 }, ("TURBOPACK compile-time value", void 0)))
         }, void 0, false, {
             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-            lineNumber: 71,
+            lineNumber: 84,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0));
     };
@@ -1893,7 +1862,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                     children: title
                 }, void 0, false, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                    lineNumber: 117,
+                    lineNumber: 130,
                     columnNumber: 7
                 }, ("TURBOPACK compile-time value", void 0)),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Tooltip$2f$Tooltip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Tooltip$3e$__["Tooltip"], {
@@ -1933,23 +1902,23 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                             }
                         }, void 0, false, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 160,
+                            lineNumber: 173,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                        lineNumber: 150,
+                        lineNumber: 163,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 }, void 0, false, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                    lineNumber: 127,
+                    lineNumber: 140,
                     columnNumber: 7
                 }, ("TURBOPACK compile-time value", void 0))
             ]
         }, void 0, true, {
             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-            lineNumber: 116,
+            lineNumber: 129,
             columnNumber: 5
         }, ("TURBOPACK compile-time value", void 0));
     // Helper function to create a tooltip-wrapped label
@@ -1987,12 +1956,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                lineNumber: 186,
+                lineNumber: 199,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-            lineNumber: 168,
+            lineNumber: 181,
             columnNumber: 5
         }, ("TURBOPACK compile-time value", void 0));
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Dialog$2f$Dialog$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Dialog$3e$__["Dialog"], {
@@ -2068,18 +2037,18 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                             children: character.title
                         }, void 0, false, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 262,
+                            lineNumber: 275,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                        lineNumber: 244,
+                        lineNumber: 257,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                lineNumber: 230,
+                lineNumber: 243,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$DialogContent$2f$DialogContent$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__DialogContent$3e$__["DialogContent"], {
@@ -2122,7 +2091,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.primary.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 312,
+                                    lineNumber: 325,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2143,7 +2112,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: "Level:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 319,
+                                                    lineNumber: 332,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2155,13 +2124,13 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: character.level || "N/A"
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 322,
+                                                    lineNumber: 335,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 318,
+                                            lineNumber: 331,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2178,7 +2147,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: "Race:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 327,
+                                                    lineNumber: 340,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2190,13 +2159,13 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: character.race || "N/A"
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 330,
+                                                    lineNumber: 343,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 326,
+                                            lineNumber: 339,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2213,7 +2182,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: "Background:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 335,
+                                                    lineNumber: 348,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2225,13 +2194,13 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: character.background || "N/A"
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 338,
+                                                    lineNumber: 351,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 334,
+                                            lineNumber: 347,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2248,7 +2217,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: "Gender:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 343,
+                                                    lineNumber: 356,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2260,13 +2229,13 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: character.gender || "N/A"
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 346,
+                                                    lineNumber: 359,
                                                     columnNumber: 17
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 342,
+                                            lineNumber: 355,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         character.alignment && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2280,7 +2249,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             children: createTooltipLabel("Good", "Measures the character's virtuous and benevolent nature. Higher values indicate a more altruistic and kind character. Combined with Evil, this determines the character's moral alignment.")
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 353,
+                                                            lineNumber: 366,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2292,13 +2261,13 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             children: character.alignment.good
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 359,
+                                                            lineNumber: 372,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 352,
+                                                    lineNumber: 365,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2310,7 +2279,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             children: createTooltipLabel("Evil", "Measures the character's malevolent and selfish nature. Higher values indicate a more cruel and destructive character. Combined with Good, this determines the character's moral alignment.")
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 364,
+                                                            lineNumber: 377,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2322,13 +2291,13 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             children: character.alignment.evil
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 370,
+                                                            lineNumber: 383,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 363,
+                                                    lineNumber: 376,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
@@ -2336,13 +2305,13 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 317,
+                                    lineNumber: 330,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 303,
+                            lineNumber: 316,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         character.vitals && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -2360,7 +2329,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.error.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 390,
+                                    lineNumber: 403,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2379,7 +2348,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: createTooltipLabel("Health Points (HP)", "The character's physical health and vitality. When HP reaches 0, the character becomes incapacitated or dies. Rest and healing restore HP.")
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 397,
+                                                    lineNumber: 410,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2403,7 +2372,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 404,
+                                                            lineNumber: 417,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2421,19 +2390,19 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 417,
+                                                            lineNumber: 430,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 403,
+                                                    lineNumber: 416,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 396,
+                                            lineNumber: 409,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2448,7 +2417,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: createTooltipLabel("Mana Points (MP)", "Magical energy used to cast spells and perform magical abilities. MP is consumed when using magic and regenerates over time or through rest.")
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 423,
+                                                    lineNumber: 436,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2472,7 +2441,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 430,
+                                                            lineNumber: 443,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2490,19 +2459,19 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 443,
+                                                            lineNumber: 456,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 429,
+                                                    lineNumber: 442,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 422,
+                                            lineNumber: 435,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2517,7 +2486,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: createTooltipLabel("Stamina Points (SP)", "Physical endurance and energy used for running, dodging, and performing strenuous physical actions. SP depletes during intense activities and recovers during rest.")
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 449,
+                                                    lineNumber: 462,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2541,7 +2510,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 456,
+                                                            lineNumber: 469,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0)),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2559,31 +2528,31 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                            lineNumber: 469,
+                                                            lineNumber: 482,
                                                             columnNumber: 21
                                                         }, ("TURBOPACK compile-time value", void 0))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 455,
+                                                    lineNumber: 468,
                                                     columnNumber: 19
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 448,
+                                            lineNumber: 461,
                                             columnNumber: 17
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 395,
+                                    lineNumber: 408,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 381,
+                            lineNumber: 394,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         character.needs && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -2601,7 +2570,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.success.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 489,
+                                    lineNumber: 502,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -2632,7 +2601,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     children: createTooltipLabel(key.charAt(0).toUpperCase() + key.slice(1), tooltip)
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 501,
+                                                    lineNumber: 514,
                                                     columnNumber: 21
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$LinearProgress$2f$LinearProgress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LinearProgress$3e$__["LinearProgress"], {
@@ -2648,7 +2617,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 504,
+                                                    lineNumber: 517,
                                                     columnNumber: 21
                                                 }, ("TURBOPACK compile-time value", void 0)),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2664,24 +2633,24 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                    lineNumber: 516,
+                                                    lineNumber: 529,
                                                     columnNumber: 21
                                                 }, ("TURBOPACK compile-time value", void 0))
                                             ]
                                         }, key, true, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 500,
+                                            lineNumber: 513,
                                             columnNumber: 19
                                         }, ("TURBOPACK compile-time value", void 0)))
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 494,
+                                    lineNumber: 507,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 480,
+                            lineNumber: 493,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -2704,7 +2673,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     children: "Equipment"
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 535,
+                                    lineNumber: 548,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2729,12 +2698,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "medium"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 559,
+                                                lineNumber: 572,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 558,
+                                            lineNumber: 571,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2750,12 +2719,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "small"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 569,
+                                                lineNumber: 582,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 568,
+                                            lineNumber: 581,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2771,12 +2740,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "small"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 577,
+                                                lineNumber: 590,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 576,
+                                            lineNumber: 589,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2792,12 +2761,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "small"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 585,
+                                                lineNumber: 598,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 584,
+                                            lineNumber: 597,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2814,12 +2783,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "medium"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 595,
+                                                lineNumber: 608,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 594,
+                                            lineNumber: 607,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2836,12 +2805,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "large"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 603,
+                                                lineNumber: 616,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 602,
+                                            lineNumber: 615,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2858,12 +2827,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "medium"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 611,
+                                                lineNumber: 624,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 610,
+                                            lineNumber: 623,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2879,12 +2848,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "small"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 621,
+                                                lineNumber: 634,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 620,
+                                            lineNumber: 633,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2900,12 +2869,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "small"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 629,
+                                                lineNumber: 642,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 628,
+                                            lineNumber: 641,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2921,12 +2890,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "medium"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 639,
+                                                lineNumber: 652,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 638,
+                                            lineNumber: 651,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2942,12 +2911,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "small"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 649,
+                                                lineNumber: 662,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 648,
+                                            lineNumber: 661,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2963,12 +2932,12 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "small"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 657,
+                                                lineNumber: 670,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 656,
+                                            lineNumber: 669,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2984,24 +2953,24 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                                 size: "small"
                                             }, void 0, false, {
                                                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                                lineNumber: 665,
+                                                lineNumber: 678,
                                                 columnNumber: 17
                                             }, ("TURBOPACK compile-time value", void 0))
                                         }, void 0, false, {
                                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                            lineNumber: 664,
+                                            lineNumber: 677,
                                             columnNumber: 15
                                         }, ("TURBOPACK compile-time value", void 0))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 548,
+                                    lineNumber: 561,
                                     columnNumber: 13
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 526,
+                            lineNumber: 539,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0)),
                         character.attributes && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -3019,14 +2988,14 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.primary.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 686,
+                                    lineNumber: 699,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 renderStatGrid(character.attributes, 4)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 677,
+                            lineNumber: 690,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         character.battleStats && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -3044,14 +3013,14 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.error.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 706,
+                                    lineNumber: 719,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 renderStatGrid(character.battleStats, 3)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 697,
+                            lineNumber: 710,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         character.elements && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -3069,14 +3038,14 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.info.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 726,
+                                    lineNumber: 739,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 renderStatGrid(character.elements, 3)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 717,
+                            lineNumber: 730,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         character.proficiencies && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -3094,14 +3063,14 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.warning.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 746,
+                                    lineNumber: 759,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 renderStatGrid(character.proficiencies, 4)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 737,
+                            lineNumber: 750,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         character.artisans && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -3119,14 +3088,14 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.success.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 766,
+                                    lineNumber: 779,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 renderStatGrid(character.artisans, 4)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 757,
+                            lineNumber: 770,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0)),
                         character.planarAptitude !== undefined && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -3144,7 +3113,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     color: theme.palette.secondary.main
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 786,
+                                    lineNumber: 799,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$LinearProgress$2f$LinearProgress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LinearProgress$3e$__["LinearProgress"], {
@@ -3160,7 +3129,7 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 791,
+                                    lineNumber: 804,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -3176,30 +3145,30 @@ const CharacterStatsModal = ({ open, onClose, character })=>{
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                                    lineNumber: 803,
+                                    lineNumber: 816,
                                     columnNumber: 15
                                 }, ("TURBOPACK compile-time value", void 0))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                            lineNumber: 777,
+                            lineNumber: 790,
                             columnNumber: 13
                         }, ("TURBOPACK compile-time value", void 0))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                    lineNumber: 301,
+                    lineNumber: 314,
                     columnNumber: 9
                 }, ("TURBOPACK compile-time value", void 0))
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-                lineNumber: 282,
+                lineNumber: 295,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx",
-        lineNumber: 204,
+        lineNumber: 217,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -3271,6 +3240,11 @@ function GameView({ mockPartyData } = {}) {
     const [selectedMemberIndex, setSelectedMemberIndex] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
     const [scheduleModalOpen, setScheduleModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [statsModalOpen, setStatsModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Mock location data - will come from backend later
+    const location = {
+        name: "Demo Location",
+        situation: "demo"
+    };
     // Use provided mock data, or default mock data, or will be fetched from API later
     const mockParty = mockPartyData || [
         {
@@ -3346,7 +3320,6 @@ function GameView({ mockPartyData } = {}) {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameSidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameSidebar"], {
                         onScheduleClick: ()=>setScheduleModalOpen(true),
-                        onStatsClick: ()=>setStatsModalOpen(true),
                         onSkillsClick: ()=>console.log("Skills clicked"),
                         onInventoryClick: ()=>console.log("Inventory clicked"),
                         onNewsClick: ()=>console.log("News clicked"),
@@ -3354,7 +3327,7 @@ function GameView({ mockPartyData } = {}) {
                         onLogoutClick: handleLogout
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                        lineNumber: 76,
+                        lineNumber: 90,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -3372,29 +3345,65 @@ function GameView({ mockPartyData } = {}) {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                                 sx: {
-                                    display: "grid",
-                                    gridTemplateColumns: "repeat(3, 1fr)",
-                                    gap: 4,
-                                    justifyItems: "center",
-                                    mb: 4
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    gap: 2,
+                                    alignItems: "flex-start",
+                                    mb: 3
                                 },
-                                children: mockParty.map((member, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$PartyMemberCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PartyMemberCard"], {
+                                children: mockParty.map((member, originalIndex)=>({
+                                        member,
+                                        originalIndex
+                                    })).filter(({ member })=>member.name) // Only show members with names
+                                .map(({ member, originalIndex })=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$PartyMemberCard$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PartyMemberCard"], {
                                         portrait: member.portrait || undefined,
                                         name: member.name || undefined,
+                                        title: member.title || undefined,
                                         level: member.level || undefined,
                                         isPlayer: member.isPlayer,
-                                        isSelected: selectedMemberIndex === index,
+                                        isSelected: selectedMemberIndex === originalIndex,
                                         isEmpty: !member.name,
-                                        onClick: ()=>setSelectedMemberIndex(index)
-                                    }, index, false, {
+                                        onClick: ()=>{
+                                            setSelectedMemberIndex(originalIndex);
+                                            setStatsModalOpen(true);
+                                        }
+                                    }, originalIndex, false, {
                                         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                        lineNumber: 111,
-                                        columnNumber: 15
+                                        lineNumber: 127,
+                                        columnNumber: 17
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                lineNumber: 101,
+                                lineNumber: 114,
                                 columnNumber: 11
+                            }, this),
+                            location.situation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
+                                sx: {
+                                    width: "100%",
+                                    borderRadius: 2,
+                                    overflow: "hidden",
+                                    border: `2px solid ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.secondary.main, 0.3)}`,
+                                    boxShadow: `0 4px 16px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#000", 0.1)}`,
+                                    mb: 4
+                                },
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                    src: `/img/${location.situation}.png`,
+                                    alt: location.name,
+                                    style: {
+                                        width: "100%",
+                                        height: "auto",
+                                        display: "block",
+                                        objectFit: "cover"
+                                    }
+                                }, void 0, false, {
+                                    fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
+                                    lineNumber: 156,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
+                                lineNumber: 146,
+                                columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                                 sx: {
@@ -3406,19 +3415,19 @@ function GameView({ mockPartyData } = {}) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                lineNumber: 125,
+                                lineNumber: 170,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                        lineNumber: 87,
+                        lineNumber: 100,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 68,
+                lineNumber: 82,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$ActionScheduleModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ActionScheduleModal"], {
@@ -3430,7 +3439,7 @@ function GameView({ mockPartyData } = {}) {
                 hasRailStation: true
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 140,
+                lineNumber: 185,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$CharacterStatsModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CharacterStatsModal"], {
@@ -3439,13 +3448,13 @@ function GameView({ mockPartyData } = {}) {
                 character: mockParty[selectedMemberIndex] || null
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 150,
+                lineNumber: 195,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-        lineNumber: 56,
+        lineNumber: 70,
         columnNumber: 5
     }, this);
 }
@@ -3833,6 +3842,9 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 /**
  * Mock party data for UI development
  * Comprehensive structure with all fields needed for UI display
+ * 
+ * NOTE: MockPartyMember extends CharacterStatsView for compatibility.
+ * In production, use CharacterStatsView from @/types/game
  */ __turbopack_context__.s([
     "mockParty",
     ()=>mockParty

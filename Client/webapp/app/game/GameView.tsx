@@ -1,19 +1,43 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, alpha, useTheme } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Typography, alpha, useTheme } from "@mui/material";
 import { useRouter } from "next/navigation";
 import {
   GameSidebar,
   PartyMemberCard,
+  SettingsButton,
+  SettingsModal,
+  NewsModal,
+  ChatPanel,
+  GameTimeAndLocation,
 } from "@/components/GameView";
 import { ActionScheduleModal } from "@/components/GameView/ActionScheduleModal";
 import { CharacterStatsModal } from "@/components/GameView/CharacterStatsModal";
 import { MockPartyMember } from "@/data/mockPartyData";
+import { mockNews, GameTimeInterface } from "@/data/mockNewsData";
 
 interface GameViewProps {
   mockPartyData?: MockPartyMember[]; // Optional mock data for UI development
 }
+
+// Location data structure for frontend
+interface LocationData {
+  name: string;
+  region: string;
+  subRegion: string;
+  situation: string; // Image identifier (e.g., "demo" maps to /img/demo.png)
+}
+
+// Mock game time - will come from backend later
+const mockGameTime: GameTimeInterface = {
+  hour: 3,
+  dayOfWeek: 2,
+  dayOfSeason: 15,
+  season: 1,
+  dayPassed: 14,
+  year: 1,
+};
 
 export default function GameView({ mockPartyData }: GameViewProps = {} as GameViewProps) {
   const theme = useTheme();
@@ -21,6 +45,55 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(0);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [statsModalOpen, setStatsModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [newsModalOpen, setNewsModalOpen] = useState(false);
+
+  // Mock location data - will come from backend later
+  const location: LocationData = {
+    name: "Wayward Inn",
+    region: "Central",
+    subRegion: "Capital",
+    situation: "demo", // Maps to /img/demo.png
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input/textarea
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      switch (e.key.toLowerCase()) {
+        case "c":
+          // Focus chat - chat panel is always visible, could scroll to it later
+          // For now, just a placeholder (chat is always visible)
+          break;
+        case "s":
+          // Open Skills - placeholder for now
+          console.log("Skills clicked - S key");
+          break;
+        case "i":
+          // Open Inventory - placeholder for now
+          console.log("Inventory clicked - I key");
+          break;
+        case "n":
+          setNewsModalOpen(true);
+          break;
+        case "t":
+          setScheduleModalOpen(true);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, []);
 
   // Use provided mock data, or default mock data, or will be fetched from API later
   const mockParty = mockPartyData || [
@@ -47,21 +120,19 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
     // TODO: Open rail travel modal
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("sessionToken");
-    router.push("/login");
-  };
 
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        height: "100vh", // Use fixed height instead of minHeight to prevent scrolling
+        maxHeight: "100vh", // Ensure it never exceeds viewport
         display: "flex",
         flexDirection: "column",
         background: "var(--gradient-arcane)",
         backgroundAttachment: "fixed",
         padding: 2,
         gap: 2,
+        overflow: "hidden", // Prevent page-level scrolling
       }}
     >
       {/* Main Content Area */}
@@ -70,23 +141,25 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
           flex: 1,
           display: "flex",
           gap: 2,
+          minHeight: 0, // Important: allows flex children to shrink below content size
+          overflow: "hidden", // Prevent overflow
         }}
       >
         {/* Left: Sidebar */}
         <GameSidebar
           onScheduleClick={() => setScheduleModalOpen(true)}
-          onStatsClick={() => setStatsModalOpen(true)}
           onSkillsClick={() => console.log("Skills clicked")}
           onInventoryClick={() => console.log("Inventory clicked")}
-          onNewsClick={() => console.log("News clicked")}
-          onSettingsClick={() => console.log("Settings clicked")}
-          onLogoutClick={handleLogout}
+          onNewsClick={() => setNewsModalOpen(true)}
         />
 
         {/* Center: Party Display */}
         <Box
           sx={{
             flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0, // Important: allows flex children to shrink
             backgroundColor: alpha(theme.palette.background.paper, 0.9),
             border: `2px solid ${theme.palette.tertiary?.main || theme.palette.secondary.main}`,
             borderRadius: 2,
@@ -95,43 +168,107 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
               0 4px 16px ${alpha("#000", 0.1)},
               inset 0 1px 0 ${alpha("#fff", 0.3)}
             `,
+            overflow: "hidden", // Prevent overflow
           }}
         >
-          {/* Party Members Grid */}
+          {/* Party Members - Single Row, Left Aligned, Only Show Existing Members */}
           <Box
             sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 4,
-              justifyItems: "center",
-              mb: 4,
+              display: "flex",
+              flexDirection: "row",
+              gap: 2,
+              alignItems: "flex-start",
+              mb: 3,
             }}
           >
-            {mockParty.map((member, index) => (
-              <PartyMemberCard
-                key={index}
-                portrait={member.portrait || undefined}
-                name={member.name || undefined}
-                level={member.level || undefined}
-                isPlayer={member.isPlayer}
-                isSelected={selectedMemberIndex === index}
-                isEmpty={!member.name}
-                onClick={() => setSelectedMemberIndex(index)}
-              />
-            ))}
+            {mockParty
+              .map((member, originalIndex) => ({ member, originalIndex }))
+              .filter(({ member }) => member.name) // Only show members with names
+              .map(({ member, originalIndex }) => (
+                <PartyMemberCard
+                  key={originalIndex}
+                  portrait={member.portrait || undefined}
+                  name={member.name || undefined}
+                  title={member.title || undefined}
+                  level={member.level || undefined}
+                  isPlayer={member.isPlayer}
+                  isSelected={selectedMemberIndex === originalIndex}
+                  isEmpty={!member.name}
+                  needs={member.needs}
+                  nextAction={
+                    originalIndex === 0
+                      ? "Craft Magic Staff"
+                      : originalIndex === 1
+                      ? "Train Strength"
+                      : originalIndex === 2
+                      ? "Rest"
+                      : undefined
+                  }
+                  actionType={
+                    originalIndex === 0
+                      ? "crafting"
+                      : originalIndex === 1
+                      ? "training"
+                      : originalIndex === 2
+                      ? "resting"
+                      : undefined
+                  }
+                  onClick={() => {
+                    setSelectedMemberIndex(originalIndex);
+                    setStatsModalOpen(true);
+                  }}
+                />
+              ))}
           </Box>
 
-          {/* Selected Character Details - TODO: Implement */}
+          {/* Location Situation Image - Fixed Height with Game Time and Location Overlay */}
+          {location.situation && (
+            <Box
+              sx={{
+                width: "100%",
+                height: "35vh", // Fixed viewport height
+                minHeight: 200, // Minimum height for smaller screens
+                maxHeight: 350, // Maximum height for very large screens
+                borderRadius: 2,
+                overflow: "hidden",
+                border: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+                boxShadow: `0 4px 16px ${alpha("#000", 0.1)}`,
+                mb: 3,
+                position: "relative", // For absolute positioning of game time and location
+              }}
+            >
+              <img
+                src={`/img/${location.situation}.png`}
+                alt={location.name}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "block",
+                  objectFit: "cover", // Maintain aspect ratio, crop if needed
+                  objectPosition: "center",
+                }}
+              />
+              {/* Game Time and Location Display - Top Right */}
+              <GameTimeAndLocation
+                gameTime={mockGameTime}
+                region={location.region}
+                subRegion={location.subRegion}
+                locationName={location.name}
+              />
+            </Box>
+          )}
+
+          {/* Chat Panel - Replaces Recent News */}
           <Box
             sx={{
-              mt: 4,
-              padding: 3,
-              backgroundColor: alpha("#fff", 0.3),
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.tertiary?.main || theme.palette.secondary.main, 0.3)}`,
+              flex: 1, // Take remaining space
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 0, // Important: allows flex children to shrink
+              overflow: "hidden",
             }}
           >
-            {/* Character details will go here */}
+            <ChatPanel currentUserId="mock-character-001" />
           </Box>
         </Box>
       </Box>
@@ -152,6 +289,22 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
         onClose={() => setStatsModalOpen(false)}
         character={mockParty[selectedMemberIndex] || null}
       />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        open={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
+      />
+
+      {/* News Modal */}
+      <NewsModal
+        open={newsModalOpen}
+        onClose={() => setNewsModalOpen(false)}
+        news={mockNews}
+      />
+
+      {/* Settings Button - Fixed bottom-right */}
+      <SettingsButton onClick={() => setSettingsModalOpen(true)} />
     </Box>
   );
 }

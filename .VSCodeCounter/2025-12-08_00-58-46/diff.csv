@@ -1,0 +1,442 @@
+"filename", "language", "XML", "TypeScript", "TypeScript JSX", "JSON", "JSON with Comments", "JavaScript", "Markdown", "Shell Script", "HTML", "YAML", "Docker", "CSS", "Log", "Properties", "comment", "blank", "total"
+"/Users/vajrap/workspace/MyProject/.idea/MyProject.iml", "XML", -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12
+"/Users/vajrap/workspace/MyProject/.idea/dictionaries/project.xml", "XML", -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/.idea/inspectionProfiles/Project_Default.xml", "XML", -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/.idea/modules.xml", "XML", -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8
+"/Users/vajrap/workspace/MyProject/.idea/vcs.xml", "XML", -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/L10N/buffDebuffEnums.ts", "TypeScript", 0, -51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, -7, -62
+"/Users/vajrap/workspace/MyProject/Client/L10N/buffsAndDebuffs.ts", "TypeScript", 0, -223, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -5, -230
+"/Users/vajrap/workspace/MyProject/Client/L10N/skillEnums.ts", "TypeScript", 0, -153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -264, -71, -488
+"/Users/vajrap/workspace/MyProject/Client/L10N/skills.ts", "TypeScript", 0, -428, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -4, -434
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/.eslintrc.cjs", "JavaScript", 0, 0, 0, 0, 0, -19, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -21
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/README.md", "Markdown", 0, 0, 0, 0, 0, 0, -48, 0, 0, 0, 0, 0, 0, 0, 0, -15, -63
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/dist/assets/index-zWSswt4V.js", "JavaScript", 0, 0, 0, 0, 0, -247, 0, 0, 0, 0, 0, 0, 0, 0, -43, -38, -328
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/dist/index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, -2, -15
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/dist/vite.svg", "XML", -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, -2, -15
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/package-lock.json", "JSON", 0, 0, 0, -4120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -4121
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/package.json", "JSON", 0, 0, 0, -34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -36
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/public/vite.svg", "XML", -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/App.tsx", "TypeScript JSX", 0, 0, -193, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -25, -219
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/components/BattleResults/AIAnalysisPanel.tsx", "TypeScript JSX", 0, 0, -192, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, -26, -222
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/components/BattleResults/BattleResultsView.tsx", "TypeScript JSX", 0, 0, -214, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -15, -230
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/components/BattleResults/PartySummary.tsx", "TypeScript JSX", 0, 0, -42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, -46
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/components/BattleResults/StatisticsPanel.tsx", "TypeScript JSX", 0, 0, -708, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, -41, -769
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/components/BattleResults/TurnDetail.tsx", "TypeScript JSX", 0, 0, -77, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8, -85
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/components/PartyConfig/CharacterSlot.tsx", "TypeScript JSX", 0, 0, -199, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -16, -216
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/components/PartyConfig/PartyConfigPanel.tsx", "TypeScript JSX", 0, 0, -259, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -25, -285
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/components/PresetManager/PresetSelector.tsx", "TypeScript JSX", 0, 0, -172, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -184
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/constants/aiSystemPrompt.ts", "TypeScript", 0, -97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -19, -116
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/main.tsx", "TypeScript JSX", 0, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, -28
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/services/api.ts", "TypeScript", 0, -157, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -14, -17, -188
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/services/types.ts", "TypeScript", 0, -255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -24, -286
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/utils/nameGenerator.ts", "TypeScript", 0, -41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -17, -13, -71
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/src/vite-env.d.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -3
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/tsconfig.json", "JSON with Comments", 0, 0, 0, 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -5, -33
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/tsconfig.node.json", "JSON", 0, 0, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -12
+"/Users/vajrap/workspace/MyProject/Client/battle-simulator/vite.config.ts", "TypeScript", 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -28
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/README.md", "Markdown", 0, 0, 0, 0, 0, 0, -51, 0, 0, 0, 0, 0, 0, 0, 0, -22, -73
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/bun.lock", "JSON with Comments", 0, 0, 0, 0, -107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -87, -194
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/package.json", "JSON", 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -21
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/public/app.js", "JavaScript", 0, 0, 0, 0, 0, -1853, 0, 0, 0, 0, 0, 0, 0, 0, -3, -3, -1859
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/public/app.ts", "TypeScript", 0, -230, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, -30, -280
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/public/index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, -37, 0, 0, 0, 0, 0, 0, -6, -43
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/public/style.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -284, 0, 0, -6, -46, -336
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/public/textParser.js", "JavaScript", 0, 0, 0, 0, 0, -228, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -230
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/public/textParser.ts", "TypeScript", 0, -276, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -77, -49, -402
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/public/tooltip.js", "JavaScript", 0, 0, 0, 0, 0, -1405, 0, 0, 0, 0, 0, 0, 0, 0, -55, -52, -1512
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/public/tooltip.ts", "TypeScript", 0, -82, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11, -19, -112
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/server.ts", "TypeScript", 0, -136, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -15, -22, -173
+"/Users/vajrap/workspace/MyProject/Client/text-visualizer/tsconfig.json", "JSON with Comments", 0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -17
+"/Users/vajrap/workspace/MyProject/Client/webapp/.env", "Properties", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22, -10, -10, -42
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/build-manifest.json", "JSON", 0, 0, 0, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -50
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/cache/next-devtools-config.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/fallback-build-manifest.json", "JSON", 0, 0, 0, -37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -37
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/logs/next-development.log", "Log", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2003, 0, 0, -91, -2094
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/package.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/prerender-manifest.json", "JSON", 0, 0, 0, -11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/routes-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app-paths-manifest.json", "JSON", 0, 0, 0, -9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/_not-found/page.js", "JavaScript", 0, 0, 0, 0, 0, -11, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -12
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/_not-found/page/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/_not-found/page/build-manifest.json", "JSON", 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/_not-found/page/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/_not-found/page/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/_not-found/page/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/_not-found/page_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-login/route.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -7
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-login/route/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-login/route/build-manifest.json", "JSON", 0, 0, 0, -11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-login/route/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-login/route_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-register/route.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -7
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-register/route/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-register/route/build-manifest.json", "JSON", 0, 0, 0, -11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-register/route/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/api/test-register/route_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/character-creation/page.js", "JavaScript", 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/character-creation/page/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/character-creation/page/build-manifest.json", "JSON", 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/character-creation/page/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/character-creation/page/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/character-creation/page/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/character-creation/page_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/mock/page.js", "JavaScript", 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/mock/page/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/mock/page/build-manifest.json", "JSON", 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/mock/page/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/mock/page/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/mock/page/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/mock/page_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/page.js", "JavaScript", 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/page/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/page/build-manifest.json", "JSON", 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/page/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/page/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/page/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/game/page_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/login/page.js", "JavaScript", 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/login/page/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/login/page/build-manifest.json", "JSON", 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/login/page/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/login/page/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/login/page/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/login/page_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/page.js", "JavaScript", 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/page/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/page/build-manifest.json", "JSON", 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/page/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/page/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/page/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/page_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/register/page.js", "JavaScript", 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/register/page/app-paths-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/register/page/build-manifest.json", "JSON", 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -22
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/register/page/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/register/page/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/register/page/server-reference-manifest.json", "JSON", 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/app/register/page_client-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/27ff1_webapp__next-internal_server_app_api_test-register_route_actions_bc5bcc5a.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/[root-of-the-server]__16c73eb2._.js", "JavaScript", 0, 0, 0, 0, 0, -67, 0, 0, 0, 0, 0, 0, 0, 0, -1, -16, -84
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/[root-of-the-server]__1da31330._.js", "JavaScript", 0, 0, 0, 0, 0, -69, 0, 0, 0, 0, 0, 0, 0, 0, -2, -16, -87
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/[turbopack]_runtime.js", "JavaScript", 0, 0, 0, 0, 0, -640, 0, 0, 0, 0, 0, 0, 0, 0, -128, -2, -770
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/bb998_Client_webapp__next-internal_server_app_api_test-login_route_actions_146aef92.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/eb252_next_42edce38._.js", "JavaScript", 0, 0, 0, 0, 0, -13013, 0, 0, 0, 0, 0, 0, 0, 0, -1349, -120, -14482
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/eb252_next_de5a194e._.js", "JavaScript", 0, 0, 0, 0, 0, -13013, 0, 0, 0, 0, 0, 0, 0, 0, -1349, -120, -14482
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/27ff1_webapp__next-internal_server_app_character-creation_page_actions_7791bbcd.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/953a0_MyProject_Client_webapp__next-internal_server_app_game_page_actions_20ce69c3.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/953a0_MyProject_Client_webapp__next-internal_server_app_login_page_actions_d554a84b.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/953a0_MyProject_Client_webapp__next-internal_server_app_page_actions_ee9e7028.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[externals]_next_dist_shared_lib_no-fallback-error_external_59b92b38.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -8
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__025e2423._.js", "JavaScript", 0, 0, 0, 0, 0, -4383, 0, 0, 0, 0, 0, 0, 0, 0, -258, -16, -4657
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__09803343._.js", "JavaScript", 0, 0, 0, 0, 0, -1753, 0, 0, 0, 0, 0, 0, 0, 0, -72, -15, -1840
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__177d7beb._.js", "JavaScript", 0, 0, 0, 0, 0, -1484, 0, 0, 0, 0, 0, 0, 0, 0, -17, -15, -1516
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__1aaf5479._.js", "JavaScript", 0, 0, 0, 0, 0, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -38
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__1f15768e._.js", "JavaScript", 0, 0, 0, 0, 0, -2770, 0, 0, 0, 0, 0, 0, 0, 0, -193, -18, -2981
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__22018ef3._.js", "JavaScript", 0, 0, 0, 0, 0, -1518, 0, 0, 0, 0, 0, 0, 0, 0, -28, -11, -1557
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__22b909eb._.js", "JavaScript", 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, -1, -6, -32
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__2522e286._.js", "JavaScript", 0, 0, 0, 0, 0, -3078, 0, 0, 0, 0, 0, 0, 0, 0, -61, -13, -3152
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__2ef1c820._.js", "JavaScript", 0, 0, 0, 0, 0, -3333, 0, 0, 0, 0, 0, 0, 0, 0, -24, -17, -3374
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__398ec6c0._.js", "JavaScript", 0, 0, 0, 0, 0, -3191, 0, 0, 0, 0, 0, 0, 0, 0, -56, -14, -3261
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__4ab17b39._.js", "JavaScript", 0, 0, 0, 0, 0, -3431, 0, 0, 0, 0, 0, 0, 0, 0, -36, -50, -3517
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__54912db8._.js", "JavaScript", 0, 0, 0, 0, 0, -2887, 0, 0, 0, 0, 0, 0, 0, 0, -56, -12, -2955
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__5e71e210._.js", "JavaScript", 0, 0, 0, 0, 0, -61, 0, 0, 0, 0, 0, 0, 0, 0, -3, -9, -73
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__63d3a075._.js", "JavaScript", 0, 0, 0, 0, 0, -1385, 0, 0, 0, 0, 0, 0, 0, 0, -63, -14, -1462
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__65edb100._.js", "JavaScript", 0, 0, 0, 0, 0, -43, 0, 0, 0, 0, 0, 0, 0, 0, -3, -8, -54
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__6b449750._.js", "JavaScript", 0, 0, 0, 0, 0, -267, 0, 0, 0, 0, 0, 0, 0, 0, -9, -9, -285
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__79d00464._.js", "JavaScript", 0, 0, 0, 0, 0, -9, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -12
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__7f148858._.js", "JavaScript", 0, 0, 0, 0, 0, -42, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, -62
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__94d99312._.js", "JavaScript", 0, 0, 0, 0, 0, -61, 0, 0, 0, 0, 0, 0, 0, 0, -3, -9, -73
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__a4ab7fa0._.js", "JavaScript", 0, 0, 0, 0, 0, -2565, 0, 0, 0, 0, 0, 0, 0, 0, -35, -17, -2617
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__cb8b2f1c._.js", "JavaScript", 0, 0, 0, 0, 0, -3411, 0, 0, 0, 0, 0, 0, 0, 0, -36, -40, -3487
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__cd9b7670._.js", "JavaScript", 0, 0, 0, 0, 0, -3078, 0, 0, 0, 0, 0, 0, 0, 0, -61, -14, -3153
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__ce7fd09e._.js", "JavaScript", 0, 0, 0, 0, 0, -4315, 0, 0, 0, 0, 0, 0, 0, 0, -264, -15, -4594
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__e0d7b8ff._.js", "JavaScript", 0, 0, 0, 0, 0, -61, 0, 0, 0, 0, 0, 0, 0, 0, -3, -9, -73
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__e37f92b1._.js", "JavaScript", 0, 0, 0, 0, 0, -61, 0, 0, 0, 0, 0, 0, 0, 0, -3, -9, -73
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__e6a4d965._.js", "JavaScript", 0, 0, 0, 0, 0, -22, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10, -32
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[root-of-the-server]__e7337784._.js", "JavaScript", 0, 0, 0, 0, 0, -4619, 0, 0, 0, 0, 0, 0, 0, 0, -200, -20, -4839
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/[turbopack]_runtime.js", "JavaScript", 0, 0, 0, 0, 0, -640, 0, 0, 0, 0, 0, 0, 0, 0, -128, -2, -770
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/bb998_Client_webapp__next-internal_server_app__not-found_page_actions_76fbe801.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/bb998_Client_webapp__next-internal_server_app_game_mock_page_actions_7706fa44.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/bb998_Client_webapp__next-internal_server_app_register_page_actions_2c0f6a61.js", "JavaScript", 0, 0, 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_00682e57._.js", "JavaScript", 0, 0, 0, 0, 0, -6747, 0, 0, 0, 0, 0, 0, 0, 0, -935, -155, -7837
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_0d042f49._.js", "JavaScript", 0, 0, 0, 0, 0, -4128, 0, 0, 0, 0, 0, 0, 0, 0, -186, -31, -4345
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_3647efd6._.js", "JavaScript", 0, 0, 0, 0, 0, -5008, 0, 0, 0, 0, 0, 0, 0, 0, -746, -88, -5842
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_45b0ad64._.js", "JavaScript", 0, 0, 0, 0, 0, -12882, 0, 0, 0, 0, 0, 0, 0, 0, -2480, -154, -15516
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_54f17b74._.js", "JavaScript", 0, 0, 0, 0, 0, -6018, 0, 0, 0, 0, 0, 0, 0, 0, -908, -102, -7028
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_5603c1e2._.js", "JavaScript", 0, 0, 0, 0, 0, -6781, 0, 0, 0, 0, 0, 0, 0, 0, -935, -160, -7876
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_789c77ab._.js", "JavaScript", 0, 0, 0, 0, 0, -4995, 0, 0, 0, 0, 0, 0, 0, 0, -746, -87, -5828
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_@mui_material_c1533bdc._.js", "JavaScript", 0, 0, 0, 0, 0, -8445, 0, 0, 0, 0, 0, 0, 0, 0, -1358, -123, -9926
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_@mui_system_383be71e._.js", "JavaScript", 0, 0, 0, 0, 0, -2666, 0, 0, 0, 0, 0, 0, 0, 0, -256, -41, -2963
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_@popperjs_core_lib_dd6ad9c8._.js", "JavaScript", 0, 0, 0, 0, 0, -2194, 0, 0, 0, 0, 0, 0, 0, 0, -60, -56, -2310
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_bccde6d0._.js", "JavaScript", 0, 0, 0, 0, 0, -6031, 0, 0, 0, 0, 0, 0, 0, 0, -908, -103, -7042
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_c09ecb94._.js", "JavaScript", 0, 0, 0, 0, 0, -5008, 0, 0, 0, 0, 0, 0, 0, 0, -746, -88, -5842
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_c164541d._.js", "JavaScript", 0, 0, 0, 0, 0, -5050, 0, 0, 0, 0, 0, 0, 0, 0, -737, -73, -5860
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_c4444ac0._.js", "JavaScript", 0, 0, 0, 0, 0, -11022, 0, 0, 0, 0, 0, 0, 0, 0, -2222, -124, -13368
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_ea28530f._.js", "JavaScript", 0, 0, 0, 0, 0, -11305, 0, 0, 0, 0, 0, 0, 0, 0, -2263, -122, -13690
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_1d3e9350._.js", "JavaScript", 0, 0, 0, 0, 0, -48, 0, 0, 0, 0, 0, 0, 0, 0, -4, -3, -55
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_178a5380._.js", "JavaScript", 0, 0, 0, 0, 0, -8634, 0, 0, 0, 0, 0, 0, 0, 0, -606, -54, -9294
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_39542ecc._.js", "JavaScript", 0, 0, 0, 0, 0, -8634, 0, 0, 0, 0, 0, 0, 0, 0, -606, -54, -9294
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_4feffdad._.js", "JavaScript", 0, 0, 0, 0, 0, -4872, 0, 0, 0, 0, 0, 0, 0, 0, -968, -86, -5926
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_59549ef8._.js", "JavaScript", 0, 0, 0, 0, 0, -14871, 0, 0, 0, 0, 0, 0, 0, 0, -1525, -148, -16544
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_7898808d._.js", "JavaScript", 0, 0, 0, 0, 0, -14886, 0, 0, 0, 0, 0, 0, 0, 0, -1527, -151, -16564
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_7d30e6cd._.js", "JavaScript", 0, 0, 0, 0, 0, -4876, 0, 0, 0, 0, 0, 0, 0, 0, -968, -87, -5931
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_875b91ba._.js", "JavaScript", 0, 0, 0, 0, 0, -8655, 0, 0, 0, 0, 0, 0, 0, 0, -606, -55, -9316
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_89c28da2._.js", "JavaScript", 0, 0, 0, 0, 0, -10225, 0, 0, 0, 0, 0, 0, 0, 0, -807, -78, -11110
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_b5de8713._.js", "JavaScript", 0, 0, 0, 0, 0, -8634, 0, 0, 0, 0, 0, 0, 0, 0, -606, -54, -9294
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_client_components_7b7f316a._.js", "JavaScript", 0, 0, 0, 0, 0, -131, 0, 0, 0, 0, 0, 0, 0, 0, -14, -4, -149
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_client_components_builtin_forbidden_68127715.js", "JavaScript", 0, 0, 0, 0, 0, -29, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -32
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_client_components_builtin_global-error_18e1ae56.js", "JavaScript", 0, 0, 0, 0, 0, -17, 0, 0, 0, 0, 0, 0, 0, 0, -3, -4, -24
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_client_components_builtin_unauthorized_2fa1d575.js", "JavaScript", 0, 0, 0, 0, 0, -29, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -32
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_d3734de8._.js", "JavaScript", 0, 0, 0, 0, 0, -8642, 0, 0, 0, 0, 0, 0, 0, 0, -606, -54, -9302
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/eb252_next_dist_d4df8580._.js", "JavaScript", 0, 0, 0, 0, 0, -8634, 0, 0, 0, 0, 0, 0, 0, 0, -606, -54, -9294
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/chunks/ssr/workspace_MyProject_Client_webapp_c7b26d12._.js", "JavaScript", 0, 0, 0, 0, 0, -110, 0, 0, 0, 0, 0, 0, 0, 0, -5, -9, -124
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/interception-route-rewrite-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/middleware-build-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -51
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/middleware-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/next-font-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages-manifest.json", "JSON", 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_app.js", "JavaScript", 0, 0, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -5
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_app/build-manifest.json", "JSON", 0, 0, 0, -23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -23
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_app/client-build-manifest.json", "JSON", 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_app/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_app/pages-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_app/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_document.js", "JavaScript", 0, 0, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_document/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_document/pages-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_document/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_error.js", "JavaScript", 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_error/build-manifest.json", "JSON", 0, 0, 0, -23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -23
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_error/client-build-manifest.json", "JSON", 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_error/next-font-manifest.json", "JSON", 0, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_error/pages-manifest.json", "JSON", 0, 0, 0, -3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/pages/_error/react-loadable-manifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/server-reference-manifest.js", "JavaScript", 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/server/server-reference-manifest.json", "JSON", 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/[next]_entry_page-loader_ts_071ae873._.js", "JavaScript", 0, 0, 0, 0, 0, -18, 0, 0, 0, 0, 0, 0, 0, 0, -3, -2, -23
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/[next]_entry_page-loader_ts_e1ca7d46._.js", "JavaScript", 0, 0, 0, 0, 0, -18, 0, 0, 0, 0, 0, 0, 0, 0, -3, -2, -23
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/[root-of-the-server]__89743755._.js", "JavaScript", 0, 0, 0, 0, 0, -444, 0, 0, 0, 0, 0, 0, 0, 0, -25, -3, -472
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/[root-of-the-server]__acb3e68b._.js", "JavaScript", 0, 0, 0, 0, 0, -444, 0, 0, 0, 0, 0, 0, 0, 0, -25, -3, -472
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_0a7fd02b._.js", "JavaScript", 0, 0, 0, 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -13
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_c5900a0a._.js", "JavaScript", 0, 0, 0, 0, 0, -7, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -8
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_c8c997ce._.js", "JavaScript", 0, 0, 0, 0, 0, -440, 0, 0, 0, 0, 0, 0, 0, 0, -25, -2, -467
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_10b94013._.js", "JavaScript", 0, 0, 0, 0, 0, -11109, 0, 0, 0, 0, 0, 0, 0, 0, -2256, -124, -13489
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_1650a043._.js", "JavaScript", 0, 0, 0, 0, 0, -3105, 0, 0, 0, 0, 0, 0, 0, 0, -522, -58, -3685
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_2dfac579._.js", "JavaScript", 0, 0, 0, 0, 0, -3105, 0, 0, 0, 0, 0, 0, 0, 0, -522, -58, -3685
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_3d7530aa._.js", "JavaScript", 0, 0, 0, 0, 0, -4118, 0, 0, 0, 0, 0, 0, 0, 0, -684, -72, -4874
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_424e860a._.js", "JavaScript", 0, 0, 0, 0, 0, -1309, 0, 0, 0, 0, 0, 0, 0, 0, -25, -9, -1343
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_555163f0._.js", "JavaScript", 0, 0, 0, 0, 0, -9243, 0, 0, 0, 0, 0, 0, 0, 0, -1998, -94, -11335
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_616c8a43._.js", "JavaScript", 0, 0, 0, 0, 0, -3092, 0, 0, 0, 0, 0, 0, 0, 0, -522, -57, -3671
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_7a12c83f._.js", "JavaScript", 0, 0, 0, 0, 0, -6858, 0, 0, 0, 0, 0, 0, 0, 0, -939, -157, -7954
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_878bbfc7._.js", "JavaScript", 0, 0, 0, 0, 0, -4131, 0, 0, 0, 0, 0, 0, 0, 0, -684, -73, -4888
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_@mui_material_f06637bf._.js", "JavaScript", 0, 0, 0, 0, 0, -8602, 0, 0, 0, 0, 0, 0, 0, 0, -1358, -123, -10083
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_@mui_system_03ca8959._.js", "JavaScript", 0, 0, 0, 0, 0, -2688, 0, 0, 0, 0, 0, 0, 0, 0, -256, -41, -2985
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_@popperjs_core_lib_d5ea4673._.js", "JavaScript", 0, 0, 0, 0, 0, -2194, 0, 0, 0, 0, 0, 0, 0, 0, -60, -56, -2310
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_@swc_helpers_cjs_0b0d11ac._.js", "JavaScript", 0, 0, 0, 0, 0, -45, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3, -49
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_badf136b._.js", "JavaScript", 0, 0, 0, 0, 0, -6635, 0, 0, 0, 0, 0, 0, 0, 0, -931, -154, -7720
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_ddd0f803._.js", "JavaScript", 0, 0, 0, 0, 0, -9520, 0, 0, 0, 0, 0, 0, 0, 0, -2039, -92, -11651
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_app_ca05dd85.js", "JavaScript", 0, 0, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -8
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_191cc4ad._.js", "JavaScript", 0, 0, 0, 0, 0, -1956, 0, 0, 0, 0, 0, 0, 0, 0, -186, -22, -2164
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_3a729ddc._.js", "JavaScript", 0, 0, 0, 0, 0, -1942, 0, 0, 0, 0, 0, 0, 0, 0, -338, -22, -2302
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_415bba26._.js", "JavaScript", 0, 0, 0, 0, 0, -4450, 0, 0, 0, 0, 0, 0, 0, 0, -464, -66, -4980
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_602c3f8f._.js", "JavaScript", 0, 0, 0, 0, 0, -2109, 0, 0, 0, 0, 0, 0, 0, 0, -201, -23, -2333
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_a9516ca4._.js", "JavaScript", 0, 0, 0, 0, 0, -2165, 0, 0, 0, 0, 0, 0, 0, 0, -346, -25, -2536
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_build_polyfills_polyfill-nomodule.js", "JavaScript", 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_client_0a51649a._.js", "JavaScript", 0, 0, 0, 0, 0, -10548, 0, 0, 0, 0, 0, 0, 0, 0, -2458, -102, -13108
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_client_3c66f25e._.js", "JavaScript", 0, 0, 0, 0, 0, -3576, 0, 0, 0, 0, 0, 0, 0, 0, -355, -41, -3972
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_client_components_builtin_global-error_e94b0144.js", "JavaScript", 0, 0, 0, 0, 0, -7, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -8
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_compiled_7f24a18e._.js", "JavaScript", 0, 0, 0, 0, 0, -3425, 0, 0, 0, 0, 0, 0, 0, 0, -242, -209, -3876
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_compiled_ed15c875._.js", "JavaScript", 0, 0, 0, 0, 0, -2741, 0, 0, 0, 0, 0, 0, 0, 0, -161, -14, -2916
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_compiled_next-devtools_index_049477b6.js", "JavaScript", 0, 0, 0, 0, 0, -1363, 0, 0, 0, 0, 0, 0, 0, 0, -98, -198, -1659
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_compiled_react-dom_bf606ee7._.js", "JavaScript", 0, 0, 0, 0, 0, -16484, 0, 0, 0, 0, 0, 0, 0, 0, -38, -5, -16527
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_compiled_react-server-dom-turbopack_1eef23c5._.js", "JavaScript", 0, 0, 0, 0, 0, -2799, 0, 0, 0, 0, 0, 0, 0, 0, -9, -4, -2812
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_shared_lib_2c399478._.js", "JavaScript", 0, 0, 0, 0, 0, -5102, 0, 0, 0, 0, 0, 0, 0, 0, -582, -63, -5747
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_dist_shared_lib_395e96dd._.js", "JavaScript", 0, 0, 0, 0, 0, -4882, 0, 0, 0, 0, 0, 0, 0, 0, -563, -61, -5506
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_next_error_b966c4a4.js", "JavaScript", 0, 0, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -8
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/eb252_react-dom_92d2872e._.js", "JavaScript", 0, 0, 0, 0, 0, -15338, 0, 0, 0, 0, 0, 0, 0, 0, -38, -5, -15381
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/pages/_app.js", "JavaScript", 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/pages/_error.js", "JavaScript", 0, 0, 0, 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/turbopack-workspace_MyProject_Client_webapp_38567c12._.js", "JavaScript", 0, 0, 0, 0, 0, -1480, 0, 0, 0, 0, 0, 0, 0, 0, -353, -3, -1836
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/turbopack-workspace_MyProject_Client_webapp_pages__app_27b5baf1._.js", "JavaScript", 0, 0, 0, 0, 0, -1480, 0, 0, 0, 0, 0, 0, 0, 0, -353, -3, -1836
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/turbopack-workspace_MyProject_Client_webapp_pages__error_76b91501._.js", "JavaScript", 0, 0, 0, 0, 0, -1480, 0, 0, 0, 0, 0, 0, 0, 0, -353, -3, -1836
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_06961098._.js", "JavaScript", 0, 0, 0, 0, 0, -1557, 0, 0, 0, 0, 0, 0, 0, 0, -17, -9, -1583
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_1b02be5b._.js", "JavaScript", 0, 0, 0, 0, 0, -3249, 0, 0, 0, 0, 0, 0, 0, 0, -56, -8, -3313
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_2d38e2af._.js", "JavaScript", 0, 0, 0, 0, 0, -2647, 0, 0, 0, 0, 0, 0, 0, 0, -35, -11, -2693
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_37cc8265._.js", "JavaScript", 0, 0, 0, 0, 0, -1430, 0, 0, 0, 0, 0, 0, 0, 0, -63, -8, -1501
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_3fb0e692._.js", "JavaScript", 0, 0, 0, 0, 0, -4376, 0, 0, 0, 0, 0, 0, 0, 0, -264, -9, -4649
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_4c0d80e9._.js", "JavaScript", 0, 0, 0, 0, 0, -4730, 0, 0, 0, 0, 0, 0, 0, 0, -200, -14, -4944
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_585c615e._.js", "JavaScript", 0, 0, 0, 0, 0, -1816, 0, 0, 0, 0, 0, 0, 0, 0, -72, -9, -1897
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_59894a62._.js", "JavaScript", 0, 0, 0, 0, 0, -2855, 0, 0, 0, 0, 0, 0, 0, 0, -193, -12, -3060
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_6d1eaea0._.js", "JavaScript", 0, 0, 0, 0, 0, -3136, 0, 0, 0, 0, 0, 0, 0, 0, -61, -8, -3205
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_8fe2f5ef._.js", "JavaScript", 0, 0, 0, 0, 0, -3432, 0, 0, 0, 0, 0, 0, 0, 0, -24, -11, -3467
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_995f58ba._.js", "JavaScript", 0, 0, 0, 0, 0, -2939, 0, 0, 0, 0, 0, 0, 0, 0, -56, -6, -3001
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_a0ff3932._.js", "JavaScript", 0, 0, 0, 0, 0, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -15
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_app_character-creation_page_tsx_d3f5148e._.js", "JavaScript", 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_app_game_mock_page_tsx_d3f5148e._.js", "JavaScript", 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_app_game_page_tsx_d3f5148e._.js", "JavaScript", 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_app_layout_tsx_e94b0144._.js", "JavaScript", 0, 0, 0, 0, 0, -11, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -12
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_app_login_page_tsx_d3f5148e._.js", "JavaScript", 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_app_register_page_tsx_d3f5148e._.js", "JavaScript", 0, 0, 0, 0, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_b32b435d._.js", "JavaScript", 0, 0, 0, 0, 0, -4450, 0, 0, 0, 0, 0, 0, 0, 0, -258, -10, -4718
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_d14323f6._.js", "JavaScript", 0, 0, 0, 0, 0, -1563, 0, 0, 0, 0, 0, 0, 0, 0, -28, -5, -1596
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_e4de5882._.js", "JavaScript", 0, 0, 0, 0, 0, -3547, 0, 0, 0, 0, 0, 0, 0, 0, -37, -38, -3622
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_f5f8e666._.js", "JavaScript", 0, 0, 0, 0, 0, -3133, 0, 0, 0, 0, 0, 0, 0, 0, -61, -7, -3201
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_pages__app_2da965e7._.js", "JavaScript", 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -16
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/chunks/workspace_MyProject_Client_webapp_pages__error_2da965e7._.js", "JavaScript", 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -16
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/development/_buildManifest.js", "JavaScript", 0, 0, 0, 0, 0, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -14
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/development/_clientMiddlewareManifest.json", "JSON", 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/static/development/_ssgManifest.js", "JavaScript", 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/types/cache-life.d.ts", "TypeScript", 0, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -106, -14, -146
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/types/routes.d.ts", "TypeScript", 0, -37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -31, -12, -80
+"/Users/vajrap/workspace/MyProject/Client/webapp/.next/dev/types/validator.ts", "TypeScript", 0, -94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -21, -19, -134
+"/Users/vajrap/workspace/MyProject/Client/webapp/API_TYPES_REFACTOR_PLAN.md", "Markdown", 0, 0, 0, 0, 0, 0, -39, 0, 0, 0, 0, 0, 0, 0, 0, -14, -53
+"/Users/vajrap/workspace/MyProject/Client/webapp/COMPONENT_ARCHITECTURE.md", "Markdown", 0, 0, 0, 0, 0, 0, -170, 0, 0, 0, 0, 0, 0, 0, 0, -35, -205
+"/Users/vajrap/workspace/MyProject/Client/webapp/GAME_PAGE_DATA_STATUS.md", "Markdown", 0, 0, 0, 0, 0, 0, -57, 0, 0, 0, 0, 0, 0, 0, 0, -20, -77
+"/Users/vajrap/workspace/MyProject/Client/webapp/GAME_UI_INTEGRATION_PLAN.md", "Markdown", 0, 0, 0, 0, 0, 0, -166, 0, 0, 0, 0, 0, 0, 0, 0, -46, -212
+"/Users/vajrap/workspace/MyProject/Client/webapp/GAME_VIEW_DESIGN.md", "Markdown", 0, 0, 0, 0, 0, 0, -468, 0, 0, 0, 0, 0, 0, 0, 0, -99, -567
+"/Users/vajrap/workspace/MyProject/Client/webapp/LANGUAGE_SWITCHING.md", "Markdown", 0, 0, 0, 0, 0, 0, -164, 0, 0, 0, 0, 0, 0, 0, 0, -64, -228
+"/Users/vajrap/workspace/MyProject/Client/webapp/MIGRATION_STATUS.md", "Markdown", 0, 0, 0, 0, 0, 0, -53, 0, 0, 0, 0, 0, 0, 0, 0, -18, -71
+"/Users/vajrap/workspace/MyProject/Client/webapp/TESTING_CHECKLIST.md", "Markdown", 0, 0, 0, 0, 0, 0, -68, 0, 0, 0, 0, 0, 0, 0, 0, -16, -84
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/api/test-login/route.ts", "TypeScript", 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5, -30
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/api/test-register/route.ts", "TypeScript", 0, -27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -5, -33
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/character-creation/CharacterCreationView.tsx", "TypeScript JSX", 0, 0, -609, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, -55, -696
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/character-creation/characterStatsData.ts", "TypeScript", 0, -741, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -18, -34, -793
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/character-creation/page.tsx", "TypeScript JSX", 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -7
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/character-creation/useCharacterCreationLogic.ts", "TypeScript", 0, -249, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -29, -39, -317
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/components/GlobalComponents.tsx", "TypeScript JSX", 0, 0, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, -16
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/game/GameView.tsx", "TypeScript JSX", 0, 0, -132, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -15, -159
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/game/mock/page.tsx", "TypeScript JSX", 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -4, -17
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/game/page.tsx", "TypeScript JSX", 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -7
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/layout.tsx", "TypeScript JSX", 0, 0, -19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -21
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/login/LoginView.tsx", "TypeScript JSX", 0, 0, -366, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, -31, -403
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/login/page.tsx", "TypeScript JSX", 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -7
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/login/useLoginLogic.ts", "TypeScript", 0, -152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -18, -24, -194
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/page.tsx", "TypeScript JSX", 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -7
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/register/RegisterView.tsx", "TypeScript JSX", 0, 0, -524, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, -38, -571
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/register/page.tsx", "TypeScript JSX", 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -7
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/register/useRegisterLogic.ts", "TypeScript", 0, -221, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -27, -34, -282
+"/Users/vajrap/workspace/MyProject/Client/webapp/app/theme/ThemeProvider.tsx", "TypeScript JSX", 0, 0, -71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -4, -78
+"/Users/vajrap/workspace/MyProject/Client/webapp/bun.lock", "JSON with Comments", 0, 0, 0, 0, -638, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -598, -1236
+"/Users/vajrap/workspace/MyProject/Client/webapp/dist/README.md", "Markdown", 0, 0, 0, 0, 0, 0, -117, 0, 0, 0, 0, 0, 0, 0, 0, -34, -151
+"/Users/vajrap/workspace/MyProject/Client/webapp/dist/assets/index-IR2mf7Ta.js", "JavaScript", 0, 0, 0, 0, 0, -283, 0, 0, 0, 0, 0, 0, 0, 0, -67, -45, -395
+"/Users/vajrap/workspace/MyProject/Client/webapp/dist/index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, -124, 0, 0, 0, 0, 0, -10, -19, -153
+"/Users/vajrap/workspace/MyProject/Client/webapp/index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, -124, 0, 0, 0, 0, 0, -10, -19, -153
+"/Users/vajrap/workspace/MyProject/Client/webapp/next-env.d.ts", "TypeScript", 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, -2, -7
+"/Users/vajrap/workspace/MyProject/Client/webapp/next.config.ts", "TypeScript", 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -4, -9
+"/Users/vajrap/workspace/MyProject/Client/webapp/package-lock.json", "JSON", 0, 0, 0, -4565, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -4566
+"/Users/vajrap/workspace/MyProject/Client/webapp/package.json", "JSON", 0, 0, 0, -43, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -44
+"/Users/vajrap/workspace/MyProject/Client/webapp/public/README.md", "Markdown", 0, 0, 0, 0, 0, 0, -117, 0, 0, 0, 0, 0, 0, 0, 0, -34, -151
+"/Users/vajrap/workspace/MyProject/Client/webapp/server.ts", "TypeScript", 0, -46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -11, -69
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/App.tsx", "TypeScript JSX", 0, 0, -48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11, -59
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/L10N/buffDebuffEnums.ts", "TypeScript", 0, -51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, -7, -62
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/L10N/buffsAndDebuffs.ts", "TypeScript", 0, -223, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -5, -230
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/L10N/skillEnums.ts", "TypeScript", 0, -153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -264, -71, -488
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/L10N/skills.ts", "TypeScript", 0, -428, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -4, -434
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/Alert/AlertBox.tsx", "TypeScript JSX", 0, 0, -281, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -16, -304
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/Alert/index.ts", "TypeScript", 0, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -4
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/GameView/ActionScheduleModal.tsx", "TypeScript JSX", 0, 0, -319, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -21, -352
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/GameView/ActionSelectionModal.tsx", "TypeScript JSX", 0, 0, -160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -13, -180
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/GameView/CharacterStatsModal.tsx", "TypeScript JSX", 0, 0, -767, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -31, -29, -827
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/GameView/EquipmentSlot.tsx", "TypeScript JSX", 0, 0, -237, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10, -16, -263
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/GameView/GameSidebar.tsx", "TypeScript JSX", 0, 0, -126, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -16, -154
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/GameView/GameViewIcon.tsx", "TypeScript JSX", 0, 0, -93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, -9, -108
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/GameView/PartyMemberCard.tsx", "TypeScript JSX", 0, 0, -210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -16, -14, -240
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/GameView/index.ts", "TypeScript", 0, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8, -22
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/LanguageSwitcher.tsx", "TypeScript JSX", 0, 0, -286, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -23, -321
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/MusicPlayer/components/MusicPlayer.tsx", "TypeScript JSX", 0, 0, -361, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, -23, -393
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/MusicPlayer/components/ScrollingText.tsx", "TypeScript JSX", 0, 0, -55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -62
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/MusicPlayer/components/SongList.tsx", "TypeScript JSX", 0, 0, -113, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, -119
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/MusicPlayer/hooks/useMusicPlayer.ts", "TypeScript", 0, -179, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, -37, -222
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/MusicPlayer/index.ts", "TypeScript", 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -5
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/MusicPlayer/songList.ts", "TypeScript", 0, -99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -102
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/components/MusicPlayer/types.ts", "TypeScript", 0, -18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -20
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/config/actions.ts", "TypeScript", 0, -101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -16, -8, -125
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/data/mockPartyData.ts", "TypeScript", 0, -528, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -40, -63, -631
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/localization/index.ts", "TypeScript", 0, -987, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -18, -47, -1052
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/main.tsx", "TypeScript JSX", 0, 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -3, -18
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/services/RestHandler.ts", "TypeScript", 0, -88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5, -14, -107
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/services/authService.ts", "TypeScript", 0, -87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -19, -12, -118
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/services/characterService.ts", "TypeScript", 0, -106, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -13, -122
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/services/validation.ts", "TypeScript", 0, -238, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -47, -44, -329
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/styles/global.tsx", "TypeScript JSX", 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5, -2, -71
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/styles/theme.ts", "TypeScript", 0, -299, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -14, -17, -330
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/theme/index.ts", "TypeScript", 0, -282, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -147, -8, -437
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/theme/theme.d.ts", "TypeScript", 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, -29
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/types/api.ts", "TypeScript", 0, -177, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -31, -28, -236
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/types/character.ts", "TypeScript", 0, -77, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -19, -16, -112
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/types/game.ts", "TypeScript", 0, -79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -21, -11, -111
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/types/localization.ts", "TypeScript", 0, -268, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, -19, -293
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/utils/TextRenderer.tsx", "TypeScript JSX", 0, 0, -44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -7, -58
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/utils/localizationHelper.ts", "TypeScript", 0, -29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -18, -10, -57
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/utils/textRenderer.ts", "TypeScript", 0, -327, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -80, -55, -462
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/viewmodels/LoginViewModel.ts", "TypeScript", 0, -158, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -23, -34, -215
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/viewmodels/RegisterViewModel.ts", "TypeScript", 0, -224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -31, -46, -301
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/views/CharacterCreationView.tsx", "TypeScript JSX", 0, 0, -548, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -21, -60, -629
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/views/GameView.tsx", "TypeScript JSX", 0, 0, -112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, -10, -131
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/views/LoginView.tsx", "TypeScript JSX", 0, 0, -377, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11, -33, -421
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/views/RegisterView.tsx", "TypeScript JSX", 0, 0, -516, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -36, -564
+"/Users/vajrap/workspace/MyProject/Client/webapp/src/vite-env.d.ts", "TypeScript", 0, -27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -3, -31
+"/Users/vajrap/workspace/MyProject/Client/webapp/tsconfig.json", "JSON with Comments", 0, 0, 0, 0, -74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -75
+"/Users/vajrap/workspace/MyProject/Client/webapp/tsconfig.node.json", "JSON", 0, 0, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -11
+"/Users/vajrap/workspace/MyProject/Client/webapp/vite.config.ts", "TypeScript", 0, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -2, -33
+"/Users/vajrap/workspace/MyProject/DATABASE_CONNECTION_INFO.md", "Markdown", 0, 0, 0, 0, 0, 0, -45, 0, 0, 0, 0, 0, 0, 0, 0, -16, -61
+"/Users/vajrap/workspace/MyProject/Doc/Monster.md", "Markdown", 0, 0, 0, 0, 0, 0, -84, 0, 0, 0, 0, 0, 0, 0, 0, -39, -123
+"/Users/vajrap/workspace/MyProject/Doc/battle-system-skill-design.md", "Markdown", 0, 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, -5, -30
+"/Users/vajrap/workspace/MyProject/Doc/project.markdown", "Markdown", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1
+"/Users/vajrap/workspace/MyProject/Doc/quest-system-design.md", "Markdown", 0, 0, 0, 0, 0, 0, -648, 0, 0, 0, 0, 0, 0, 0, 0, -159, -807
+"/Users/vajrap/workspace/MyProject/Doc/server-lazy-kanban.md", "Markdown", 0, 0, 0, 0, 0, 0, -51, 0, 0, 0, 0, 0, 0, 0, 0, -16, -67
+"/Users/vajrap/workspace/MyProject/Dockerfile", "Docker", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5, 0, 0, 0, 0, -4, -9
+"/Users/vajrap/workspace/MyProject/GAME_READINESS_CHECKLIST.md", "Markdown", 0, 0, 0, 0, 0, 0, -221, 0, 0, 0, 0, 0, 0, 0, 0, -71, -292
+"/Users/vajrap/workspace/MyProject/SYSTEM_ARCHITECTURE.md", "Markdown", 0, 0, 0, 0, 0, 0, -1465, 0, 0, 0, 0, 0, 0, 0, 0, -454, -1919
+"/Users/vajrap/workspace/MyProject/Server/Common/Text/TextEnum.ts", "TypeScript", 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -6
+"/Users/vajrap/workspace/MyProject/Server/README.md", "Markdown", 0, 0, 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, 0, 0, 0, -19, -55
+"/Users/vajrap/workspace/MyProject/Server/SKILL_DESCRIPTION_STANDARD.md", "Markdown", 0, 0, 0, 0, 0, 0, -527, 0, 0, 0, 0, 0, 0, 0, 0, -123, -650
+"/Users/vajrap/workspace/MyProject/Server/Tests/API/actions.test.ts", "TypeScript", 0, -645, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -52, -128, -825
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Battle/README.md", "Markdown", 0, 0, 0, 0, 0, 0, -91, 0, 0, 0, 0, 0, 0, 0, 0, -32, -123
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Battle/damageResolution.test.ts", "TypeScript", 0, -548, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -117, -100, -765
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Battle/dropProcess.test.ts", "TypeScript", 0, -252, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -64, -87, -403
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Battle/getTarget.test.ts", "TypeScript", 0, -343, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8, -68, -419
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Character/Character.test.ts", "TypeScript", 0, -399, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -9, -66, -474
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Character/Subclass/Alignment/CharacterAlighment.test.ts", "TypeScript", 0, -319, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -25, -344
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Character/Subclass/Stats/CharacterAttributes.test.ts", "TypeScript", 0, -419, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -19, -97, -535
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Character/Subclass/Stats/train.test.ts", "TypeScript", 0, -42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -49
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Character/Subclass/Title/title.test.ts", "TypeScript", 0, -101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -17, -118
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Character/Subclass/Vitals/CharacterVitals.test.ts", "TypeScript", 0, -499, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -27, -145, -671
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Location/Location.refillResources.test.ts", "TypeScript", 0, -1416, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -28, -131, -1575
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Location/LocationGraph.test.ts", "TypeScript", 0, -111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -30, -153
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Market/MarketPrice.test.ts", "TypeScript", 0, -31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -11, -42
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Market/PriceModifiers.test.ts", "TypeScript", 0, -222, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -73, -74, -369
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Market/ResourceProductionTracker.test.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -469, -96, -565
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/News/NewsArchive.test.ts", "TypeScript", 0, -403, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, -83, -518
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Skill/learnSkill.test.ts", "TypeScript", 0, -356, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -11, -368
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Weather/WeatherCard.test.ts", "TypeScript", 0, -285, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8, -62, -355
+"/Users/vajrap/workspace/MyProject/Server/Tests/Entity/Weather/getRandomWeatherDeviant.test.ts", "TypeScript", 0, -136, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, -41, -209
+"/Users/vajrap/workspace/MyProject/Server/Tests/Event/craftArmor.test.ts", "TypeScript", 0, -132, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10, -29, -171
+"/Users/vajrap/workspace/MyProject/Server/Tests/Event/craftWeapon.test.ts", "TypeScript", 0, -141, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -28, -181
+"/Users/vajrap/workspace/MyProject/Server/Tests/Game/GameLoop.test.ts", "TypeScript", 0, -112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -30, -142
+"/Users/vajrap/workspace/MyProject/Server/Tests/Helper/Character.ts", "TypeScript", 0, -198, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -14, -16, -228
+"/Users/vajrap/workspace/MyProject/Server/Tests/Services/CharacterService.pure.test.ts", "TypeScript", 0, -331, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -24, -75, -430
+"/Users/vajrap/workspace/MyProject/Server/Tests/Utils/Dice.test.ts", "TypeScript", 0, -50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, -62
+"/Users/vajrap/workspace/MyProject/Server/Tests/Utils/isBodyValid.test.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, -9, -41
+"/Users/vajrap/workspace/MyProject/Server/Tests/Utils/statMod.test.ts", "TypeScript", 0, -41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -3, -44
+"/Users/vajrap/workspace/MyProject/Server/Tests/playGround.ts", "TypeScript", 0, -402, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -44, -56, -502
+"/Users/vajrap/workspace/MyProject/Server/bun.lock", "JSON with Comments", 0, 0, 0, 0, -591, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -555, -1146
+"/Users/vajrap/workspace/MyProject/Server/drizzle.config.ts", "TypeScript", 0, -13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, -15
+"/Users/vajrap/workspace/MyProject/Server/jest.config.js", "JavaScript", 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -26
+"/Users/vajrap/workspace/MyProject/Server/package-lock.json", "JSON", 0, 0, 0, -9418, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -9419
+"/Users/vajrap/workspace/MyProject/Server/package.json", "JSON", 0, 0, 0, -56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -57
+"/Users/vajrap/workspace/MyProject/Server/scripts/db-management.ts", "TypeScript", 0, -353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, -59, -432
+"/Users/vajrap/workspace/MyProject/Server/scripts/extract-l10n.ts", "TypeScript", 0, -438, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -91, -81, -610
+"/Users/vajrap/workspace/MyProject/Server/scripts/game-loop.ts", "TypeScript", 0, -102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, -122
+"/Users/vajrap/workspace/MyProject/Server/scripts/migrate.ts", "TypeScript", 0, -26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -8, -35
+"/Users/vajrap/workspace/MyProject/Server/scripts/test-db.ts", "TypeScript", 0, -46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -14, -67
+"/Users/vajrap/workspace/MyProject/Server/scripts/test-endpoints.ts", "TypeScript", 0, -155, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -15, -33, -203
+"/Users/vajrap/workspace/MyProject/Server/tsconfig.json", "JSON with Comments", 0, 0, 0, 0, -27, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5, -5, -37
+"/Users/vajrap/workspace/MyProject/docker-compose.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 0, 0, -33, 0, 0, 0, 0, -27, -7, -67
+"/Users/vajrap/workspace/MyProject/loki-config.yaml", "YAML", 0, 0, 0, 0, 0, 0, 0, 0, 0, -47, 0, 0, 0, 0, 0, -9, -56
+"/Users/vajrap/workspace/MyProject/promtail-config.yaml", "YAML", 0, 0, 0, 0, 0, 0, 0, 0, 0, -39, 0, 0, 0, 0, -5, -5, -49
+"/Users/vajrap/workspace/MyProject/settings.json", "JSON with Comments", 0, 0, 0, 0, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5
+"/Users/vajrap/workspace/MyProject/start-dev.sh", "Shell Script", 0, 0, 0, 0, 0, 0, 0, -153, 0, 0, 0, 0, 0, 0, -24, -34, -211
+"Total", "-", -37, -18157, -8569, -18785, -1482, -485309, -4711, -153, -311, -119, -5, -284, -2003, -22, -54136, -11913, -605996

@@ -1,14 +1,24 @@
 import React from "react";
-import { Box, Typography, alpha, useTheme } from "@mui/material";
+import { Box, Typography, alpha, useTheme, Tooltip } from "@mui/material";
 import { PersonAdd } from "@mui/icons-material";
+import { CharacterNeedsBar } from "./CharacterNeedsBar";
+import { ActionIndicator } from "./ActionIndicator";
 
 export interface PartyMemberCardProps {
   portrait?: string; // Portrait image path (if character exists)
   name?: string; // Character name
+  title?: string; // Character title (epithet + role)
   level?: number; // Character level
   isPlayer?: boolean; // Is this the player's character?
   isSelected?: boolean; // Is this card currently selected?
   isEmpty?: boolean; // Is this an empty slot?
+  needs?: {
+    mood: number;
+    energy: number;
+    satiety: number;
+  };
+  nextAction?: string; // Name of next action to execute
+  actionType?: string; // Type of action
   onClick: () => void;
 }
 
@@ -20,44 +30,82 @@ export interface PartyMemberCardProps {
 export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
   portrait,
   name,
+  title,
   level,
   isPlayer = false,
   isSelected = false,
   isEmpty = false,
+  needs,
+  nextAction,
+  actionType,
   onClick,
 }) => {
   const theme = useTheme();
 
-  // Determine glow color based on state
+  // Determine glow color - only player gets special color, others are normal
   const glowColor = isPlayer
     ? theme.palette.primary.main // Purple for player
-    : isSelected
-    ? theme.palette.tertiary.main // Teal for selected
-    : theme.palette.text.disabled; // Grey for normal
+    : theme.palette.text.disabled; // Grey for normal (no selected state)
 
-  return (
+  // Tooltip content with needs and next action
+  const tooltipContent = !isEmpty && (needs || nextAction) ? (
+    <Box sx={{ padding: 1, minWidth: 200 }}>
+      {needs && (
+        <Box sx={{ mb: nextAction ? 1.5 : 0 }}>
+          <CharacterNeedsBar
+            mood={needs.mood}
+            energy={needs.energy}
+            satiety={needs.satiety}
+            compact={false}
+          />
+        </Box>
+      )}
+      {nextAction && (
+        <Box>
+          <Typography
+            sx={{
+              fontFamily: "Cinzel, serif",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              color: theme.palette.text.secondary,
+              mb: 0.5,
+            }}
+          >
+            Next Action:
+          </Typography>
+          <ActionIndicator
+            actionName={nextAction}
+            actionType={actionType}
+            isNext={true}
+          />
+        </Box>
+      )}
+    </Box>
+  ) : null;
+
+  const cardContent = (
     <Box
       onClick={onClick}
       sx={{
         position: "relative",
-        width: 120,
+        width: 80,
         cursor: "pointer",
         transition: "all 0.25s ease-out",
         
         "&:hover": {
-          transform: "translateY(-4px) scale(1.03)",
+          transform: "translateY(-2px) scale(1.05)",
         },
 
         "&:active": {
-          transform: "translateY(-2px) scale(1.01)",
+          transform: "translateY(-1px) scale(1.02)",
         },
       }}
     >
       {/* Portrait Circle */}
       <Box
         sx={{
-          width: 120,
-          height: 120,
+          width: 80,
+          height: 80,
           borderRadius: "50%",
           border: isEmpty
             ? `3px dashed ${theme.palette.text.disabled}`
@@ -71,11 +119,16 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
           overflow: "hidden",
           position: "relative",
           
-          // Glow effect
+          // Glow effect - only player gets strong glow
           boxShadow: isEmpty
             ? "none"
+            : isPlayer
+            ? `
+              0 0 24px ${alpha(glowColor, 0.6)},
+              inset 0 2px 4px ${alpha("#000", 0.1)}
+            `
             : `
-              0 0 ${isSelected || isPlayer ? "24px" : "12px"} ${alpha(glowColor, isSelected || isPlayer ? 0.6 : 0.3)},
+              0 0 8px ${alpha(glowColor, 0.2)},
               inset 0 2px 4px ${alpha("#000", 0.1)}
             `,
 
@@ -115,7 +168,7 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
             }}
           >
             <img
-              src={portrait}
+              src={portrait?.startsWith("/") ? portrait : `/img/portraits/${portrait}.png`}
               alt={name || "Character"}
               style={{
                 width: "100%",
@@ -129,7 +182,7 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
           <Typography
             sx={{
               fontFamily: "Cinzel, serif",
-              fontSize: "2.5rem",
+              fontSize: "1.75rem",
               fontWeight: 700,
               color: theme.palette.text.secondary,
             }}
@@ -137,79 +190,21 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
             {name?.charAt(0) || "?"}
           </Typography>
         )}
-
-        {/* Player star indicator */}
-        {isPlayer && !isEmpty && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: -8,
-              right: -8,
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              backgroundColor: theme.palette.primary.main,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: `2px solid ${theme.palette.background.paper}`,
-              boxShadow: `0 0 16px ${alpha(theme.palette.primary.main, 0.6)}`,
-            }}
-          >
-            <Typography
-              sx={{
-                color: "#fff",
-                fontSize: "1.2rem",
-                lineHeight: 1,
-              }}
-            >
-              ⭐
-            </Typography>
-          </Box>
-        )}
-
-        {/* Level badge */}
-        {!isEmpty && level !== undefined && (
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: -8,
-              left: "50%",
-              transform: "translateX(-50%)",
-              backgroundColor: theme.palette.secondary.main,
-              color: "#fff",
-              padding: "4px 12px",
-              borderRadius: 2,
-              border: `2px solid ${theme.palette.background.paper}`,
-              boxShadow: `0 2px 8px ${alpha("#000", 0.2)}`,
-            }}
-          >
-            <Typography
-              sx={{
-                fontFamily: "Crimson Text, serif",
-                fontSize: "0.9rem",
-                fontWeight: 700,
-                letterSpacing: "0.5px",
-              }}
-            >
-              Lv {level}
-            </Typography>
-          </Box>
-        )}
       </Box>
 
-      {/* Character Name */}
+      {/* Character Name Only */}
       {!isEmpty && name && (
         <Typography
           sx={{
             textAlign: "center",
             fontFamily: "Crimson Text, serif",
-            fontSize: "1rem",
-            fontWeight: 600,
+            fontSize: "0.8rem",
+            fontWeight: 500,
             color: isPlayer ? theme.palette.primary.main : theme.palette.text.primary,
-            mt: 2,
+            mt: 1.5,
+            lineHeight: 1.2,
             textShadow: isPlayer
-              ? `0 0 8px ${alpha(theme.palette.primary.main, 0.4)}`
+              ? `0 0 6px ${alpha(theme.palette.primary.main, 0.4)}`
               : "none",
           }}
         >
@@ -235,5 +230,30 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
       )}
     </Box>
   );
+
+  // Wrap with tooltip if there's content to show
+  if (tooltipContent) {
+    return (
+      <Tooltip
+        title={tooltipContent}
+        arrow
+        placement="top"
+        componentsProps={{
+          tooltip: {
+            sx: {
+              backgroundColor: alpha(theme.palette.background.paper, 0.95),
+              border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+              boxShadow: `0 4px 16px ${alpha("#000", 0.2)}`,
+              maxWidth: 300,
+            },
+          },
+        }}
+      >
+        {cardContent}
+      </Tooltip>
+    );
+  }
+
+  return cardContent;
 };
 

@@ -1,24 +1,18 @@
 import React, { useState } from "react";
 import { Box, alpha, useTheme } from "@mui/material";
 import {
-  Assessment,
   AutoAwesome,
   Inventory,
   Article,
   CalendarMonth,
-  Settings,
-  Logout,
 } from "@mui/icons-material";
 import { GameViewIcon } from "./GameViewIcon";
 
 export interface GameSidebarProps {
   onScheduleClick?: () => void;
-  onStatsClick?: () => void;
   onSkillsClick?: () => void;
   onInventoryClick?: () => void;
   onNewsClick?: () => void;
-  onSettingsClick?: () => void;
-  onLogoutClick?: () => void;
 }
 
 /**
@@ -27,12 +21,9 @@ export interface GameSidebarProps {
  */
 export const GameSidebar: React.FC<GameSidebarProps> = ({
   onScheduleClick,
-  onStatsClick,
   onSkillsClick,
   onInventoryClick,
   onNewsClick,
-  onSettingsClick,
-  onLogoutClick,
 }) => {
   const theme = useTheme();
   const [activeButton, setActiveButton] = useState<string | null>(null);
@@ -82,13 +73,6 @@ export const GameSidebar: React.FC<GameSidebarProps> = ({
 
       {/* Character Section */}
       <GameViewIcon
-        icon={Assessment}
-        text="Stats"
-        onClick={() => handleButtonClick("stats", onStatsClick)}
-        active={activeButton === "stats"}
-      />
-
-      <GameViewIcon
         icon={AutoAwesome}
         text="Skills"
         onClick={() => handleButtonClick("skills", onSkillsClick)}
@@ -118,34 +102,6 @@ export const GameSidebar: React.FC<GameSidebarProps> = ({
         text="News"
         onClick={() => handleButtonClick("news", onNewsClick)}
         active={activeButton === "news"}
-      />
-
-      {/* Spacer to push bottom buttons down */}
-      <Box sx={{ flex: 1 }} />
-
-      {/* Divider */}
-      <Box
-        sx={{
-          height: 2,
-          backgroundColor: alpha(theme.palette.text.disabled, 0.2),
-          my: 1,
-          borderRadius: 1,
-        }}
-      />
-
-      {/* System Section */}
-      <GameViewIcon
-        icon={Settings}
-        text="Settings"
-        onClick={() => handleButtonClick("settings", onSettingsClick)}
-        active={activeButton === "settings"}
-      />
-
-      <GameViewIcon
-        icon={Logout}
-        text="Logout"
-        onClick={() => handleButtonClick("logout", onLogoutClick)}
-        active={activeButton === "logout"}
       />
     </Box>
   );
