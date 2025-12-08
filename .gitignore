@@ -1,2 +1,5 @@
 /loki-data/
 /logs/
+
+# VSCodeCounter extension generated files
+.VSCodeCounter/
