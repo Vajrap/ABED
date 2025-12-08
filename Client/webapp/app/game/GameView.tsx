@@ -133,6 +133,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
         padding: 2,
         gap: 2,
         overflow: "hidden", // Prevent page-level scrolling
+        position: "relative",
       }}
     >
       {/* Main Content Area */}
@@ -143,6 +144,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
           gap: 2,
           minHeight: 0, // Important: allows flex children to shrink below content size
           overflow: "hidden", // Prevent overflow
+          position: "relative",
         }}
       >
         {/* Left: Sidebar */}
@@ -153,32 +155,51 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
           onNewsClick={() => setNewsModalOpen(true)}
         />
 
-        {/* Center: Party Display */}
+        {/* Center: Party Display with Location Image Box */}
         <Box
           sx={{
             flex: 1,
             display: "flex",
             flexDirection: "column",
             minHeight: 0, // Important: allows flex children to shrink
-            backgroundColor: alpha(theme.palette.background.paper, 0.9),
-            border: `2px solid ${theme.palette.tertiary?.main || theme.palette.secondary.main}`,
-            borderRadius: 2,
-            padding: 4,
-            boxShadow: `
-              0 4px 16px ${alpha("#000", 0.1)},
-              inset 0 1px 0 ${alpha("#fff", 0.3)}
-            `,
-            overflow: "hidden", // Prevent overflow
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          {/* Party Members - Single Row, Left Aligned, Only Show Existing Members */}
+
+          {/* Top Right: Game Time + Location + Settings - Floating inside image box */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 24,
+              right: 24,
+              zIndex: 100,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 1.5,
+            }}
+          >
+            <GameTimeAndLocation
+              gameTime={mockGameTime}
+              region={location.region}
+              subRegion={location.subRegion}
+              locationName={location.name}
+            />
+            <SettingsButton onClick={() => setSettingsModalOpen(true)} />
+          </Box>
+
+          {/* Party Members - Single Row, Left Aligned - Floating inside image box */}
           <Box
             sx={{
               display: "flex",
               flexDirection: "row",
               gap: 2,
               alignItems: "flex-start",
-              mb: 3,
+              padding: 4,
+              paddingTop: 6, // Extra padding to account for negative top of image
+              position: "relative",
+              zIndex: 20,
             }}
           >
             {mockParty
@@ -226,9 +247,10 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
             <Box
               sx={{
                 width: "100%",
-                height: "35vh", // Fixed viewport height
+                marginTop: "-185px",
+                height: "55vh", // Fixed viewport height
                 minHeight: 200, // Minimum height for smaller screens
-                maxHeight: 350, // Maximum height for very large screens
+                maxHeight: 500, // Maximum height for very large screens
                 borderRadius: 2,
                 overflow: "hidden",
                 border: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
@@ -258,7 +280,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
             </Box>
           )}
 
-          {/* Chat Panel - Replaces Recent News */}
+          {/* Chat Panel - Below image box */}
           <Box
             sx={{
               flex: 1, // Take remaining space
@@ -266,6 +288,16 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
               flexDirection: "column",
               minHeight: 0, // Important: allows flex children to shrink
               overflow: "hidden",
+              backgroundColor: alpha(theme.palette.background.paper, 0.9),
+              border: `2px solid ${theme.palette.tertiary?.main || theme.palette.secondary.main}`,
+              borderRadius: 2,
+              padding: 2,
+              boxShadow: `
+                0 4px 16px ${alpha("#000", 0.1)},
+                inset 0 1px 0 ${alpha("#fff", 0.3)}
+              `,
+              position: "relative",
+              zIndex: 10,
             }}
           >
             <ChatPanel currentUserId="mock-character-001" />
@@ -303,8 +335,6 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
         news={mockNews}
       />
 
-      {/* Settings Button - Fixed bottom-right */}
-      <SettingsButton onClick={() => setSettingsModalOpen(true)} />
     </Box>
   );
 }

@@ -1,15 +1,12 @@
 "use client";
 
 import React from "react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { MusicPlayer } from "@/components/MusicPlayer";
 
+/**
+ * GlobalComponents - Reserved for global UI components
+ * Language switcher and music player will be moved to Settings modal
+ */
 export default function GlobalComponents() {
-  return (
-    <>
-      <LanguageSwitcher />
-      <MusicPlayer />
-    </>
-  );
+  return null;
 }
 

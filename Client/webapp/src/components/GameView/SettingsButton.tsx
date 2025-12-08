@@ -7,8 +7,7 @@ export interface SettingsButtonProps {
 }
 
 /**
- * Settings button - Fixed position in bottom-right corner
- * Replaces language switcher position
+ * Settings button - Positioned in top-right corner with game time/location
  */
 export const SettingsButton: React.FC<SettingsButtonProps> = ({ onClick }) => {
   const theme = useTheme();
@@ -18,10 +17,6 @@ export const SettingsButton: React.FC<SettingsButtonProps> = ({ onClick }) => {
       <IconButton
         onClick={onClick}
         sx={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          zIndex: 9998,
           width: 48,
           height: 48,
           backgroundColor: alpha(theme.palette.background.paper, 0.9),

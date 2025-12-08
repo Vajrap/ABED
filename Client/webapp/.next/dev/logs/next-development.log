@@ -1283,3 +1283,313 @@ Import traces:
 [17:05:33.801] Server  LOG      ✓ Compiled in 39ms
 [17:05:39.632] Server  LOG      ✓ Compiled in 34ms
 [17:06:03.816] Browser LOG     Skills clicked
+[20:57:13.983] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[20:57:14.247] Browser ERROR   uncaughtError: Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <body>
+      <ThemeProvider>
+        <ThemeProvider theme={{...}}>
+          <ThemeProvider themeId={undefined} theme={{...}}>
+            <ThemeProvider theme={{...}}>
+              <RtlProvider value={false}>
+                <DefaultPropsProvider value={{...}}>
+                  <CssBaseline>
+                  <GlobalStyles>
+                  <GlobalComponents>
+                    <LanguageSwitcher>
+                    <MusicPlayer>
++                     <audio ref={{current:null}} preload="metadata" loop={false}>
+-                     <style data-emotion="css-global 17aa9ug" data-s="">
+                      ...
+                  ...
+
+[20:57:40.029] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[21:01:20.728] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[21:01:21.089] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[21:03:09.066] Server  LOG      ✓ Compiled in 35ms
+[21:03:15.721] Server  LOG      ✓ Compiled in 22ms
+[21:03:17.742] Server  LOG      ✓ Compiled in 19ms
+[21:03:20.619] Server  LOG      ✓ Compiled in 16ms
+[21:03:24.125] Server  LOG      ✓ Compiled in 20ms
+[21:03:27.853] Server  LOG      ✓ Compiled in 17ms
+[21:04:10.112] Server  LOG      ✓ Compiled in 32ms
+[21:05:47.575] Server  LOG      ✓ Compiled in 54ms
+[21:07:21.227] Server  LOG      ✓ Compiled in 40ms
+[21:07:39.839] Server  LOG      ✓ Compiled in 51ms
+[21:07:47.772] Server  LOG      ✓ Compiled in 17ms
+[21:08:06.059] Server  LOG      ✓ Compiled in 12ms
+[21:08:06.539] Server  LOG      ✓ Compiled in 17ms
+[21:08:11.191] Server  LOG      ✓ Compiled in 13ms
+[21:08:15.879] Server  LOG      ✓ Compiled in 35ms
+[21:08:19.588] Server  LOG      ✓ Compiled in 12ms
+[21:08:23.780] Server  LOG      ✓ Compiled in 13ms
+[21:08:43.480] Server  LOG      ✓ Compiled in 22ms
+[21:08:49.732] Server  LOG      ✓ Compiled in 51ms
+[21:09:05.930] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[21:09:10.233] Server  LOG      ✓ Compiled in 39ms
+[21:09:34.054] Server  LOG      ✓ Compiled in 20ms
+[21:09:51.731] Server  LOG      ✓ Compiled in 26ms
+[21:09:55.179] Server  LOG      ✓ Compiled in 19ms
+[21:10:06.550] Server  LOG      ✓ Compiled in 155ms
+[21:10:15.119] Server  LOG      ✓ Compiled in 13ms
+[21:10:56.143] Server  LOG      ✓ Compiled in 35ms
+[21:11:01.111] Server  LOG      ✓ Compiled in 24ms
+[21:11:14.581] Server  LOG      ✓ Compiled in 51ms
+[21:11:32.059] Server  LOG      ✓ Compiled in 44ms
+[21:11:32.179] Browser ERROR   uncaughtError: Error: Objects are not valid as a React child (found: object with keys {position, left, right, height, minHeight, maxHeight, borderRadius, border, boxShadow, zIndex}). If you meant to render a collection of children, use an array instead.
+[21:11:33.045] Browser ERROR   uncaughtError: Error: Objects are not valid as a React child (found: object with keys {position, left, right, height, minHeight, maxHeight, borderRadius, border, boxShadow, zIndex}). If you meant to render a collection of children, use an array instead.
+[21:11:33.833] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[21:11:33.833] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[21:11:33.872] Server  LOG      ✓ Compiled in 51ms
+[21:11:36.114] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[21:11:36.317] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[21:11:41.495] Server  LOG      ✓ Compiled in 16ms
+[21:11:53.448] Server  LOG      ✓ Compiled in 35ms
+[21:12:15.625] Server  LOG      ✓ Compiled in 18ms
+[21:12:23.094] Server  LOG      ✓ Compiled in 306ms
+[21:12:23.220] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:296:17
+Parsing ecmascript source code failed
+  294 |                 width: "100%",
+  295 |                 top
+> 296 |                 height: "55vh", // Fixed viewport height
+      |                 ^^^^^^
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+  299 |                 borderRadius: 2,
+
+Expected '</', got 'height'
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:24.042] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:296:17
+Parsing ecmascript source code failed
+  294 |                 width: "100%",
+  295 |                 top
+> 296 |                 height: "55vh", // Fixed viewport height
+      |                 ^^^^^^
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+  299 |                 borderRadius: 2,
+
+Expected '</', got 'height'
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:24.687] Server  LOG      ✓ Compiled in 45ms
+[21:12:36.389] Server  LOG      ✓ Compiled in 23ms
+[21:12:37.939] Server  LOG      ✓ Compiled in 55ms
+[21:12:38.046] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:295:29
+Parsing ecmascript source code failed
+  293 |               sx={{
+  294 |                 width: "100%",
+> 295 |                 marginTop: -80px,
+      |                             ^^
+  296 |                 height: "35vh", // Fixed viewport height
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:38.046] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:295:31
+Parsing ecmascript source code failed
+  293 |               sx={{
+  294 |                 width: "100%",
+> 295 |                 marginTop: -80px,
+      |                               ^
+  296 |                 height: "35vh", // Fixed viewport height
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+
+Identifier cannot follow number
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:38.053] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:295:29
+Parsing ecmascript source code failed
+  293 |               sx={{
+  294 |                 width: "100%",
+> 295 |                 marginTop: -80px,
+      |                             ^^
+  296 |                 height: "35vh", // Fixed viewport height
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:38.053] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:295:31
+Parsing ecmascript source code failed
+  293 |               sx={{
+  294 |                 width: "100%",
+> 295 |                 marginTop: -80px,
+      |                               ^
+  296 |                 height: "35vh", // Fixed viewport height
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+
+Identifier cannot follow number
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:40.157] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:295:29
+Parsing ecmascript source code failed
+  293 |               sx={{
+  294 |                 width: "100%",
+> 295 |                 marginTop: -80px,
+      |                             ^^
+  296 |                 height: "35vh", // Fixed viewport height
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:40.157] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:295:31
+Parsing ecmascript source code failed
+  293 |               sx={{
+  294 |                 width: "100%",
+> 295 |                 marginTop: -80px,
+      |                               ^
+  296 |                 height: "35vh", // Fixed viewport height
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+
+Identifier cannot follow number
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:41.044] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:295:29
+Parsing ecmascript source code failed
+  293 |               sx={{
+  294 |                 width: "100%",
+> 295 |                 marginTop: -80px,
+      |                             ^^
+  296 |                 height: "35vh", // Fixed viewport height
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:41.044] Browser ERROR   ./workspace/MyProject/Client/webapp/app/game/GameView.tsx:295:31
+Parsing ecmascript source code failed
+  293 |               sx={{
+  294 |                 width: "100%",
+> 295 |                 marginTop: -80px,
+      |                               ^
+  296 |                 height: "35vh", // Fixed viewport height
+  297 |                 minHeight: 200, // Minimum height for smaller screens
+  298 |                 maxHeight: 350, // Maximum height for very large screens
+
+Identifier cannot follow number
+
+Import traces:
+  Client Component Browser:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component Browser]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./workspace/MyProject/Client/webapp/app/game/GameView.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Client Component SSR]
+    ./workspace/MyProject/Client/webapp/app/game/mock/page.tsx [Server Component]
+[21:12:46.065] Server  LOG      ✓ Compiled in 15ms
+[21:12:54.376] Server  LOG      ✓ Compiled in 21ms
+[21:12:59.135] Server  LOG      ✓ Compiled in 27ms
+[21:13:13.216] Server  LOG      ✓ Compiled in 21ms
+[21:13:18.011] Server  LOG      ✓ Compiled in 14ms
+[21:13:21.078] Server  LOG      ✓ Compiled in 11ms
+[21:13:25.639] Server  LOG      ✓ Compiled in 16ms
+[21:13:29.997] Server  LOG      ✓ Compiled in 19ms
+[21:13:38.337] Server  LOG      ✓ Compiled in 18ms
+[21:13:42.860] Server  LOG      ✓ Compiled in 26ms
+[21:13:58.919] Server  LOG      ✓ Compiled in 28ms
+[21:14:31.301] Server  LOG      ✓ Compiled in 16ms

@@ -4947,10 +4947,6 @@ const SettingsButton = ({ onClick })=>{
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$IconButton$2f$IconButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconButton$3e$__["IconButton"], {
             onClick: onClick,
             sx: {
-                position: "fixed",
-                bottom: 20,
-                right: 20,
-                zIndex: 9998,
                 width: 48,
                 height: 48,
                 backgroundColor: (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.background.paper, 0.9),
@@ -4975,17 +4971,17 @@ const SettingsButton = ({ onClick })=>{
                 }
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/SettingsButton.tsx",
-                lineNumber: 44,
+                lineNumber: 39,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         }, void 0, false, {
             fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/SettingsButton.tsx",
-            lineNumber: 18,
+            lineNumber: 17,
             columnNumber: 7
         }, ("TURBOPACK compile-time value", void 0))
     }, void 0, false, {
         fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/SettingsButton.tsx",
-        lineNumber: 17,
+        lineNumber: 16,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };
@@ -6990,16 +6986,12 @@ const GameTimeAndLocation = ({ gameTime, region, subRegion, locationName })=>{
     const dayName = getDayName(gameTime.dayOfWeek);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
         sx: {
-            position: "absolute",
-            top: 16,
-            right: 16,
             padding: "0.75rem 1rem",
             backgroundColor: (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.background.paper, 0.9),
             border: `2px solid ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.secondary.main, 0.5)}`,
             borderRadius: 2,
             boxShadow: `0 4px 16px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#000", 0.2)}`,
             backdropFilter: "blur(8px)",
-            zIndex: 10,
             textAlign: "right"
         },
         children: [
@@ -7025,7 +7017,7 @@ const GameTimeAndLocation = ({ gameTime, region, subRegion, locationName })=>{
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameTimeAndLocation.tsx",
-                lineNumber: 65,
+                lineNumber: 61,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -7047,7 +7039,7 @@ const GameTimeAndLocation = ({ gameTime, region, subRegion, locationName })=>{
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/src/components/GameView/GameTimeAndLocation.tsx",
-                lineNumber: 79,
+                lineNumber: 75,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0))
         ]
@@ -7268,7 +7260,8 @@ function GameView({ mockPartyData } = {}) {
             backgroundAttachment: "fixed",
             padding: 2,
             gap: 2,
-            overflow: "hidden"
+            overflow: "hidden",
+            position: "relative"
         },
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -7277,7 +7270,8 @@ function GameView({ mockPartyData } = {}) {
                     display: "flex",
                     gap: 2,
                     minHeight: 0,
-                    overflow: "hidden"
+                    overflow: "hidden",
+                    position: "relative"
                 },
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameSidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameSidebar"], {
@@ -7287,7 +7281,7 @@ function GameView({ mockPartyData } = {}) {
                         onNewsClick: ()=>setNewsModalOpen(true)
                     }, void 0, false, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                        lineNumber: 149,
+                        lineNumber: 151,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -7296,24 +7290,55 @@ function GameView({ mockPartyData } = {}) {
                             display: "flex",
                             flexDirection: "column",
                             minHeight: 0,
-                            backgroundColor: (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.background.paper, 0.9),
-                            border: `2px solid ${theme.palette.tertiary?.main || theme.palette.secondary.main}`,
-                            borderRadius: 2,
-                            padding: 4,
-                            boxShadow: `
-              0 4px 16px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#000", 0.1)},
-              inset 0 1px 0 ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#fff", 0.3)}
-            `,
+                            position: "relative",
                             overflow: "hidden"
                         },
                         children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
+                                sx: {
+                                    position: "absolute",
+                                    top: 24,
+                                    right: 24,
+                                    zIndex: 100,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "flex-end",
+                                    gap: 1.5
+                                },
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameTimeAndLocation$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameTimeAndLocation"], {
+                                        gameTime: mockGameTime,
+                                        region: location.region,
+                                        subRegion: location.subRegion,
+                                        locationName: location.name
+                                    }, void 0, false, {
+                                        fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
+                                        lineNumber: 183,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$SettingsButton$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SettingsButton"], {
+                                        onClick: ()=>setSettingsModalOpen(true)
+                                    }, void 0, false, {
+                                        fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
+                                        lineNumber: 189,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
+                                lineNumber: 171,
+                                columnNumber: 11
+                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                                 sx: {
                                     display: "flex",
                                     flexDirection: "row",
                                     gap: 2,
                                     alignItems: "flex-start",
-                                    mb: 3
+                                    padding: 4,
+                                    paddingTop: 6,
+                                    position: "relative",
+                                    zIndex: 20
                                 },
                                 children: mockParty.map((member, originalIndex)=>({
                                         member,
@@ -7336,20 +7361,21 @@ function GameView({ mockPartyData } = {}) {
                                         }
                                     }, originalIndex, false, {
                                         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                        lineNumber: 188,
+                                        lineNumber: 209,
                                         columnNumber: 17
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                lineNumber: 175,
+                                lineNumber: 193,
                                 columnNumber: 11
                             }, this),
                             location.situation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                                 sx: {
                                     width: "100%",
-                                    height: "35vh",
+                                    marginTop: "-185px",
+                                    height: "55vh",
                                     minHeight: 200,
-                                    maxHeight: 350,
+                                    maxHeight: 500,
                                     borderRadius: 2,
                                     overflow: "hidden",
                                     border: `2px solid ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.secondary.main, 0.3)}`,
@@ -7370,7 +7396,7 @@ function GameView({ mockPartyData } = {}) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                        lineNumber: 240,
+                                        lineNumber: 262,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$GameTimeAndLocation$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GameTimeAndLocation"], {
@@ -7380,13 +7406,13 @@ function GameView({ mockPartyData } = {}) {
                                         locationName: location.name
                                     }, void 0, false, {
                                         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                        lineNumber: 252,
+                                        lineNumber: 274,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                lineNumber: 226,
+                                lineNumber: 247,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$material$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -7395,30 +7421,40 @@ function GameView({ mockPartyData } = {}) {
                                     display: "flex",
                                     flexDirection: "column",
                                     minHeight: 0,
-                                    overflow: "hidden"
+                                    overflow: "hidden",
+                                    backgroundColor: (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])(theme.palette.background.paper, 0.9),
+                                    border: `2px solid ${theme.palette.tertiary?.main || theme.palette.secondary.main}`,
+                                    borderRadius: 2,
+                                    padding: 2,
+                                    boxShadow: `
+                0 4px 16px ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#000", 0.1)},
+                inset 0 1px 0 ${(0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f40$mui$2f$system$2f$esm$2f$colorManipulator$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["alpha"])("#fff", 0.3)}
+              `,
+                                    position: "relative",
+                                    zIndex: 10
                                 },
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$ChatPanel$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ChatPanel"], {
                                     currentUserId: "mock-character-001"
                                 }, void 0, false, {
                                     fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                    lineNumber: 271,
+                                    lineNumber: 303,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                                lineNumber: 262,
+                                lineNumber: 284,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                        lineNumber: 157,
+                        lineNumber: 159,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 139,
+                lineNumber: 140,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$ActionScheduleModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ActionScheduleModal"], {
@@ -7430,7 +7466,7 @@ function GameView({ mockPartyData } = {}) {
                 hasRailStation: true
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 277,
+                lineNumber: 309,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$CharacterStatsModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["CharacterStatsModal"], {
@@ -7439,7 +7475,7 @@ function GameView({ mockPartyData } = {}) {
                 character: mockParty[selectedMemberIndex] || null
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 287,
+                lineNumber: 319,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$SettingsModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SettingsModal"], {
@@ -7447,7 +7483,7 @@ function GameView({ mockPartyData } = {}) {
                 onClose: ()=>setSettingsModalOpen(false)
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 294,
+                lineNumber: 326,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$NewsModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["NewsModal"], {
@@ -7456,14 +7492,7 @@ function GameView({ mockPartyData } = {}) {
                 news: __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$data$2f$mockNewsData$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockNews"]
             }, void 0, false, {
                 fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 300,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$workspace$2f$MyProject$2f$Client$2f$webapp$2f$src$2f$components$2f$GameView$2f$SettingsButton$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SettingsButton"], {
-                onClick: ()=>setSettingsModalOpen(true)
-            }, void 0, false, {
-                fileName: "[project]/workspace/MyProject/Client/webapp/app/game/GameView.tsx",
-                lineNumber: 307,
+                lineNumber: 332,
                 columnNumber: 7
             }, this)
         ]

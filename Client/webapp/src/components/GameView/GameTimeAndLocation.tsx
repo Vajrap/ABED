@@ -48,16 +48,12 @@ export const GameTimeAndLocation: React.FC<GameTimeAndLocationProps> = ({
   return (
     <Box
       sx={{
-        position: "absolute",
-        top: 16,
-        right: 16,
         padding: "0.75rem 1rem",
         backgroundColor: alpha(theme.palette.background.paper, 0.9),
         border: `2px solid ${alpha(theme.palette.secondary.main, 0.5)}`,
         borderRadius: 2,
         boxShadow: `0 4px 16px ${alpha("#000", 0.2)}`,
         backdropFilter: "blur(8px)",
-        zIndex: 10,
         textAlign: "right",
       }}
     >
