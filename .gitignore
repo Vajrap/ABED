@@ -3,3 +3,7 @@
 
 # VSCodeCounter extension generated files
 .VSCodeCounter/
+
+# Next.js build output
+.next/
+out/

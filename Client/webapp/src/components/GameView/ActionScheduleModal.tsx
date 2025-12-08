@@ -36,6 +36,7 @@ export interface ActionScheduleModalProps {
   onTravelClick?: () => void;
   onRailTravelClick?: () => void;
   hasRailStation?: boolean; // Whether current location has a rail station
+  characterSkills?: Record<string, { level: number; exp: number }>; // Character's skills for Train Skill sub-selection
 }
 
 /**
@@ -49,6 +50,7 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
   onTravelClick,
   onRailTravelClick,
   hasRailStation = true, // Default to true for now (can be disabled later)
+  characterSkills,
 }) => {
   const theme = useTheme();
   const [schedule, setSchedule] = useState<Record<string, string>>({});
@@ -60,10 +62,12 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
     setSelectionModalOpen(true);
   };
 
-  const handleActionSelect = (actionId: string) => {
+  const handleActionSelect = (actionId: string, subSelectionValue?: string) => {
     if (selectedSlot) {
       const key = `${selectedSlot.day}-${selectedSlot.phase}`;
-      setSchedule({ ...schedule, [key]: actionId });
+      // Store action with parameter in format: "actionId|parameterValue" if sub-selection exists
+      const actionKey = subSelectionValue ? `${actionId}|${subSelectionValue}` : actionId;
+      setSchedule({ ...schedule, [key]: actionKey });
     }
   };
 
@@ -161,7 +165,10 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
               <React.Fragment key={`phase-${phaseIndex}`}>
                 {DAYS.map((_, dayIndex) => {
                   const PhaseIcon = phase.icon;
-                  const actionId = getActionForSlot(dayIndex, phaseIndex);
+                  const actionKey = getActionForSlot(dayIndex, phaseIndex);
+                  // Parse action key: "actionId" or "actionId|parameterValue"
+                  const actionId = actionKey?.includes("|") ? actionKey.split("|")[0] : actionKey;
+                  const parameterValue = actionKey?.includes("|") ? actionKey.split("|")[1] : null;
                   const actionDef = actionId ? getActionById(actionId) : null;
                   const ActionIcon = actionDef?.icon || null;
                   
@@ -233,6 +240,22 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
                       >
                         {actionDef ? actionDef.name : "None"}
                       </Typography>
+                      
+                      {/* Parameter value (if exists) */}
+                      {parameterValue && (
+                        <Typography
+                          sx={{
+                            fontFamily: "Crimson Text, serif",
+                            fontSize: "0.6rem",
+                            color: theme.palette.text.secondary,
+                            textAlign: "center",
+                            fontStyle: "italic",
+                            opacity: 0.8,
+                          }}
+                        >
+                          {parameterValue}
+                        </Typography>
+                      )}
                     </Box>
                   );
                 })}
@@ -343,6 +366,7 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
           day={selectedSlot.day}
           phase={selectedSlot.phase}
           onActionSelect={handleActionSelect}
+          characterSkills={characterSkills}
         />
       )}
     </>

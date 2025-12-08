@@ -49,3 +49,6 @@ export type { CharacterNeedsBarProps } from "./CharacterNeedsBar";
 export { ActionIndicator } from "./ActionIndicator";
 export type { ActionIndicatorProps } from "./ActionIndicator";
 
+export { ActionSubSelectionModal } from "./ActionSubSelectionModal";
+export type { ActionSubSelectionModalProps } from "./ActionSubSelectionModal";
+

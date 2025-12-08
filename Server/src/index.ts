@@ -14,6 +14,9 @@ import dotenv from "dotenv";
 import { characterCreationRoutes } from "./API/characterCreation";
 import { loginRoutes } from "./API/login";
 import { registerRoutes } from "./API/register";
+import { partyRoutes } from "./API/party";
+import { locationRoutes } from "./API/location";
+import { newsRoutes } from "./API/news";
 
 dotenv.config();
 
@@ -53,6 +56,9 @@ async function startServer() {
           .use(loginRoutes)
           .use(registerRoutes)
           .use(characterCreationRoutes)
+          .use(partyRoutes)
+          .use(locationRoutes)
+          .use(newsRoutes)
       )
       // Global error handler
       .onError(({ code, error, set }) => {

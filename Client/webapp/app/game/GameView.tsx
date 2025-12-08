@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Box, Typography, alpha, useTheme } from "@mui/material";
+import { Box, Typography, alpha, useTheme, CircularProgress, Alert } from "@mui/material";
 import { useRouter } from "next/navigation";
 import {
   GameSidebar,
@@ -14,32 +14,13 @@ import {
 } from "@/components/GameView";
 import { ActionScheduleModal } from "@/components/GameView/ActionScheduleModal";
 import { CharacterStatsModal } from "@/components/GameView/CharacterStatsModal";
-import { MockPartyMember } from "@/data/mockPartyData";
-import { mockNews, GameTimeInterface } from "@/data/mockNewsData";
+import { actionService } from "@/services/actionService";
+import { gameDataService } from "@/services/gameDataService";
+import type { PartyInterface, CharacterInterface, GameTimeInterface, News } from "@/types/api";
+import type { LocationData } from "@/services/locationService";
+import type { CharacterStatsView } from "@/types/game";
 
-interface GameViewProps {
-  mockPartyData?: MockPartyMember[]; // Optional mock data for UI development
-}
-
-// Location data structure for frontend
-interface LocationData {
-  name: string;
-  region: string;
-  subRegion: string;
-  situation: string; // Image identifier (e.g., "demo" maps to /img/demo.png)
-}
-
-// Mock game time - will come from backend later
-const mockGameTime: GameTimeInterface = {
-  hour: 3,
-  dayOfWeek: 2,
-  dayOfSeason: 15,
-  season: 1,
-  dayPassed: 14,
-  year: 1,
-};
-
-export default function GameView({ mockPartyData }: GameViewProps = {} as GameViewProps) {
+export default function GameView() {
   const theme = useTheme();
   const router = useRouter();
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(0);
@@ -48,13 +29,72 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [newsModalOpen, setNewsModalOpen] = useState(false);
 
-  // Mock location data - will come from backend later
-  const location: LocationData = {
-    name: "Wayward Inn",
-    region: "Central",
-    subRegion: "Capital",
-    situation: "demo", // Maps to /img/demo.png
-  };
+  // Data state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [party, setParty] = useState<PartyInterface | null>(null);
+  const [location, setLocation] = useState<LocationData | null>(null);
+  const [news, setNews] = useState<News[]>([]);
+  const [unseenNews, setUnseenNews] = useState<News[]>([]);
+  const [gameTime, setGameTime] = useState<GameTimeInterface | null>(null);
+
+  // Fetch game data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const response = await gameDataService.fetchGameData();
+        
+        if (response.success && response.data) {
+          setParty(response.data.party);
+          setLocation(response.data.location);
+          setNews(response.data.news);
+          setUnseenNews(response.data.unseenNews);
+          
+          // Extract game time from response (location or news)
+          if (response.data.gameTime) {
+            setGameTime(response.data.gameTime);
+          } else if (response.data.news.length > 0) {
+            setGameTime(response.data.news[0].ts);
+          } else {
+            // Default game time if unavailable (shouldn't happen in production)
+            console.warn("No game time available, using default");
+            setGameTime({
+              hour: 3,
+              dayOfWeek: 2,
+              dayOfSeason: 15,
+              season: 1,
+              dayPassed: 14,
+              year: 1,
+            });
+          }
+        } else {
+          // Handle partial errors
+          const errorMessages = response.errors 
+            ? Object.values(response.errors).filter(Boolean).join(", ")
+            : "Failed to load game data";
+          setError(errorMessages);
+          
+          // Still try to set partial data if available
+          if (response.data) {
+            if (response.data.party) setParty(response.data.party);
+            if (response.data.location) setLocation(response.data.location);
+            if (response.data.news) setNews(response.data.news);
+            if (response.data.unseenNews) setUnseenNews(response.data.unseenNews);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching game data:", err);
+        setError(err instanceof Error ? err.message : "Failed to load game data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -95,19 +135,252 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
 
-  // Use provided mock data, or default mock data, or will be fetched from API later
-  const mockParty = mockPartyData || [
-    { name: "Hero", level: 5, portrait: null, isPlayer: true },
-    { name: "Warrior", level: 4, portrait: null, isPlayer: false },
-    { name: "Mage", level: 3, portrait: null, isPlayer: false },
-    { name: null, level: null, portrait: null, isPlayer: false }, // Empty slot
-    { name: null, level: null, portrait: null, isPlayer: false }, // Empty slot
-    { name: null, level: null, portrait: null, isPlayer: false }, // Empty slot
-  ];
+  // Map backend CharacterInterface to component props
+  const mapCharacterToMember = (character: CharacterInterface | null, isPlayer: boolean): CharacterStatsView | null => {
+    if (!character) return null;
+    
+    return {
+      id: character.id,
+      name: character.name,
+      gender: character.gender,
+      race: character.race,
+      type: character.type,
+      level: character.level,
+      portrait: character.portrait || null,
+      background: character.background,
+      alignment: character.alignment as any, // Alignment is already in the right format
+      title: character.title,
+      attributes: character.attributes,
+      battleStats: character.battleStats,
+      elements: character.elements,
+      proficiencies: character.proficiencies,
+      artisans: character.artisans,
+      vitals: character.vitals,
+      needs: character.needs,
+      planarAptitude: character.planarAptitude,
+      equipment: character.equipments, // Will be processed by CharacterStatsModal
+    };
+  };
 
-  const handleScheduleSave = (schedule: Record<string, string>) => {
-    console.log("Schedule saved:", schedule);
-    // TODO: Send schedule to backend
+  // Get party members array from party data
+  const partyMembers = party?.characters.map((char, index) => {
+    const isPlayer = char?.id === party.playerCharacterId;
+    return mapCharacterToMember(char, isPlayer);
+  }) || [];
+
+  const handleScheduleSave = async (schedule: Record<string, string>) => {
+    console.log("[GameView] Schedule saved:", schedule);
+    
+    try {
+      // Map UI day indices (0-5) to DayOfWeek enum values
+      const dayOfWeekMap = [
+        "laoh",      // Day 0
+        "rowana",    // Day 1
+        "aftree",    // Day 2
+        "udur",      // Day 3
+        "matris",    // Day 4
+        "seethar",   // Day 5
+      ];
+      
+      // Map UI phase indices (0-3) to TimeOfDay enum values
+      // UI order: Morning (0), Afternoon (1), Evening (2), Night (3)
+      const timeOfDayMap = [
+        "morning",   // Phase 0 - Morning
+        "afternoon", // Phase 1 - Afternoon
+        "evening",   // Phase 2 - Evening
+        "night",     // Phase 3 - Night
+      ];
+      
+      // Map backend ActionInput enum values to CharacterAction objects
+      // The schedule contains backend ActionInput enum values (from ActionSelectionModal)
+      // Format: "actionId" or "actionId|parameterValue" for actions with sub-selection
+      const mapActionToCharacterAction = (actionInputValue: string | null): any => {
+        if (!actionInputValue) {
+          return { type: "None" };
+        }
+        
+        // Check if action has a parameter (format: "actionId|parameterValue")
+        const [actionId, parameterValue] = actionInputValue.includes("|")
+          ? actionInputValue.split("|")
+          : [actionInputValue, null];
+        
+        // Build CharacterAction object based on action type
+        switch (actionId) {
+          // Simple actions without parameters
+          case "None":
+            return { type: "None" };
+          case "Rest":
+            return { type: "Rest" };
+          case "Inn":
+            return { type: "Inn" };
+          case "Camping":
+            return { type: "Camping" };
+          case "House Rest":
+            return { type: "House Rest" };
+          case "Socialize":
+            return { type: "Socialize" };
+          case "Stroll":
+            return { type: "Stroll" };
+          case "Tavern":
+            return { type: "Tavern" };
+          case "Mining":
+            return { type: "Mining" };
+          case "Wood Cutting":
+            return { type: "Wood Cutting" };
+          case "Foraging":
+            return { type: "Foraging" };
+          case "Smelting":
+            return { type: "Smelting" };
+          case "Tanning":
+            return { type: "Tanning" };
+          case "Carpentry":
+            return { type: "Carpentry" };
+          case "Weaving":
+            return { type: "Weaving" };
+          case "Enchanting":
+            return { type: "Enchanting" };
+          
+          // Actions that need parameters
+          case "Train Attribute":
+            return parameterValue
+              ? { type: "Train Attribute", attribute: parameterValue }
+              : { type: "None" }; // Invalid - missing parameter
+          case "Train Proficiency":
+            return parameterValue
+              ? { type: "Train Proficiency", proficiency: parameterValue }
+              : { type: "None" }; // Invalid - missing parameter
+          case "Train Artisan":
+            return parameterValue
+              ? { type: "Train Artisan", artisan: parameterValue }
+              : { type: "None" }; // Invalid - missing parameter
+          case "Train Skill":
+            return parameterValue
+              ? { type: "Train Skill", skillId: parameterValue }
+              : { type: "None" }; // Invalid - missing parameter
+          case "Learn Skill":
+            return parameterValue
+              ? { type: "Learn Skill", skillId: parameterValue }
+              : { type: "None" }; // Invalid - missing parameter
+          case "Read":
+            return parameterValue
+              ? { type: "Read", bookId: parameterValue }
+              : { type: "None" }; // Invalid - missing parameter
+          case "Craft":
+            return parameterValue
+              ? { type: "Craft", itemId: parameterValue }
+              : { type: "None" }; // Invalid - missing parameter
+          
+          // Organization/Sect actions that need sub-selection
+          case "Heavens Decree":
+            return parameterValue
+              ? { type: "Heavens Decree", action: parameterValue }
+              : { type: "None" };
+          case "Church of Laoh":
+            return parameterValue
+              ? { type: "Church of Laoh", action: parameterValue }
+              : { type: "None" };
+          case "Great Temple of Laoh":
+            return parameterValue
+              ? { type: "Great Temple of Laoh", action: parameterValue }
+              : { type: "None" };
+          case "Cult of Nizarith":
+            return parameterValue
+              ? { type: "Cult of Nizarith", action: parameterValue }
+              : { type: "None" };
+          case "Shrine of Gelthoran":
+          case "Shrine of Aqorath":
+          case "Shrine of Valthoria":
+          case "Shrine of Pyrnthanas":
+            return parameterValue
+              ? { type: actionId, action: parameterValue }
+              : { type: "None" };
+          case "Major Shrine of Gelthoran":
+          case "Major Shrine of Aqorath":
+          case "Major Shrine of Valthoria":
+          case "Major Shrine of Pyrnthanas":
+            return parameterValue
+              ? { type: actionId, action: parameterValue }
+              : { type: "None" };
+          case "Knight Order":
+            return parameterValue
+              ? { type: "Knight Order", action: parameterValue }
+              : { type: "None" };
+          case "Magic School":
+            return parameterValue
+              ? { type: "Magic School", action: parameterValue }
+              : { type: "None" };
+          case "Arcane Academia":
+            return parameterValue
+              ? { type: "Arcane Academia", action: parameterValue }
+              : { type: "None" };
+          
+          default:
+            // Unknown action - log warning and default to None
+            console.warn(`[GameView] Unknown ActionInput value: ${actionId}, defaulting to None`);
+            return { type: "None" };
+        }
+      };
+      
+      // Build actionSequence structure: Record<DayOfWeek, Record<TimeOfDay, CharacterAction>>
+      const actionSequence: Record<string, Record<string, any>> = {};
+      
+      // Initialize all days with empty time slots
+      dayOfWeekMap.forEach((day) => {
+        actionSequence[day] = {};
+        timeOfDayMap.forEach((time) => {
+          actionSequence[day][time] = { type: "None" };
+        });
+      });
+      
+      // Fill in scheduled actions
+      Object.entries(schedule).forEach(([key, actionId]) => {
+        const [dayIndexStr, phaseIndexStr] = key.split("-");
+        const dayIndex = parseInt(dayIndexStr, 10);
+        const phaseIndex = parseInt(phaseIndexStr, 10);
+        
+        if (
+          dayIndex >= 0 &&
+          dayIndex < dayOfWeekMap.length &&
+          phaseIndex >= 0 &&
+          phaseIndex < timeOfDayMap.length
+        ) {
+          const day = dayOfWeekMap[dayIndex];
+          const time = timeOfDayMap[phaseIndex];
+          actionSequence[day][time] = mapActionToCharacterAction(actionId);
+        }
+      });
+      
+      // Build complete request payload
+      const request = {
+        actionSequence,
+        // Optional fields for travel planning (not implemented yet)
+        // travelPath: undefined,
+        // travelMethod: undefined,
+        // railTravelTo: undefined,
+        // haltTravel: false,
+      };
+      
+      console.log("[GameView] Built request payload:", request);
+      
+      // Send API request to backend
+      const response = await actionService.updateActions(request);
+      console.log("[GameView] Actions updated successfully:", response);
+      
+      // TODO: Handle response (e.g., show converted actions to user, update UI)
+      if (response.status === "SUCCESS") {
+        console.log("[GameView] Schedule saved successfully");
+        if (response.convertedActions && response.convertedActions.length > 0) {
+          console.warn("[GameView] Some actions were converted:", response.convertedActions);
+          // TODO: Show notification to user about converted actions
+        }
+      } else {
+        console.error("[GameView] Schedule save failed:", response.reason);
+        // TODO: Show error notification to user
+      }
+    } catch (error) {
+      console.error("[GameView] Error saving schedule:", error);
+      // TODO: Show error toast/notification to user
+    }
   };
 
   const handleTravelClick = () => {
@@ -120,6 +393,69 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
     // TODO: Open rail travel modal
   };
 
+
+  // Show loading state
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--gradient-arcane)",
+        }}
+      >
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
+  // Show error state
+  if (error && !party && !location) {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--gradient-arcane)",
+          padding: 4,
+        }}
+      >
+        <Alert severity="error" sx={{ maxWidth: 600 }}>
+          <Typography variant="h6" gutterBottom>
+            Failed to load game data
+          </Typography>
+          <Typography>{error}</Typography>
+        </Alert>
+      </Box>
+    );
+  }
+
+  // If we don't have critical data, show error
+  if (!party || !location || !gameTime) {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--gradient-arcane)",
+          padding: 4,
+        }}
+      >
+        <Alert severity="warning" sx={{ maxWidth: 600 }}>
+          <Typography variant="h6" gutterBottom>
+            Missing game data
+          </Typography>
+          <Typography>Required data not available. Please try refreshing.</Typography>
+        </Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -181,7 +517,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
             }}
           >
             <GameTimeAndLocation
-              gameTime={mockGameTime}
+              gameTime={gameTime}
               region={location.region}
               subRegion={location.subRegion}
               locationName={location.name}
@@ -202,44 +538,29 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
               zIndex: 5, // Lower z-index so fullscreen chat (9999) appears above
             }}
           >
-            {mockParty
+            {partyMembers
               .map((member, originalIndex) => ({ member, originalIndex }))
-              .filter(({ member }) => member.name) // Only show members with names
-              .map(({ member, originalIndex }) => (
-                <PartyMemberCard
-                  key={originalIndex}
-                  portrait={member.portrait || undefined}
-                  name={member.name || undefined}
-                  title={member.title || undefined}
-                  level={member.level || undefined}
-                  isPlayer={member.isPlayer}
-                  isSelected={selectedMemberIndex === originalIndex}
-                  isEmpty={!member.name}
-                  needs={member.needs}
-                  nextAction={
-                    originalIndex === 0
-                      ? "Craft Magic Staff"
-                      : originalIndex === 1
-                      ? "Train Strength"
-                      : originalIndex === 2
-                      ? "Rest"
-                      : undefined
-                  }
-                  actionType={
-                    originalIndex === 0
-                      ? "crafting"
-                      : originalIndex === 1
-                      ? "training"
-                      : originalIndex === 2
-                      ? "resting"
-                      : undefined
-                  }
-                  onClick={() => {
-                    setSelectedMemberIndex(originalIndex);
-                    setStatsModalOpen(true);
-                  }}
-                />
-              ))}
+              .filter(({ member }) => member && member.name) // Only show members with names
+              .map(({ member, originalIndex }) => {
+                const isPlayer = member?.id === party.playerCharacterId;
+                return (
+                  <PartyMemberCard
+                    key={member?.id || originalIndex}
+                    portrait={member?.portrait || undefined}
+                    name={typeof member?.name === 'string' ? member.name : (member?.name as any)?.en || undefined}
+                    title={typeof member?.title === 'string' ? member.title : (member?.title as any)?.en || undefined}
+                    level={member?.level || undefined}
+                    isPlayer={isPlayer}
+                    isSelected={selectedMemberIndex === originalIndex}
+                    isEmpty={!member}
+                    needs={member?.needs}
+                    onClick={() => {
+                      setSelectedMemberIndex(originalIndex);
+                      setStatsModalOpen(true);
+                    }}
+                  />
+                );
+              })}
           </Box>
 
           {/* Location Situation Image - Fixed Height with Game Time and Location Overlay */}
@@ -272,7 +593,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
               />
               {/* Game Time and Location Display - Top Right */}
               <GameTimeAndLocation
-                gameTime={mockGameTime}
+                gameTime={gameTime}
                 region={location.region}
                 subRegion={location.subRegion}
                 locationName={location.name}
@@ -300,7 +621,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
               zIndex: 10,
             }}
           >
-            <ChatPanel currentUserId="mock-character-001" />
+            <ChatPanel currentUserId={party.playerCharacterId} />
           </Box>
         </Box>
       </Box>
@@ -312,14 +633,42 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
         onSave={handleScheduleSave}
         onTravelClick={handleTravelClick}
         onRailTravelClick={handleRailTravelClick}
-        hasRailStation={true} // TODO: Get from party/location data - for now, leave active
+        hasRailStation={location.hasRailStation}
+        characterSkills={(() => {
+          // Find player character
+          const playerCharacter = party.characters.find(
+            (char) => char && char.id === party.playerCharacterId
+          );
+          
+          if (!playerCharacter) return undefined;
+          
+          const skillsMap: Record<string, { level: number; exp: number }> = {};
+          
+          // Add active skills
+          if (playerCharacter.activeSkills) {
+            playerCharacter.activeSkills.forEach((skill) => {
+              skillsMap[skill.id] = { level: skill.level, exp: skill.exp };
+            });
+          }
+          
+          // Add conditional skills (avoid duplicates)
+          if (playerCharacter.conditionalSkills) {
+            playerCharacter.conditionalSkills.forEach((skill) => {
+              if (!skillsMap[skill.id]) {
+                skillsMap[skill.id] = { level: skill.level, exp: skill.exp };
+              }
+            });
+          }
+          
+          return Object.keys(skillsMap).length > 0 ? skillsMap : undefined;
+        })()}
       />
 
       {/* Character Stats Modal */}
       <CharacterStatsModal
         open={statsModalOpen}
         onClose={() => setStatsModalOpen(false)}
-        character={mockParty[selectedMemberIndex] || null}
+        character={partyMembers[selectedMemberIndex] || null}
       />
 
       {/* Settings Modal */}
@@ -332,7 +681,7 @@ export default function GameView({ mockPartyData }: GameViewProps = {} as GameVi
       <NewsModal
         open={newsModalOpen}
         onClose={() => setNewsModalOpen(false)}
-        news={mockNews}
+        news={news}
       />
 
     </Box>

@@ -6,16 +6,16 @@ import { ActionIndicator } from "./ActionIndicator";
 
 export interface PartyMemberCardProps {
   portrait?: string; // Portrait image path (if character exists)
-  name?: string; // Character name
-  title?: string; // Character title (epithet + role)
+  name?: string | { en: string; th: string }; // Character name (string or L10N)
+  title?: string | { en: string; th: string }; // Character title (epithet + role) (string or L10N)
   level?: number; // Character level
   isPlayer?: boolean; // Is this the player's character?
   isSelected?: boolean; // Is this card currently selected?
   isEmpty?: boolean; // Is this an empty slot?
   needs?: {
-    mood: number;
-    energy: number;
-    satiety: number;
+    mood: number | { base: number; bonus: number; current: number; max: number };
+    energy: number | { base: number; bonus: number; current: number; max: number };
+    satiety: number | { base: number; bonus: number; current: number; max: number };
   };
   nextAction?: string; // Name of next action to execute
   actionType?: string; // Type of action
@@ -53,9 +53,9 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
       {needs && (
         <Box sx={{ mb: nextAction ? 1.5 : 0 }}>
           <CharacterNeedsBar
-            mood={needs.mood}
-            energy={needs.energy}
-            satiety={needs.satiety}
+            mood={typeof needs.mood === 'number' ? needs.mood : (needs.mood?.current ?? 0) / (needs.mood?.max ?? 100) * 100}
+            energy={typeof needs.energy === 'number' ? needs.energy : (needs.energy?.current ?? 0) / (needs.energy?.max ?? 100) * 100}
+            satiety={typeof needs.satiety === 'number' ? needs.satiety : (needs.satiety?.current ?? 0) / (needs.satiety?.max ?? 100) * 100}
             compact={false}
           />
         </Box>
@@ -187,7 +187,7 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
               color: theme.palette.text.secondary,
             }}
           >
-            {name?.charAt(0) || "?"}
+            {(typeof name === 'string' ? name : name?.en || "?")?.charAt(0) || "?"}
           </Typography>
         )}
       </Box>
@@ -208,7 +208,7 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
               : "none",
           }}
         >
-          {name}
+          {typeof name === 'string' ? name : (name as any)?.en || ''}
         </Typography>
       )}
 

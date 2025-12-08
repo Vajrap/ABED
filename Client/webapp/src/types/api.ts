@@ -233,3 +233,81 @@ export interface PartyResponse {
   message?: string;
 }
 
+// ============================================
+// News Types (matching backend)
+// ============================================
+
+export enum NewsSignificance {
+  TRIVIAL = "trivial",
+  MINOR = "minor",
+  NOTABLE = "notable",
+  MAJOR = "major",
+  MOMENTOUS = "momentous",
+}
+
+export enum NewsPropagation {
+  SECRET = "secret",
+  PRIVATE = "private",
+  LOCAL = "local",
+  REGIONAL = "regional",
+  CONTINENTAL = "continental",
+  GLOBAL = "global",
+}
+
+export type NewsScope =
+  | { kind: "worldScope" }
+  | { kind: "regionScope"; region: string }
+  | { kind: "subRegionScope"; subRegion: string }
+  | { kind: "locationScope"; location: string }
+  | { kind: "partyScope"; partyId: string }
+  | { kind: "privateScope"; characterId: string }
+  | { kind: "none" };
+
+export interface NewsContext {
+  region: string;
+  subRegion: string;
+  location: string;
+  partyId: string;
+  characterIds: string[];
+}
+
+export interface L10NContent {
+  en: string;
+  th?: string;
+  entities?: {
+    chars?: Record<string, any>;
+    items?: Record<string, any>;
+    skills?: Record<string, any>;
+    locs?: Record<string, any>;
+    parties?: Record<string, any>;
+  };
+}
+
+export interface GameTimeInterface {
+  hour: number; // 1-4
+  dayOfWeek: number; // 1-6
+  dayOfSeason: number; // 1-48
+  season: number; // 1-7
+  dayPassed: number;
+  year: number;
+}
+
+export interface NewsSpreadConfig {
+  // Optional custom spread configuration
+  [key: string]: any;
+}
+
+export interface News {
+  id: string;
+  ts: GameTimeInterface;
+  scope: NewsScope;
+  tags?: string[];
+  content: L10NContent; // L10N content with markup
+  tokens?: any[]; // DEPRECATED: Old token system
+  context: NewsContext;
+  significance: NewsSignificance;
+  propagation: NewsPropagation;
+  spreadConfig?: NewsSpreadConfig;
+  secretTier?: TierEnum; // DEPRECATED
+}
+

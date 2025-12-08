@@ -1,6 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "../Database/connection";
 import { characters, type InsertCharacter } from "../Database/Schema";
+import { eq } from "drizzle-orm";
 import { CharacterType,RaceEnum } from "../InterFacesEnumsAndTypes/Enums";
 import { Character } from "../Entity/Character/Character";
 import { CharacterAlignment } from "../Entity/Character/Subclass/Alignment/CharacterAlignment";
@@ -52,6 +53,7 @@ export class CharacterService {
       // 2. Create party for the character
       const party = PartyService.createParty(character, LocationsEnum.WaywardInn);
       character.partyID = party.partyID;
+      character.location = LocationsEnum.WaywardInn; // Set character location
 
       // 3. Manager are for easy access to characters and parties
       characterManager.addCharacter(character);
@@ -93,6 +95,7 @@ export class CharacterService {
       level: character.level,
       portrait: character.portrait,
       background: character.background,
+      location: character.location || null,
 
       // Character systems - serialize to JSON
       alignment: character.alignment as any,
@@ -247,6 +250,26 @@ export class CharacterService {
     }
 
     return { character: savedCharacter, id: savedCharacter.id };
+  }
+
+  /**
+   * Update an existing character in the database
+   */
+  static async updateCharacterInDatabase(character: Character): Promise<void> {
+    const insertCharacter = this.characterToInsertCharacter(character);
+    
+    try {
+      await db
+        .update(characters)
+        .set({
+          ...insertCharacter,
+          updatedAt: new Date(),
+          updatedBy: "system",
+        })
+        .where(eq(characters.id, character.id));
+    } catch (error) {
+      throw error;
+    }
   }
   
   /**

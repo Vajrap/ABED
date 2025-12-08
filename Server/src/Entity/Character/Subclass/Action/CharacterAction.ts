@@ -16,10 +16,77 @@ export enum restEnums {
   HouseRest = "House Rest",
 }
 
+// Organization/Sect Action Enums
+export enum HeavensDecreeAction {
+  Meeting = "Meeting",
+  Join = "Join",
+  Leave = "Leave",
+  Train = "Train",
+  Socialize = "Socialize",
+}
+
+export enum ChurchOfLaohAction {
+  Meeting = "Meeting",
+  Join = "Join",
+  Leave = "Leave",
+  Train = "Train",
+  Socialize = "Socialize",
+  MagicLearning = "Magic Learning",
+}
+
+export enum GreatTempleOfLaohAction {
+  Meeting = "Meeting",
+  Train = "Train",
+  Socialize = "Socialize",
+}
+
+export enum CultOfNizarithAction {
+  Join = "Join",
+  Leave = "Leave",
+  Train = "Train",
+  Socialize = "Socialize",
+  MagicLearning = "Magic Learning",
+}
+
+export enum ShrineAction {
+  Meeting = "Meeting",
+  Join = "Join",
+  Leave = "Leave",
+  Train = "Train",
+  Socialize = "Socialize",
+}
+
+export enum MajorShrineAction {
+  Meeting = "Meeting",
+  Train = "Train",
+  Socialize = "Socialize",
+}
+
+export enum KnightOrderAction {
+  Join = "Join",
+  Leave = "Leave",
+  Train = "Train",
+  Socialize = "Socialize",
+}
+
+export enum MagicSchoolAction {
+  Join = "Join",
+  Leave = "Leave",
+  Train = "Train",
+  Socialize = "Socialize",
+}
+
+export enum ArcaneAcademiaAction {
+  Join = "Join",
+  Leave = "Leave",
+  Train = "Train",
+  Socialize = "Socialize",
+}
+
 // Input on character scope
 export enum ActionInput {
   None = "None",
-  Socialize = "Socialize",
+  // Travel are part of Group Action
   Travel = "Travel",
   RailTravel = "Rail Travel",
 
@@ -28,6 +95,10 @@ export enum ActionInput {
   Inn = "Inn",
   Camping = "Camping",
   HouseRest = "House Rest",
+
+  // Randomly select an NPC on location to socialize with
+  Socialize = "Socialize",
+  
 
   // Attributes
   TrainAttribute = "Train Attribute",
@@ -39,16 +110,17 @@ export enum ActionInput {
   TrainSkill = "Train Skill",
   LearnSkill = "Learn Skill",
 
-  // read
+  // TODO: Implement Reading Book
   Read = "Read",
 
-  // stroll
+  // strolling, encounter random events
   Stroll = "Stroll",
   Tavern = "Tavern",
 
   // artisan
   // Craft, automated, use character's config
   Craft = "Craft",
+
   // Gathering
   Mining = "Mining",
   WoodCutting = "Wood Cutting",
@@ -60,20 +132,12 @@ export enum ActionInput {
   Carpentry = "Carpentry",
   Weaving = "Weaving",
 
-  // Part of crafting
-  // Smithing = "Smithing",
-  // Jewelry = "Jewelry",
-  // Cooking = "Cooking",
-  // Alchemy = "Alchemy",
-
   // Item Refining
-  Enchanting = "Enchanting", // Need to pick item with slot + maybe rune or something like so
+  Enchanting = "Enchanting", // TODO: Need to pick item with slot + maybe rune or something like so, Gem ETC,
 
-  // Automatically happened
-  // Skinning = "Skinning",
-
-  // Special choice in some places, just idea place holder now
-  HeavensDecreeMeeting = "Heavens Decree Meeting",
+  
+  // Organization/Sect actions (require sub-selection)
+  HeavensDecree = "Heavens Decree",
   ChurchOfLaoh = "Church of Laoh",
   GreatTempleOfLaoh = "Great Temple of Laoh",
   CultOfNizarith = "Cult of Nizarith",
@@ -85,15 +149,21 @@ export enum ActionInput {
   MajorShrineOfValthoria = "Major Shrine of Valthoria",
   ShrineOfPyrnthanas = "Shrine of Pyrnthanas",
   MajorShrineOfPyrnthanas = "Major Shrine of Pyrnthanas",
-  Barrack = "Barrack",
   KnightOrder = "Knight Order",
   MagicSchool = "Magic School",
-  MagicAcademy = "Magic Academy",
-  ChurchOfLaohMagicLearning = "Church of Laoh Magic Learning",
-  CultOfNizarithMagicLearning = "Cult of Nizarith Magic Learning",
-  AdventureGuild = "Adventure Guild",
+  ArcaneAcademia = "Arcane Academia",
+
+  // TODO: Take hunting quest
   BountyBoard = "Bounty Board",
-  Arena = "Arena",
+
+  // TODO: Participating needded money, get reward while watching also get reward if bet right.
+  ArenaWatching = "Arena Watching",
+  ArenaParticipating = "Arena Participating",
+
+  // Looking for quest in Adventure Guild. If you come solo, the quest might put you into a party when you accept.
+  AdventureGuildQuest = "Adventure Guild Quest",
+  // Hiring some random NPC
+  AdventureGuildHire = "Adventure Guild Hire",
 }
 
 export type CharacterActionSequence = {
@@ -196,7 +266,6 @@ export type CharacterAction =
 
   // Other actions
   | { type: ActionInput.Socialize }
-  | { type: ActionInput.Read }
   | { type: ActionInput.Stroll }
   | { type: ActionInput.Tavern }
   | { type: ActionInput.Mining }
@@ -208,30 +277,29 @@ export type CharacterAction =
   | { type: ActionInput.Weaving }
   | { type: ActionInput.Enchanting }
 
-  // Religious / special
-  | { type: ActionInput.HeavensDecreeMeeting }
-  | { type: ActionInput.ChurchOfLaoh }
-  | { type: ActionInput.GreatTempleOfLaoh }
-  | { type: ActionInput.CultOfNizarith }
-  | { type: ActionInput.ShrineOfGelthoran }
-  | { type: ActionInput.MajorShrineOfGelthoran }
-  | { type: ActionInput.ShrineOfAqorath }
-  | { type: ActionInput.MajorShrineOfAqorath }
-  | { type: ActionInput.ShrineOfValthoria }
-  | { type: ActionInput.MajorShrineOfValthoria }
-  | { type: ActionInput.ShrineOfPyrnthanas }
-  | { type: ActionInput.MajorShrineOfPyrnthanas }
+  // Religious / special (with sub-selection)
+  | { type: ActionInput.HeavensDecree; action: HeavensDecreeAction }
+  | { type: ActionInput.ChurchOfLaoh; action: ChurchOfLaohAction }
+  | { type: ActionInput.GreatTempleOfLaoh; action: GreatTempleOfLaohAction }
+  | { type: ActionInput.CultOfNizarith; action: CultOfNizarithAction }
+  | { type: ActionInput.ShrineOfGelthoran; action: ShrineAction }
+  | { type: ActionInput.MajorShrineOfGelthoran; action: MajorShrineAction }
+  | { type: ActionInput.ShrineOfAqorath; action: ShrineAction }
+  | { type: ActionInput.MajorShrineOfAqorath; action: MajorShrineAction }
+  | { type: ActionInput.ShrineOfValthoria; action: ShrineAction }
+  | { type: ActionInput.MajorShrineOfValthoria; action: MajorShrineAction }
+  | { type: ActionInput.ShrineOfPyrnthanas; action: ShrineAction }
+  | { type: ActionInput.MajorShrineOfPyrnthanas; action: MajorShrineAction }
 
-  // Combat / adventure
-  | { type: ActionInput.Barrack }
-  | { type: ActionInput.KnightOrder }
-  | { type: ActionInput.MagicSchool }
-  | { type: ActionInput.MagicAcademy }
-  | { type: ActionInput.ChurchOfLaohMagicLearning }
-  | { type: ActionInput.CultOfNizarithMagicLearning }
-  | { type: ActionInput.AdventureGuild }
+  // Combat / adventure (with sub-selection)
+  | { type: ActionInput.KnightOrder; action: KnightOrderAction }
+  | { type: ActionInput.MagicSchool; action: MagicSchoolAction }
+  | { type: ActionInput.ArcaneAcademia; action: ArcaneAcademiaAction }
   | { type: ActionInput.BountyBoard }
-  | { type: ActionInput.Arena };
+  | { type: ActionInput.ArenaWatching }
+  | { type: ActionInput.ArenaParticipating }
+  | { type: ActionInput.AdventureGuildQuest }
+  | { type: ActionInput.AdventureGuildHire };
 
 export const groupRest = [
   ActionInput.Inn,

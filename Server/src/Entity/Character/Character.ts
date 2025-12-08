@@ -4,6 +4,7 @@ import {
   RelationStatusEnum,
   type ElementKey,
 } from "../../InterFacesEnumsAndTypes/Enums";
+import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { CharacterAlignment } from "./Subclass/Alignment/CharacterAlignment";
 import { CharacterAttributes } from "./Subclass/Stats/CharacterAttributes";
 import { CharacterProficiencies } from "./Subclass/Stats/CharacterProficiencies";
@@ -58,6 +59,7 @@ export class Character {
   id: string = "";
   userId: string | null = null;
   partyID: string | null = null;
+  location: LocationsEnum | null = null; // Current location - denormalized from party for quick access
 
   name: L10N;
   gender: "MALE" | "FEMALE" | "NONE" = "NONE";

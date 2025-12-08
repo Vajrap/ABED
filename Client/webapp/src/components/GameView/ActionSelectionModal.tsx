@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,13 +9,16 @@ import {
   useTheme,
 } from "@mui/material";
 import { getActionsForPhase } from "@/config/actions";
+import { ActionSubSelectionModal } from "./ActionSubSelectionModal";
+import { getSubSelectionOptions } from "@/config/subSelectionOptions";
 
 export interface ActionSelectionModalProps {
   open: boolean;
   onClose: () => void;
   day: number;
   phase: number;
-  onActionSelect: (actionId: string) => void;
+  onActionSelect: (actionId: string, subSelectionValue?: string) => void;
+  characterSkills?: Record<string, { level: number; exp: number }>; // Character's skills for Train Skill sub-selection
 }
 
 const PHASE_NAMES = ["Morning", "Afternoon", "Evening", "Night"];
@@ -29,21 +32,37 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
   day,
   phase,
   onActionSelect,
+  characterSkills,
 }) => {
   const theme = useTheme();
-
   // Get available actions for this phase (from frontend config)
   const availableActions = getActionsForPhase(phase);
+  const [subSelectionModalOpen, setSubSelectionModalOpen] = useState(false);
+  const [selectedAction, setSelectedAction] = useState<(typeof availableActions)[0] | null>(null);
 
   const handleActionClick = (action: typeof availableActions[0]) => {
-    if (action.needsSubSelection) {
-      // TODO: Open sub-selection modal (e.g., training -> select skill)
-      console.log(`Action ${action.name} needs sub-selection`);
-      onClose();
+    if (action.needsSubSelection && action.subSelectionType) {
+      // Open sub-selection modal
+      setSelectedAction(action);
+      setSubSelectionModalOpen(true);
     } else {
+      // No sub-selection needed, select directly
       onActionSelect(action.id);
       onClose();
     }
+  };
+
+  const handleSubSelectionConfirm = (actionId: string, subSelectionValue: string) => {
+    // Store action with parameter: "actionId|parameterValue"
+    onActionSelect(actionId, subSelectionValue);
+    setSubSelectionModalOpen(false);
+    setSelectedAction(null);
+    onClose();
+  };
+
+  const handleSubSelectionCancel = () => {
+    setSubSelectionModalOpen(false);
+    setSelectedAction(null);
   };
 
   return (
@@ -55,7 +74,7 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
       PaperProps={{
         sx: {
           borderRadius: 2,
-          padding: 3,
+          padding: 2,
           fontFamily: "Crimson Text, serif",
           backgroundColor: theme.palette.background.paper,
           border: `3px solid ${theme.palette.tertiary.main}`,
@@ -75,26 +94,26 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
       <DialogTitle
         sx={{
           fontFamily: "Cinzel, serif",
-          fontSize: "1.5rem",
+          fontSize: "1.25rem",
           fontWeight: 700,
           color: theme.palette.tertiary.main,
           textAlign: "center",
-          pb: 2,
+          pb: 1.5,
           borderBottom: `2px solid ${alpha(theme.palette.tertiary.main, 0.3)}`,
         }}
       >
         Select Action
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 3 }}>
+      <DialogContent sx={{ pt: 2, pb: 2 }}>
         {/* Time Slot Info */}
         <Typography
           sx={{
             fontFamily: "Crimson Text, serif",
-            fontSize: "1.1rem",
+            fontSize: "0.95rem",
             color: theme.palette.text.secondary,
             textAlign: "center",
-            mb: 3,
+            mb: 2,
           }}
         >
           Day {day + 1} - {PHASE_NAMES[phase]}
@@ -105,7 +124,9 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 2,
+            gap: 1,
+            maxHeight: "60vh",
+            overflowY: "auto",
           }}
         >
           {availableActions.map((action) => {
@@ -118,9 +139,9 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 2,
-                  padding: 2.5,
-                  borderRadius: 1.5,
+                  gap: 1.25,
+                  padding: 1.25,
+                  borderRadius: 1,
                   border: `2px solid ${alpha(theme.palette.tertiary.main, 0.3)}`,
                   backgroundColor: alpha("#fff", 0.3),
                   cursor: "pointer",
@@ -129,28 +150,30 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
                   "&:hover": {
                     backgroundColor: alpha(theme.palette.tertiary.main, 0.15),
                     border: `2px solid ${theme.palette.tertiary.main}`,
-                    boxShadow: `0 0 16px ${alpha(theme.palette.tertiary.main, 0.3)}`,
-                    transform: "translateX(4px)",
+                    boxShadow: `0 0 12px ${alpha(theme.palette.tertiary.main, 0.3)}`,
+                    transform: "translateX(3px)",
                   },
 
                   "&:active": {
-                    transform: "translateX(2px)",
+                    transform: "translateX(1px)",
                   },
                 }}
               >
                 <ActionIcon
                   sx={{
-                    fontSize: "2rem",
+                    fontSize: "1.25rem",
                     color: theme.palette.tertiary.main,
+                    flexShrink: 0,
                   }}
                 />
-                <Box sx={{ flex: 1 }}>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography
                     sx={{
                       fontFamily: "Crimson Text, serif",
-                      fontSize: "1.2rem",
+                      fontSize: "0.95rem",
                       fontWeight: 600,
                       color: theme.palette.text.primary,
+                      lineHeight: 1.3,
                     }}
                   >
                     {action.name}
@@ -159,9 +182,10 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
                     <Typography
                       sx={{
                         fontFamily: "Crimson Text, serif",
-                        fontSize: "0.9rem",
+                        fontSize: "0.75rem",
                         color: theme.palette.text.secondary,
                         fontStyle: "italic",
+                        lineHeight: 1.2,
                       }}
                     >
                       (requires selection)
@@ -173,6 +197,20 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
           })}
         </Box>
       </DialogContent>
+
+      {/* Sub-selection Modal */}
+      {selectedAction && selectedAction.subSelectionType && (
+        <ActionSubSelectionModal
+          open={subSelectionModalOpen}
+          onClose={handleSubSelectionCancel}
+          action={selectedAction}
+          onSelect={handleSubSelectionConfirm}
+          availableOptions={getSubSelectionOptions(
+            selectedAction.subSelectionType,
+            characterSkills
+          )}
+        />
+      )}
     </Dialog>
   );
 };

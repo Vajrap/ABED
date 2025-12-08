@@ -2,6 +2,8 @@ import { eq } from "drizzle-orm";
 import { persistGameStateSnapshot } from "./gameStateStore";
 import { newsArchiveService } from "../Entity/News/NewsArchive";
 import { market } from "../Entity/Market/Market";
+import { characterManager } from "../Game/CharacterManager";
+import { CharacterService } from "../Services/CharacterService";
 import { db } from "./connection";
 import {
   marketState,
@@ -120,6 +122,22 @@ async function persistResourceProductionSnapshot(): Promise<void> {
   }
 }
 
+async function persistCharactersSnapshot(): Promise<void> {
+  const charactersToSave = characterManager.characters;
+  Report.debug(`Persisting ${charactersToSave.length} characters to database...`);
+  
+  for (const character of charactersToSave) {
+    try {
+      await CharacterService.updateCharacterInDatabase(character);
+    } catch (error) {
+      Report.error(`Failed to persist character ${character.id}`, { error, characterId: character.id });
+      throw error; // Re-throw to be caught by run() wrapper
+    }
+  }
+  
+  Report.info(`✅ Persisted ${charactersToSave.length} characters to database`);
+}
+
 export async function saveDailyState(): Promise<void> {
   const errors: Array<{ scope: string; error: unknown }> = [];
 
@@ -136,6 +154,7 @@ export async function saveDailyState(): Promise<void> {
   await run("newsArchive", () => newsArchiveService.saveToDatabase());
   await run("marketState", persistMarketStateSnapshot);
   await run("resourceProduction", persistResourceProductionSnapshot);
+  await run("characters", persistCharactersSnapshot);
 
   if (errors.length === 0) {
     Report.info("Daily state persistence completed successfully");

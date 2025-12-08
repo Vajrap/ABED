@@ -6,6 +6,7 @@ export const characters = pgTable("characters", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   partyID: uuid("party_id"),
+  location: varchar("location", { length: 100 }), // LocationsEnum - denormalized for quick access
   
   // Basic character info (matching Character entity exactly)
   name: varchar("name", { length: 255 }).notNull(),

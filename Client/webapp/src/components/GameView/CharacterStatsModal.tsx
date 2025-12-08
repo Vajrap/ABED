@@ -40,6 +40,13 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
   if (!character || !character.name) {
     return null;
   }
+  
+  // Helper to extract string from L10N or string
+  const getString = (value: string | { en: string; th: string } | null | undefined): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    return value.en || '';
+  };
 
   // Organize equipment by slot for easy lookup
   // Handle both array format (EquipmentDisplay[]) and object format (Record<slot, ItemId>)
@@ -252,7 +259,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
           mb: 3,
         }}
       >
-        {character.name}'s Stats
+        {getString(character.name) || 'Character'}'s Stats
         {character.title && (
           <Tooltip
             title="Character title formed from their Epithet (background) and Role (class). Titles reflect the character's identity and can affect how NPCs react to them."
@@ -286,7 +293,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                 display: "inline-block",
               }}
             >
-              {character.title}
+              {getString(character.title)}
             </Typography>
           </Tooltip>
         )}
@@ -341,7 +348,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                   Race:
                 </Typography>
                 <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "1rem", fontWeight: 600 }}>
-                  {character.race || "N/A"}
+                  {getString(character.race) || "N/A"}
                 </Typography>
               </Grid>
               <Grid item xs={6} sm={4}>
@@ -349,7 +356,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                   Background:
                 </Typography>
                 <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "1rem", fontWeight: 600 }}>
-                  {character.background || "N/A"}
+                  {getString(character.background) || "N/A"}
                 </Typography>
               </Grid>
               <Grid item xs={6} sm={4}>
@@ -516,7 +523,14 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                     </Box>
                     <LinearProgress
                       variant="determinate"
-                      value={character.needs?.[key as keyof typeof character.needs] as number || 0}
+                      value={(() => {
+                        const needValue = character.needs?.[key as keyof typeof character.needs];
+                        if (typeof needValue === 'number') return needValue;
+                        if (needValue && typeof needValue === 'object' && 'current' in needValue && 'max' in needValue) {
+                          return (needValue.current / needValue.max) * 100;
+                        }
+                        return 0;
+                      })()}
                       sx={{
                         height: 20,
                         borderRadius: 1,
@@ -527,7 +541,14 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                       }}
                     />
                     <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "0.85rem", mt: 0.5, textAlign: "center" }}>
-                      {character.needs?.[key as keyof typeof character.needs] || 0}%
+                      {(() => {
+                        const needValue = character.needs?.[key as keyof typeof character.needs];
+                        if (typeof needValue === 'number') return `${needValue}%`;
+                        if (needValue && typeof needValue === 'object' && 'current' in needValue && 'max' in needValue) {
+                          return `${Math.round((needValue.current / needValue.max) * 100)}%`;
+                        }
+                        return '0%';
+                      })()}
                     </Typography>
                   </Grid>
                 ))}
@@ -803,7 +824,13 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
               />
               <LinearProgress
                 variant="determinate"
-                value={character.planarAptitude}
+                value={(() => {
+                  const apt = character.planarAptitude;
+                  if (typeof apt === 'number') return apt;
+                  if (apt && typeof apt === 'object' && 'aptitude' in apt) return apt.aptitude;
+                  if (apt && typeof apt === 'object' && 'total' in apt) return apt.total;
+                  return 0;
+                })()}
                 sx={{
                   height: 30,
                   borderRadius: 2,
@@ -814,7 +841,13 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                 }}
               />
               <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "1rem", mt: 1, textAlign: "center" }}>
-                {character.planarAptitude}%
+                {(() => {
+                  const apt = character.planarAptitude;
+                  if (typeof apt === 'number') return `${apt}%`;
+                  if (apt && typeof apt === 'object' && 'aptitude' in apt) return `${apt.aptitude}%`;
+                  if (apt && typeof apt === 'object' && 'total' in apt) return `${apt.total}%`;
+                  return '0%';
+                })()}
               </Typography>
             </Paper>
           )}

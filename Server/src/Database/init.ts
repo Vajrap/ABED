@@ -13,6 +13,8 @@ import {
 import Report from "../Utils/Reporter";
 import { GameTime } from "../Game/GameTime/GameTime";
 import { sql } from "drizzle-orm";
+import { loadCharactersFromDatabase } from "../Utils/CharacterDatabaseLoader";
+import { loadPartiesFromDatabase } from "../Utils/PartyDatabaseLoader";
 
 export async function initializeDatabase(): Promise<void> {
   Report.info("🚀 Initializing database...");
@@ -69,6 +71,12 @@ async function loadGameDataFromDatabase(): Promise<void> {
   Report.info("📥 Loading game data from database...");
 
   try {
+    // Load Characters (must be loaded first as parties depend on them)
+    await loadCharactersFromDatabase();
+    
+    // Load Parties (depends on characters being loaded)
+    await loadPartiesFromDatabase();
+
     // Load Game State
     await loadGameState();
 
