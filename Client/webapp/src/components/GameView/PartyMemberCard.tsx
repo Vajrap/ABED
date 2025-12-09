@@ -3,6 +3,7 @@ import { Box, Typography, alpha, useTheme, Tooltip } from "@mui/material";
 import { PersonAdd } from "@mui/icons-material";
 import { CharacterNeedsBar } from "./CharacterNeedsBar";
 import { ActionIndicator } from "./ActionIndicator";
+import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
 
 export interface PartyMemberCardProps {
   portrait?: string; // Portrait image path (if character exists)
@@ -167,13 +168,13 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
               overflow: "hidden",
             }}
           >
-            <img
-              src={portrait?.startsWith("/") ? portrait : `/img/portraits/${portrait}.png`}
+            <PortraitRenderer
+              portrait={portrait}
+              size="100%"
               alt={name || "Character"}
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
               }}
             />
           </Box>

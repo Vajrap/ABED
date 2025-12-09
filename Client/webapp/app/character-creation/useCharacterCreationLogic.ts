@@ -5,6 +5,8 @@ import type { LocalizedText } from "@/types/localization";
 import { characterService } from "@/services/characterService";
 import { L10N, getLocalizedText, getCurrentLanguage } from "@/localization";
 import { calculateCharacterStats, type CalculatedStats, RACE_STATS, CLASS_STATS, BACKGROUND_STATS } from "./characterStatsData";
+import type { PortraitData } from "@/types/character";
+import { portraitAssetService, type PortraitPartOptions } from "@/services/portraitAssetService";
 
 // Helper function to get unique race IDs (handle case variations)
 export function getAvailableRaces(): Array<{ id: string; name: string }> {
@@ -107,7 +109,7 @@ export interface CharacterCreationFormData {
   name: string;
   gender: "MALE" | "FEMALE";
   race: string;
-  portrait: string;
+  portrait: PortraitData;
   class: string;
   background: string;
 }
@@ -118,26 +120,31 @@ export interface CharacterCreationState {
   nameCheckMessage: string | null;
   stats: CalculatedStats | null;
   formData: CharacterCreationFormData;
-  portraitIndex: number;
+  portraitOptions: PortraitPartOptions | null;
+  assetCatalogLoaded: boolean;
 }
 
 // Re-export for convenience
 export type { CalculatedStats as CharacterCreationStats };
-
-// Available portraits based on race and gender
-const getPortraits = (race: string, gender: "MALE" | "FEMALE"): string[] => {
-  const prefix = gender === "MALE" ? "m" : "f";
-  const raceKey = race.toLowerCase();
-  
-  // Generate portrait IDs based on race and gender
-  return [`${prefix}_${raceKey}01`, `${prefix}_${raceKey}02`, `${prefix}_${raceKey}03`];
-};
 
 // Default values
 const DEFAULT_RACE = "Human";
 const DEFAULT_CLASS = "Cleric";
 const DEFAULT_BACKGROUND = "Noble";
 const DEFAULT_GENDER: "MALE" | "FEMALE" = "MALE";
+
+// Default portrait data (will be replaced when asset catalog loads)
+const DEFAULT_PORTRAIT: PortraitData = {
+  base: "c1",
+  jaw: "jaw1",
+  eyes: "eye1",
+  eyes_color: "c1",
+  face: "face1",
+  beard: null,
+  hair_top: "m1_top", // Will be replaced with gender-specific value when catalog loads
+  hair_bot: "m1_bot",
+  hair_color: "c1",
+};
 
 export function useCharacterCreationLogic() {
   const [state, setState] = useState<CharacterCreationState>({
@@ -149,12 +156,42 @@ export function useCharacterCreationLogic() {
       name: "",
       gender: DEFAULT_GENDER,
       race: DEFAULT_RACE,
-      portrait: getPortraits(DEFAULT_RACE, DEFAULT_GENDER)[0] || "",
+      portrait: DEFAULT_PORTRAIT,
       class: DEFAULT_CLASS,
       background: DEFAULT_BACKGROUND,
     },
-    portraitIndex: 0,
+    portraitOptions: null,
+    assetCatalogLoaded: false,
   });
+
+  // Load asset catalog on mount
+  useEffect(() => {
+    const loadAssetCatalog = async () => {
+      try {
+        await portraitAssetService.loadCatalogs();
+        const options = await portraitAssetService.getPortraitPartOptions(DEFAULT_RACE);
+        const defaultPortrait = await portraitAssetService.generateDefaultPortrait(
+          DEFAULT_GENDER,
+          DEFAULT_RACE
+        );
+        setState((prev) => ({
+          ...prev,
+          portraitOptions: options,
+          assetCatalogLoaded: true,
+          formData: { ...prev.formData, portrait: defaultPortrait },
+        }));
+      } catch (error) {
+        console.error("Failed to load asset catalog:", error);
+        // Continue with default portrait even if catalog fails to load
+        setState((prev) => ({
+          ...prev,
+          assetCatalogLoaded: true,
+        }));
+      }
+    };
+
+    loadAssetCatalog();
+  }, []);
 
   // Calculate stats when race, class, or background changes
   useEffect(() => {
@@ -176,18 +213,58 @@ export function useCharacterCreationLogic() {
     }
   }, [state.formData.race, state.formData.class, state.formData.background]);
 
-  // Update portrait when race or gender changes
+  // Update portrait options and regenerate default portrait when race or gender changes
   useEffect(() => {
-    if (state.formData.race) {
-      const portraits = getPortraits(state.formData.race, state.formData.gender);
-      if (portraits.length > 0) {
+    if (!state.assetCatalogLoaded || !state.formData.race) return;
+
+    let cancelled = false;
+
+    const updatePortraitForRaceAndGender = async () => {
+      try {
+        const options = await portraitAssetService.getPortraitPartOptions(state.formData.race);
+        
+        if (cancelled) return;
+        
+        // Filter hair options by gender (f1, f2 for female, m1, m2 for male)
+        const genderPrefix = state.formData.gender === "MALE" ? "m" : "f";
+        const filteredHairOptions = options.hair_top.filter((hair) => 
+          hair.startsWith(genderPrefix) || hair.startsWith("hair")
+        );
+        
+        const optionsWithFilteredHair = {
+          ...options,
+          hair_top: filteredHairOptions,
+          hair_bot: filteredHairOptions.map(h => h.replace("_top", "_bot")),
+        };
+        
+        // Beard options are already included in portraitOptions (independent of jaw)
+        const optionsWithBeard = optionsWithFilteredHair;
+        
+        const defaultPortrait = await portraitAssetService.generateDefaultPortrait(
+          state.formData.gender,
+          state.formData.race
+        );
+        
+        if (cancelled) return;
+        
         setState((prev) => ({
           ...prev,
-          formData: { ...prev.formData, portrait: portraits[prev.portraitIndex % portraits.length] },
+          portraitOptions: optionsWithBeard,
+          formData: { ...prev.formData, portrait: defaultPortrait },
         }));
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to update portrait for race/gender:", error);
+        }
       }
-    }
-  }, [state.formData.race, state.formData.gender, state.portraitIndex]);
+    };
+
+    updatePortraitForRaceAndGender();
+    
+    return () => {
+      cancelled = true;
+    };
+  }, [state.formData.race, state.formData.gender, state.assetCatalogLoaded]);
 
   // Update form field
   const updateField = <K extends keyof CharacterCreationFormData>(
@@ -203,27 +280,65 @@ export function useCharacterCreationLogic() {
     }));
   };
 
-  // Update portrait index
-  const updatePortraitIndex = (direction: "prev" | "next") => {
+  // Update a specific portrait part
+  const updatePortraitPart = (part: keyof PortraitData, value: string | number | null) => {
     setState((prev) => {
-      if (!prev.formData.race) return prev;
-      
-      const portraits = getPortraits(prev.formData.race, prev.formData.gender);
-      if (portraits.length === 0) return prev;
-
-      let newIndex;
-      if (direction === "prev") {
-        newIndex = prev.portraitIndex > 0 ? prev.portraitIndex - 1 : portraits.length - 1;
+      const newPortrait = { ...prev.formData.portrait };
+      if (part === "beard") {
+        // Beard is now a number (1-6) or null
+        if (value === null || value === "" || value === undefined) {
+          newPortrait.beard = null;
       } else {
-        newIndex = prev.portraitIndex < portraits.length - 1 ? prev.portraitIndex + 1 : 0;
+          const numValue = typeof value === "number" ? value : parseInt(String(value), 10);
+          newPortrait.beard = isNaN(numValue) ? null : numValue;
+        }
+      } else if (part in newPortrait) {
+        (newPortrait as any)[part] = value;
       }
-
       return {
         ...prev,
-        portraitIndex: newIndex,
-        formData: { ...prev.formData, portrait: portraits[newIndex] },
+        formData: { ...prev.formData, portrait: newPortrait },
       };
     });
+  };
+
+  // Cycle through options for a portrait part
+  const cyclePortraitPart = (part: keyof PortraitData, direction: "prev" | "next") => {
+    if (!state.portraitOptions) return;
+
+    // Get options for the part
+    let options: (string | number)[];
+    if (part === "beard") {
+      // Beard options are numbers 1-6
+      options = state.portraitOptions?.beard || [1, 2, 3, 4, 5, 6];
+    } else if (part === "eyes_color" || part === "hair_color") {
+      // Color options are handled separately, not cycled
+      return;
+    } else {
+      const partOptions = state.portraitOptions?.[part as keyof typeof state.portraitOptions];
+      if (!partOptions || !Array.isArray(partOptions) || partOptions.length === 0) {
+        return;
+      }
+      options = partOptions;
+    }
+
+    const currentValue = state.formData.portrait[part];
+    const currentIndex = options.indexOf(currentValue as any);
+    let newIndex: number;
+
+    // If current value not found, start at 0
+    if (currentIndex === -1) {
+      newIndex = 0;
+    } else if (direction === "prev") {
+      newIndex = currentIndex > 0 ? currentIndex - 1 : options.length - 1;
+    } else {
+      newIndex = currentIndex < options.length - 1 ? currentIndex + 1 : 0;
+    }
+
+    const newValue = options[newIndex];
+    updatePortraitPart(part, newValue as any);
+
+    // Note: Beard is independent of jaw, so no special handling needed when jaw changes
   };
 
   // Create character
@@ -295,19 +410,13 @@ export function useCharacterCreationLogic() {
            /^[a-zA-Z\u0E00-\u0E7F\s]+$/.test(state.formData.name);
   };
 
-  // Get available portraits for current race/gender
-  const getAvailablePortraits = (): string[] => {
-    if (!state.formData.race) return [];
-    return getPortraits(state.formData.race, state.formData.gender);
-  };
-
   return {
     ...state,
     updateField,
-    updatePortraitIndex,
+    updatePortraitPart,
+    cyclePortraitPart,
     createCharacter,
     isFormValid,
-    getAvailablePortraits,
     // Available options from local data
     availableRaces: getAvailableRaces(),
     availableClasses: getAvailableClasses(),

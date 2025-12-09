@@ -8,7 +8,7 @@ import {
   alpha,
   useTheme,
 } from "@mui/material";
-import { getActionsForPhase } from "@/config/actions";
+import { getActionsForPhase, getActionById } from "@/config/actions";
 import { ActionSubSelectionModal } from "./ActionSubSelectionModal";
 import { getSubSelectionOptions } from "@/config/subSelectionOptions";
 
@@ -19,6 +19,12 @@ export interface ActionSelectionModalProps {
   phase: number;
   onActionSelect: (actionId: string, subSelectionValue?: string) => void;
   characterSkills?: Record<string, { level: number; exp: number }>; // Character's skills for Train Skill sub-selection
+  availableActionsByPhase?: {
+    morning: string[];
+    afternoon: string[];
+    evening: string[];
+    night: string[];
+  }; // Phase-specific actions from backend
 }
 
 const PHASE_NAMES = ["Morning", "Afternoon", "Evening", "Night"];
@@ -33,10 +39,19 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
   phase,
   onActionSelect,
   characterSkills,
+  availableActionsByPhase,
 }) => {
   const theme = useTheme();
-  // Get available actions for this phase (from frontend config)
-  const availableActions = getActionsForPhase(phase);
+  
+  // Map phase index (0-3) to phase name
+  const PHASE_KEYS: ("morning" | "afternoon" | "evening" | "night")[] = ["morning", "afternoon", "evening", "night"];
+  const phaseKey = PHASE_KEYS[phase] || "morning";
+  
+  // Get available actions for this phase - use backend data if available, fallback to mock config
+  const phaseActionIds = availableActionsByPhase?.[phaseKey] || getActionsForPhase(phase).map(a => a.id);
+  const availableActions = phaseActionIds
+    .map(id => getActionById(id))
+    .filter(Boolean) as ReturnType<typeof getActionsForPhase>;
   const [subSelectionModalOpen, setSubSelectionModalOpen] = useState(false);
   const [selectedAction, setSelectedAction] = useState<(typeof availableActions)[0] | null>(null);
 
@@ -151,7 +166,6 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
                     backgroundColor: alpha(theme.palette.tertiary.main, 0.15),
                     border: `2px solid ${theme.palette.tertiary.main}`,
                     boxShadow: `0 0 12px ${alpha(theme.palette.tertiary.main, 0.3)}`,
-                    transform: "translateX(3px)",
                   },
 
                   "&:active": {

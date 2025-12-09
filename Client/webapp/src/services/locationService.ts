@@ -10,7 +10,13 @@ export interface LocationData {
   subRegion: string;
   situation: string; // Image identifier
   hasRailStation: boolean;
-  availableActions: string[];
+  availableActions: string[]; // Legacy: flat array (deprecated)
+  availableActionsByPhase?: {
+    morning: string[];
+    afternoon: string[];
+    evening: string[];
+    night: string[];
+  }; // New: phase-specific actions
   gameTime?: GameTimeInterface; // Current game time
 }
 

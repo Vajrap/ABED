@@ -1,6 +1,7 @@
 import React from "react";
 import { Tooltip, Box, Typography, alpha, useTheme } from "@mui/material";
 import { L10NContent } from "@/data/mockNewsData";
+import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
 
 export interface L10NTextRendererProps {
   content: L10NContent;
@@ -167,17 +168,20 @@ function renderEntityTooltip(
               }}
             >
               <Box
-                component="img"
-                src={`/img/portraits/${charData.portraitUrl}.png`}
-                alt={charData.name.en}
                 sx={{
                   width: 64,
                   height: 64,
                   borderRadius: "50%",
                   border: `2px solid ${theme.palette.primary.main}`,
-                  objectFit: "cover",
+                  overflow: "hidden",
                 }}
+              >
+                <PortraitRenderer
+                  portrait={charData.portraitUrl}
+                  size="100%"
+                  alt={charData.name.en}
               />
+              </Box>
             </Box>
           )}
           <Typography

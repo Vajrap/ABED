@@ -26,6 +26,19 @@ export interface SkillValue {
   experience: number;
 }
 
+// Portrait Data Structure - composable portrait built from multiple layers
+export interface PortraitData {
+  base: string; // e.g., "c1", "c2" - base body/color
+  jaw: string; // e.g., "jaw1", "jaw2" - jaw shape
+  eyes: string; // e.g., "eye1", "eye2" - eye type/style
+  eyes_color: string; // e.g., "c1", "c2" - eye color (c1-c7)
+  face: string; // e.g., "face1", "face2" - face features
+  beard?: number | null; // e.g., 1, 2, 3, 4, 5, 6 - beard style number (tied to jaw, uses hair_color)
+  hair_top: string; // e.g., "m1_top", "f1_top" - hair type and layer
+  hair_bot: string; // e.g., "m1_bot", "f1_bot" - hair type and layer
+  hair_color: string; // e.g., "c1", "c2" - hair color (c1-c10), also used for beard color
+}
+
 // Main Character Interface (matches backend CharacterInterface)
 export interface Character {
   // Basic Info
@@ -35,7 +48,7 @@ export interface Character {
   race: string;
   type: string; // CharacterType enum
   level: number;
-  portrait: string;
+  portrait: string | PortraitData; // Support both old string format and new PortraitData
   background: string;
   alignment: any; // CharacterAlignmentEnum from backend
   
@@ -83,7 +96,7 @@ export interface CharacterCreationRequest {
   name: string;
   gender: "MALE" | "FEMALE" | "NONE";
   race: string;
-  portrait: string;
+  portrait: string | PortraitData; // Support both old string format and new PortraitData
   background: string;
   startingClass: string;
 }

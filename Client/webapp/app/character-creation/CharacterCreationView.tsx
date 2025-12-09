@@ -14,6 +14,12 @@ import {
   Alert,
   CircularProgress,
   Divider,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -27,6 +33,8 @@ import { useLocalization, L10N } from "@/localization";
 import { skillsL10N } from "@/L10N/skills";
 import * as skillEnums from "@/L10N/skillEnums";
 import { renderText, type RenderTextOptions } from "@/utils/textRenderer";
+import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
+import { BattleSpriteRenderer } from "@/components/Battle/BattleSpriteRenderer";
 
 // Helper function to get skill L10N by mapping skill name + class to enum value
 // This function searches across all skill enum types since skills are stored by their enum value (not class prefix)
@@ -284,6 +292,36 @@ const getLocalizedBackgroundDescription = (t: any, backgroundId: string): string
   }
 };
 
+// Helper function to extract number from label (e.g., "eye1" -> "1", "jaw2" -> "2")
+const extractNumber = (label: string): string => {
+  const match = label.match(/\d+/);
+  return match ? match[0] : label;
+};
+
+// Color mappings
+const EYES_COLORS = [
+  { value: "c1", label: "Red" },
+  { value: "c2", label: "Green" },
+  { value: "c3", label: "Yellow" },
+  { value: "c4", label: "Blue" },
+  { value: "c5", label: "Purple" },
+  { value: "c6", label: "Pink" },
+  { value: "c7", label: "Gray" },
+];
+
+const HAIR_COLORS = [
+  { value: "c1", label: "Red" },
+  { value: "c2", label: "Green" },
+  { value: "c3", label: "Gold" },
+  { value: "c4", label: "Blue" },
+  { value: "c5", label: "Purple" },
+  { value: "c6", label: "Pink" },
+  { value: "c7", label: "Deep Brown" },
+  { value: "c8", label: "Auburn" },
+  { value: "c9", label: "Black" },
+  { value: "c10", label: "Gray" },
+];
+
 export default function CharacterCreationView() {
   const router = useRouter();
   const { t, currentLanguage } = useLocalization();
@@ -293,12 +331,13 @@ export default function CharacterCreationView() {
     nameCheckMessage,
     stats,
     formData,
-    portraitIndex,
+    portraitOptions,
+    assetCatalogLoaded,
     updateField,
-    updatePortraitIndex,
+    updatePortraitPart,
+    cyclePortraitPart,
     createCharacter,
     isFormValid,
-    getAvailablePortraits,
     availableRaces,
     availableClasses,
     availableBackgrounds,
@@ -323,8 +362,6 @@ export default function CharacterCreationView() {
 
   // Stats are calculated locally when race, class, or background changes
 
-  const availablePortraits = getAvailablePortraits();
-
   return (
     <CharacterCreationContainer>
       <Box sx={{ display: 'flex', gap: 3, width: '100%', maxWidth: '1400px' }}>
@@ -335,11 +372,13 @@ export default function CharacterCreationView() {
             </Typography>
           </TitleBox>
 
-          {/* Character Name and Portrait */}
+          {/* Main Content: Character Info and Portrait */}
           <FormSection>
-            <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
-              {/* Name Input */}
-              <Box sx={{ flex: 1 }}>
+            <Box sx={{ display: 'flex', gap: 4, alignItems: 'flex-start' }}>
+              {/* Character Info Section */}
+              <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 3 }}>
+                {/* Name */}
+                <Box>
                 <SectionTitle variant="h6">{t(L10N.characterCreation.name)}</SectionTitle>
                 <TextField
                   fullWidth
@@ -373,32 +412,8 @@ export default function CharacterCreationView() {
                 )}
               </Box>
 
-              {/* Portrait Selector */}
-              <Box sx={{ flex: 1 }}>
-                <SectionTitle variant="h6">{t(L10N.characterCreation.portrait)}</SectionTitle>
-                <PortraitBox>
-                  <IconButton
-                    onClick={() => updatePortraitIndex("prev")}
-                    disabled={isLoading || availablePortraits.length === 0}
-                  >
-                    <NavigateBefore />
-                  </IconButton>
-                  <PortraitPlaceholder>
-                    {formData.portrait || "No portrait"}
-                  </PortraitPlaceholder>
-                  <IconButton
-                    onClick={() => updatePortraitIndex("next")}
-                    disabled={isLoading || availablePortraits.length === 0}
-                  >
-                    <NavigateNext />
-                  </IconButton>
-                </PortraitBox>
-              </Box>
-            </Box>
-          </FormSection>
-
           {/* Gender Selection */}
-          <FormSection>
+                <Box>
             <SectionTitle variant="h6">{t(L10N.characterCreation.gender)}</SectionTitle>
             <GenderToggleBox>
               <GenderButton
@@ -416,12 +431,12 @@ export default function CharacterCreationView() {
                 {t(L10N.characterCreation.female)}
               </GenderButton>
             </GenderToggleBox>
-          </FormSection>
+                </Box>
 
           {/* Race Selection */}
-          <FormSection>
+                <Box>
             <SectionTitle variant="h6">{t(L10N.characterCreation.race)}</SectionTitle>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
               {availableRaces.map((race) => (
                 <Chip
                   key={race.id}
@@ -429,23 +444,15 @@ export default function CharacterCreationView() {
                   onClick={() => updateField("race", race.id)}
                   color={formData.race === race.id ? "primary" : "default"}
                   variant={formData.race === race.id ? "filled" : "outlined"}
-                  sx={{ marginBottom: 1 }}
                 />
               ))}
             </Stack>
-            {formData.race && (
-              <DescriptionBox>
-                <Typography variant="body2" color="text.secondary">
-                  {getLocalizedRaceDescription(t, formData.race)}
-                </Typography>
-              </DescriptionBox>
-            )}
-          </FormSection>
+                </Box>
 
           {/* Class Selection */}
-          <FormSection>
+                <Box>
             <SectionTitle variant="h6">{t(L10N.characterCreation.class)}</SectionTitle>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
               {availableClasses.map((classItem) => (
                 <Chip
                   key={classItem.id}
@@ -453,23 +460,15 @@ export default function CharacterCreationView() {
                   onClick={() => updateField("class", classItem.id)}
                   color={formData.class === classItem.id ? "primary" : "default"}
                   variant={formData.class === classItem.id ? "filled" : "outlined"}
-                  sx={{ marginBottom: 1 }}
                 />
               ))}
             </Stack>
-            {formData.class && (
-              <DescriptionBox>
-                <Typography variant="body2" color="text.secondary">
-                  {getLocalizedClassDescription(t, formData.class)}
-                </Typography>
-              </DescriptionBox>
-            )}
-          </FormSection>
+                </Box>
 
           {/* Background Selection */}
-          <FormSection>
+                <Box>
             <SectionTitle variant="h6">{t(L10N.characterCreation.background)}</SectionTitle>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
               {availableBackgrounds.map((background) => (
                 <Chip
                   key={background.id}
@@ -477,17 +476,307 @@ export default function CharacterCreationView() {
                   onClick={() => updateField("background", background.id)}
                   color={formData.background === background.id ? "primary" : "default"}
                   variant={formData.background === background.id ? "filled" : "outlined"}
-                  sx={{ marginBottom: 1 }}
                 />
               ))}
             </Stack>
-            {formData.background && (
-              <DescriptionBox>
-                <Typography variant="body2" color="text.secondary">
-                  {getLocalizedBackgroundDescription(t, formData.background)}
+                </Box>
+              </Box>
+
+              {/* Portrait Section */}
+              <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>                
+                {/* Portrait and Battle Preview */}
+                <Box sx={{ display: "flex", gap: 10, justifyContent: "left" }}>
+                  <Box>
+                    <PortraitRenderer
+                      portrait={formData.portrait}
+                      size={120}
+                      alt="Character portrait preview"
+                    />
+                  </Box>
+                  <Box>
+                      <BattleSpriteRenderer
+                        portrait={formData.portrait}
+                        size={120}
+                        animated={true}
+                      />
+                  </Box>
+                </Box>
+
+                {/* Portrait Part Selectors */}
+                {assetCatalogLoaded && portraitOptions && (
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                      {/* Row 1: Base, Face */}
+                      <Box sx={{ display: "flex", gap: 1.5 }}>
+                        {/* Base Color */}
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                            Base Color
+                          </Typography>
+                          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("base", "prev")}
+                            >
+                              <NavigateBefore />
+                            </IconButton>
+                            <Chip
+                              label={extractNumber(formData.portrait.base)}
+                              size="small"
+                              sx={{ minWidth: 60 }}
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("base", "next")}
+                            >
+                              <NavigateNext />
+                            </IconButton>
+                          </Box>
+                        </Box>
+
+                        {/* Face */}
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                            Face
+                          </Typography>
+                          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("face", "prev")}
+                            >
+                              <NavigateBefore />
+                            </IconButton>
+                            <Chip
+                              label={extractNumber(formData.portrait.face)}
+                              size="small"
+                              sx={{ minWidth: 60 }}
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("face", "next")}
+                            >
+                              <NavigateNext />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      </Box>
+
+                      {/* Row 2: Eyes, Eyes Color */}
+                      <Box sx={{ display: "flex", gap: 1.5 }}>
+                        {/* Eyes */}
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                            Eyes
+                          </Typography>
+                          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("eyes", "prev")}
+                            >
+                              <NavigateBefore />
+                            </IconButton>
+                            <Chip
+                              label={extractNumber(formData.portrait.eyes)}
+                              size="small"
+                              sx={{ minWidth: 60 }}
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("eyes", "next")}
+                            >
+                              <NavigateNext />
+                            </IconButton>
+                          </Box>
+                        </Box>
+
+                        {/* Eyes Color */}
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                            Eyes Color
+                          </Typography>
+                          <FormControl fullWidth size="small">
+                            <Select
+                              value={formData.portrait.eyes_color || "c1"}
+                              onChange={(e) => updatePortraitPart("eyes_color", e.target.value)}
+                              sx={{ fontSize: "0.75rem" }}
+                            >
+                              {EYES_COLORS.map((color) => (
+                                <MenuItem key={color.value} value={color.value}>
+                                  {color.label}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
+                      </Box>
+
+
+                      {/* Row 3: Hair Top, Hair Bottom */}
+                      <Box sx={{ display: "flex", gap: 1.5 }}>
+                        {/* Hair Top */}
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                            Hair Top
+                          </Typography>
+                          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("hair_top", "prev")}
+                            >
+                              <NavigateBefore />
+                            </IconButton>
+                            <Chip
+                              label={extractNumber(formData.portrait.hair_top.replace("_top", ""))}
+                              size="small"
+                              sx={{ minWidth: 60 }}
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("hair_top", "next")}
+                            >
+                              <NavigateNext />
+                            </IconButton>
+                          </Box>
+                        </Box>
+
+                        {/* Hair Bottom */}
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                            Hair Bottom
+                          </Typography>
+                          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("hair_bot", "prev")}
+                            >
+                              <NavigateBefore />
+                            </IconButton>
+                            <Chip
+                              label={extractNumber(formData.portrait.hair_bot.replace("_bot", ""))}
+                              size="small"
+                              sx={{ minWidth: 60 }}
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("hair_bot", "next")}
+                            >
+                              <NavigateNext />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      </Box>
+
+                      {/* Row 4: Hair Color + Beard Checkbox */}
+                      <Box sx={{ display: "flex", gap: 1.5, alignItems: "flex-end" }}>
+                        {/* Hair Color */}
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                            Hair Color
+                          </Typography>
+                          <FormControl fullWidth size="small">
+                            <Select
+                              value={formData.portrait.hair_color || "c1"}
+                              onChange={(e) => updatePortraitPart("hair_color", e.target.value)}
+                              sx={{ fontSize: "0.75rem" }}
+                            >
+                              {HAIR_COLORS.map((color) => (
+                                <MenuItem key={color.value} value={color.value}>
+                                  {color.label}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Box>
+
+                        {/* Beard Checkbox */}
+                        {formData.gender === "MALE" && (
+                          <Box>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={formData.portrait.beard !== null && formData.portrait.beard !== undefined}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      updatePortraitPart("beard", 1);
+                                    } else {
+                                      updatePortraitPart("beard", null);
+                                    }
+                                  }}
+                                  size="small"
+                                />
+                              }
+                              label="Beard"
+                            />
+                          </Box>
+                        )}
+                      </Box>
+
+                      {/* Row 5: Jaw + Beard (only shown when checkbox is checked) */}
+                      <Box sx={{ display: "flex", gap: 1.5 }}>
+                        {/* Jaw */}
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                            Jaw
+                          </Typography>
+                          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("jaw", "prev")}
+                            >
+                              <NavigateBefore />
+                            </IconButton>
+                            <Chip
+                              label={extractNumber(formData.portrait.jaw)}
+                              size="small"
+                              sx={{ minWidth: 60 }}
+                            />
+                            <IconButton
+                              size="small"
+                              onClick={() => cyclePortraitPart("jaw", "next")}
+                            >
+                              <NavigateNext />
+                            </IconButton>
+                          </Box>
+                        </Box>
+
+                        {/* Beard (only shown when checkbox is checked) */}
+                        {formData.gender === "MALE" && formData.portrait.beard !== null && formData.portrait.beard !== undefined && (
+                          <Box sx={{ flex: 1 }}>
+                            <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                              Beard
+                            </Typography>
+                            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                              <IconButton
+                                size="small"
+                                onClick={() => cyclePortraitPart("beard", "prev")}
+                              >
+                                <NavigateBefore />
+                              </IconButton>
+                              <Chip
+                                label={formData.portrait.beard?.toString() || "None"}
+                                size="small"
+                                sx={{ minWidth: 60 }}
+                                color="primary"
+                              />
+                              <IconButton
+                                size="small"
+                                onClick={() => cyclePortraitPart("beard", "next")}
+                              >
+                                <NavigateNext />
+                              </IconButton>
+                            </Box>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  )}
+
+                {!assetCatalogLoaded && (
+                  <Typography variant="caption" color="text.secondary">
+                    Loading portrait options...
                 </Typography>
-              </DescriptionBox>
             )}
+              </Box>
+            </Box>
           </FormSection>
 
           {/* Error Display */}

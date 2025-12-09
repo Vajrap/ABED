@@ -43,7 +43,7 @@ export const EquipmentSlot: React.FC<EquipmentSlotProps> = ({
           mb: 1,
         }}
       >
-        {equipment.name || equipment.itemId || equipment.id || "Unknown Item"}
+        {(equipment.name || equipment.itemId || equipment.id) || "Unknown Item"}
       </Typography>
       
       {(equipment.description || equipment.desc) && (
@@ -152,7 +152,7 @@ export const EquipmentSlot: React.FC<EquipmentSlotProps> = ({
       }}
     >
       <Tooltip
-        title={tooltipContent || `Empty ${label || slot}`}
+        title={equipment ? tooltipContent : `Empty ${label || slot}`}
         arrow
         placement="top"
         componentsProps={{
@@ -163,6 +163,7 @@ export const EquipmentSlot: React.FC<EquipmentSlotProps> = ({
               borderRadius: 2,
               boxShadow: `0 4px 16px ${alpha("#000", 0.2)}`,
               maxWidth: 350,
+              color: "#333",
             },
           },
           arrow: {
@@ -216,19 +217,21 @@ export const EquipmentSlot: React.FC<EquipmentSlotProps> = ({
           }}
         >
           {equipment ? (
-            <Typography
-              sx={{
-                fontFamily: "Crimson Text, serif",
-                fontSize: dimensions.fontSize,
-                fontWeight: 600,
-                color: theme.palette.text.primary,
-                textAlign: "center",
-                px: 0.5,
-                lineHeight: 1.2,
-              }}
-            >
-              {(equipment.name || equipment.itemId || equipment.id || "Item")?.split(" ")[0]}
-            </Typography>
+            (equipment.name || equipment.itemId || equipment.id) ? (
+              <Typography
+                sx={{
+                  fontFamily: "Crimson Text, serif",
+                  fontSize: dimensions.fontSize,
+                  fontWeight: 600,
+                  color: theme.palette.text.primary,
+                  textAlign: "center",
+                  px: 0.5,
+                  lineHeight: 1.2,
+                }}
+              >
+                {(equipment.name || equipment.itemId || equipment.id)?.split(" ")[0]}
+              </Typography>
+            ) : null
           ) : (
             <Typography
               sx={{

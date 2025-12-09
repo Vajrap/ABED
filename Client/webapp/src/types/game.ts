@@ -89,9 +89,9 @@ export interface CharacterStatsView {
   
   // Vitals & Needs
   vitals?: {
-    hp: { current: number; max: number };
-    mp: { current: number; max: number };
-    sp: { current: number; max: number };
+    hp: { current: number; base: number; bonus: number };
+    mp: { current: number; base: number; bonus: number };
+    sp: { current: number; base: number; bonus: number };
   };
   needs?: {
     mood: number;

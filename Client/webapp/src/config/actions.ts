@@ -92,28 +92,28 @@ export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
   // Training actions (need sub-selection)
   "Train Attribute": {
     id: "Train Attribute",
-    name: "Training",
+    name: "Train Attribute",
     icon: FitnessCenter,
     needsSubSelection: true,
     subSelectionType: "attribute",
   },
   "Train Proficiency": {
     id: "Train Proficiency",
-    name: "Training",
+    name: "Train Proficiency",
     icon: FitnessCenter,
     needsSubSelection: true,
     subSelectionType: "proficiency",
   },
   "Train Artisan": {
     id: "Train Artisan",
-    name: "Training",
+    name: "Train Artisan",
     icon: FitnessCenter,
     needsSubSelection: true,
     subSelectionType: "artisan",
   },
   "Train Skill": {
     id: "Train Skill",
-    name: "Training",
+    name: "Train Skill",
     icon: FitnessCenter,
     needsSubSelection: true,
     subSelectionType: "skill",

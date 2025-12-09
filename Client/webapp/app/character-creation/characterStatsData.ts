@@ -179,48 +179,6 @@ export const RACE_STATS: Record<string, RaceStatData> = {
     baseMP: 5,
     attributes: attributesFromTiers(BASE_ATTRIBUTES, { three: "strength", two: "vitality", one: "endurance" }),
   },
-  Dwarf: {
-    planarAptitude: 35,
-    baseHP: 15,
-    baseSP: 20,
-    baseMP: 10,
-    attributes: attributesFromTiers(BASE_ATTRIBUTES, { three: "endurance", two: "intelligence", one: "willpower" }),
-  },
-  dwarf: {
-    planarAptitude: 35,
-    baseHP: 15,
-    baseSP: 20,
-    baseMP: 10,
-    attributes: attributesFromTiers(BASE_ATTRIBUTES, { three: "endurance", two: "intelligence", one: "willpower" }),
-  },
-  Halfling: {
-    planarAptitude: 50,
-    baseHP: 15,
-    baseSP: 15,
-    baseMP: 15,
-    attributes: attributesFromTiers(BASE_ATTRIBUTES, { three: "dexterity", two: "agility", one: "luck" }),
-  },
-  halfling: {
-    planarAptitude: 50,
-    baseHP: 15,
-    baseSP: 15,
-    baseMP: 15,
-    attributes: attributesFromTiers(BASE_ATTRIBUTES, { three: "dexterity", two: "agility", one: "luck" }),
-  },
-  Vulpine: {
-    planarAptitude: 70,
-    baseHP: 13,
-    baseSP: 13,
-    baseMP: 18,
-    attributes: attributesFromTiers(BASE_ATTRIBUTES, { three: "intelligence", two: "agility", one: "planar" }),
-  },
-  vulpine: {
-    planarAptitude: 70,
-    baseHP: 13,
-    baseSP: 13,
-    baseMP: 18,
-    attributes: attributesFromTiers(BASE_ATTRIBUTES, { three: "intelligence", two: "agility", one: "planar" }),
-  },
 };
 
 // Class definitions with proficiency data (from Server/src/API/characterCreation/classes.ts)

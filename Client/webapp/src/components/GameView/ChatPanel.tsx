@@ -17,6 +17,7 @@ import {
 import { ArrowBack, Send, Fullscreen, Minimize } from "@mui/icons-material";
 import { ChatMessage, Friend, ChatScope, UserStatus } from "@/types/chat";
 import { mockChatMessages, mockFriends, getChatMessagesByScope } from "@/data/mockChatData";
+import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
 
 type FriendFilterTab = "lovers" | "closeFriends" | "friends" | "npcs" | "all";
 
@@ -388,12 +389,24 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                     >
                       {/* Portrait/Avatar */}
                       <Box sx={{ position: "relative" }}>
+                        {friend.portrait ? (
+                          <Box
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              borderRadius: "50%",
+                              overflow: "hidden",
+                              border: `2px solid ${theme.palette.secondary.main}`,
+                            }}
+                          >
+                            <PortraitRenderer
+                              portrait={friend.portrait}
+                              size="100%"
+                              alt={friend.name}
+                            />
+                          </Box>
+                        ) : (
                         <Avatar
-                          src={
-                            friend.portrait
-                              ? `/img/portraits/${friend.portrait}.png`
-                              : undefined
-                          }
                           sx={{
                             width: 48,
                             height: 48,
@@ -402,6 +415,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                         >
                           {friend.name.charAt(0)}
                         </Avatar>
+                        )}
                         {/* Status dot for players */}
                         {friend.isPlayer && friend.status && (
                           <Box
@@ -707,9 +721,24 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                               mb: 0.25,
                             }}
                           >
-                            {message.senderPortrait && (
+                            {message.senderPortrait ? (
+                              <Box
+                                sx={{
+                                  width: 24,
+                                  height: 24,
+                                  borderRadius: "50%",
+                                  overflow: "hidden",
+                                  border: `1px solid ${theme.palette.secondary.main}`,
+                                }}
+                              >
+                                <PortraitRenderer
+                                  portrait={message.senderPortrait}
+                                  size="100%"
+                                  alt="Sender"
+                                />
+                              </Box>
+                            ) : (
                               <Avatar
-                                src={`/img/portraits/${message.senderPortrait}.png`}
                                 sx={{
                                   width: 24,
                                   height: 24,

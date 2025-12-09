@@ -11,7 +11,6 @@ class RestHandler {
         const timeout = this.DEFAULT_TIMEOUT;
         
         const url = `${this.API_BASE_URL}${endpoint}`;
-        console.log(`[RestHandler] Making ${method} request to: ${url}`, { reqBody, requireAuth });
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
         
@@ -37,7 +36,6 @@ class RestHandler {
             });
             
             clearTimeout(timeoutId);
-            console.log(`[RestHandler] Response status: ${response.status} for ${url}`);
             
             if (!response.ok) {
                 const errorText = await response.text();
@@ -47,25 +45,20 @@ class RestHandler {
                 } catch {
                     errorData = { message: errorText };
                 }
-                console.error(`[RestHandler] Error response for ${url}:`, errorData);
                 throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
             }
             
             const jsonResponse = await response.json();
-            console.log(`[RestHandler] Success response from ${url}:`, jsonResponse);
             return jsonResponse;
         } catch (error) {
             clearTimeout(timeoutId);
             if (error instanceof Error && error.name === 'AbortError') {
-                console.error(`[RestHandler] Request timeout for ${url}`);
                 throw new Error('Request timeout');
             }
             // Improve error message for network errors
             if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('Failed to fetch'))) {
-                console.error(`[RestHandler] Network error connecting to ${url}:`, error);
                 throw new Error(`Cannot connect to server at ${this.API_BASE_URL}. Please ensure the backend is running and accessible. Error: ${error.message}`);
             }
-            console.error(`[RestHandler] Error for ${url}:`, error);
             throw error;
         }
     }

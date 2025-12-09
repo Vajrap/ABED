@@ -52,3 +52,6 @@ export type { ActionIndicatorProps } from "./ActionIndicator";
 export { ActionSubSelectionModal } from "./ActionSubSelectionModal";
 export type { ActionSubSelectionModalProps } from "./ActionSubSelectionModal";
 
+export { TitleSelectionModal } from "./TitleSelectionModal";
+export type { TitleSelectionModalProps } from "./TitleSelectionModal";
+

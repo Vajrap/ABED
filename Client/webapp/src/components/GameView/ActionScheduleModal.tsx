@@ -37,6 +37,12 @@ export interface ActionScheduleModalProps {
   onRailTravelClick?: () => void;
   hasRailStation?: boolean; // Whether current location has a rail station
   characterSkills?: Record<string, { level: number; exp: number }>; // Character's skills for Train Skill sub-selection
+  availableActionsByPhase?: {
+    morning: string[];
+    afternoon: string[];
+    evening: string[];
+    night: string[];
+  }; // Phase-specific actions from backend
 }
 
 /**
@@ -51,6 +57,7 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
   onRailTravelClick,
   hasRailStation = true, // Default to true for now (can be disabled later)
   characterSkills,
+  availableActionsByPhase,
 }) => {
   const theme = useTheme();
   const [schedule, setSchedule] = useState<Record<string, string>>({});
@@ -102,6 +109,7 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
               0 8px 32px ${alpha("#000", 0.15)}
             `,
             minHeight: "80vh",
+            overflow: "hidden",
           },
         }}
         BackdropProps={{
@@ -126,13 +134,22 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
           Weekly Action Schedule
         </DialogTitle>
 
-        <DialogContent>
+        <DialogContent
+          sx={{
+            overflow: "hidden",
+            "& > *": {
+              overflow: "visible",
+            },
+          }}
+        >
           {/* Grid */}
           <Box
             sx={{
               display: "grid",
               gridTemplateColumns: "repeat(6, 1fr)",
               gap: 1,
+              overflow: "visible",
+              position: "relative",
             }}
           >
             {/* Day headers */}
@@ -192,18 +209,21 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
                           ? alpha(theme.palette.tertiary.main, 0.15)
                           : alpha("#fff", 0.3),
                         transition: "all 0.2s ease-out",
+                        height: "13vh",
+                        position: "relative",
+                        overflow: "hidden",
 
                         "&:hover": {
                           backgroundColor: alpha(theme.palette.tertiary.main, 0.2),
                           border: `2px solid ${theme.palette.tertiary.main}`,
                           boxShadow: `0 0 12px ${alpha(theme.palette.tertiary.main, 0.3)}`,
                           transform: "scale(1.05)",
+                          zIndex: 1,
                         },
 
                         "&:active": {
                           transform: "scale(0.98)",
                         },
-                        height: "13vh",
                       }}
                     >
                       {/* Phase indicator icon (small, top) */}
@@ -212,7 +232,9 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
                           fontSize: "1.5rem",
                           color: phase.color,
                           opacity: 0.8,
-                          filter: `drop-shadow(0 0 4px ${alpha(phase.color, 0.4)})`,
+                          filter: `drop-shadow(0 0 2px ${alpha(phase.color, 0.3)})`,
+                          position: "relative",
+                          zIndex: 0,
                         }}
                       />
                       
@@ -366,6 +388,7 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
           day={selectedSlot.day}
           phase={selectedSlot.phase}
           onActionSelect={handleActionSelect}
+          availableActionsByPhase={availableActionsByPhase}
           characterSkills={characterSkills}
         />
       )}
