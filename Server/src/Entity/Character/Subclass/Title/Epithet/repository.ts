@@ -8,62 +8,62 @@ const epithet_none = new Epithet(
 
 const epithet_retainer = new Epithet(
   CharacterEpithetEnum.Retainer,
-    {en: "test", th: "test"},
+    {en: "Retainer", th: "Retainer"},
 );
 
 const epithet_peasant = new Epithet(
   CharacterEpithetEnum.Peasant,
-    {en: "test", th: "test"},
+    {en: "Peasant", th: "Peasant"},
 );
 
 const epithet_merchant = new Epithet(
   CharacterEpithetEnum.Merchant,
-    {en: "test", th: "test"},
+    {en: "Merchant", th: "Merchant"},
 );
 
 const epithet_scholar = new Epithet(
   CharacterEpithetEnum.Scholar,
-    {en: "test", th: "test"},
+    {en: "Scholar", th: "Scholar"},
 );
 
 const epithet_artisan = new Epithet(
   CharacterEpithetEnum.Artisan,
-    {en: "test", th: "test"},
+    {en: "Artisan", th: "Artisan"},
 );
 
 const epithet_soldier = new Epithet(
   CharacterEpithetEnum.Soldier,
-    {en: "test", th: "test"},
+    {en: "Soldier", th: "Soldier"},
 );
 
 const epithet_noble = new Epithet(
   CharacterEpithetEnum.Noble,
-    {en: "test", th: "test"},
+    {en: "Noble", th: "Noble"},
 );
 
 const epithet_adventurer = new Epithet(
   CharacterEpithetEnum.Adventurer,
-    {en: "test", th: "test"},
+    {en: "Adventurer", th: "Adventurer"},
 );
 
 const epithet_criminal = new Epithet(
   CharacterEpithetEnum.Criminal,
-    {en: "test", th: "test"},
+    {en: "Criminal", th: "Criminal"},
 );
 
 const epithet_hermit = new Epithet(
   CharacterEpithetEnum.Hermit,
-    {en: "test", th: "test"},
+    {en: "Hermit", th: "Hermit"},
 );
 
 const epithet_folkHero = new Epithet(
   CharacterEpithetEnum.FolkHero,
-    {en: "test", th: "test"},
+    {en: "FolkHero", th: "FolkHero"},
 );
 
 const epithet_cityGuard = new Epithet(
   CharacterEpithetEnum.CityGuard,
-    {en: "test", th: "test"},
+    {en: "CityGuard", th: "CityGuard"},
 );
 
 export const epithetRepository: Map<CharacterEpithetEnum, Epithet> = new Map([

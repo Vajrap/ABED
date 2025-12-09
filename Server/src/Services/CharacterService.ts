@@ -27,12 +27,13 @@ import { racesBonus } from "src/API/characterCreation/races";
 import { equip } from "src/Utils/equip";
 import { activeEpithet } from "src/Entity/Character/Subclass/Title/logics/active";
 import { activeRole } from "src/Entity/Character/Subclass/Title/logics/active";
+import type { PortraitData } from "../InterFacesEnumsAndTypes/PortraitData";
 
 export interface CharacterCreationData {
   name: string;
   gender: "MALE" | "FEMALE" | "NONE";
   race: PlayableRaceEnum;
-  portrait: string; // e.g., "m_human01"
+  portrait: PortraitData | string; // Support both new PortraitData and legacy string format
   background: PlayableBackgroundEnum;
   startingClass: PlayableClassEnum;
 }

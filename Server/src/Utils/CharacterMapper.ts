@@ -3,26 +3,51 @@ import { type CharacterInterface } from "../InterFacesEnumsAndTypes/CharacterInt
 import { CharacterType, CharacterAlignmentEnum } from "../InterFacesEnumsAndTypes/Enums";
 
 // Helper function to extract essential UI values from StatBlock objects
-function extractStatValues(stats: Record<string, any>): Record<string, any> {
+function extractStatValues(stats: any): Record<string, any> {
+  // Handle CharacterStatArchetype instances (have toJSON method)
+  if (stats && typeof stats === 'object' && typeof stats.toJSON === 'function') {
+    stats = stats.toJSON();
+  }
+  
+  // Handle arrays - convert to object if needed
+  if (Array.isArray(stats)) {
+    const result: Record<string, any> = {};
+    stats.forEach((item, index) => {
+      result[`item_${index}`] = item;
+    });
+    return result;
+  }
+  
+  // If it's not an object or is null/undefined, return empty object
+  if (!stats || typeof stats !== 'object') {
+    return {};
+  }
+
   const result: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(stats)) {
     if (value && typeof value === 'object' && 'total' in value) {
       // StatBlock structure: { base, bonus, battle, exp, total }
+      const statValue = value as any;
       result[key] = {
-        base: value.base || 0,
-        bonus: value.bonus || 0,
-        battle: value.battle || 0,
-        total: value.total || 0,
-        exp: value.exp || 0
+        base: statValue.base || 0,
+        bonus: statValue.bonus || 0,
+        battle: statValue.battle || 0,
+        total: statValue.total || 0,
+        exp: statValue.exp || 0
       };
     } else if (value && typeof value === 'object' && 'current' in value) {
-      // Vital structure: { base, bonus, current, max }
+      // Vital structure: { base, bonus, current }
+      // Max is calculated from base + bonus (not stored)
+      const vitalValue = value as any;
+      const base = vitalValue.base || 0;
+      const bonus = vitalValue.bonus || 0;
+      const max = Math.max(1, base + bonus);
       result[key] = {
-        base: value.base || 0,
-        bonus: value.bonus || 0,
-        current: value.current || 0,
-        max: value.max || 0
+        base,
+        bonus,
+        current: vitalValue.current || 0,
+        max: vitalValue.max !== undefined ? vitalValue.max : max
       };
     } else {
       result[key] = value;
@@ -57,23 +82,94 @@ function extractMapValues(mapData: any): Record<string, any> {
 export function mapCharacterToInterface(character: Character): CharacterInterface {
   return {
     id: character.id,
-    name: character.name,
+    name: typeof character.name === 'string' ? character.name : (character.name?.en || character.name?.th || ''),
     gender: character.gender as "MALE" | "FEMALE" | "NONE",
-    race: character.race,
+    race: typeof character.race === 'string' ? character.race : (character.race ? String(character.race) : ''),
     type: (character.type as CharacterType) || CharacterType.humanoid,
     level: character.level,
-    portrait: character.portrait || "",
+    portrait: typeof character.portrait === 'object' && character.portrait !== null 
+      ? character.portrait 
+      : (character.portrait || ""), // Support both PortraitData and legacy string format
     background: character.background || "",
     alignment: character.alignment.alignment(),
 
     // Extract essential UI values from complex objects
-    artisans: extractStatValues(character.artisans || {}) as any,
-    attributes: extractStatValues(character.attribute || {}) as any, // Note: database uses 'attribute' not 'attributes'
-    battleStats: extractStatValues(character.battleStats || {}) as any,
-    elements: extractStatValues(character.elements || {}) as any,
-    proficiencies: extractStatValues(character.proficiencies || {}) as any,
-    needs: extractStatValues(character.needs || {}) as any,
-    vitals: extractStatValues(character.vitals || {}) as any,
+    // CharacterStatArchetype instances need to be converted to plain objects first
+    artisans: extractStatValues(
+      character.artisans && typeof (character.artisans as any).toJSON === 'function' 
+        ? (character.artisans as any).toJSON() 
+        : character.artisans || {}
+    ) as any,
+    attributes: extractStatValues(
+      character.attribute && typeof (character.attribute as any).toJSON === 'function' 
+        ? (character.attribute as any).toJSON() 
+        : character.attribute || {}
+    ) as any, // Note: database uses 'attribute' not 'attributes'
+    battleStats: extractStatValues(
+      character.battleStats && typeof (character.battleStats as any).toJSON === 'function' 
+        ? (character.battleStats as any).toJSON() 
+        : character.battleStats || {}
+    ) as any,
+    elements: extractStatValues(
+      character.elements && typeof (character.elements as any).toJSON === 'function' 
+        ? (character.elements as any).toJSON() 
+        : character.elements || {}
+    ) as any,
+    proficiencies: extractStatValues(
+      character.proficiencies && typeof (character.proficiencies as any).toJSON === 'function' 
+        ? (character.proficiencies as any).toJSON() 
+        : character.proficiencies || {}
+    ) as any,
+    needs: (() => {
+      // Needs have a special structure - they're 0-100 values
+      const needsData = character.needs && typeof (character.needs as any).toJSON === 'function' 
+        ? (character.needs as any).toJSON() 
+        : character.needs || {};
+      const result: Record<string, any> = {};
+      for (const [key, value] of Object.entries(needsData)) {
+        if (value && typeof value === 'object' && 'current' in value) {
+          // CharacterNeed structure: { bonus, current } - max is always 100
+          result[key] = {
+            current: (value as any).current || 50,
+            max: 100,
+            bonus: (value as any).bonus || 0,
+          };
+        } else if (typeof value === 'number') {
+          result[key] = {
+            current: value,
+            max: 100,
+            bonus: 0,
+          };
+        } else {
+          result[key] = value;
+        }
+      }
+      return result as any;
+    })(),
+    vitals: (() => {
+      // Vitals have base, bonus, current - max is calculated from base + bonus
+      const vitalsData = character.vitals && typeof (character.vitals as any).toJSON === 'function' 
+        ? (character.vitals as any).toJSON() 
+        : character.vitals || {};
+      const result: Record<string, any> = {};
+      for (const [key, value] of Object.entries(vitalsData)) {
+        if (value && typeof value === 'object' && 'current' in value) {
+          // Vital structure: { base, bonus, current } - max = base + bonus
+          const base = (value as any).base || 0;
+          const bonus = (value as any).bonus || 0;
+          const max = Math.max(1, base + bonus);
+          result[key] = {
+            base,
+            bonus,
+            current: (value as any).current || 0,
+            max: (value as any).max !== undefined ? (value as any).max : max,
+          };
+        } else {
+          result[key] = value;
+        }
+      }
+      return result as any;
+    })(),
     fame: extractStatValues(character.fame || {}) as any,
     behavior: {
       battlePolicy: character.behavior.battlePolicy,
@@ -86,7 +182,7 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
       preferredInnType: character.behavior.preferredInnType,
       useCampSupplies: character.behavior.useCampSupplies,
     },
-    title: character.title.string(),
+    title: character.title.string() as any,
     possibleEpithets: character.possibleEpithets || [] as any,
     possibleRoles: character.possibleRoles || [] as any,
     actionSequence: character.actionSequence || {} as any,
@@ -99,7 +195,9 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
     activeBreathingSkill: character.activeBreathingSkill || null as any,
     planarAptitude: extractStatValues(character.planarAptitude || {}) as any,
     relations: extractMapValues(character.relations || {}) as any,
-    traits: character.traits || [] as any,
+    traits: (character.traits instanceof Map 
+      ? Array.from(character.traits.keys()) 
+      : (character.traits || [])) as any,
     inventorySize: character.inventorySize || { base: 20, bonus: 0 } as any,
     inventory: extractMapValues(character.inventory || {}) as any,
     equipments: extractMapValues(character.equipments || {}) as any,

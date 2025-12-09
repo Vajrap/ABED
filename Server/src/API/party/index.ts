@@ -69,13 +69,6 @@ export const partyRoutes = new Elysia({ prefix: "/party" })
       // 4. Map to frontend interface (includes all character data)
       const partyInterface = mapPartyToInterface(party);
 
-      Report.info("Returning party for user", {
-        userId: user.id,
-        username: user.username,
-        partyId: party.partyID,
-        location: party.location,
-      });
-
       // 5. Return party with all character data
       return {
         success: true,

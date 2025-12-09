@@ -5,6 +5,7 @@ import { characterManager } from "../../Game/CharacterManager";
 import { locationManager } from "../../Entity/Location/Manager/LocationManager";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
+import { TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 
 export const locationRoutes = new Elysia({ prefix: "/location" })
   .onError(({ code, error, set }) => {
@@ -97,6 +98,14 @@ export const locationRoutes = new Elysia({ prefix: "/location" })
       // Get current game time
       const gameTime = GameTime.getCurrentGameDateTime();
 
+      // Get phase-specific actions for all phases
+      const availableActionsByPhase = {
+        [TimeOfDay.morning]: location.getAvailableActions(TimeOfDay.morning),
+        [TimeOfDay.afternoon]: location.getAvailableActions(TimeOfDay.afternoon),
+        [TimeOfDay.evening]: location.getAvailableActions(TimeOfDay.evening),
+        [TimeOfDay.night]: location.getAvailableActions(TimeOfDay.night),
+      };
+
       const locationData = {
         id: location.id,
         name: locationName,
@@ -105,7 +114,8 @@ export const locationRoutes = new Elysia({ prefix: "/location" })
         // TODO: Add situation image identifier if available
         situation: location.id.toLowerCase().replace(/_/g, '-'), // Placeholder - map to actual situation images
         hasRailStation: !!location.trainStationId,
-        availableActions: location.actions,
+        availableActions: location.actions, // Legacy: flat array (deprecated, kept for backward compatibility)
+        availableActionsByPhase, // New: phase-specific actions
         gameTime, // Include current game time
       };
 

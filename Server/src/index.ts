@@ -17,6 +17,7 @@ import { registerRoutes } from "./API/register";
 import { partyRoutes } from "./API/party";
 import { locationRoutes } from "./API/location";
 import { newsRoutes } from "./API/news";
+import { updateTitleRoutes } from "./API/character/updateTitle";
 
 dotenv.config();
 
@@ -59,6 +60,7 @@ async function startServer() {
           .use(partyRoutes)
           .use(locationRoutes)
           .use(newsRoutes)
+          .use(updateTitleRoutes)
       )
       // Global error handler
       .onError(({ code, error, set }) => {

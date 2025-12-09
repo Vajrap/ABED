@@ -6,7 +6,7 @@ import type {
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { RegionEnum } from "../../InterFacesEnumsAndTypes/Enums/Region";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
-import type { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
+import { DayOfWeek, TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
 import type {
   ResourceGenerateCapacity,
   ResourceGenerationConfig,
@@ -125,7 +125,9 @@ export class Location {
   parties: Party[] = [];
   innType: LocationInns;
   connectedLocations: { location: Location; distance: number }[] = [];
-  actions: ActionInput[];
+  actions: ActionInput[]; // Deprecated: kept for backward compatibility, use actionsByPhase instead
+  actionsByPhase: Record<TimeOfDay, ActionInput[]>; // Phase-specific available actions
+  actionsByPhaseAndDay?: Record<DayOfWeek, Record<TimeOfDay, ActionInput[]>>; // Optional: Day-specific phase actions
   randomEvents: RandomEvents;
   weatherScale: number;
   volatility: WeatherVolatility;
@@ -153,19 +155,37 @@ export class Location {
     name: L10N,
     subRegion: SubRegionEnum,
     connectedLocations: { location: Location; distance: number }[],
-    actions: ActionInput[],
+    actions: ActionInput[] | Record<TimeOfDay, ActionInput[]>, // Can be flat array (legacy) or phase-specific object
     volatility: WeatherVolatility,
     randomEvents?: RandomEvents,
     innConfig?: LocationInns,
     weatherScale?: number,
     resourceGeneration?: ResourceGenerationConfig,
+    actionsByPhaseAndDay?: Record<DayOfWeek, Record<TimeOfDay, ActionInput[]>>, // Optional: Day-specific phase actions
   ) {
     this.id = id;
     this.name = name;
     this.subRegion = subRegion;
     this.region = subregionRepository[subRegion].region;
     this.connectedLocations = connectedLocations;
-    this.actions = actions;
+    
+    // Handle both legacy flat array and new phase-specific format
+    if (Array.isArray(actions)) {
+      // Legacy: flat array - distribute to all phases
+      this.actions = actions;
+      this.actionsByPhase = {
+        [TimeOfDay.morning]: [...actions],
+        [TimeOfDay.afternoon]: [...actions],
+        [TimeOfDay.evening]: [...actions],
+        [TimeOfDay.night]: [...actions],
+      };
+    } else {
+      // New: phase-specific object
+      this.actions = Object.values(actions).flat(); // Flatten for backward compatibility
+      this.actionsByPhase = actions;
+    }
+    
+    this.actionsByPhaseAndDay = actionsByPhaseAndDay;
     this.randomEvents = randomEvents ? randomEvents : defaultRandomEvents;
     this.innType = innConfig
       ? innConfig
@@ -180,6 +200,20 @@ export class Location {
     this.resourceGeneration =
       resourceGeneration ?? this.getDefaultResourceGeneration();
     this.trainStationId = null;
+  }
+
+  /**
+   * Get available actions for a specific phase (and optionally day)
+   * Returns phase-specific actions, or day+phase specific if configured
+   */
+  getAvailableActions(phase: TimeOfDay, day?: DayOfWeek): ActionInput[] {
+    // Check for day-specific actions first (if configured)
+    if (day && this.actionsByPhaseAndDay && this.actionsByPhaseAndDay[day] && this.actionsByPhaseAndDay[day][phase]) {
+      return this.actionsByPhaseAndDay[day][phase];
+    }
+    
+    // Fall back to phase-specific actions
+    return this.actionsByPhase[phase] || [];
   }
 
   getRandomEventFor(
@@ -309,7 +343,9 @@ export class Location {
         continue;
       }
 
-      const groups = groupCharacterActions(party, day, phase, this.actions);
+      // Get phase-specific (and optionally day-specific) available actions
+      const validActions = this.getAvailableActions(phase, day);
+      const groups = groupCharacterActions(party, day, phase, validActions);
       processCharacterGroups(groups, context, results, this.randomEvents);
     }
 

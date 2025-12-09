@@ -54,6 +54,7 @@ import {
 import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.ts";
 import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
 import { RaceEnum } from "../../InterFacesEnumsAndTypes/Enums";
+import type { PortraitData } from "../../InterFacesEnumsAndTypes/PortraitData";
 
 export class Character {
   id: string = "";
@@ -66,7 +67,7 @@ export class Character {
   race: RaceEnum | string = ""; // Allow string for backwards compatibility, but prefer RaceEnum
   type: CharacterType = CharacterType.humanoid;
   level: number = 1;
-  portrait: string | null = null;
+  portrait: PortraitData | string | null = null; // Support both new PortraitData and legacy string format
   background: string | null = null;
 
   alignment: CharacterAlignment = new CharacterAlignment({});
@@ -185,7 +186,7 @@ export class Character {
     type: CharacterType;
     gender?: "MALE" | "FEMALE" | "NONE";
     level: number;
-    portrait?: string;
+    portrait?: PortraitData | string; // Support both new PortraitData and legacy string format
     background?: string;
     alignment: CharacterAlignment;
     artisans: CharacterArtisans;

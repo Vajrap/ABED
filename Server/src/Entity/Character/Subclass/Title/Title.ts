@@ -21,13 +21,13 @@ export class CharacterTitle {
       if (epithetObj) {
           epithetName = epithetObj.name
       } else {
-          epithetName = {en: "null", th: "null"}
+          epithetName = {en: "", th: ""}
       }
 
       if (roleObj) {
           roleName = roleObj.name
       } else {
-          roleName = {en: "null", th: "null"}
+          roleName = {en: "", th: ""}
       }
 
       return {

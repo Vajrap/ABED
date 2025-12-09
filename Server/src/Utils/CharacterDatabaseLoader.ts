@@ -20,6 +20,8 @@ import { L10N } from "../InterFacesEnumsAndTypes/L10N";
 import { CharacterType } from "../InterFacesEnumsAndTypes/Enums";
 import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import Report from "./Reporter";
+import { SkillId } from "src/Entity/Skill/enums";
+import { TraitEnum } from "src/Entity/Trait/enum";
 
 /**
  * Load all characters from database into CharacterManager
@@ -158,13 +160,30 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
   const vitals = new CharacterVitals(record.vitals as any || {});
   const fame = new CharacterFame(record.fame as any || {});
   const behavior = new CharacterBehavior(record.behavior as any || {});
-  const title = new CharacterTitle(record.title as any || {});
+  // Title will be restored below (moved after character creation to access it properly)
   const actionSequence = record.actionSequence as any || defaultActionSequence();
 
   // Restore L10N name (database stores as string, convert to L10N)
   const name: L10N = typeof record.name === 'string'
     ? { en: record.name, th: record.name }
     : record.name as L10N;
+
+  // Restore title - handle both object format {role, epithet} and separate params
+  let title: CharacterTitle;
+  if (record.title && typeof record.title === 'object') {
+    const titleData = record.title as any;
+    // If it's an object with role/epithet properties, use them
+    if ('role' in titleData || 'epithet' in titleData) {
+      title = new CharacterTitle(
+        titleData.epithet as any,
+        titleData.role as any
+      );
+    } else {
+      title = new CharacterTitle();
+    }
+  } else {
+    title = new CharacterTitle();
+  }
 
   // Create character
   const character = new Character({
@@ -192,17 +211,20 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
     updatedBy: record.updatedBy || "system",
   });
 
-  // Set user, party IDs, and location (location may not exist in older records)
+  // Set user, party IDs, location, race, and title (not in constructor)
   character.userId = record.userId;
   character.partyID = record.partyID || null;
   character.location = ((record as any).location as LocationsEnum | undefined) || null;
+  character.race = (record.race as any) || ""; // Restore race from database
+  character.title = title; // Use the restored title
 
   // Restore skills (database stores as JSONB, convert to Map)
   if (record.skills) {
+    console.log(record.skills);
     const skillsData = record.skills as any;
     if (typeof skillsData === 'object' && !Array.isArray(skillsData)) {
       for (const [skillId, skillData] of Object.entries(skillsData)) {
-        character.skills.set(skillId, skillData as any);
+        character.skills.set(skillId as SkillId, skillData as any);
       }
     }
   }
@@ -224,7 +246,7 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
   character.possibleEpithets = (record.possibleEpithets as any[]) || [];
   character.possibleRoles = (record.possibleRoles as any[]) || [];
   character.information = (record.informations as Record<string, number>) || {};
-  character.traits = (record.traits as string[]) || [];
+  character.traits = (record.traits as Map<TraitEnum, number>) || new Map();
   
   // Restore planar aptitude (if stored as object with aptitude property)
   if (record.planarAptitude) {
@@ -263,6 +285,8 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
 
   // Mark as player if it has a userId
   character.isPlayer = !!character.userId;
+
+  console.log(character);
 
   return character;
 }

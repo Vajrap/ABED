@@ -65,10 +65,31 @@ export class CharacterVitals {
   hp: Vital;
   mp: Vital;
   sp: Vital;
-  constructor(data: { hp?: Vital; mp?: Vital; sp?: Vital }) {
-    this.hp = data.hp ?? new Vital({});
-    this.mp = data.mp ?? new Vital({});
-    this.sp = data.sp ?? new Vital({});
+  constructor(data: { hp?: Vital | any; mp?: Vital | any; sp?: Vital | any } = {}) {
+    // Handle both Vital instances and plain objects
+    if (data.hp instanceof Vital) {
+      this.hp = data.hp;
+    } else if (data.hp && typeof data.hp === 'object') {
+      this.hp = Vital.fromJSON(data.hp);
+    } else {
+      this.hp = new Vital({});
+    }
+
+    if (data.mp instanceof Vital) {
+      this.mp = data.mp;
+    } else if (data.mp && typeof data.mp === 'object') {
+      this.mp = Vital.fromJSON(data.mp);
+    } else {
+      this.mp = new Vital({});
+    }
+
+    if (data.sp instanceof Vital) {
+      this.sp = data.sp;
+    } else if (data.sp && typeof data.sp === 'object') {
+      this.sp = Vital.fromJSON(data.sp);
+    } else {
+      this.sp = new Vital({});
+    }
   }
 
   get isDead() {
@@ -100,7 +121,11 @@ export class CharacterVitals {
   }
 
   toJSON() {
-    return { hp: this.hp.toJSON(), mp: this.mp.toJSON(), sp: this.sp.toJSON() };
+    return {
+      hp: this.hp instanceof Vital ? this.hp.toJSON() : this.hp,
+      mp: this.mp instanceof Vital ? this.mp.toJSON() : this.mp,
+      sp: this.sp instanceof Vital ? this.sp.toJSON() : this.sp,
+    };
   }
 
   static fromJSON(data: any = {}) {

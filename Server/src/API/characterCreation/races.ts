@@ -24,18 +24,6 @@ export const raceDescription: Record<PlayableRaceEnum, L10N> = {
     en: "",
     th: "",
   },
-  [RaceEnum.Dwarf]: {
-    en: "",
-    th: "",
-  },
-  [RaceEnum.Halfling]: {
-    en: "",
-    th: "",
-  },
-  [RaceEnum.Vulpine]: {
-    en: "",
-    th: "",
-  },
 };
 
 export const racesBonus: Record<PlayableRaceEnum, RaceBonus> = {
@@ -72,41 +60,6 @@ export const racesBonus: Record<PlayableRaceEnum, RaceBonus> = {
       three: "strength",
       two: "vitality",
       one: "endurance",
-    },
-  },
-
-  [RaceEnum.Dwarf]: {
-    planarAptitude: 35,
-    baseHP: 15,
-    baseSP: 20,
-    baseMP: 10,
-    attributes: {
-      three: "endurance",
-      two: "intelligence",
-      one: "willpower",
-    },
-  },
-
-  [RaceEnum.Halfling]: {
-    planarAptitude: 50,
-    baseHP: 15,
-    baseSP: 15,
-    baseMP: 15,
-    attributes: {
-      three: "dexterity",
-      two: "agility",
-      one: "luck",
-    },
-  },
-  [RaceEnum.Vulpine]: {
-    planarAptitude: 70,
-    baseHP: 13,
-    baseSP: 13,
-    baseMP: 18,
-    attributes: {
-      three: "intelligence",
-      two: "agility",
-      one: "planar",
     },
   },
 };

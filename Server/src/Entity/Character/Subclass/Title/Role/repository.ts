@@ -8,27 +8,27 @@ const role_none = new Role(
 
 const role_fighter = new Role(
   CharacterRoleEnum.Fighter,
-    {en: "test", th: "test"},
+    {en: "Fighter", th: "Fighter"},
 );
 
 const role_cleric = new Role(
   CharacterRoleEnum.Cleric,
-    {en: "test", th: "test"},
+    {en: "Cleric", th: "Cleric"},
 );
 
 const role_rogue = new Role(
   CharacterRoleEnum.Rogue,
-    {en: "test", th: "test"},
+    {en: "Rogue", th: "Rogue"},
 );
 
 const role_mage = new Role(
   CharacterRoleEnum.Mage,
-    {en: "test", th: "test"},
+    {en: "Mage", th: "Mage"},
 );
 
 const role_scholar = new Role(
   CharacterRoleEnum.Scholar,
-    {en: "test", th: "test"},
+    {en: "Scholar", th: "Scholar"},
 );
 
 export const roleRepository: Map<CharacterRoleEnum, Role> = new Map([

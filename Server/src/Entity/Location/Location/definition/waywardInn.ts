@@ -4,6 +4,7 @@ import { SubRegionEnum } from "src/InterFacesEnumsAndTypes/Enums/SubRegion";
 import { RailStationEnum } from "src/InterFacesEnumsAndTypes/Enums/RailStation";
 import { ActionInput } from "../../../Character/Subclass/Action/CharacterAction";
 import { InnLevel, type LocationInns } from "../../Config/Inn";
+import { TimeOfDay } from "../../../../InterFacesEnumsAndTypes/Time";
 
 /**
  * Wayward Inn - A cozy roadside inn serving travelers
@@ -20,26 +21,54 @@ export const waywardInn = new Location(
   },
   SubRegionEnum.GoldenPlains,
   [], // Connected locations - will be populated when more locations exist
-  [
-    // Rest actions
-    ActionInput.Rest,
-    ActionInput.Inn,
-    
-    // Training actions
-    ActionInput.TrainAttribute,
-    ActionInput.TrainProficiency,
-    ActionInput.TrainArtisan,
-    ActionInput.TrainSkill,
-    
-    // Learning
-    ActionInput.LearnSkill,
-    ActionInput.Read,
-    
-    // Social
-    ActionInput.Socialize,
-    ActionInput.Stroll,
-    ActionInput.Tavern,
-  ],
+  {
+    // Phase-specific available actions
+    [TimeOfDay.morning]: [
+      // Morning - productive activities, training, learning
+      ActionInput.Rest,
+      ActionInput.TrainAttribute,
+      ActionInput.TrainProficiency,
+      ActionInput.TrainArtisan,
+      ActionInput.TrainSkill,
+      ActionInput.LearnSkill,
+      ActionInput.Read,
+      ActionInput.Socialize,
+    ],
+    [TimeOfDay.afternoon]: [
+      // Afternoon - active tasks, gathering, crafting
+      ActionInput.Rest,
+      ActionInput.Stroll,
+      ActionInput.Mining,
+      ActionInput.WoodCutting,
+      ActionInput.Foraging,
+      ActionInput.Craft,
+      ActionInput.TrainAttribute,
+      ActionInput.TrainProficiency,
+      ActionInput.TrainArtisan,
+      ActionInput.TrainSkill,
+      ActionInput.Read,
+      ActionInput.Socialize,
+    ],
+    [TimeOfDay.evening]: [
+      // Evening - social activities, tavern, light training
+      ActionInput.Rest,
+      ActionInput.Inn,
+      ActionInput.Tavern,
+      ActionInput.Socialize,
+      ActionInput.TrainAttribute,
+      ActionInput.TrainProficiency,
+      ActionInput.Read,
+      ActionInput.Stroll,
+    ],
+    [TimeOfDay.night]: [
+      // Night - quiet activities, rest, reading (no tavern)
+      ActionInput.Rest,
+      ActionInput.Inn,
+      ActionInput.Read,
+      ActionInput.Socialize,
+      ActionInput.Enchanting, // Quiet magical work
+    ],
+  },
   "CALM", // Weather volatility
   undefined, // Random events - use defaults
   {

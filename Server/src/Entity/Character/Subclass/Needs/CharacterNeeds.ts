@@ -61,16 +61,37 @@ export class CharacterNeeds {
   satiety: CharacterNeed = new CharacterNeed({ bonus: 0, current: 50 });
 
   constructor(data: Partial<CharacterNeeds> = {}) {
-    this.mood = data.mood ?? new CharacterNeed({ bonus: 0, current: 50 });
-    this.energy = data.energy ?? new CharacterNeed({ bonus: 0, current: 50 });
-    this.satiety = data.satiety ?? new CharacterNeed({ bonus: 0, current: 50 });
+    // Handle both CharacterNeed instances and plain objects
+    if (data.mood instanceof CharacterNeed) {
+      this.mood = data.mood;
+    } else if (data.mood && typeof data.mood === 'object') {
+      this.mood = CharacterNeed.fromJSON(data.mood);
+    } else {
+      this.mood = new CharacterNeed({ bonus: 0, current: 50 });
+    }
+
+    if (data.energy instanceof CharacterNeed) {
+      this.energy = data.energy;
+    } else if (data.energy && typeof data.energy === 'object') {
+      this.energy = CharacterNeed.fromJSON(data.energy);
+    } else {
+      this.energy = new CharacterNeed({ bonus: 0, current: 50 });
+    }
+
+    if (data.satiety instanceof CharacterNeed) {
+      this.satiety = data.satiety;
+    } else if (data.satiety && typeof data.satiety === 'object') {
+      this.satiety = CharacterNeed.fromJSON(data.satiety);
+    } else {
+      this.satiety = new CharacterNeed({ bonus: 0, current: 50 });
+    }
   }
 
   toJSON() {
     return {
-      mood: this.mood.toJSON(),
-      energy: this.energy.toJSON(),
-      satiety: this.satiety.toJSON(),
+      mood: this.mood instanceof CharacterNeed ? this.mood.toJSON() : this.mood,
+      energy: this.energy instanceof CharacterNeed ? this.energy.toJSON() : this.energy,
+      satiety: this.satiety instanceof CharacterNeed ? this.satiety.toJSON() : this.satiety,
     };
   }
 
