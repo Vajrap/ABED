@@ -92,6 +92,13 @@
       "when": 1736388000000,
       "tag": "0012_add_location_to_characters",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1736391600000,
+      "tag": "0013_convert_portrait_to_jsonb",
+      "breakpoints": true
     }
   ]
 }

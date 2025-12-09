@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, alpha, useTheme, Tooltip } from "@mui/material";
 import { PersonAdd } from "@mui/icons-material";
 import { CharacterNeedsBar } from "./CharacterNeedsBar";
 import { ActionIndicator } from "./ActionIndicator";
 import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
+
+import type { EquipmentDisplay } from "@/types/game";
 
 export interface PartyMemberCardProps {
   portrait?: string; // Portrait image path (if character exists)
@@ -20,6 +22,7 @@ export interface PartyMemberCardProps {
   };
   nextAction?: string; // Name of next action to execute
   actionType?: string; // Type of action
+  equipment?: EquipmentDisplay[] | Record<string, string>; // Character equipment data
   onClick: () => void;
 }
 
@@ -39,9 +42,36 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
   needs,
   nextAction,
   actionType,
+  equipment,
   onClick,
 }) => {
   const theme = useTheme();
+
+  // Extract body equipment ID from equipment data (similar to CharacterStatsModal)
+  const bodyEquipmentId = useMemo(() => {
+    if (!equipment) return null;
+    
+    // Organize equipment by slot
+    const equipmentBySlot: Record<string, EquipmentDisplay> = {};
+    if (Array.isArray(equipment)) {
+      equipment.forEach((eq) => {
+        equipmentBySlot[eq.slot] = eq;
+      });
+    } else {
+      Object.entries(equipment).forEach(([slot, itemId]) => {
+        equipmentBySlot[slot] = {
+          slot,
+          itemId: itemId as string,
+          id: itemId as string,
+        };
+      });
+    }
+    
+    const bodyEq = equipmentBySlot.body;
+    if (!bodyEq) return null;
+    if (typeof bodyEq === 'string') return bodyEq;
+    return bodyEq.itemId || bodyEq.id || null;
+  }, [equipment]);
 
   // Determine glow color - only player gets special color, others are normal
   const glowColor = isPlayer
@@ -107,7 +137,7 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
         sx={{
           width: 80,
           height: 80,
-          borderRadius: "50%",
+          borderRadius: "2%",
           border: isEmpty
             ? `3px dashed ${theme.palette.text.disabled}`
             : `3px solid ${glowColor}`,
@@ -142,7 +172,7 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
             right: 0,
             height: "40%",
             background: `linear-gradient(180deg, ${alpha("#fff", 0.3)} 0%, transparent 100%)`,
-            borderRadius: "50%",
+            borderRadius: "2%",
             pointerEvents: "none",
           },
         }}
@@ -171,10 +201,10 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
             <PortraitRenderer
               portrait={portrait}
               size="100%"
-              alt={name || "Character"}
-              style={{
-                width: "100%",
-                height: "100%",
+              portraitScale={1.5}
+              portraitOffset={{ x: 0, y: 0 }}
+              equipment={{
+                body: bodyEquipmentId,
               }}
             />
           </Box>

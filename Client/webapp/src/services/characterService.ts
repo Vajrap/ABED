@@ -1,5 +1,6 @@
 import { restHandler } from "./RestHandler";
 import type { CharacterInterface } from "@/types/api";
+import type { CharacterCreationRequest, CharacterCreationResponse } from "@/types/character";
 
 export interface UpdateTitleRequest {
   characterId: string;
@@ -14,6 +15,23 @@ export interface UpdateTitleResponse {
 }
 
 class CharacterService {
+  async createCharacter(request: CharacterCreationRequest): Promise<CharacterCreationResponse> {
+    try {
+      const response = await restHandler.post<CharacterCreationRequest, CharacterCreationResponse>(
+        "/api/characterCreation/create",
+        request,
+        true // requireAuth
+      );
+      return response;
+    } catch (error: any) {
+      console.error("Error creating character:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to create character",
+      };
+    }
+  }
+
   async updateTitle(request: UpdateTitleRequest): Promise<UpdateTitleResponse> {
     try {
       const response = await restHandler.post<UpdateTitleRequest, UpdateTitleResponse>(

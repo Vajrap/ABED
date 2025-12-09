@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Box } from "@mui/material";
 import type { PortraitData } from "@/types/character";
 import { portraitAssetService } from "@/services/portraitAssetService";
+import { getArmorSpriteId, getWeaponPath } from "@/utils/equipmentSpriteMapper";
 
 // Inject battle animation keyframes globally
 if (typeof document !== "undefined") {
@@ -133,13 +134,16 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
 
         // 3. Clothing bottom (from equipment) - z-index: 3
         if (equipment.body) {
-          // Map equipment to battle sprite clothing
-          // This is a simplified mapping - you may need to adjust based on your equipment system
-          const clothPath = `/img/battle/cloth/cloth1/bot`;
-          const clothFiles = battleCatalog[clothPath] || [];
-          const clothFile = clothFiles.find((f) => f.includes(effectiveBaseColor));
-          if (clothFile) {
-            layers.push({ path: `${clothPath}/${clothFile}`, zIndex: 3 });
+          // Map equipment ID to sprite ID
+          const clothSpriteId = getArmorSpriteId(equipment.body);
+          if (clothSpriteId) {
+            const clothPath = `/img/battle/cloth/${clothSpriteId}/bot`;
+            const clothFiles = battleCatalog[clothPath] || [];
+            // Use c1 for now (as requested)
+            const clothFile = clothFiles.find((f) => f.includes("_c1"));
+            if (clothFile) {
+              layers.push({ path: `${clothPath}/${clothFile}`, zIndex: 3 });
+            }
           }
         }
 
@@ -159,15 +163,28 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
 
         // 5. Clothing top (from equipment) - z-index: 5
         if (equipment.body) {
-          const clothTopPath = `/img/battle/cloth/cloth1/top`;
-          const clothTopFiles = battleCatalog[clothTopPath] || [];
-          const clothTopFile = clothTopFiles.find((f) => f.includes(effectiveBaseColor));
-          if (clothTopFile) {
-            layers.push({ path: `${clothTopPath}/${clothTopFile}`, zIndex: 5 });
+          // Map equipment ID to sprite ID
+          const clothSpriteId = getArmorSpriteId(equipment.body);
+          if (clothSpriteId) {
+            const clothTopPath = `/img/battle/cloth/${clothSpriteId}/top`;
+            const clothTopFiles = battleCatalog[clothTopPath] || [];
+            // Use c1 for now (as requested)
+            const clothTopFile = clothTopFiles.find((f) => f.includes("_c1"));
+            if (clothTopFile) {
+              layers.push({ path: `${clothTopPath}/${clothTopFile}`, zIndex: 5 });
+            }
           }
         }
 
-        // 6. Hair top - z-index: 6
+        // 6. Weapon bot (from equipment) - z-index: 6 (before hair top)
+        if (equipment.weapon) {
+          const weaponPaths = getWeaponPath(equipment.weapon);
+          if (weaponPaths) {
+            layers.push({ path: weaponPaths.bot, zIndex: 6 });
+          }
+        }
+
+        // 7. Hair top - z-index: 7
         // Handle f1_top, m1_top, or hair1_top format
         const hairTopMatch = portrait.hair_top.match(/^(f\d+|m\d+|hair\d+)_top$/);
         if (hairTopMatch) {
@@ -177,17 +194,15 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
           const hairColor = portrait.hair_color || effectiveBaseColor;
           const hairTopFile = hairTopFiles.find((f) => f.includes(`_${hairColor}_top.png`) || f.includes(`_${hairColor}_`));
           if (hairTopFile) {
-            layers.push({ path: `${hairTopPath}/${hairTopFile}`, zIndex: 6 });
+            layers.push({ path: `${hairTopPath}/${hairTopFile}`, zIndex: 7 });
           }
         }
 
-        // 7. Weapon top (from equipment) - z-index: 7
+        // 8. Weapon top (from equipment) - z-index: 8 (after hair top)
         if (equipment.weapon) {
-          const weaponPath = `/img/battle/weapon/weapon1/top`;
-          const weaponFiles = battleCatalog[weaponPath] || [];
-          const weaponFile = weaponFiles.find((f) => f.includes(effectiveBaseColor));
-          if (weaponFile) {
-            layers.push({ path: `${weaponPath}/${weaponFile}`, zIndex: 7 });
+          const weaponPaths = getWeaponPath(equipment.weapon);
+          if (weaponPaths) {
+            layers.push({ path: weaponPaths.top, zIndex: 8 });
           }
         }
 
@@ -203,7 +218,7 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
     loadBattleSprites();
   }, [portraitKey, equipmentKey]);
 
-  // Reset animation when portrait changes (to sync all layers)
+  // Reset animation when portrait or equipment changes (to sync all layers)
   useEffect(() => {
     if (animated && spriteLayers.length > 0) {
       // Use requestAnimationFrame to ensure DOM is ready
@@ -223,7 +238,7 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
       });
       return () => cancelAnimationFrame(frameId);
     }
-  }, [portraitKey, animated, spriteLayers.length]);
+  }, [portraitKey, equipmentKey, animated, spriteLayers.length]);
 
   if (loading) {
     return (

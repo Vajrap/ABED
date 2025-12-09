@@ -572,6 +572,7 @@ export default function GameView() {
                     isSelected={selectedMemberIndex === originalIndex}
                     isEmpty={!member}
                     needs={member?.needs}
+                    equipment={member?.equipment}
                     onClick={() => {
                       setSelectedMemberIndex(originalIndex);
                       setStatsModalOpen(true);

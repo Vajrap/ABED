@@ -496,6 +496,10 @@ export default function CharacterCreationView() {
                   <Box>
                       <BattleSpriteRenderer
                         portrait={formData.portrait}
+                        equipment={{
+                          body: stats?.startingEquipments?.find(eq => eq.slot === "body")?.item || null,
+                          weapon: stats?.startingEquipments?.find(eq => eq.slot === "rightHand")?.item || null,
+                        }}
                         size={120}
                         animated={true}
                       />

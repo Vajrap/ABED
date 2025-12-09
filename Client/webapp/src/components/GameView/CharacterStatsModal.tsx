@@ -20,6 +20,8 @@ import { HelpOutline, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { EquipmentSlot } from "./EquipmentSlot";
 import { CharacterStatsView, EquipmentDisplay } from "@/types/game";
 import { TitleSelectionModal } from "./TitleSelectionModal";
+import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
+import { BattleSpriteRenderer } from "@/components/Battle/BattleSpriteRenderer";
 
 export interface CharacterStatsModalProps {
   open: boolean;
@@ -179,6 +181,20 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
       });
     }
   }
+  
+  // Extract body equipment ID - handle both object and string formats
+  const bodyEquipmentId = (() => {
+    const bodyEq = equipmentBySlot.body;
+    if (!bodyEq) return null;
+    if (typeof bodyEq === 'string') return bodyEq;
+    return bodyEq.itemId || bodyEq.id || null;
+  })();
+  
+  // Debug: Log equipment structure
+  console.log("CharacterStatsModal: character.equipment", character.equipment);
+  console.log("CharacterStatsModal: equipmentBySlot", equipmentBySlot);
+  console.log("CharacterStatsModal: equipmentBySlot.body", equipmentBySlot.body);
+  console.log("CharacterStatsModal: body equipment ID", bodyEquipmentId);
 
   // Helper function to format stat value
   // Calculate stat modifier based on backend logic
@@ -473,8 +489,98 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
           gap: 0.25,
         }}
       >
-        <Box>
-          {getString(character.name) || 'Character'}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 4,
+            flexWrap: "wrap",
+          }}
+        >
+          {character.portrait && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                  backgroundColor: alpha(theme.palette.background.default, 0.5),
+                }}
+              >
+                <PortraitRenderer
+                  portrait={character.portrait}
+                  size={120}
+                  alt={getString(character.name) || "Character"}
+                  equipment={{
+                    body: bodyEquipmentId,
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: 200,
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "Cinzel, serif",
+                fontSize: "1.25rem",
+                fontWeight: 600,
+                color: theme.palette.text.primary,
+                textAlign: "center",
+              }}
+            >
+              {getString(character.name) || 'Character'}
+            </Typography>
+          </Box>
+          {character.portrait && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 150,
+                  height: 150,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  border: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+                  backgroundColor: alpha(theme.palette.background.default, 0.5),
+                }}
+              >
+                <BattleSpriteRenderer
+                  portrait={character.portrait}
+                  equipment={{
+                    body: equipmentBySlot.body?.itemId || equipmentBySlot.body?.id || null,
+                    weapon: equipmentBySlot.rightHand?.itemId || equipmentBySlot.rightHand?.id || equipmentBySlot.leftHand?.itemId || equipmentBySlot.leftHand?.id || null,
+                  }}
+                  size={150}
+                  animated={true}
+                />
+              </Box>
+            </Box>
+          )}
         </Box>
         {character.title && (
           <Tooltip
@@ -554,7 +660,9 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
               onToggle={() => toggleSection("basicInfo")}
             />
             <Collapse in={expandedSections.basicInfo}>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
+              {/* Portrait Display */}
+              
               <Grid item xs={6} sm={4}>
                 <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.85rem", color: theme.palette.text.secondary }}>
                   Level:

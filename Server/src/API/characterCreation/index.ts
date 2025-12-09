@@ -11,11 +11,25 @@ import { backgroundBonus } from "./background";
 
 
 // Request body schema for validation
+// Portrait can be either a string (legacy) or a PortraitData object (new composable system)
 const CharacterCreationSchema = t.Object({
   name: t.String({ minLength: 3, maxLength: 20 }),
   gender: t.Union([t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("NONE")]),
   race: t.String(),
-  portrait: t.String({ minLength: 1 }),
+  portrait: t.Union([
+    t.String({ minLength: 1 }), // Legacy string format
+    t.Object({ // New PortraitData format
+      base: t.String(),
+      jaw: t.String(),
+      eyes: t.String(),
+      eyes_color: t.String(),
+      face: t.String(),
+      beard: t.Union([t.Number(), t.Null()]),
+      hair_top: t.String(),
+      hair_bot: t.String(),
+      hair_color: t.String(),
+    }),
+  ]),
   background: t.String(),
   startingClass: t.String(),
 });

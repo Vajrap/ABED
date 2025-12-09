@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Box } from "@mui/material";
 import type { PortraitData } from "@/types/character";
 import { portraitAssetService } from "@/services/portraitAssetService";
+import { getArmorSpriteId, getArmorSpritePathForPortrait } from "@/utils/equipmentSpriteMapper";
 
 export interface PortraitRendererProps {
   portrait: PortraitData | string | null | undefined;
@@ -11,6 +12,11 @@ export interface PortraitRendererProps {
   className?: string;
   style?: React.CSSProperties;
   alt?: string;
+  portraitScale?: number; // Override default scale (default: 3 for character creation)
+  portraitOffset?: { x: number; y: number }; // Offset in pixels to shift portrait (default: {x: 0, y: 0})
+  equipment?: {
+    body?: string | null; // Armor/body equipment ID
+  };
 }
 
 /**
@@ -25,6 +31,9 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
   className,
   style,
   alt = "Character portrait",
+  portraitScale,
+  portraitOffset,
+  equipment = {},
 }) => {
   const [imagePaths, setImagePaths] = useState<Array<{ path: string; zIndex: number; filter?: string }>>([]);
   const [loading, setLoading] = useState(true);
@@ -36,8 +45,19 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
     return JSON.stringify(portrait);
   }, [portrait]);
 
+  const equipmentKey = useMemo(() => {
+    return JSON.stringify(equipment || {});
+  }, [equipment]);
+
   useEffect(() => {
     const loadPortraitImages = async () => {
+      console.log("PortraitRenderer: useEffect triggered", { 
+        portraitKey, 
+        equipmentKey, 
+        equipment: JSON.stringify(equipment),
+        equipmentBody: equipment?.body 
+      });
+      
       if (!portrait) {
         setImagePaths([]);
         setLoading(false);
@@ -84,6 +104,33 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
           baseFilter = "hue-rotate(3deg) saturate(0.75) brightness(1.18)";
         }
 
+        // Load clothing/equipment if provided
+        let clothBotPath: string | null = null;
+        let clothTopPath: string | null = null;
+        
+        console.log("PortraitRenderer: Equipment object", JSON.stringify(equipment), "equipment.body:", equipment?.body);
+        
+        if (equipment?.body) {
+          console.log("PortraitRenderer: Processing equipment.body:", equipment.body);
+          const clothPath = getArmorSpritePathForPortrait(equipment.body);
+          console.log("PortraitRenderer: getArmorSpritePathForPortrait result for", equipment.body, ":", clothPath);
+          if (clothPath) {
+            clothBotPath = clothPath.bot;
+            clothTopPath = clothPath.top;
+            console.log("PortraitRenderer: Loading clothing", { 
+              equipmentId: equipment.body, 
+              botPath: clothBotPath, 
+              topPath: clothTopPath 
+            });
+          } else {
+            console.warn("PortraitRenderer: No cloth path found for equipment", equipment.body);
+          }
+        } else {
+          console.log("PortraitRenderer: No equipment.body provided. equipment:", equipment, "equipment?.body:", equipment?.body);
+        }
+        
+        console.log("PortraitRenderer: After equipment processing - clothBotPath:", clothBotPath, "clothTopPath:", clothTopPath);
+
         // Load all parts in parallel for better performance
         // Use effectiveBaseColor (c1 for filtered colors) for parts other than base
         const [
@@ -106,16 +153,26 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
           portraitAssetService.getPortraitPartPath("hair_top", portrait.hair_top, effectiveBaseColor, portrait),
         ]);
 
-        // Add paths in z-index order, with filter applied to base, jaw, and face layers when using filtered colors
+        // Add paths in z-index order (based on assetmaker CSS z-index values):
+        // base(30), cloth_bot(35), jaw(40), face(50), eyes(70), cloth_top(80), beard(83), hair_bot(85), hair_top(90)
         // Base, jaw, and face all need the same filter to match skin tone
-        if (basePath) paths.push({ path: basePath, zIndex: 1, filter: baseFilter });
-        if (jawPath) paths.push({ path: jawPath, zIndex: 2, filter: baseFilter }); // Apply same filter to jaw
-        if (facePath) paths.push({ path: facePath, zIndex: 3, filter: baseFilter }); // Apply same filter to face
-        if (eyesPath) paths.push({ path: eyesPath, zIndex: 4 });
-        if (beardPath) paths.push({ path: beardPath, zIndex: 5 });
-        if (hairBotPath) paths.push({ path: hairBotPath, zIndex: 6 });
-        if (hairTopPath) paths.push({ path: hairTopPath, zIndex: 7 });
+        if (basePath) paths.push({ path: basePath, zIndex: 30, filter: baseFilter });
+        if (clothBotPath) {
+          paths.push({ path: clothBotPath, zIndex: 35 }); // Cloth bottom after base, before jaw
+          console.log("PortraitRenderer: Added cloth_bot", clothBotPath, "zIndex: 35");
+        }
+        if (jawPath) paths.push({ path: jawPath, zIndex: 40, filter: baseFilter }); // Apply same filter to jaw
+        if (facePath) paths.push({ path: facePath, zIndex: 50, filter: baseFilter }); // Apply same filter to face
+        if (eyesPath) paths.push({ path: eyesPath, zIndex: 70 });
+        if (clothTopPath) {
+          paths.push({ path: clothTopPath, zIndex: 80 }); // Cloth top after eyes, before beard
+          console.log("PortraitRenderer: Added cloth_top", clothTopPath, "zIndex: 80");
+        }
+        if (beardPath) paths.push({ path: beardPath, zIndex: 83 });
+        if (hairBotPath) paths.push({ path: hairBotPath, zIndex: 85 });
+        if (hairTopPath) paths.push({ path: hairTopPath, zIndex: 90 });
 
+        console.log("PortraitRenderer: Final paths", paths.map(p => ({ path: p.path, zIndex: p.zIndex })));
         setImagePaths(paths);
       } catch (error) {
         console.error("Failed to load portrait images:", error);
@@ -126,7 +183,7 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
     };
 
     loadPortraitImages();
-  }, [portraitKey]);
+  }, [portraitKey, equipmentKey]);
 
   if (loading) {
     return (
@@ -138,7 +195,7 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: "grey.200",
-          borderRadius: 2,
+          // borderRadius: 2,
           ...style,
         }}
         className={className}
@@ -158,7 +215,7 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
           alignItems: "center",
           justifyContent: "center",
           backgroundColor: "grey.200",
-          borderRadius: 2,
+          // borderRadius: 2,
           ...style,
         }}
         className={className}
@@ -175,7 +232,7 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
         width: size,
         height: size,
         overflow: "hidden",
-        borderRadius: 2,
+        // borderRadius: 2,
         ...style,
       }}
       className={className}
@@ -185,11 +242,13 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
         // Sprite is 192x192px, we want to show just the face (top-left portion)
         // For a 120px display, 3x scale shows ~64px of sprite (good for face)
         const containerSize = typeof size === "number" ? size : 120;
-        const scale = 3; // 3x zoom to focus on face area
+        const scale = portraitScale ?? 3; // Default 3x zoom for character creation, override for other contexts
+        const offset = portraitOffset ?? { x: 0, y: 0 }; // Default no offset, override for positioning
         
-        // Apply filter to base, jaw, and face layers (zIndex 1, 2, 3) when filter is defined
+        // Apply filter to base (30), jaw (40), and face (50) layers when filter is defined
         // These layers all need the same filter to match skin tone
-        const shouldApplyFilter = (zIndex === 1 || zIndex === 2 || zIndex === 3) && filter;
+        // Note: cloth layers should NOT have the filter applied
+        const shouldApplyFilter = (zIndex === 30 || zIndex === 40 || zIndex === 50) && filter;
         
         return (
           <img
@@ -204,14 +263,19 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
               height: `${containerSize}px`,
               objectFit: "none", // Don't scale the image content
               objectPosition: "top left", // Anchor to top-left
-              transform: `scale(${scale})`, // Scale up the entire image
+              transform: `scale(${scale})${offset.x !== 0 || offset.y !== 0 ? ` translate(${offset.x}px, ${offset.y}px)` : ""}`, // Scale and optionally shift position
               transformOrigin: "top left", // Keep top-left corner fixed
-              ...(shouldApplyFilter && { filter }), // Apply CSS filter ONLY to base layer (zIndex === 1)
+              ...(shouldApplyFilter && { filter }), // Apply CSS filter to base, jaw, and face layers
               zIndex,
             }}
             onError={(e) => {
+              // Log error for debugging
+              console.error("PortraitRenderer: Image failed to load", path, e);
               // Hide broken images
               (e.target as HTMLImageElement).style.display = "none";
+            }}
+            onLoad={() => {
+              console.log("PortraitRenderer: Image loaded successfully", path);
             }}
           />
         );

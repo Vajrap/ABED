@@ -1,7 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import { db } from "../Database/connection";
 import { characters, type InsertCharacter } from "../Database/Schema";
-import { eq } from "drizzle-orm";
 import { CharacterType,RaceEnum } from "../InterFacesEnumsAndTypes/Enums";
 import { Character } from "../Entity/Character/Character";
 import { CharacterAlignment } from "../Entity/Character/Subclass/Alignment/CharacterAlignment";
@@ -83,20 +82,22 @@ export class CharacterService {
    * Convert Character entity to InsertCharacter for database storage
    */
   private static characterToInsertCharacter(character: Character): InsertCharacter {
-    return {
+    // Build insert object - exclude location since it may not exist in older DB schemas
+    // Truncate all varchar fields to their schema limits
+    const insertData: any = {
       id: character.id,
       userId: character.userId!,
       partyID: character.partyID,
 
-      // Basic info
-      name: character.name.en,
-      gender: character.gender,
-      race: character.race!,
-      type: character.type,
+      // Basic info - truncate all varchar fields
+      name: String(character.name?.en || character.name || '').substring(0, 255),
+      gender: String(character.gender || '').substring(0, 10),
+      race: String(character.race || '').substring(0, 50),
+      type: String(character.type || 'humanoid').substring(0, 50),
       level: character.level,
       portrait: character.portrait,
-      background: character.background,
-      location: character.location || null,
+      background: String(character.background || '').substring(0, 100),
+      // location is excluded - will be added via migration later
 
       // Character systems - serialize to JSON
       alignment: character.alignment as any,
@@ -122,7 +123,7 @@ export class CharacterService {
       conditionalSkillsCondition: character.conditionalSkillsCondition as any,
       skillLearningProgress: character.skillLearningProgress as any,
       breathingSkills: character.breathingSkills as any,
-      activeBreathingSkill: character.activeBreathingSkill as any,
+      activeBreathingSkill: character.activeBreathingSkill ? String(character.activeBreathingSkill).substring(0, 50) : null,
       breathingSkillsLearningProgress: character.breathingSkillsLearningProgress as any,
       planarAptitude: character.planarAptitude as any,
 
@@ -139,10 +140,12 @@ export class CharacterService {
       statTracker: character.statTracker,
       abGuage: character.abGauge,
 
-      // Audit
-      createdBy: "system",
-      updatedBy: "system",
+      // Audit - truncate to 255
+      createdBy: "system".substring(0, 255),
+      updatedBy: "system".substring(0, 255),
     };
+    
+    return insertData as InsertCharacter;
   }
 
   static createCharacter(
@@ -236,21 +239,84 @@ export class CharacterService {
   }
 
   static async saveCharacterToDatabase(character: InsertCharacter): Promise<{ character: InsertCharacter; id: string }> {
-    let savedCharacter;
-    try {
-      [savedCharacter] = await db
-        .insert(characters)
-        .values(character)
-        .returning();
-    } catch (error) {
-      throw error;
-    }
+    // Use raw SQL to avoid issues with missing columns (like location) in older database schemas
+    const char = character as any;
+    
+    // Prepare JSON values as strings for casting
+    const portraitJson = JSON.stringify(char.portrait || null);
+    const alignmentJson = JSON.stringify(char.alignment || {});
+    const artisansJson = JSON.stringify(char.artisans || {});
+    const attributeJson = JSON.stringify(char.attribute || {});
+    const battleStatsJson = JSON.stringify(char.battleStats || {});
+    const elementsJson = JSON.stringify(char.elements || {});
+    const proficienciesJson = JSON.stringify(char.proficiencies || {});
+    const saveRollsJson = JSON.stringify(char.saveRolls || {});
+    const needsJson = JSON.stringify(char.needs || {});
+    const vitalsJson = JSON.stringify(char.vitals || {});
+    const fameJson = JSON.stringify(char.fame || {});
+    const behaviorJson = JSON.stringify(char.behavior || {});
+    const titleJson = JSON.stringify(char.title || {});
+    const possibleEpithetsJson = JSON.stringify(char.possibleEpithets || []);
+    const possibleRolesJson = JSON.stringify(char.possibleRoles || []);
+    const actionSequenceJson = JSON.stringify(char.actionSequence || {});
+    const informationsJson = JSON.stringify(char.informations || {});
+    const skillsJson = JSON.stringify(char.skills || {});
+    const activeSkillsJson = JSON.stringify(char.activeSkills || []);
+    const conditionalSkillsJson = JSON.stringify(char.conditionalSkills || []);
+    const conditionalSkillsConditionJson = JSON.stringify(char.conditionalSkillsCondition || {});
+    const skillLearningProgressJson = JSON.stringify(char.skillLearningProgress || {});
+    const breathingSkillsJson = JSON.stringify(char.breathingSkills || {});
+    const breathingSkillsLearningProgressJson = JSON.stringify(char.breathingSkillsLearningProgress || {});
+    const planarAptitudeJson = JSON.stringify(char.planarAptitude || {});
+    const relationsJson = JSON.stringify(char.relations || {});
+    const traitsJson = JSON.stringify(char.traits || []);
+    const inventorySizeJson = JSON.stringify(char.inventorySize || { base: 20, bonus: 0 });
+    const inventoryJson = JSON.stringify(char.inventory || {});
+    const equipmentsJson = JSON.stringify(char.equipments || {});
 
+    // Use parameterized queries with proper JSON casting
+    // Pass JSON strings as parameters and cast them in SQL
+    const result = await db.execute(sql`
+      INSERT INTO characters (
+        id, user_id, party_id, name, gender, race, type, level, portrait, background,
+        alignment, artisans, attribute, battle_stats, elements, proficiencies, save_rolls,
+        needs, vitals, fame, behavior, title, possible_epithets, possible_roles,
+        action_sequence, informations, skills, active_skills, conditional_skills,
+        conditional_skills_condition, skill_learning_progress, breathing_skills,
+        active_breathing_skill, breathing_skills_learning_progress, planar_aptitude,
+        relations, traits, inventory_size, inventory, equipments, stat_tracker, ab_guage,
+        created_at, updated_at, created_by, updated_by
+      ) VALUES (
+        ${char.id}, ${char.userId}, ${char.partyID || null},
+        ${String(char.name || '').substring(0, 255)}, ${String(char.gender || '').substring(0, 10)}, ${String(char.race || '').substring(0, 50)}, ${String(char.type || '').substring(0, 50)},
+        ${char.level}, ${sql.raw(`'${portraitJson.replace(/'/g, "''")}'::jsonb`)}, ${String(char.background || '').substring(0, 100)},
+        ${sql.raw(`'${alignmentJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${artisansJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${attributeJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${battleStatsJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${elementsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${proficienciesJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${saveRollsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${needsJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${vitalsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${fameJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${behaviorJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${titleJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${possibleEpithetsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${possibleRolesJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${actionSequenceJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${informationsJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${skillsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${activeSkillsJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${conditionalSkillsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${conditionalSkillsConditionJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${skillLearningProgressJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${breathingSkillsJson.replace(/'/g, "''")}'::jsonb`)},
+        ${char.activeBreathingSkill ? String(char.activeBreathingSkill).substring(0, 50) : null}, ${sql.raw(`'${breathingSkillsLearningProgressJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${planarAptitudeJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${relationsJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${traitsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${inventorySizeJson.replace(/'/g, "''")}'::jsonb`)},
+        ${sql.raw(`'${inventoryJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${equipmentsJson.replace(/'/g, "''")}'::jsonb`)},
+        ${char.statTracker || 0}, ${char.abGuage || 0},
+        NOW(), NOW(), ${String(char.createdBy || 'system').substring(0, 255)}, ${String(char.updatedBy || 'system').substring(0, 255)}
+      ) RETURNING *
+    `);
+    
+    const savedCharacter = result.rows[0] as any;
+    
     if (!savedCharacter) {
       throw new Error("Failed to create character");
     }
 
-    return { character: savedCharacter, id: savedCharacter.id };
+    return { character: savedCharacter as InsertCharacter, id: savedCharacter.id as string };
   }
 
   /**
@@ -307,8 +373,9 @@ export class CharacterService {
   }
 
   static async isCharacterNameAvailable(name: string): Promise<boolean> {
+    // Only select id to avoid issues with missing columns
     const [existing] = await db
-      .select()
+      .select({ id: characters.id })
       .from(characters)
       .where(eq(characters.name, name))
       .limit(1);
