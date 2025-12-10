@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, alpha, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,6 +6,7 @@ import {
   PartyMemberCard,
 } from "@/components/GameView";
 import { ActionScheduleModal } from "@/components/GameView/ActionScheduleModal";
+import { websocketService } from "@/services/websocketService";
 
 export const GameView: React.FC = () => {
   const theme = useTheme();
@@ -28,7 +29,19 @@ export const GameView: React.FC = () => {
     // TODO: Send schedule to backend
   };
 
+  // Initialize WebSocket connection when entering game view
+  useEffect(() => {
+    websocketService.connect();
+
+    // Cleanup: disconnect WebSocket when leaving game view
+    return () => {
+      websocketService.disconnect();
+    };
+  }, []);
+
   const handleLogout = () => {
+    // Disconnect WebSocket before logout
+    websocketService.disconnect();
     localStorage.removeItem("sessionToken");
     navigate("/login");
   };

@@ -181,7 +181,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
       });
     }
   }
-  
+
   // Extract body equipment ID - handle both object and string formats
   const bodyEquipmentId = (() => {
     const bodyEq = equipmentBySlot.body;
@@ -499,35 +499,35 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
             flexWrap: "wrap",
           }}
         >
-          {character.portrait && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
-              <Box
-                sx={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
-                  backgroundColor: alpha(theme.palette.background.default, 0.5),
-                }}
-              >
-                <PortraitRenderer
-                  portrait={character.portrait}
-                  size={120}
-                  alt={getString(character.name) || "Character"}
+        {character.portrait && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 120,
+                        height: 120,
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                        backgroundColor: alpha(theme.palette.background.default, 0.5),
+                      }}
+                    >
+                      <PortraitRenderer
+                        portrait={character.portrait}
+                        size={120}
+                        alt={getString(character.name) || "Character"}
                   equipment={{
                     body: bodyEquipmentId,
                   }}
-                />
-              </Box>
-            </Box>
+                      />
+                    </Box>
+                  </Box>
           )}
           <Box
             sx={{
@@ -547,40 +547,40 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                 textAlign: "center",
               }}
             >
-              {getString(character.name) || 'Character'}
+          {getString(character.name) || 'Character'}
             </Typography>
           </Box>
           {character.portrait && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
-              <Box
-                sx={{
-                  width: 150,
-                  height: 150,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  border: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
-                  backgroundColor: alpha(theme.palette.background.default, 0.5),
-                }}
-              >
-                <BattleSpriteRenderer
-                  portrait={character.portrait}
-                  equipment={{
-                    body: equipmentBySlot.body?.itemId || equipmentBySlot.body?.id || null,
-                    weapon: equipmentBySlot.rightHand?.itemId || equipmentBySlot.rightHand?.id || equipmentBySlot.leftHand?.itemId || equipmentBySlot.leftHand?.id || null,
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 1,
                   }}
-                  size={150}
-                  animated={true}
-                />
-              </Box>
-            </Box>
-          )}
+                >
+                  <Box
+                    sx={{
+                      width: 150,
+                      height: 150,
+                      borderRadius: 2,
+                      overflow: "hidden",
+                      border: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+                      backgroundColor: alpha(theme.palette.background.default, 0.5),
+                    }}
+                  >
+                    <BattleSpriteRenderer
+                      portrait={character.portrait}
+                      equipment={{
+                        body: equipmentBySlot.body?.itemId || equipmentBySlot.body?.id || null,
+                        weapon: equipmentBySlot.rightHand?.itemId || equipmentBySlot.rightHand?.id || equipmentBySlot.leftHand?.itemId || equipmentBySlot.leftHand?.id || null,
+                      }}
+                      size={150}
+                      animated={true}
+                    />
+                  </Box>
+                </Box>
+              )}
         </Box>
         {character.title && (
           <Tooltip

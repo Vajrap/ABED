@@ -13,13 +13,17 @@ import {
   Tab,
   TextField,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import { ArrowBack, Send, Fullscreen, Minimize } from "@mui/icons-material";
 import { ChatMessage, Friend, ChatScope, UserStatus } from "@/types/chat";
-import { mockChatMessages, mockFriends, getChatMessagesByScope } from "@/data/mockChatData";
+import { mockFriends, getChatMessagesByScope } from "@/data/mockChatData";
 import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
+import { locationService } from "@/services/locationService";
+import { chatService } from "@/services/chatService";
+import { websocketService } from "@/services/websocketService";
 
-type FriendFilterTab = "lovers" | "closeFriends" | "friends" | "npcs" | "all";
+type FriendFilterTab = "lovers" | "closeFriends" | "friends" | "npcs" | "location" | "all";
 
 export interface ChatPanelProps {
   currentUserId?: string; // Current player's user ID
@@ -36,19 +40,35 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
   const [friendFilterTab, setFriendFilterTab] = useState<FriendFilterTab>("all");
   const [chatInput, setChatInput] = useState<string>("");
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [locationNPCs, setLocationNPCs] = useState<Friend[]>([]);
+  const [loadingLocationNPCs, setLoadingLocationNPCs] = useState<boolean>(false);
+  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local message cache
+  const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Get messages based on selected chat type
   const getDisplayMessages = (): ChatMessage[] => {
-    if (selectedChatType === "social" && selectedFriendId) {
-      // Private chat: pass both friend ID and current user ID
-      return getChatMessagesByScope("private", selectedFriendId, currentUserId);
-    }
-    if (selectedChatType !== "social") {
-      // Public chats: just filter by scope
-      return getChatMessagesByScope(selectedChatType);
-    }
-    return [];
+    // Combine local messages (from API) with any mock data (for now)
+    const mockMessages = getChatMessagesByScope(
+      selectedChatType === "social" ? "private" : selectedChatType,
+      selectedChatType === "social" ? (selectedFriendId || undefined) : undefined,
+      currentUserId
+    );
+    
+    // Filter local messages by current scope
+    const filteredLocal = localMessages.filter((msg) => {
+      if (selectedChatType === "social" && selectedFriendId) {
+        return (
+          msg.scope === "private" &&
+          (msg.senderId === selectedFriendId || msg.recipientId === selectedFriendId)
+        );
+      }
+      return msg.scope === selectedChatType;
+    });
+
+    // Combine and sort by timestamp
+    const allMessages = [...mockMessages, ...filteredLocal];
+    return allMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   };
 
   const messages = getDisplayMessages();
@@ -92,20 +112,100 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
     setSelectedFriendId(friendId);
   };
 
-  // Handle sending a chat message
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  // WebSocket message handler
+  useEffect(() => {
+    // Connect WebSocket when component mounts (if not already connected)
+    if (!websocketService.isConnected()) {
+      websocketService.connect();
+    }
 
-    // TODO: Send message to backend
-    console.log("Sending message:", {
-      scope: selectedChatType,
-      recipientId: selectedChatType === "social" ? selectedFriendId : undefined,
-      content: chatInput.trim(),
-      senderId: currentUserId,
+    // Register handler for CHAT_MESSAGE type
+    const unsubscribe = websocketService.onMessage("CHAT_MESSAGE", (message) => {
+      const chatData = message.data;
+      
+      // Convert timestamp string to Date
+      const chatMessage: ChatMessage = {
+        ...chatData,
+        timestamp: new Date(chatData.timestamp),
+      };
+
+      // Only add message if it matches current chat view
+      const shouldAdd = (() => {
+        if (selectedChatType === "social" && selectedFriendId) {
+          // Private chat: check if message is from/to the selected friend
+          return (
+            chatMessage.scope === "private" &&
+            (chatMessage.senderId === selectedFriendId || chatMessage.recipientId === selectedFriendId)
+          );
+        }
+        // Public chats: check if scope matches
+        return chatMessage.scope === selectedChatType;
+      })();
+
+      if (shouldAdd) {
+        setLocalMessages((prev) => [...prev, chatMessage]);
+        // Auto-scroll will happen via messagesEndRef effect
+      }
     });
 
-    // Clear input after sending
+    // Cleanup on unmount
+    return () => {
+      unsubscribe();
+      // Note: We don't disconnect WebSocket here as it might be used by other components
+      // WebSocket will be disconnected when user logs out or leaves game view
+    };
+  }, [selectedChatType, selectedFriendId]);
+
+  // Handle sending a chat message
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || sendingMessage) return;
+
+    const content = chatInput.trim();
+    const scope = selectedChatType === "social" ? "private" : selectedChatType;
+    const recipientId = selectedChatType === "social" ? selectedFriendId || undefined : undefined;
+
+    // Clear input immediately for better UX
     setChatInput("");
+    setSendingMessage(true);
+
+    try {
+      // Send message to backend
+      const response = await chatService.sendMessage({
+        scope,
+        recipientId,
+        content,
+      });
+
+      if (response.success && response.message) {
+        // Add message to local state immediately (optimistic update)
+        // Note: For NPCs, response.isNPC will be true and actual response may come via WebSocket
+        const message = {
+          ...response.message,
+          timestamp: response.message.timestamp instanceof Date 
+            ? response.message.timestamp 
+            : new Date(response.message.timestamp),
+        };
+        setLocalMessages((prev) => [...prev, message]);
+        console.log("Message sent successfully", {
+          message,
+          isNPC: response.isNPC,
+          note: response.isNPC ? "NPC response may come via WebSocket" : "Message sent",
+        });
+      } else {
+        // Error handling
+        console.error("Failed to send message:", response.messageKey);
+        // TODO: Show error toast/notification
+        // Restore input on error
+        setChatInput(content);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      // TODO: Show error toast/notification
+      // Restore input on error
+      setChatInput(content);
+    } finally {
+      setSendingMessage(false);
+    }
   };
 
   // Check if chat input should be shown
@@ -118,8 +218,47 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
     return true;
   };
 
+  // Fetch location NPCs when location tab is selected
+  useEffect(() => {
+    if (friendFilterTab === "location") {
+      setLoadingLocationNPCs(true);
+      locationService
+        .getLocationNPCs()
+        .then((response) => {
+          if (response.success && response.npcs) {
+            // Convert NPCs to Friend format
+            const npcFriends: Friend[] = response.npcs.map((npc) => ({
+              id: npc.id,
+              name: npc.name,
+              portrait: npc.portrait,
+              isPlayer: false, // NPCs are not players
+              // No status for NPCs
+            }));
+            setLocationNPCs(npcFriends);
+          } else {
+            setLocationNPCs([]);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching location NPCs:", error);
+          setLocationNPCs([]);
+        })
+        .finally(() => {
+          setLoadingLocationNPCs(false);
+        });
+    } else {
+      // Clear location NPCs when switching away from location tab
+      setLocationNPCs([]);
+    }
+  }, [friendFilterTab]);
+
   // Filter friends based on selected tab
   const getFilteredFriends = (): Friend[] => {
+    // If location tab, return location NPCs
+    if (friendFilterTab === "location") {
+      return locationNPCs;
+    }
+
     let filtered = mockFriends;
 
     switch (friendFilterTab) {
@@ -318,6 +457,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                 <Tab label="Close Friends" value="closeFriends" />
                 <Tab label="Friends" value="friends" />
                 <Tab label="NPCs" value="npcs" />
+                <Tab label="Location" value="location" />
               </Tabs>
             </Box>
 
@@ -342,7 +482,28 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                 },
               }}
             >
-              {filteredFriends.length === 0 ? (
+              {loadingLocationNPCs ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 4,
+                  }}
+                >
+                  <CircularProgress size={24} />
+                  <Typography
+                    sx={{
+                      fontFamily: "Crimson Text, serif",
+                      fontSize: "0.9rem",
+                      color: theme.palette.text.secondary,
+                      ml: 2,
+                    }}
+                  >
+                    Loading NPCs...
+                  </Typography>
+                </Box>
+              ) : filteredFriends.length === 0 ? (
                 <Typography
                   sx={{
                     fontFamily: "Crimson Text, serif",
@@ -352,7 +513,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                     mt: 4,
                   }}
                 >
-                  No {friendFilterTab === "all" ? "friends" : friendFilterTab} found
+                  {friendFilterTab === "location"
+                    ? "No NPCs found at this location"
+                    : `No ${friendFilterTab === "all" ? "friends" : friendFilterTab} found`}
                 </Typography>
               ) : (
                 filteredFriends.map((friend) => {
@@ -394,15 +557,16 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                             sx={{
                               width: 48,
                               height: 48,
-                              borderRadius: "50%",
+                              // borderRadius: "50%",
                               overflow: "hidden",
                               border: `2px solid ${theme.palette.secondary.main}`,
                             }}
                           >
                             <PortraitRenderer
                               portrait={friend.portrait}
-                              size="100%"
+                              size="100px"
                               alt={friend.name}
+                              portraitScale={1}
                             />
                           </Box>
                         ) : (
@@ -877,7 +1041,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                         <InputAdornment position="end">
                           <IconButton
                             onClick={handleSendMessage}
-                            disabled={!chatInput.trim()}
+                            disabled={!chatInput.trim() || sendingMessage}
                             sx={{
                               color: isLoverChat
                                 ? "#ff69b4"
@@ -892,7 +1056,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                               },
                             }}
                           >
-                            <Send />
+                            {sendingMessage ? (
+                              <CircularProgress size={20} />
+                            ) : (
+                              <Send />
+                            )}
                           </IconButton>
                         </InputAdornment>
                       ),

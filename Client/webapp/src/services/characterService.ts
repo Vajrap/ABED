@@ -48,6 +48,30 @@ class CharacterService {
       };
     }
   }
+
+  /**
+   * Check if the current user has a character
+   */
+  async checkHasCharacter(): Promise<{ success: boolean; hasCharacter: boolean }> {
+    try {
+      // Use autoAuth to validate session and get user info, then check character
+      const authResponse = await restHandler.post<null, { success: boolean; hasCharacter?: boolean }>(
+        "/api/auth/check-character",
+        null,
+        true // requireAuth
+      );
+      return {
+        success: authResponse.success,
+        hasCharacter: authResponse.hasCharacter ?? false,
+      };
+    } catch (error: any) {
+      console.error("Error checking character:", error);
+      return {
+        success: false,
+        hasCharacter: false,
+      };
+    }
+  }
 }
 
 export const characterService = new CharacterService();

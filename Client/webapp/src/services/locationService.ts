@@ -45,6 +45,51 @@ class LocationService {
       };
     }
   }
+
+  /**
+   * Get all NPCs at the current location
+   */
+  async getLocationNPCs(): Promise<{
+    success: boolean;
+    npcs?: Array<{
+      id: string;
+      name: string;
+      portrait?: any; // PortraitData or string
+      level: number;
+      race: string;
+      gender: "MALE" | "FEMALE" | "NONE";
+      background: string | null;
+    }>;
+    locationId?: string;
+    messageKey?: string;
+  }> {
+    try {
+      const response = await restHandler.get<{
+        success: boolean;
+        npcs?: Array<{
+          id: string;
+          name: string;
+          portrait?: any;
+          level: number;
+          race: string;
+          gender: "MALE" | "FEMALE" | "NONE";
+          background: string | null;
+        }>;
+        locationId?: string;
+        messageKey?: string;
+      }>(
+        "/api/location/npcs",
+        true // requireAuth
+      );
+      return response;
+    } catch (error) {
+      console.error("Get location NPCs error:", error);
+      return {
+        success: false,
+        messageKey: error instanceof Error ? error.message : "location.npcsFetchFailed",
+      };
+    }
+  }
 }
 
 // Export singleton instance

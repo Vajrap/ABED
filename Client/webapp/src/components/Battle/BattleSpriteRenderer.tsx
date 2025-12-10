@@ -124,11 +124,14 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
         // Face color comes from eyes_color (as per assetmaker logic)
         // Use effectiveBaseColor (c1 for filtered colors) to find matching face files
         // Apply same filter as skin when using filtered colors (c7, c8) to match skin tone
+        // Note: Face layer may include a collar, but clothing layers (z-index 3, 5) should cover it
         const facePath = `/img/battle/face`;
         const faceFiles = battleCatalog[facePath] || [];
         const faceColor = portrait.eyes_color || effectiveBaseColor;
         const faceFile = faceFiles.find((f) => f.includes(`_${faceColor}.png`) || f.includes(`_${faceColor}_`));
         if (faceFile) {
+          // When clothing is equipped, we still render the face but clothing top (z-index 5) should cover the collar
+          // The face collar might still be visible if clothing doesn't fully cover the neck area
           layers.push({ path: `${facePath}/${faceFile}`, zIndex: 2, filter: skinFilter }); // Apply same filter to face
         }
 
@@ -300,9 +303,18 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
         // These layers need the same filter to match skin tone
         const shouldApplyFilter = (zIndex === 1 || zIndex === 2) && filter;
         
+        // When clothing is equipped, mask the face layer (zIndex 2) to hide the collar area
+        // The face layer has a collar baked in, but clothing should cover it
+        const hasEquipment = equipment.body && equipment.body.trim() !== "";
+        const isFaceLayer = zIndex === 2;
+        const shouldMaskCollar = isFaceLayer && hasEquipment;
+        
+        // Create unique key that includes zIndex and equipment info to force re-render when equipment changes
+        const uniqueKey = `${path}-${zIndex}-${equipmentKey}-${index}`;
+        
         return (
           <Box
-            key={`${path}-${index}`}
+            key={uniqueKey}
             data-battle-layer
             sx={{
               position: "absolute",
@@ -316,7 +328,13 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
               backgroundPosition: "0px 0px",
               transform: `scale(${scale})`,
               transformOrigin: "top left",
-              ...(shouldApplyFilter && { filter }), // Apply CSS filter ONLY to skin layer (zIndex === 1)
+              ...(shouldApplyFilter && { filter }), // Apply CSS filter ONLY to skin and face layers (zIndex === 1 or 2)
+              // Mask the collar area from face layer when clothing is equipped
+              // Clip from top 0% to ~30% to hide the collar area (adjust percentage as needed)
+              ...(shouldMaskCollar && {
+                clipPath: "inset(0% 0% 70% 0%)", // Hide top 30% where collar typically is
+                WebkitClipPath: "inset(0% 0% 70% 0%)", // Webkit prefix for Safari
+              }),
               zIndex,
               ...(animated && {
                 animation: "battleAnimation 1s steps(6) infinite",

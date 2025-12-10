@@ -153,8 +153,8 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
           portraitAssetService.getPortraitPartPath("hair_top", portrait.hair_top, effectiveBaseColor, portrait),
         ]);
 
-        // Add paths in z-index order (based on assetmaker CSS z-index values):
-        // base(30), cloth_bot(35), jaw(40), face(50), eyes(70), cloth_top(80), beard(83), hair_bot(85), hair_top(90)
+        // Add paths in z-index order (beard behind equipment):
+        // base(30), cloth_bot(35), jaw(40), face(50), eyes(70), beard(75), cloth_top(80), hair_bot(85), hair_top(90)
         // Base, jaw, and face all need the same filter to match skin tone
         if (basePath) paths.push({ path: basePath, zIndex: 30, filter: baseFilter });
         if (clothBotPath) {
@@ -164,11 +164,11 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
         if (jawPath) paths.push({ path: jawPath, zIndex: 40, filter: baseFilter }); // Apply same filter to jaw
         if (facePath) paths.push({ path: facePath, zIndex: 50, filter: baseFilter }); // Apply same filter to face
         if (eyesPath) paths.push({ path: eyesPath, zIndex: 70 });
+        if (beardPath) paths.push({ path: beardPath, zIndex: 75 }); // Beard after eyes, before cloth_top
         if (clothTopPath) {
-          paths.push({ path: clothTopPath, zIndex: 80 }); // Cloth top after eyes, before beard
+          paths.push({ path: clothTopPath, zIndex: 80 }); // Cloth top after beard
           console.log("PortraitRenderer: Added cloth_top", clothTopPath, "zIndex: 80");
         }
-        if (beardPath) paths.push({ path: beardPath, zIndex: 83 });
         if (hairBotPath) paths.push({ path: hairBotPath, zIndex: 85 });
         if (hairTopPath) paths.push({ path: hairTopPath, zIndex: 90 });
 
@@ -242,7 +242,7 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
         // Sprite is 192x192px, we want to show just the face (top-left portion)
         // For a 120px display, 3x scale shows ~64px of sprite (good for face)
         const containerSize = typeof size === "number" ? size : 120;
-        const scale = portraitScale ?? 3; // Default 3x zoom for character creation, override for other contexts
+        const scale = portraitScale ?? 2.5; // Default 3x zoom for character creation, override for other contexts
         const offset = portraitOffset ?? { x: 0, y: 0 }; // Default no offset, override for positioning
         
         // Apply filter to base (30), jaw (40), and face (50) layers when filter is defined
@@ -257,6 +257,7 @@ export const PortraitRenderer: React.FC<PortraitRendererProps> = ({
             alt={index === 0 ? alt : ""}
             style={{
               position: "absolute",
+              scale: 1,
               top: 0,
               left: 0,
               width: `${containerSize}px`, // Base size matches container

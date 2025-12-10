@@ -201,7 +201,7 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
             <PortraitRenderer
               portrait={portrait}
               size="100%"
-              portraitScale={1.5}
+              portraitScale={1.55}
               portraitOffset={{ x: 0, y: 0 }}
               equipment={{
                 body: bodyEquipmentId,

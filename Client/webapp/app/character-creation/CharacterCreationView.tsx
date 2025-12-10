@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -35,6 +35,7 @@ import * as skillEnums from "@/L10N/skillEnums";
 import { renderText, type RenderTextOptions } from "@/utils/textRenderer";
 import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
 import { BattleSpriteRenderer } from "@/components/Battle/BattleSpriteRenderer";
+import { characterService } from "@/services/characterService";
 
 // Helper function to get skill L10N by mapping skill name + class to enum value
 // This function searches across all skill enum types since skills are stored by their enum value (not class prefix)
@@ -322,9 +323,13 @@ const HAIR_COLORS = [
   { value: "c10", label: "Gray" },
 ];
 
+// Feature flag to enable/disable redirects (useful for debugging/fixing the page)
+const ENABLE_REDIRECTS = process.env.NEXT_PUBLIC_ENABLE_CHARACTER_CREATION_REDIRECTS !== "false";
+
 export default function CharacterCreationView() {
   const router = useRouter();
   const { t, currentLanguage } = useLocalization();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const {
     isLoading,
     error,
@@ -342,6 +347,54 @@ export default function CharacterCreationView() {
     availableClasses,
     availableBackgrounds,
   } = useCharacterCreationLogic();
+
+  // Check authentication and character status on mount
+  useEffect(() => {
+    if (!ENABLE_REDIRECTS) {
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    const checkAuthAndCharacter = async () => {
+      try {
+        // Check if user has a token (is logged in)
+        const token = typeof window !== "undefined" ? localStorage.getItem("sessionToken") : null;
+        
+        if (!token) {
+          // Not logged in - redirect to login
+          console.log("CharacterCreationView: No token found, redirecting to login");
+          router.push("/login");
+          return;
+        }
+
+        // Check if user has a character
+        const result = await characterService.checkHasCharacter();
+        
+        if (!result.success) {
+          // Auth failed - redirect to login
+          console.log("CharacterCreationView: Auth check failed, redirecting to login");
+          router.push("/login");
+          return;
+        }
+
+        if (result.hasCharacter) {
+          // User already has a character - redirect to game
+          console.log("CharacterCreationView: User already has character, redirecting to game");
+          router.push("/game");
+          return;
+        }
+
+        // User is logged in and doesn't have a character - allow access
+        setIsCheckingAuth(false);
+      } catch (error) {
+        console.error("CharacterCreationView: Error checking auth/character:", error);
+        // On error, allow access (fail open) so page can still be fixed
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuthAndCharacter();
+  }, [router]);
 
   const handleCreateCharacter = async () => {
     const success = await createCharacter();
@@ -361,6 +414,17 @@ export default function CharacterCreationView() {
   };
 
   // Stats are calculated locally when race, class, or background changes
+
+  // Show loading state while checking auth
+  if (ENABLE_REDIRECTS && isCheckingAuth) {
+    return (
+      <CharacterCreationContainer>
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+          <CircularProgress />
+        </Box>
+      </CharacterCreationContainer>
+    );
+  }
 
   return (
     <CharacterCreationContainer>
@@ -491,6 +555,9 @@ export default function CharacterCreationView() {
                       portrait={formData.portrait}
                       size={120}
                       alt="Character portrait preview"
+                      equipment={{
+                        body: stats?.startingEquipments?.find(eq => eq.slot === "body")?.item || null,
+                      }}
                     />
                   </Box>
                   <Box>
@@ -526,7 +593,12 @@ export default function CharacterCreationView() {
                             <Chip
                               label={extractNumber(formData.portrait.base)}
                               size="small"
-                              sx={{ minWidth: 60 }}
+                              sx={{ 
+                                minWidth: 60,
+                                backgroundColor: "primary.main",
+                                color: "white",
+                                fontWeight: 500,
+                              }}
                             />
                             <IconButton
                               size="small"
@@ -552,7 +624,12 @@ export default function CharacterCreationView() {
                             <Chip
                               label={extractNumber(formData.portrait.face)}
                               size="small"
-                              sx={{ minWidth: 60 }}
+                              sx={{ 
+                                minWidth: 60,
+                                backgroundColor: "primary.main",
+                                color: "white",
+                                fontWeight: 500,
+                              }}
                             />
                             <IconButton
                               size="small"
@@ -581,7 +658,12 @@ export default function CharacterCreationView() {
                             <Chip
                               label={extractNumber(formData.portrait.eyes)}
                               size="small"
-                              sx={{ minWidth: 60 }}
+                              sx={{ 
+                                minWidth: 60,
+                                backgroundColor: "primary.main",
+                                color: "white",
+                                fontWeight: 500,
+                              }}
                             />
                             <IconButton
                               size="small"
@@ -631,7 +713,12 @@ export default function CharacterCreationView() {
                             <Chip
                               label={extractNumber(formData.portrait.hair_top.replace("_top", ""))}
                               size="small"
-                              sx={{ minWidth: 60 }}
+                              sx={{ 
+                                minWidth: 60,
+                                backgroundColor: "primary.main",
+                                color: "white",
+                                fontWeight: 500,
+                              }}
                             />
                             <IconButton
                               size="small"
@@ -657,7 +744,12 @@ export default function CharacterCreationView() {
                             <Chip
                               label={extractNumber(formData.portrait.hair_bot.replace("_bot", ""))}
                               size="small"
-                              sx={{ minWidth: 60 }}
+                              sx={{ 
+                                minWidth: 60,
+                                backgroundColor: "primary.main",
+                                color: "white",
+                                fontWeight: 500,
+                              }}
                             />
                             <IconButton
                               size="small"
@@ -731,7 +823,12 @@ export default function CharacterCreationView() {
                             <Chip
                               label={extractNumber(formData.portrait.jaw)}
                               size="small"
-                              sx={{ minWidth: 60 }}
+                              sx={{ 
+                                minWidth: 60,
+                                backgroundColor: "primary.main",
+                                color: "white",
+                                fontWeight: 500,
+                              }}
                             />
                             <IconButton
                               size="small"
@@ -758,8 +855,12 @@ export default function CharacterCreationView() {
                               <Chip
                                 label={formData.portrait.beard?.toString() || "None"}
                                 size="small"
-                                sx={{ minWidth: 60 }}
-                                color="primary"
+                                sx={{ 
+                                  minWidth: 60,
+                                  backgroundColor: "primary.main",
+                                  color: "white",
+                                  fontWeight: 500,
+                                }}
                               />
                               <IconButton
                                 size="small"

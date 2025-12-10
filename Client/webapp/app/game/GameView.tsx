@@ -16,9 +16,13 @@ import { ActionScheduleModal } from "@/components/GameView/ActionScheduleModal";
 import { CharacterStatsModal } from "@/components/GameView/CharacterStatsModal";
 import { actionService } from "@/services/actionService";
 import { gameDataService } from "@/services/gameDataService";
+import { characterService } from "@/services/characterService";
 import type { PartyInterface, CharacterInterface, GameTimeInterface, News } from "@/types/api";
 import type { LocationData } from "@/services/locationService";
 import type { CharacterStatsView } from "@/types/game";
+
+// Feature flag to enable/disable redirects (useful for debugging/fixing the page)
+const ENABLE_REDIRECTS = process.env.NEXT_PUBLIC_ENABLE_GAME_REDIRECTS !== "false";
 
 export default function GameView() {
   const theme = useTheme();
@@ -37,9 +41,63 @@ export default function GameView() {
   const [news, setNews] = useState<News[]>([]);
   const [unseenNews, setUnseenNews] = useState<News[]>([]);
   const [gameTime, setGameTime] = useState<GameTimeInterface | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Fetch game data on mount
+  // Check authentication on mount
   useEffect(() => {
+    if (!ENABLE_REDIRECTS) {
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    const checkAuth = async () => {
+      try {
+        // Check if user has a token (is logged in)
+        const token = typeof window !== "undefined" ? localStorage.getItem("sessionToken") : null;
+        
+        if (!token) {
+          // Not logged in - redirect to login
+          console.log("GameView: No token found, redirecting to login");
+          router.push("/login");
+          return;
+        }
+
+        // Check if user has a character and is authenticated
+        const result = await characterService.checkHasCharacter();
+        
+        if (!result.success) {
+          // Auth failed - redirect to login
+          console.log("GameView: Auth check failed, redirecting to login");
+          router.push("/login");
+          return;
+        }
+
+        if (!result.hasCharacter) {
+          // User doesn't have a character - redirect to character creation
+          console.log("GameView: User doesn't have character, redirecting to character creation");
+          router.push("/character-creation");
+          return;
+        }
+
+        // User is authenticated and has a character - allow access
+        setIsCheckingAuth(false);
+      } catch (error) {
+        console.error("GameView: Error checking auth:", error);
+        // On error, allow access (fail open) so page can still be fixed
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  // Fetch game data on mount (only after auth check passes)
+  useEffect(() => {
+    // Don't fetch data if we're still checking auth or redirects are enabled and auth check failed
+    if (ENABLE_REDIRECTS && isCheckingAuth) {
+      return;
+    }
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -71,10 +129,25 @@ export default function GameView() {
             });
           }
         } else {
-          // Handle partial errors
+          // Check for authentication errors in the error messages
           const errorMessages = response.errors 
             ? Object.values(response.errors).filter(Boolean).join(", ")
             : "Failed to load game data";
+          
+          // Check if any error is auth-related
+          const hasAuthError = response.errors && (
+            errorMessages.includes("auth.noToken") ||
+            errorMessages.includes("auth.invalidSession") ||
+            errorMessages.includes("auth")
+          );
+
+          if (ENABLE_REDIRECTS && hasAuthError) {
+            // Authentication error - redirect to login
+            console.log("GameView: Authentication error detected, redirecting to login");
+            router.push("/login");
+            return;
+          }
+
           setError(errorMessages);
           
           // Still try to set partial data if available
@@ -87,16 +160,29 @@ export default function GameView() {
         }
       } catch (err) {
         console.error("Error fetching game data:", err);
-        setError(err instanceof Error ? err.message : "Failed to load game data");
+        const errorMessage = err instanceof Error ? err.message : "Failed to load game data";
+        
+        // Check if error is auth-related (401 Unauthorized)
+        if (ENABLE_REDIRECTS && (
+          errorMessage.includes("401") ||
+          errorMessage.includes("Unauthorized") ||
+          errorMessage.includes("auth")
+        )) {
+          console.log("GameView: Authentication error in fetch, redirecting to login");
+          router.push("/login");
+          return;
+        }
+
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [router, isCheckingAuth]);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts - Must be before any conditional returns to maintain hook order
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       // Don't trigger if user is typing in an input/textarea
@@ -134,6 +220,15 @@ export default function GameView() {
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
+
+  // Show loading state while checking auth (after all hooks)
+  if (ENABLE_REDIRECTS && isCheckingAuth) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   // Map backend CharacterInterface to component props
   const mapCharacterToMember = (character: CharacterInterface | null, isPlayer: boolean): CharacterStatsView | null => {

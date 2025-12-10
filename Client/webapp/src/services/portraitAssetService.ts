@@ -146,7 +146,12 @@ class PortraitAssetService {
       }
     });
 
-    return jaws.sort();
+    return jaws.sort((a, b) => {
+      // Extract numeric part for numeric sorting (e.g., "jaw1" -> 1, "jaw10" -> 10)
+      const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+      const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+      return numA - numB;
+    });
   }
 
   /**
@@ -166,7 +171,12 @@ class PortraitAssetService {
       }
     });
 
-    return eyes.sort();
+    return eyes.sort((a, b) => {
+      // Extract numeric part for numeric sorting (e.g., "eye1" -> 1, "eye10" -> 10)
+      const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+      const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+      return numA - numB;
+    });
   }
 
   /**
@@ -185,7 +195,12 @@ class PortraitAssetService {
       }
     });
 
-    return faces.sort();
+    return faces.sort((a, b) => {
+      // Extract numeric part for numeric sorting (e.g., "face1" -> 1, "face10" -> 10)
+      const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+      const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+      return numA - numB;
+    });
   }
 
   /**
@@ -207,7 +222,22 @@ class PortraitAssetService {
       }
     });
 
-    return beards.sort();
+    return beards.sort((a, b) => {
+      // Extract jaw and beard numbers for numeric sorting (e.g., "jaw1_beard1" -> jaw: 1, beard: 1)
+      const matchA = a.match(/jaw(\d+)_beard(\d+)/);
+      const matchB = b.match(/jaw(\d+)_beard(\d+)/);
+      if (!matchA || !matchB) return a.localeCompare(b); // Fallback to string sort if format doesn't match
+      
+      const jawA = parseInt(matchA[1], 10);
+      const jawB = parseInt(matchB[1], 10);
+      if (jawA !== jawB) {
+        return jawA - jawB; // Sort by jaw first
+      }
+      
+      const beardA = parseInt(matchA[2], 10);
+      const beardB = parseInt(matchB[2], 10);
+      return beardA - beardB; // Then sort by beard number
+    });
   }
 
   /**
@@ -238,7 +268,19 @@ class PortraitAssetService {
       }
     });
 
-    return Array.from(hairs).sort();
+    return Array.from(hairs).sort((a, b) => {
+      // Extract numeric part for numeric sorting (e.g., "m1" -> 1, "m10" -> 10, "f1" -> 1)
+      // Handle both "m1", "f1", "hair1" formats
+      const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
+      const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
+      // First sort by prefix (f, m, hair), then by number
+      const prefixA = a.match(/^(f|m|hair)/)?.[0] || "";
+      const prefixB = b.match(/^(f|m|hair)/)?.[0] || "";
+      if (prefixA !== prefixB) {
+        return prefixA.localeCompare(prefixB);
+      }
+      return numA - numB;
+    });
   }
 
   /**
@@ -403,7 +445,7 @@ class PortraitAssetService {
       eyes: options.eyes[0] || "eye1", // Use "eye1" to match assetmaker
       eyes_color: "c1",
       face: options.face[0] || "face1",
-      beard: gender === "MALE" ? 1 : null, // Default to beard style 1 for males
+      beard: null, // Default to no beard - user can enable it via checkbox
       hair_top: `${hairPrefix}${defaultHairNum}_top`, // f1_top or m1_top
       hair_bot: `${hairPrefix}${defaultHairNum}_bot`, // f1_bot or m1_bot
       hair_color: "c1",
