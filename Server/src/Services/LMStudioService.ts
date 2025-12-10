@@ -7,15 +7,36 @@
 
 import Report from "../Utils/Reporter";
 
+export interface LMStudioTool {
+  type: "function";
+  function: {
+    name: string;
+    description: string;
+    parameters: {
+      type: "object";
+      properties: Record<string, any>;
+      required?: string[];
+    };
+  };
+}
+
 export interface LMStudioRequest {
   prompt: string; // Combined prompt: NPC prompt + memory + user message
   npcId: string;
   npcName: string;
+  tools?: LMStudioTool[]; // Optional tools for tool calling
+}
+
+export interface LMStudioToolCall {
+  id: string;
+  name: string;
+  arguments: Record<string, any>;
 }
 
 export interface LMStudioResponse {
   success: boolean;
   response: string; // NPC's response text
+  toolCalls?: LMStudioToolCall[]; // Tool calls if LLM decided to use tools
   error?: string;
 }
 
@@ -56,29 +77,52 @@ export async function callLMStudio(
     // Split prompt into system and user messages
     // The prompt format is: "NPC Character: ...\n\nRecent news...\n\nPlayer says: ...\n\nRespond naturally..."
     // We'll use the entire prompt as the user message, and add a system message for context
-    const systemMessage = `You are ${request.npcName}, a character in this world. Respond naturally and in character based on the context provided. Keep responses concise and engaging.`;
+    let systemMessage = `You are ${request.npcName}, a character in this world. 
+
+CRITICAL: Stay in character at all times. Your character has boundaries, values, and the right to refuse inappropriate requests. If someone makes threats, sexual advances, or disrespects you, respond assertively and in character. Do NOT be overly accommodating to inappropriate behavior - maintain your character's dignity and boundaries.
+
+Respond naturally and in character based on the context provided. Keep responses concise and engaging (2-4 sentences).`;
+
+    // Add tool calling instructions if tools are available
+    if (request.tools && request.tools.length > 0) {
+      systemMessage += `\n\nIMPORTANT: You have access to tools/actions. When the player asks you to join their party, go on an adventure together, or requests you to be part of their group, you MUST call the checkJoinParty tool BEFORE responding. Do not just agree or decline - use the tool to check the requirements first.`;
+    }
     
+    const requestBody: any = {
+      model: LM_STUDIO_MODEL,
+      messages: [
+        {
+          role: "system",
+          content: systemMessage,
+        },
+        {
+          role: "user",
+          content: request.prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 500,
+      stream: false,
+    };
+
+    // Add tools if provided
+    if (request.tools && request.tools.length > 0) {
+      requestBody.tools = request.tools;
+      requestBody.tool_choice = "auto"; // Let LLM decide when to use tools
+      
+      Report.debug("Tools included in LM Studio request", {
+        npcId: request.npcId,
+        toolCount: request.tools.length,
+        toolNames: request.tools.map(t => t.function.name),
+      });
+    }
+
     const response = await fetch(`${LM_STUDIO_BASE_URL}/v1/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: LM_STUDIO_MODEL,
-        messages: [
-          {
-            role: "system",
-            content: systemMessage,
-          },
-          {
-            role: "user",
-            content: request.prompt,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-        stream: false,
-      }),
+      body: JSON.stringify(requestBody),
       signal: AbortSignal.timeout(LM_STUDIO_TIMEOUT),
     });
 
@@ -111,10 +155,38 @@ export async function callLMStudio(
     }
 
     // Extract response content
-    const npcResponse = data.choices[0]?.message?.content?.trim() || "";
+    const message = data.choices[0]?.message;
+    const npcResponse = (message?.content || "").trim();
+    const toolCalls = (message as any)?.tool_calls;
 
-    if (!npcResponse) {
-      Report.warn("LM Studio returned empty response", {
+    // Parse tool calls if present
+    let parsedToolCalls: LMStudioToolCall[] | undefined;
+    if (toolCalls && toolCalls.length > 0) {
+      parsedToolCalls = toolCalls.map((tc: {
+        id: string;
+        type: string;
+        function: {
+          name: string;
+          arguments: string;
+        };
+      }) => ({
+        id: tc.id,
+        name: tc.function.name,
+        arguments: JSON.parse(tc.function.arguments),
+      }));
+
+      if (parsedToolCalls) {
+        Report.info("LM Studio returned tool calls", {
+          npcId: request.npcId,
+          toolCallCount: parsedToolCalls.length,
+          toolNames: parsedToolCalls.map((tc) => tc.name),
+        });
+      }
+    }
+
+    // If no content and no tool calls, that's an error
+    if (!npcResponse && (!parsedToolCalls || parsedToolCalls.length === 0)) {
+      Report.warn("LM Studio returned empty response and no tool calls", {
         npcId: request.npcId,
         data,
       });
@@ -128,11 +200,26 @@ export async function callLMStudio(
     Report.info("LM Studio API call successful", {
       npcId: request.npcId,
       responseLength: npcResponse.length,
+      hasToolCalls: !!parsedToolCalls && parsedToolCalls.length > 0,
+      toolCallCount: parsedToolCalls?.length || 0,
+      toolsProvided: request.tools?.length || 0,
+      toolNames: request.tools?.map(t => t.function.name) || [],
     });
+    
+    // Warn if tools were provided but not used
+    if (request.tools && request.tools.length > 0 && (!parsedToolCalls || parsedToolCalls.length === 0)) {
+      Report.warn("Tools were provided but LLM did not call any", {
+        npcId: request.npcId,
+        toolsProvided: request.tools.length,
+        toolNames: request.tools.map(t => t.function.name),
+        responsePreview: npcResponse.substring(0, 100),
+      });
+    }
 
     return {
       success: true,
       response: npcResponse,
+      toolCalls: parsedToolCalls,
     };
   } catch (error) {
     Report.error("LM Studio call failed", {

@@ -120,6 +120,27 @@
       "when": 1736402400000,
       "tag": "0016_create_npc_memory_table",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1736406000000,
+      "tag": "0017_create_chat_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1736409600000,
+      "tag": "0019_create_npc_summary_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1736413200000,
+      "tag": "0020_add_last_summarized_exchange",
+      "breakpoints": true
     }
   ]
 }

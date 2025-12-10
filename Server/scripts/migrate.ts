@@ -20,10 +20,17 @@ async function runMigrations() {
   const db = drizzle(pool);
 
   try {
+    // Run migrations - Drizzle will automatically:
+    // 1. Check which migrations have been run (via __drizzle_migrations table)
+    // 2. Run only the new migrations
+    // 3. Record their hashes in the database
     await migrate(db, { migrationsFolder: "./src/Database/migrations" });
     console.log("✅ Migrations completed successfully");
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Migration failed:", error);
+    console.error("\n💡 If migrations are out of sync, you may need to:");
+    console.error("   1. Check migration status: bun run scripts/check-migration-status.ts");
+    console.error("   2. Fix tracking: bun run scripts/run-missing-migrations.ts");
     process.exit(1);
   } finally {
     await pool.end();

@@ -20,6 +20,7 @@ import { locationRoutes } from "./API/location";
 import { newsRoutes } from "./API/news";
 import { updateTitleRoutes } from "./API/character/updateTitle";
 import { chatRoutes } from "./API/chat";
+import { battleRoutes } from "./API/battle";
 import { websocketRoutes } from "./API/websocket";
 
 dotenv.config();
@@ -68,6 +69,7 @@ async function startServer() {
           .use(newsRoutes)
           .use(updateTitleRoutes)
           .use(chatRoutes)
+          .use(battleRoutes)
       )
       // Global error handler
       .onError(({ code, error, set }) => {

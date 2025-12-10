@@ -8,6 +8,8 @@
 import { db } from "../Database/connection";
 import { npcCharacterRelations } from "../Database/Schema";
 import { eq, and } from "drizzle-orm";
+import { summarizeRelationship } from "./LLMSummarizationService";
+import { getChatHistoryForAI } from "./ChatHistoryService";
 import Report from "../Utils/Reporter";
 
 export interface NPCImpression {
@@ -16,6 +18,8 @@ export interface NPCImpression {
   relationTitle: string | null;
   lastConversationSummary: string | null;
   importantEvents: any[];
+  conversationCount: number;
+  lastSummarizedExchange: number;
 }
 
 /**
@@ -42,13 +46,15 @@ export async function getNPCImpression(
       return null;
     }
 
-    return {
-      affection: relation.affection,
-      closeness: relation.closeness,
-      relationTitle: relation.relationTitle,
-      lastConversationSummary: relation.lastConversationSummary,
-      importantEvents: (relation.importantEvents as any[]) || [],
-    };
+      return {
+        affection: relation.affection,
+        closeness: relation.closeness,
+        relationTitle: relation.relationTitle,
+        lastConversationSummary: relation.lastConversationSummary,
+        importantEvents: (relation.importantEvents as any[]) || [],
+        conversationCount: relation.conversationCount,
+        lastSummarizedExchange: relation.lastSummarizedExchange || 0,
+      };
   } catch (error) {
     Report.error("Error getting NPC impression", {
       error: error instanceof Error ? error.message : String(error),
@@ -81,7 +87,7 @@ export async function getOrCreateNPCRelation(
         characterId,
         affection: 0,
         closeness: 0,
-        relationTitle: null,
+        relationTitle: "stranger",
         conversationCount: 0,
       })
       .returning();
@@ -91,13 +97,15 @@ export async function getOrCreateNPCRelation(
       characterId,
     });
 
-    return {
-      affection: newRelation.affection,
-      closeness: newRelation.closeness,
-      relationTitle: newRelation.relationTitle,
-      lastConversationSummary: newRelation.lastConversationSummary,
-      importantEvents: (newRelation.importantEvents as any[]) || [],
-    };
+          return {
+            affection: newRelation?.affection || 0,
+            closeness: newRelation?.closeness || 0,
+            relationTitle: newRelation?.relationTitle || "stranger",
+            lastConversationSummary: newRelation?.lastConversationSummary || null,
+            importantEvents: (newRelation?.importantEvents as any[]) || [],
+            conversationCount: newRelation?.conversationCount || 0,
+            lastSummarizedExchange: newRelation?.lastSummarizedExchange || 0,
+          };
   } catch (error) {
     Report.error("Error getting or creating NPC relation", {
       error: error instanceof Error ? error.message : String(error),
@@ -105,13 +113,63 @@ export async function getOrCreateNPCRelation(
       characterId,
     });
     // Return default impression on error
-    return {
-      affection: 0,
-      closeness: 0,
-      relationTitle: null,
-      lastConversationSummary: null,
-      importantEvents: [],
-    };
+          return {
+            affection: 0,
+            closeness: 0,
+            relationTitle: "stranger",
+            lastConversationSummary: null,
+            importantEvents: [],
+            conversationCount: 0,
+            lastSummarizedExchange: 0,
+          };
+  }
+}
+
+/**
+ * Summarize relationship using LLM
+ * Generates a summary of how the NPC views the character
+ */
+export async function summarizeRelationshipImpression(
+  npcId: string,
+  characterId: string
+): Promise<string | null> {
+  try {
+    const relation = await getNPCImpression(npcId, characterId);
+    if (!relation) {
+      return null;
+    }
+
+    // Get recent conversation summary
+    const conversationSummary = relation.lastConversationSummary;
+    const importantEvents = relation.importantEvents || [];
+
+    // Get recent chat history for context
+    const recentHistory = await getChatHistoryForAI(npcId, characterId, 5);
+
+    // Generate relationship summary using LLM
+    const summary = await summarizeRelationship(
+      npcId,
+      characterId,
+      relation,
+      conversationSummary,
+      importantEvents
+    );
+
+    if (summary) {
+      // Update the relation with the new summary
+      await updateNPCRelation(npcId, characterId, {
+        lastConversationSummary: summary,
+      });
+    }
+
+    return summary || null;
+  } catch (error) {
+    Report.error("Error summarizing relationship impression", {
+      error: error instanceof Error ? error.message : String(error),
+      npcId,
+      characterId,
+    });
+    return null;
   }
 }
 
@@ -127,6 +185,7 @@ export async function updateNPCRelation(
     relationTitle?: string | null;
     lastConversationSummary?: string | null;
     addImportantEvent?: any;
+    lastSummarizedExchange?: number;
   }
 ): Promise<void> {
   try {
@@ -152,6 +211,9 @@ export async function updateNPCRelation(
     }
     if (updates.lastConversationSummary !== undefined) {
       updateData.lastConversationSummary = updates.lastConversationSummary;
+    }
+    if (updates.lastSummarizedExchange !== undefined) {
+      updateData.lastSummarizedExchange = updates.lastSummarizedExchange;
     }
     if (updates.addImportantEvent) {
       // Get current events and add new one

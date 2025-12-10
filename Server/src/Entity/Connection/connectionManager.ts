@@ -62,6 +62,19 @@ class ConnectionManager {
     return null;
   }
 
+  /**
+   * Get context by WebSocket connection
+   * Used to get user context from WebSocket messages
+   */
+  getContextByWebSocket(ws: WebSocket): ClientContext | null {
+    for (const connection of this.connections.values()) {
+      if (connection.ws === ws) {
+        return connection.context;
+      }
+    }
+    return null;
+  }
+
   private isMatch(scope: NewsScope, context: ClientContext): boolean {
     switch (scope.kind) {
       case "worldScope":

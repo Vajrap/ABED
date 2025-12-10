@@ -6,6 +6,9 @@ import { partyManager } from "../../Game/PartyManager";
 import { locationManager } from "../../Entity/Location/Manager/LocationManager";
 import { connectionManager } from "../../Entity/Connection/connectionManager";
 import type { ClientContext } from "../../Entity/Connection/connectionManager";
+import { PartyService } from "../../Services/PartyService";
+import { getPendingConfirmation, handleMCPResponse } from "../../Services/MCPConfirmationService";
+import { handleBattleConfirmation } from "../../Services/BattleInitiationService";
 
 /**
  * WebSocket API Routes
@@ -110,17 +113,36 @@ export const websocketRoutes = new Elysia({ prefix: "/ws" })
 
     /**
      * Handle incoming WebSocket messages
-     * For now, just log them (future: bidirectional communication)
+     * Handles confirmation responses for party invitations and battles
      */
-    message(ws, message) {
+    async message(ws, message) {
       try {
         // Parse message if it's a string
         const data = typeof message === "string" ? JSON.parse(message) : message;
         Report.debug("WebSocket message received", { data });
-        
-        // TODO: Handle different message types (ping, chat, etc.)
+
+        // Get user context from connection
+        const context = connectionManager.getContextByWebSocket(ws as any);
+        if (!context) {
+          Report.warn("WebSocket message received but no context found");
+          return;
+        }
+
+        // Handle different message types
+        switch (data.type) {
+          case "PARTY_INVITATION_RESPONSE":
+            await handlePartyInvitationResponse(data, context);
+            break;
+          
+          case "BATTLE_INITIATION_RESPONSE":
+            await handleBattleInitiationResponse(data, context);
+            break;
+          
+          default:
+            Report.debug("Unknown WebSocket message type", { type: data.type });
+        }
       } catch (error) {
-        Report.warn("Failed to parse WebSocket message", {
+        Report.error("Failed to handle WebSocket message", {
           error: error instanceof Error ? error.message : String(error),
         });
       }
@@ -146,4 +168,122 @@ export const websocketRoutes = new Elysia({ prefix: "/ws" })
       }
     },
   });
+
+/**
+ * Handle party invitation response from client
+ */
+async function handlePartyInvitationResponse(
+  data: { requestId: string; confirmed: boolean },
+  context: ClientContext
+) {
+  try {
+    Report.info("Party invitation response received", {
+      userId: context.userId,
+      requestId: data.requestId,
+      confirmed: data.confirmed,
+    });
+
+    // Get the confirmation request
+    const request = getPendingConfirmation(data.requestId);
+    if (!request) {
+      Report.warn("Party invitation request not found", { requestId: data.requestId });
+      return;
+    }
+
+    if (!data.confirmed) {
+      Report.info("Party invitation declined", {
+        userId: context.userId,
+        npcId: request.npcId,
+      });
+      return;
+    }
+
+    // Get player character
+    const player = characterManager.getUserCharacterByUserId(context.userId);
+    if (!player || !player.partyID) {
+      Report.warn("Player character or party not found", {
+        userId: context.userId,
+      });
+      return;
+    }
+
+    // Process payment if required
+    if (request.amount && request.amount > 0) {
+      // TODO: Deduct gold from player inventory
+      // For now, we'll just log it
+      Report.info("Processing payment for party invitation", {
+        userId: context.userId,
+        amount: request.amount,
+        currency: request.currency,
+      });
+    }
+
+    // Add NPC to party
+    const added = PartyService.addNPCToParty(player.partyID, request.npcId);
+    
+    if (added) {
+      Report.info("NPC added to party via invitation", {
+        userId: context.userId,
+        npcId: request.npcId,
+        partyId: player.partyID,
+      });
+
+      // Send confirmation to client
+      const connection = connectionManager.getConnectionByUserId(context.userId);
+      if (connection) {
+        connection.ws.send(JSON.stringify({
+          type: "PARTY_INVITATION_CONFIRMED",
+          npcId: request.npcId,
+          npcName: request.npcName,
+          message: `${request.npcName} has joined your party!`,
+        }));
+      }
+    } else {
+      Report.warn("Failed to add NPC to party", {
+        userId: context.userId,
+        npcId: request.npcId,
+      });
+    }
+  } catch (error) {
+    Report.error("Error handling party invitation response", {
+      error: error instanceof Error ? error.message : String(error),
+      context,
+    });
+  }
+}
+
+/**
+ * Handle battle initiation response from client
+ */
+async function handleBattleInitiationResponse(
+  data: { requestId: string; confirmed: boolean },
+  context: ClientContext
+) {
+  try {
+    Report.info("Battle initiation response received", {
+      userId: context.userId,
+      requestId: data.requestId,
+      confirmed: data.confirmed,
+    });
+
+    const result = await handleBattleConfirmation(data.requestId, data.confirmed);
+    
+    if (result && result.confirmed && result.battleId) {
+      // Send battle started notification to client
+      const connection = connectionManager.getConnectionByUserId(context.userId);
+      if (connection) {
+        connection.ws.send(JSON.stringify({
+          type: "BATTLE_STARTED",
+          battleId: result.battleId,
+          message: "Battle has begun!",
+        }));
+      }
+    }
+  } catch (error) {
+    Report.error("Error handling battle initiation response", {
+      error: error instanceof Error ? error.message : String(error),
+      context,
+    });
+  }
+}
 

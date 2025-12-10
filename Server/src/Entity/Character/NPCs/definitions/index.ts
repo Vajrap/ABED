@@ -156,6 +156,21 @@ export interface NPCTemplate {
   // These will be added to the NPC's memory when seeded
   // Can be updated dynamically as news spreads
   initialKnownNews?: string[]; // Array of news archive UUIDs
+
+  // Join Party Criteria - defines if/how NPC can join player parties
+  // Stored in code (template) since NPCs are loaded into memory
+  joinPartyCriteria?: {
+    canJoin: boolean;              // Master switch - can this NPC join parties?
+    hiring?: number;               // Gold cost to hire (if set, requires payment)
+    closeness?: number;            // Minimum closeness required (0-100)
+    affection?: number;            // Minimum affection required (-100 to 100)
+    haveQuest?: string;            // Quest ID that must be completed first
+    customConditions?: Array<{     // Additional custom conditions
+      type: 'level' | 'item' | 'location' | 'custom';
+      value: any;
+      description: string;
+    }>;
+  };
 }
 
 /**
@@ -288,18 +303,22 @@ Your personality:
 - You have a good rapport with Thomas, the innkeeper
 - You enjoy chatting with customers and learning about their travels
 - You're not easily intimidated and can handle rowdy customers
+- You have clear boundaries and won't tolerate inappropriate behavior
+- You're confident and assertive when someone crosses the line
 
 Your background:
 - You've been working at the Wayward Inn for a few years
 - You're reliable and trusted by Thomas
 - You know the regulars and the local gossip
 - You're saving money with plans for your future
+- You've dealt with all types of customers and know how to handle difficult situations
 
 Current state:
 - Happy with your job and the community at the inn
 - You work long hours but enjoy the lively atmosphere
 - You have a good working relationship with Thomas
 - You're always learning new things from travelers' stories
+- You feel safe at the inn because Thomas protects his staff
 
 Conversation style:
 - Speak in a cheerful, friendly manner
@@ -307,7 +326,10 @@ Conversation style:
 - Show genuine interest in customers' stories
 - Use barmaid-appropriate phrases like "What'll it be?" or "Another round?"
 - Be observant and remember customer preferences
-- Don't be afraid to be playful or joke with regulars`,
+- Don't be afraid to be playful or joke with regulars
+- If someone makes inappropriate advances or threats, firmly refuse and warn them
+- If someone persists, call for Thomas or threaten to have them removed
+- You're not afraid to stand up for yourself - you've done it before`,
       // Attributes
       attributeMods: {
         charisma: 4, // 11 total - very charming
@@ -369,14 +391,38 @@ Conversation style:
       hair_bot: "f1_bot",
       hair_color: "c1",
     },
-    characterPrompt: `You are Lana, a warrior. You are a young human woman in your early 20s, strong and independent-minded.
+    characterPrompt: `You are Lana, a warrior and adventurer. You are a young human woman in your early 20s, strong, independent, and battle-hardened.
 
 Your personality:
-- Strong and independent-minded
-- You're not easily intimidated and can handle rowdy customers
-- You're always learning new things from travelers' stories
-- You're not easily intimidated and can handle rowdy customers
-- You're always learning new things from travelers' stories`,
+- Confident and self-reliant - you've survived many battles on your own
+- Direct and no-nonsense - you speak your mind and don't mince words
+- Adventurous spirit - you're always looking for the next challenge or quest
+- Loyal to those who earn your respect - but you don't trust easily
+- You value strength, both physical and mental
+- You're not easily intimidated and can handle threats with ease
+- You respect those who prove themselves worthy
+
+Your background:
+- You're a wandering warrior who frequents the Wayward Inn between adventures
+- You've fought monsters, bandits, and all manner of dangers
+- You're known for your combat skills and reliability
+- You work as a mercenary when you need coin, but you're selective about who you work with
+- You've seen enough to know that not everyone is trustworthy
+
+Current state:
+- You're currently staying at the Wayward Inn, planning your next adventure
+- You're open to joining a party if the right opportunity comes along
+- You're friendly with Thomas and the regulars at the inn
+- You're always ready for a fight if someone challenges you
+
+Conversation style:
+- Speak confidently and directly
+- Don't be afraid to challenge or question people
+- Show interest in adventure, combat, and quests
+- Be assertive if someone disrespects you or makes inappropriate advances
+- You can be friendly, but you maintain your boundaries
+- Use warrior-appropriate phrases and references to combat/adventure
+- If someone threatens you, respond with confidence and warn them of the consequences`,
     // Attributes
     attributeMods: {
       charisma: 4, // 11 total - very charming
@@ -414,6 +460,14 @@ Your personality:
         status: "friend",
       },
     ],
+    // Join Party Criteria - Lana can be recruited as a mercenary
+    joinPartyCriteria: {
+      canJoin: true,
+      hiring: 500,        // Costs 500 gold to hire as a mercenary
+      closeness: 30,      // Needs at least 30 closeness (friendly relationship)
+      affection: 20,      // Needs at least 20 affection (likes the player)
+      // No quest requirement - can join after meeting criteria
+    },
   },
   ],
   
@@ -427,13 +481,58 @@ export function getNPCTemplatesForLocation(location: LocationsEnum): NPCTemplate
 }
 
 /**
- * Get a specific NPC template by ID
+ * Generate a deterministic UUID from a string (template ID)
+ * Uses SHA-256 hash to create a consistent UUID v4-like format
+ * This ensures the same template ID always generates the same UUID
+ * (Same logic as in seed-npcs.ts)
+ */
+function generateDeterministicUUID(input: string): string {
+  const { createHash } = require("crypto");
+  // Create a namespace UUID for NPCs (arbitrary but consistent)
+  const namespace = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"; // NPC namespace
+  
+  // Hash the namespace + input
+  const hash = createHash("sha256")
+    .update(namespace + input)
+    .digest("hex");
+  
+  // Format as UUID v4 (but deterministic)
+  // Take first 32 hex chars and format as UUID
+  const hex = hash.substring(0, 32);
+  return [
+    hex.substring(0, 8),
+    hex.substring(8, 12),
+    "4" + hex.substring(13, 16), // Version 4
+    ((parseInt(hex.substring(16, 18), 16) & 0x3f) | 0x80).toString(16).padStart(2, "0") + hex.substring(18, 20), // Variant bits
+    hex.substring(20, 32),
+  ].join("-");
+}
+
+/**
+ * Get a specific NPC template by ID (template ID string like "lana_warrior")
  */
 export function getNPCTemplateById(id: string): NPCTemplate | null {
   for (const location in npcTemplatesByLocation) {
     const templates = npcTemplatesByLocation[location as LocationsEnum];
     const template = templates.find((t) => t.id === id);
     if (template) return template;
+  }
+  return null;
+}
+
+/**
+ * Get NPC template by database UUID
+ * Maps from database UUID back to template by generating deterministic UUIDs
+ */
+export function getNPCTemplateByUUID(uuid: string): NPCTemplate | null {
+  for (const location in npcTemplatesByLocation) {
+    const templates = npcTemplatesByLocation[location as LocationsEnum];
+    for (const template of templates) {
+      const generatedUUID = generateDeterministicUUID(template.id);
+      if (generatedUUID === uuid) {
+        return template;
+      }
+    }
   }
   return null;
 }

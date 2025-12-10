@@ -5,6 +5,7 @@ import type { Character } from "../Entity/Character/Character";
 import { Party } from "../Entity/Party/Party";
 import { PartyBehavior } from "../Entity/Party/PartyBehavior";
 import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
+import { partyManager } from "../Game/PartyManager";
 import Report from "../Utils/Reporter";
 
 export class PartyService {
@@ -99,5 +100,146 @@ export class PartyService {
       .where(eq(parties.partyID, partyID));
 
     Report.info(`Party updated: ${partyID}`);
+  }
+
+  /**
+   * Add NPC to party
+   * Returns true if successful, false if party is full or NPC already in party
+   */
+  static addNPCToParty(partyId: string, npcId: string): boolean {
+    try {
+      const party = partyManager.getPartyByID(partyId);
+      if (!party) {
+        Report.warn("Party not found", { partyId });
+        return false;
+      }
+
+      // Check if NPC is already in party
+      const existingIndex = party.characters.findIndex(
+        (char) => char !== "none" && char.id === npcId
+      );
+      if (existingIndex !== -1) {
+        Report.warn("NPC already in party", { partyId, npcId });
+        return false;
+      }
+
+      // Find first empty slot
+      const emptyIndex = party.characters.findIndex((char) => char === "none");
+      if (emptyIndex === -1) {
+        Report.warn("Party is full", { partyId });
+        return false;
+      }
+
+      // Get NPC character
+      const { characterManager } = require("../Game/CharacterManager");
+      const npc = characterManager.getCharacterByID(npcId);
+      if (!npc) {
+        Report.warn("NPC not found", { npcId });
+        return false;
+      }
+
+      // Add NPC to party
+      party.characters[emptyIndex] = npc;
+      npc.partyID = partyId;
+      npc.location = party.location;
+
+      // Recalculate party behavior
+      party.setup();
+
+      // Update in database
+      const insertParty = this.partyToInsertParty(party);
+      this.updateParty(partyId, insertParty).catch((error) => {
+        Report.error("Failed to update party in database", { error, partyId });
+      });
+
+      Report.info("NPC added to party", { partyId, npcId, slot: emptyIndex });
+      return true;
+    } catch (error) {
+      Report.error("Error adding NPC to party", {
+        error: error instanceof Error ? error.message : String(error),
+        partyId,
+        npcId,
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Remove NPC from party
+   * Returns true if successful, false if NPC not in party
+   */
+  static removeNPCFromParty(partyId: string, npcId: string): boolean {
+    try {
+      const party = partyManager.getPartyByID(partyId);
+      if (!party) {
+        Report.warn("Party not found", { partyId });
+        return false;
+      }
+
+      // Find NPC in party
+      const npcIndex = party.characters.findIndex(
+        (char) => char !== "none" && char.id === npcId
+      );
+      if (npcIndex === -1) {
+        Report.warn("NPC not in party", { partyId, npcId });
+        return false;
+      }
+
+      // Don't allow removing the leader
+      if (party.leader.id === npcId) {
+        Report.warn("Cannot remove party leader", { partyId, npcId });
+        return false;
+      }
+
+      // Remove NPC from party
+      const npc = party.characters[npcIndex];
+      party.characters[npcIndex] = "none";
+      
+      if (npc !== "none") {
+        npc.partyID = null;
+        // Keep location for now - NPC might stay in same location
+      }
+
+      // Recalculate party behavior
+      party.setup();
+
+      // Update in database
+      const insertParty = this.partyToInsertParty(party);
+      this.updateParty(partyId, insertParty).catch((error) => {
+        Report.error("Failed to update party in database", { error, partyId });
+      });
+
+      Report.info("NPC removed from party", { partyId, npcId });
+      return true;
+    } catch (error) {
+      Report.error("Error removing NPC from party", {
+        error: error instanceof Error ? error.message : String(error),
+        partyId,
+        npcId,
+      });
+      return false;
+    }
+  }
+
+  /**
+   * Validate party size
+   * Returns true if party has space, false if full
+   */
+  static validatePartySize(partyId: string): boolean {
+    try {
+      const party = partyManager.getPartyByID(partyId);
+      if (!party) {
+        return false;
+      }
+
+      const emptySlots = party.characters.filter((char) => char === "none").length;
+      return emptySlots > 0;
+    } catch (error) {
+      Report.error("Error validating party size", {
+        error: error instanceof Error ? error.message : String(error),
+        partyId,
+      });
+      return false;
+    }
   }
 }

@@ -22,6 +22,7 @@ export const npcCharacterRelations = pgTable("npc_character_relations", {
   lastConversationSummary: text("last_conversation_summary"), // Summary of recent conversations
   importantEvents: jsonb("important_events").default([]).notNull(), // Array of significant events/interactions
   conversationCount: integer("conversation_count").default(0).notNull(), // Total number of conversations
+  lastSummarizedExchange: integer("last_summarized_exchange").default(0).notNull(), // Exchange count when last summarized (for tracking)
   
   // Timestamps
   firstMetAt: timestamp("first_met_at").defaultNow().notNull(),
