@@ -8,6 +8,9 @@ export * from "./item_instances";
 export * from "./game_state";
 export * from "./market_state";
 export * from "./resource_production_tracking";
+export * from "./npc_memory";
+export * from "./chat";
+export * from "./npc_character_relation";
 
 // Export database tables for migrations and queries
 export { users } from "./user";
@@ -20,6 +23,9 @@ export { itemInstances } from "./item_instances";
 export { gameState } from "./game_state";
 export { marketState } from "./market_state";
 export { resourceProductionTracking } from "./resource_production_tracking";
+export { npcMemory } from "./npc_memory";
+export { chatRooms, chatLogs, publicChatLogs } from "./chat";
+export { npcCharacterRelations } from "./npc_character_relation";
 
 // Re-export types for convenience
 export type { User, InsertUser } from "./user";
@@ -31,3 +37,6 @@ export type { ItemInstance, InsertItemInstance } from "./item_instances";
 export type { GameStateDB, InsertGameState } from "./game_state";
 export type { MarketStateDB, InsertMarketState } from "./market_state";
 export type { ResourceProductionTrackingDB, InsertResourceProductionTracking } from "./resource_production_tracking";
+export type { NPCMemory, InsertNPCMemory } from "./npc_memory";
+export type { ChatRoom, InsertChatRoom, ChatLog, InsertChatLog, PublicChatLog, InsertPublicChatLog } from "./chat";
+export type { NPCCharacterRelation, InsertNPCCharacterRelation } from "./npc_character_relation";

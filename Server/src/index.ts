@@ -14,10 +14,13 @@ import dotenv from "dotenv";
 import { characterCreationRoutes } from "./API/characterCreation";
 import { loginRoutes } from "./API/login";
 import { registerRoutes } from "./API/register";
+import { authRoutes } from "./API/auth";
 import { partyRoutes } from "./API/party";
 import { locationRoutes } from "./API/location";
 import { newsRoutes } from "./API/news";
 import { updateTitleRoutes } from "./API/character/updateTitle";
+import { chatRoutes } from "./API/chat";
+import { websocketRoutes } from "./API/websocket";
 
 dotenv.config();
 
@@ -51,16 +54,20 @@ async function startServer() {
       .get("/api/health", () => {
         return { status: "ok", message: "Server is running" };
       })
+      // WebSocket routes (mounted at root, not under /api)
+      .use(websocketRoutes)
       // Mount API routes under /api prefix
       .group("/api", (app) => 
         app
           .use(loginRoutes)
           .use(registerRoutes)
+          .use(authRoutes)
           .use(characterCreationRoutes)
           .use(partyRoutes)
           .use(locationRoutes)
           .use(newsRoutes)
           .use(updateTitleRoutes)
+          .use(chatRoutes)
       )
       // Global error handler
       .onError(({ code, error, set }) => {

@@ -97,14 +97,6 @@ export const newsRoutes = new Elysia({ prefix: "/news" })
         }
       );
 
-      Report.info("Returning news for user", {
-        userId: user.id,
-        characterId: character.id,
-        location,
-        allNewsCount: allNews.length,
-        unseenNewsCount: unseenNews.length,
-      });
-
       return {
         success: true,
         news: allNews,

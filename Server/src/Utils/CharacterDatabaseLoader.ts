@@ -22,6 +22,7 @@ import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import Report from "./Reporter";
 import { SkillId } from "src/Entity/Skill/enums";
 import { TraitEnum } from "src/Entity/Trait/enum";
+import { PortraitData } from "src/InterFacesEnumsAndTypes/PortraitData";
 
 /**
  * Load all characters from database into CharacterManager
@@ -192,7 +193,7 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
     type: (record.type as CharacterType) || CharacterType.humanoid,
     gender: record.gender as "MALE" | "FEMALE" | "NONE",
     level: record.level,
-    portrait: record.portrait || undefined,
+    portrait: record.portrait as PortraitData || undefined,
     background: record.background || undefined,
     alignment,
     artisans,
@@ -216,6 +217,8 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
   character.partyID = record.partyID || null;
   character.location = ((record as any).location as LocationsEnum | undefined) || null;
   character.race = (record.race as any) || ""; // Restore race from database
+  // Note: characterPrompt is stored in DB but not loaded into Character entity yet
+  // This can be added to Character entity later if needed for runtime access
   character.title = title; // Use the restored title
 
   // Restore skills (database stores as JSONB, convert to Map)

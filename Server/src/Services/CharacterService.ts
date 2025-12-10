@@ -86,7 +86,7 @@ export class CharacterService {
     // Truncate all varchar fields to their schema limits
     const insertData: any = {
       id: character.id,
-      userId: character.userId!,
+      userId: character.userId, // Can be null for NPCs
       partyID: character.partyID,
 
       // Basic info - truncate all varchar fields
@@ -97,6 +97,7 @@ export class CharacterService {
       level: character.level,
       portrait: character.portrait,
       background: String(character.background || '').substring(0, 100),
+      characterPrompt: null, // Can be set for NPCs separately
       // location is excluded - will be added via migration later
 
       // Character systems - serialize to JSON

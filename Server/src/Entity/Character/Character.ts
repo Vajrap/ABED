@@ -185,6 +185,7 @@ export class Character {
     name: L10N;
     type: CharacterType;
     gender?: "MALE" | "FEMALE" | "NONE";
+    race?: RaceEnum;
     level: number;
     portrait?: PortraitData | string; // Support both new PortraitData and legacy string format
     background?: string;
@@ -209,6 +210,7 @@ export class Character {
     this.name = data.name;
     this.type = data.type;
     this.gender = data.gender || "NONE";
+    this.race = data.race || "";
     this.level = data.level;
     this.portrait = data.portrait || null;
     this.background = data.background || null;

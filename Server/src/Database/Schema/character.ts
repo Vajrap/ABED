@@ -4,7 +4,7 @@ import { users } from "./user";
 export const characters = pgTable("characters", {
   // Primary fields
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }), // Nullable for NPCs
   partyID: uuid("party_id"),
   location: varchar("location", { length: 100 }), // LocationsEnum - denormalized for quick access
   
@@ -16,6 +16,8 @@ export const characters = pgTable("characters", {
   level: integer("level").default(1).notNull(),
   portrait: jsonb("portrait"), // PortraitData object: { base, jaw, eyes, face, beard?, hair_top, hair_bot }
   background: varchar("background", { length: 100 }),
+  // Note: characterPrompt moved to npc_memory table for better organization and lazy loading
+  // Kept here temporarily for migration compatibility, but should use npc_memory table instead
   
   // Character systems (matching Character entity field names)
   alignment: jsonb("alignment").default({}).notNull(),

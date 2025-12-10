@@ -40,6 +40,28 @@ class ConnectionManager {
     return result;
   }
 
+  /**
+   * Get connection by userId
+   * Returns the WebSocket connection and context for a specific user
+   */
+  getConnectionByUserId(userId: string): { ws: WebSocket; context: ClientContext } | null {
+    const connection = this.connections.get(userId);
+    return connection || null;
+  }
+
+  /**
+   * Get userId by WebSocket connection
+   * Used to unregister connection on close
+   */
+  getUserIdByWebSocket(ws: WebSocket): string | null {
+    for (const [userId, connection] of this.connections.entries()) {
+      if (connection.ws === ws) {
+        return userId;
+      }
+    }
+    return null;
+  }
+
   private isMatch(scope: NewsScope, context: ClientContext): boolean {
     switch (scope.kind) {
       case "worldScope":

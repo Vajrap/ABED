@@ -1,51 +1,73 @@
-import express, { type Request, type Response } from 'express';
+import { Elysia } from "elysia";
 import Report from "../../Utils/Reporter";
 import { SessionService } from "../../Services/SessionService";
+import { CharacterService } from "../../Services/CharacterService";
 
-export const authRoutes = express.Router();
-
-authRoutes.post("/auto", async (req: Request, res: Response) => {
+export const authRoutes = new Elysia({ prefix: "/auth" })
+  .onError(({ code, error, set }) => {
+    if (code === "VALIDATION") {
+      Report.warn("Auth validation error", {
+        error: error.message,
+        code,
+      });
+      set.status = 400;
+      return { success: false, messageKey: "auth.validationError" };
+    }
+    // Log and handle other errors
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    Report.error("Auth route error", {
+      code,
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    set.status = 500;
+    return { success: false, messageKey: "auth.routeError" };
+  })
+  /**
+   * POST /api/auth/auto - Auto authentication (placeholder for JWT validation)
+   */
+  .post("/auto", async ({ body, headers, set }) => {
   Report.debug("Auth auto route hit", {
     route: "/auth/auto",
-    ip: req.ip,
   });
   try {
-    const { token } = req.body as { token: string };
+      const { token } = body as { token?: string };
 
     if (!token) {
-      return res.json({ success: false, messageKey: "auth.noToken" });
+        return { success: false, messageKey: "auth.noToken" };
     }
 
     // Validate the session token
     const user = await SessionService.validateSession(token);
 
     if (!user) {
-      return res.json({ success: false, messageKey: "auth.invalidSession" });
+        return { success: false, messageKey: "auth.invalidSession" };
     }
 
     Report.info(`Auto auth successful for user ${user.email}`);
     
-    return res.json({
+      return {
       success: true,
       user: {
         id: user.id,
         email: user.email,
         username: user.username
       }
-    });
+      };
   } catch (error) {
     Report.error(`Auto auth error: ${error}`);
-    return res.json({ success: false, messageKey: "auth.autoAuthFailed" });
+      return { success: false, messageKey: "auth.autoAuthFailed" };
   }
-});
-
-authRoutes.post("/logout", async (req: Request, res: Response) => {
+  })
+  /**
+   * POST /api/auth/logout - Logout user
+   */
+  .post("/logout", async ({ body, headers, set }) => {
   Report.debug("Auth logout route hit", {
     route: "/auth/logout",
-    ip: req.ip,
   });
   try {
-    const { token } = req.body as { token: string };
+      const { token } = body as { token?: string };
 
     if (token) {
       // Invalidate the session
@@ -58,9 +80,80 @@ authRoutes.post("/logout", async (req: Request, res: Response) => {
       }
     }
 
-    return res.json({ success: true });
+      return { success: true };
   } catch (error) {
     Report.error(`Logout error: ${error}`);
-    return res.json({ success: false, messageKey: "auth.logoutFailed" });
-  }
-});
+      return { success: false, messageKey: "auth.logoutFailed" };
+    }
+  })
+  /**
+   * POST /api/auth/check-character - Check if the authenticated user has a character
+   * Note: Uses POST instead of GET to allow Authorization header (more secure than query params)
+   */
+  .post("/check-character", async ({ headers, set, request }) => {
+    try {
+      Report.debug("Check character route hit", {
+        route: "/auth/check-character",
+        hasAuthHeader: !!headers.authorization,
+      });
+
+      const authHeader = headers.authorization;
+      if (!authHeader) {
+        Report.warn("Check character: No authorization header");
+        set.status = 401;
+        return { success: false, hasCharacter: false, messageKey: "auth.noToken" };
+      }
+
+      const token = authHeader.split(" ")[1];
+      if (!token) {
+        Report.warn("Check character: No token in authorization header");
+        set.status = 401;
+        return { success: false, hasCharacter: false, messageKey: "auth.noToken" };
+      }
+
+      // Validate the session token
+      const user = await SessionService.validateSession(token);
+
+      if (!user) {
+        Report.warn("Check character: Invalid session token");
+        set.status = 401;
+        return { success: false, hasCharacter: false, messageKey: "auth.invalidSession" };
+      }
+
+      // Check if user has a character
+      Report.debug("Check character: Checking for character", { userId: user.id });
+      let character;
+      try {
+        character = await CharacterService.getUserCharacter(user.id);
+      } catch (dbError) {
+        Report.error("Database error checking character", {
+          userId: user.id,
+          error: dbError instanceof Error ? dbError.message : String(dbError),
+          stack: dbError instanceof Error ? dbError.stack : undefined,
+        });
+        // If DB query fails, assume no character to be safe
+        character = null;
+      }
+      const hasCharacter = character !== null;
+
+      Report.debug("Check character result", {
+        userId: user.id,
+        hasCharacter,
+      });
+
+      return {
+        success: true,
+        hasCharacter,
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      Report.error("Check character error", {
+        error: errorMessage,
+        stack: errorStack,
+        fullError: error,
+      });
+      set.status = 500;
+      return { success: false, hasCharacter: false, messageKey: "auth.checkCharacterFailed" };
+    }
+  });

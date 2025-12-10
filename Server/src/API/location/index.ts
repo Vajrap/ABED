@@ -119,11 +119,6 @@ export const locationRoutes = new Elysia({ prefix: "/location" })
         gameTime, // Include current game time
       };
 
-      Report.info("Returning location for user", {
-        userId: user.id,
-        location: location.id,
-      });
-
       return {
         success: true,
         location: locationData,
@@ -134,6 +129,104 @@ export const locationRoutes = new Elysia({ prefix: "/location" })
       });
       set.status = 500;
       return { success: false, messageKey: "location.fetchFailed" };
+    }
+  })
+  /**
+   * GET /api/location/npcs
+   * Get all NPCs at the current location
+   */
+  .get("/npcs", async ({ headers, set }) => {
+    Report.debug("Location NPCs request received", {
+      route: "/location/npcs",
+    });
+
+    try {
+      // 1. Validate session
+      const authHeader = headers.authorization;
+      const token = authHeader?.split(" ")[1];
+      
+      if (!token) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.noToken" };
+      }
+
+      const user = await SessionService.validateSession(token);
+      if (!user) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.invalidSession" };
+      }
+
+      // 2. Get character from in-memory manager
+      const character = characterManager.getUserCharacterByUserId(user.id);
+      if (!character) {
+        Report.warn("Character not found for user", { userId: user.id });
+        set.status = 404;
+        return { success: false, messageKey: "character.notFound" };
+      }
+
+      // 3. Get party to find location
+      if (!character.partyID) {
+        Report.warn("Character has no party ID", { characterId: character.id });
+        set.status = 404;
+        return { success: false, messageKey: "party.notFound" };
+      }
+
+      // Import partyManager here to avoid circular dependencies
+      const { partyManager } = await import("../../Game/PartyManager");
+      const party = partyManager.getPartyByID(character.partyID);
+      if (!party) {
+        Report.warn("Party not found for character", {
+          characterId: character.id,
+          partyId: character.partyID,
+        });
+        set.status = 404;
+        return { success: false, messageKey: "party.notFound" };
+      }
+
+      // 4. Get location - prefer character location, fallback to party location
+      const locationId = character.location || party.location;
+      if (!locationId) {
+        Report.warn("No location found for character or party", { 
+          characterId: character.id,
+          partyId: party.partyID 
+        });
+        set.status = 404;
+        return { success: false, messageKey: "location.notFound" };
+      }
+
+      // 5. Get all NPCs at this location (characters with userId = null and matching location)
+      const allCharacters = characterManager.characters;
+      const locationNPCs = allCharacters.filter(
+        (char) => char.userId === null && char.location === locationId
+      );
+
+      // 6. Map NPCs to frontend-friendly format
+      const npcs = locationNPCs.map((npc) => {
+        const name = typeof npc.name === 'string' ? npc.name : npc.name?.en || npc.id;
+        return {
+          id: npc.id,
+          name,
+          portrait: npc.portrait,
+          level: npc.level,
+          race: npc.race,
+          gender: npc.gender,
+          background: npc.background || null,
+        };
+      });
+
+      Report.debug(`Found ${npcs.length} NPCs at location ${locationId}`);
+
+      return {
+        success: true,
+        npcs,
+        locationId,
+      };
+    } catch (error) {
+      Report.error("Location NPCs fetch error", {
+        error,
+      });
+      set.status = 500;
+      return { success: false, messageKey: "location.npcsFetchFailed" };
     }
   });
 

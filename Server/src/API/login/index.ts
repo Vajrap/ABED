@@ -85,13 +85,6 @@ export const loginRoutes = new Elysia({ prefix: "/login" })
         const character = await CharacterService.getUserCharacter(user.id);
         const hasCharacter = character !== null;
 
-        Report.info("User logged in successfully", {
-          userId: user.id,
-          username: user.username,
-          sessionId: session.id,
-          hasCharacter,
-        });
-
         set.status = 200;
         return {
           success: true,

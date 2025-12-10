@@ -99,6 +99,27 @@
       "when": 1736391600000,
       "tag": "0013_convert_portrait_to_jsonb",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1736395200000,
+      "tag": "0014_make_user_id_nullable_for_npcs",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1736398800000,
+      "tag": "0015_add_character_prompt",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1736402400000,
+      "tag": "0016_create_npc_memory_table",
+      "breakpoints": true
     }
   ]
 }
