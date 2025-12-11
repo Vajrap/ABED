@@ -13,7 +13,6 @@ import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { PaladinSkill } from "./index";
 import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
 import type { ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
@@ -148,13 +147,15 @@ export const divineStrike = new PaladinSkill({
       target.type === CharacterType.fiend;
     if (isUndeadOrFiend) {
       const bonusDice = skillLevel >= 5 ? 10 : 6;
-      const bonusDamage = roll(1).d(bonusDice).total;
+      // Damage dice - don't apply bless/curse
+      const bonusDamage = actor.roll({ amount: 1, face: bonusDice, applyBlessCurse: false });
       holyDamageOutput.damage += bonusDamage;
     }
 
     holyDamageOutput.damage = Math.floor(holyDamageOutput.damage);
-    holyDamageOutput.hit = rollTwenty().total + holyDamageOutput.hit;
-    holyDamageOutput.crit = rollTwenty().total + holyDamageOutput.crit;
+    // Hit/Crit rolls - apply bless/curse automatically
+    holyDamageOutput.hit = actor.rollTwenty({}) + holyDamageOutput.hit;
+    holyDamageOutput.crit = actor.rollTwenty({}) + holyDamageOutput.crit;
 
     const totalDamage = resolveDamage(
       actor.id,

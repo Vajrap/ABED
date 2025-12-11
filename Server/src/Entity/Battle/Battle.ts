@@ -1,7 +1,6 @@
 import type { AttributeKey } from "src/InterFacesEnumsAndTypes/Enums";
 import type { GameTimeInterface } from "../../InterFacesEnumsAndTypes/Time";
 import { statMod } from "../../Utils/statMod";
-import { roll } from "../../Utils/Dice";
 import {
   BuffAndDebuffEnum,
   BuffEnum,
@@ -20,8 +19,6 @@ import {
 import { skillRepository } from "../Skill/repository";
 import { getExpNeededForSkill } from "../Location/Events/handlers/train/getExpNeeded";
 import { gainStatTracker } from "../Location/Events/handlers/train/statTracker";
-import { rollTwenty } from "../../Utils/Dice";
-import type { SkillId } from "../Skill/enums";
 import type { Location } from "../Location/Location";
 import type { Party } from "../Party/Party";
 import type { TurnResult } from "../Skill/types";
@@ -42,6 +39,7 @@ import { resolveDamage } from "./damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { handleTrainSkill } from "../Location/Events/handlers/train/skill";
 import { dropProcess } from "./dropProcess";
+import { QuestProgressTracker } from "../Quest/QuestProgressTracker";
 
 interface ActiveTrap {
   damage: number;
@@ -542,6 +540,21 @@ export class Battle {
       );
     }
 
+    // Update quest progress for kill objectives
+    if (battleStatus.winner && battleStatus.defeated) {
+      const defeatedCharacters = battleStatus.defeated.getCharacters().filter(
+        (c) => c.vitals.isDead
+      );
+      
+      if (defeatedCharacters.length > 0) {
+        const winningCharacters = battleStatus.winner.getCharacters();
+        
+        for (const character of winningCharacters) {
+          QuestProgressTracker.onBattleComplete(character, defeatedCharacters);
+        }
+      }
+    }
+
     if (!battleType.allowDeath) {
       for (const actor of this.allParticipants) {
         if (actor.vitals.isDead) {
@@ -605,7 +618,7 @@ export class Battle {
         const skillDef = skillRepository[skill.id];
         const expNeeded = getExpNeededForSkill(skill.level, skillDef.tier);
         const expGained =
-          rollTwenty().total +
+          character.rollTwenty({}) +
           statMod(character.attribute.getStat("intelligence").total);
 
         skill.exp += expGained;
@@ -621,7 +634,7 @@ export class Battle {
         const skillDef = skillRepository[skill.id];
         const expNeeded = getExpNeededForSkill(skill.level, skillDef.tier);
         const expGained =
-          rollTwenty().total +
+          character.rollTwenty({}) +
           statMod(character.attribute.getStat("intelligence").total);
 
         skill.exp += expGained;
@@ -807,7 +820,7 @@ function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
   abGaugeIncrement *= speedMultiplier;
 
   if (advancingPaceEntry) {
-    abGaugeIncrement += roll(1).d(4).total;
+    abGaugeIncrement += actor.roll({ amount: 1, face: 4, applyBlessCurse: false });
   }
 
   actor.abGauge += abGaugeIncrement;

@@ -84,13 +84,18 @@ export const planarEdge = new SpellbladeSkill({
 
     // TODO: Cantrip damage - should be 1d6 since it has special effect (Edge Charge)
     // Currently varies by level, but should be consistent 1d6 for bare hand
+    // Damage dice - don't apply bless/curse
     const baseDamage = 
       isBareHand ? 
-        roll(1).d(6).total : // Should be 1d6 consistently (has special effect)
-      roll(weapon.weaponData.damage.magicalDamageDice.dice)
-        .d(weapon.weaponData.damage.magicalDamageDice.face).total;
-    const hitValue = rollTwenty().total + statMod(actor.attribute.getTotal("dexterity"));
-    const critValue = rollTwenty().total + statMod(actor.attribute.getTotal("luck"));
+        actor.roll({ amount: 1, face: 6, applyBlessCurse: false }) : // Should be 1d6 consistently (has special effect)
+      actor.roll({ 
+        amount: weapon.weaponData.damage.magicalDamageDice.dice, 
+        face: weapon.weaponData.damage.magicalDamageDice.face, 
+        applyBlessCurse: false 
+      });
+    // Hit/Crit rolls - apply bless/curse automatically
+    const hitValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("dexterity"));
+    const critValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("luck"));
 
     const rawDamage = baseDamage + planarMod + edgeChargeStacks;
     const scaledDamage = Math.max(0, rawDamage * levelScalar);

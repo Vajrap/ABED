@@ -6,6 +6,7 @@ import { PartyBehavior } from "../Entity/Party/PartyBehavior";
 import { characterManager } from "../Game/CharacterManager";
 import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import { defaultPartyAction } from "../Entity/Party/ActionlSequence/PartyActionSequence";
+import { locationRepository } from "../Entity/Location/Location/repository";
 import Report from "./Reporter";
 
 /**
@@ -30,6 +31,22 @@ export async function loadPartiesFromDatabase(): Promise<void> {
       try {
         const party = restorePartyFromDatabase(record);
         partyManager.addParty(party);
+        
+        // Register party at its location
+        const location = locationRepository[party.location];
+        if (location) {
+          location.partyMovesIn(party);
+          Report.debug("Party registered at location during load", {
+            partyId: party.partyID,
+            locationId: party.location,
+          });
+        } else {
+          Report.warn("Location not found when registering party during load", {
+            locationId: party.location,
+            partyId: party.partyID,
+          });
+        }
+        
         loadedCount++;
         Report.info(`✓ Loaded party: ${party.partyID} | location: ${party.location} | leader: ${party.leader.id}`);
       } catch (error) {
@@ -87,7 +104,7 @@ function restorePartyFromDatabase(record: typeof parties.$inferSelect): Party {
   const behavior = new PartyBehavior(record.behavior as any);
   
   // Restore action sequence
-  const actionSequence = record.actionSequence as any || defaultPartyAction();
+  const actionSequence = record.actionSequence as any || defaultPartyAction;
   
   // Restore informations
   const informations = record.informations as Record<string, number> || {};

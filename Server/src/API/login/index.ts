@@ -54,8 +54,9 @@ export const loginRoutes = new Elysia({ prefix: "/login" })
           return { success: false, messageKey: "loginPage.userNotFound" };
         }
 
-        // TODO: Add password verification (bcrypt)
-        if (user.password !== password) {
+        // Verify password using bcrypt
+        const passwordValid = await UserService.verifyPassword(password, user.password);
+        if (!passwordValid) {
           Report.warn("Login attempt with invalid credentials", {
             userId: user.id,
             username: user.username,

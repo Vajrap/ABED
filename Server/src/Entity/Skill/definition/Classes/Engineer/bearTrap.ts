@@ -7,7 +7,6 @@ import { ActorEffect } from "src/Entity/Skill/effects";
 import { statMod } from "src/Utils/statMod";
 import type { TurnResult } from "../../../types";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
-import { roll } from "src/Utils/Dice";
 import { getBattle } from "src/Entity/Battle/BattleContext";
 
 export const bearTrap = new EngineerSkill({
@@ -67,7 +66,7 @@ export const bearTrap = new EngineerSkill({
 
     // Calculate trap damage: (1d6 + DEX mod) × skillLevelMultiplier
     const dexMod = statMod(user.attribute.getTotal("dexterity"));
-    const diceDamage = roll(1).d(6).total;
+    const diceDamage = user.roll({ amount: 1, face: 6, applyBlessCurse: false });
     const levelScalar = skillLevelMultiplier(skillLevel);
     const trapDamage = Math.floor((diceDamage + dexMod) * levelScalar);
 

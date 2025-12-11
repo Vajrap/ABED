@@ -7,15 +7,21 @@ export class UserService {
    * Create a new user
    */
   static async createUser(
-    userData: Omit<InsertUser, "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy" | "lastNewsReceived">,
+    userData: Omit<InsertUser, "id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy" | "lastNewsReceived"> & { lastNewsReceived?: string },
   ): Promise<User> {
+    // Hash password using Bun's built-in password hashing
+    const hashedPassword = await Bun.password.hash(userData.password, {
+      algorithm: "bcrypt",
+      cost: 10, // bcrypt cost factor
+    });
+
     // Use raw SQL to handle character_id column which may still exist in DB but not in schema
     // This allows backward compatibility during migration
     // Provide default for last_news_received if not specified
     const lastNewsReceived = userData.lastNewsReceived ?? 'news_000';
     const result = await db.execute(sql`
       INSERT INTO users (username, password, email, last_news_received, character_id, created_by, updated_by)
-      VALUES (${userData.username}, ${userData.password}, ${userData.email ?? null}, ${lastNewsReceived}, ${userData.username}, 'system', 'system')
+      VALUES (${userData.username}, ${hashedPassword}, ${userData.email ?? null}, ${lastNewsReceived}, ${userData.username}, 'system', 'system')
       RETURNING *
     `);
 
@@ -123,10 +129,16 @@ export class UserService {
     id: string,
     newPassword: string,
   ): Promise<User | null> {
+    // Hash password using Bun's built-in password hashing
+    const hashedPassword = await Bun.password.hash(newPassword, {
+      algorithm: "bcrypt",
+      cost: 10, // bcrypt cost factor
+    });
+
     const updatedUser = await db
       .update(users)
       .set({
-        password: newPassword,
+        password: hashedPassword,
         updatedAt: new Date(),
         
       })
@@ -134,6 +146,16 @@ export class UserService {
       .returning();
 
     return updatedUser[0] || null;
+  }
+
+  /**
+   * Verify password against stored hash
+   */
+  static async verifyPassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return await Bun.password.verify(password, hashedPassword);
   }
 
   /**

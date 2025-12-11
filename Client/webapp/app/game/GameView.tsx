@@ -281,6 +281,110 @@ export default function GameView() {
     return mapCharacterToMember(char, isPlayer);
   }) || [];
 
+  // Convert backend actionSequence to frontend schedule format
+  const convertActionSequenceToSchedule = (actionSequence: Record<string, Record<string, any>> | undefined): Record<string, string> => {
+    if (!actionSequence) return {};
+
+    // Map DayOfWeek enum values to day indices
+    const dayOfWeekMap: Record<string, number> = {
+      "laoh": 0,
+      "rowana": 1,
+      "aftree": 2,
+      "udur": 3,
+      "matris": 4,
+      "seethar": 5,
+    };
+
+    // Map TimeOfDay enum values to phase indices
+    const timeOfDayMap: Record<string, number> = {
+      "morning": 0,
+      "afternoon": 1,
+      "evening": 2,
+      "night": 3,
+    };
+
+    const schedule: Record<string, string> = {};
+
+    // Convert CharacterAction objects to action strings
+    const convertActionToString = (action: any): string | null => {
+      if (!action || !action.type || action.type === "None") {
+        return null;
+      }
+
+      const actionType = action.type;
+
+      // Actions with parameters need to be formatted as "actionId|parameterValue"
+      if (actionType === "Train Attribute" && action.attribute) {
+        return `${actionType}|${action.attribute}`;
+      }
+      if (actionType === "Train Proficiency" && action.proficiency) {
+        return `${actionType}|${action.proficiency}`;
+      }
+      if (actionType === "Train Artisan" && action.artisan) {
+        return `${actionType}|${action.artisan}`;
+      }
+      if (actionType === "Train Skill" && action.skillId) {
+        return `${actionType}|${action.skillId}`;
+      }
+      if (actionType === "Learn Skill" && action.skillId) {
+        return `${actionType}|${action.skillId}`;
+      }
+      if (actionType === "Read" && action.bookId) {
+        return `${actionType}|${action.bookId}`;
+      }
+      if (actionType === "Craft" && action.itemId) {
+        return `${actionType}|${action.itemId}`;
+      }
+      // Organization/Sect actions
+      if (actionType === "Heavens Decree" && action.action) {
+        return `${actionType}|${action.action}`;
+      }
+      if (actionType === "Church of Laoh" && action.action) {
+        return `${actionType}|${action.action}`;
+      }
+      if (actionType === "Great Temple of Laoh" && action.action) {
+        return `${actionType}|${action.action}`;
+      }
+      if (actionType === "Cult of Nizarith" && action.action) {
+        return `${actionType}|${action.action}`;
+      }
+      if ((actionType.startsWith("Shrine of") || actionType.startsWith("Major Shrine of")) && action.action) {
+        return `${actionType}|${action.action}`;
+      }
+      if (actionType === "Knight Order" && action.action) {
+        return `${actionType}|${action.action}`;
+      }
+      if (actionType === "Magic School" && action.action) {
+        return `${actionType}|${action.action}`;
+      }
+      if (actionType === "Arcane Academia" && action.action) {
+        return `${actionType}|${action.action}`;
+      }
+
+      // Simple actions without parameters
+      return actionType;
+    };
+
+    // Iterate through actionSequence and convert to schedule format
+    Object.entries(actionSequence).forEach(([day, timeSlots]) => {
+      const dayIndex = dayOfWeekMap[day];
+      if (dayIndex === undefined) return;
+
+      Object.entries(timeSlots).forEach(([time, action]) => {
+        const phaseIndex = timeOfDayMap[time];
+        if (phaseIndex === undefined) return;
+
+        const actionString = convertActionToString(action);
+        if (actionString) {
+          const key = `${dayIndex}-${phaseIndex}`;
+          schedule[key] = actionString;
+        }
+      });
+    });
+
+    return schedule;
+  };
+
   const handleScheduleSave = async (schedule: Record<string, string>) => {
     console.log("[GameView] Schedule saved:", schedule);
     
@@ -749,9 +853,23 @@ export default function GameView() {
         onRailTravelClick={handleRailTravelClick}
         hasRailStation={location?.hasRailStation}
         availableActionsByPhase={location?.availableActionsByPhase}
+        initialSchedule={(() => {
+          // Find player character and convert their actionSequence to schedule format
+          const playerCharacter = party?.characters.find(
+            (char) => char && char.id === party.playerCharacterId
+          );
+          
+          if (!playerCharacter || !playerCharacter.actionSequence) {
+            return undefined;
+          }
+          
+          return convertActionSequenceToSchedule(playerCharacter.actionSequence);
+        })()}
+        currentDay={gameTime ? gameTime.dayOfWeek - 1 : undefined} // Convert dayOfWeek (1-6) to dayIndex (0-5)
+        currentPhase={gameTime ? gameTime.hour - 1 : undefined} // Convert hour (1-4) to phaseIndex (0-3)
         characterSkills={(() => {
           // Find player character
-          const playerCharacter = party.characters.find(
+          const playerCharacter = party?.characters.find(
             (char) => char && char.id === party.playerCharacterId
           );
           

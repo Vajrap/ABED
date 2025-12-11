@@ -32,6 +32,7 @@ import { newsArrayToStructure } from "../News/News";
 import { mergeNewsStructures } from "../../Utils/mergeNewsStructure";
 import type { Party } from "../Party/Party";
 import type { SkillId } from "../Skill/enums";
+import type { BookId } from "../Item/Books";
 import type { LocationInns } from "./Config/Inn";
 import { handelArtisanAction } from "./Events/handlers/artisans/handleArtisans";
 import { handleCraftAction } from "./Events/handlers/craft/handleCraftAction";
@@ -44,8 +45,10 @@ import { handleTrainArtisans } from "./Events/handlers/train/artisans";
 import { handleTrainAttribute } from "./Events/handlers/train/attribute";
 import { handleTrainProficiency } from "./Events/handlers/train/proficiency";
 import { handleTrainSkill } from "./Events/handlers/train/skill";
+import { handleGuildAction } from "./Events/handlers/special/guild";
 import type { WeatherVolatility } from "../Card/WeatherCard/WeatherCard";
 import { Weather } from "../../InterFacesEnumsAndTypes/Weather";
+import { QuestProgressTracker } from "../Quest/QuestProgressTracker";
 import Report from "../../Utils/Reporter";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import type { ResourceType } from "src/InterFacesEnumsAndTypes/ResourceTypes";
@@ -284,6 +287,9 @@ export class Location {
 
   partyMovesIn(party: Party) {
     this.parties.push(party);
+    
+    // Update quest progress for travel/explore objectives
+    QuestProgressTracker.onLocationArrival(party, this.id);
   }
 
   partyMoveOut(party: Party) {
@@ -312,21 +318,53 @@ export class Location {
     phase: TimeOfDay,
   ): Promise<NewsDistribution> {
     const results: NewsDistribution = createEmptyNewsStructure();
-    if (this.parties.length === 0) return results;
+    if (this.parties.length === 0) {
+      console.log("No parties at location to process actions", {
+        locationId: this.id,
+        day,
+        phase,
+      });
+      return results;
+    }
+
+    console.log("Processing actions for parties at location", {
+      locationId: this.id,
+      day,
+      phase,
+      partyCount: this.parties.length,
+      partyIds: this.parties.map(p => p.partyID),
+    });
 
     for (const party of this.parties) {
       const action = party.actionSequence[day][phase];
+      
+      console.log("Processing party action", {
+        partyId: party.partyID,
+        day,
+        phase,
+        partyAction: action,
+        characterCount: party.characters.filter(c => c !== "none").length,
+      });
 
       if (
         action === ActionInput.Travel ||
         action === ActionInput.RailTravel ||
         specialActions.includes(action)
-      )
+      ) {
+        console.log("Skipping party action (travel or special)", {
+          partyId: party.partyID,
+          action,
+        });
         continue;
+      }
 
       const context = buildNewsContext(this, party);
 
       if (isGroupRest(party.actionSequence[day][phase])) {
+        console.log("Party has group rest action", {
+          partyId: party.partyID,
+          action,
+        });
         const result = processGroupResting(
           party,
           action,
@@ -345,7 +383,24 @@ export class Location {
 
       // Get phase-specific (and optionally day-specific) available actions
       const validActions = this.getAvailableActions(phase, day);
+      console.log("Valid actions for phase", {
+        locationId: this.id,
+        day,
+        phase,
+        validActions: validActions.map(a => String(a)),
+      });
       const groups = groupCharacterActions(party, day, phase, validActions);
+      console.log("Character groups created", {
+        partyId: party.partyID,
+        restingCount: groups.resting.length,
+        trainAttributeCount: groups.trainAttribute.size,
+        trainArtisanCount: groups.trainArtisan.size,
+        trainProficiencyCount: groups.trainProficiency.size,
+        trainSkillCount: groups.trainSkill.size,
+        strollingCount: groups.strolling.length,
+        tavernCount: groups.tavern.length,
+        readingCount: groups.reading.length,
+      });
       processCharacterGroups(groups, context, results, this.randomEvents);
     }
 
@@ -550,11 +605,12 @@ type CharacterGroups = {
   strolling: Character[];
   tavern: Character[];
   artisanActions: ArtisanAction[];
-  reading: Character[];
+  reading: { character: Character; bookId: BookId }[];
   crafting: {
       mainCharacter: Character | undefined;
       otherCharacters: Character[];
   };
+  guildActions: Character[]; // Characters performing Adventure Guild actions
 };
 
 function groupCharacterActions(
@@ -578,10 +634,22 @@ function groupCharacterActions(
         mainCharacter: undefined,
         otherCharacters: []
     },
+    guildActions: [],
   };
 
   for (const character of party.characters.filter((c) => c !== "none")) {
     const action = character.actionSequence[day][phase];
+    
+    console.log("Processing character action", {
+      characterId: character.id,
+      characterName: typeof character.name === 'string' ? character.name : character.name?.en,
+      day,
+      phase,
+      actionType: action.type,
+      moodBefore: character.needs.mood.current,
+      energyBefore: character.needs.energy.current,
+      satietyBefore: character.needs.satiety.current,
+    });
 
     function addToMapArray<K, V>(map: Map<K, V[]>, key: K, value: V) {
       const existing = map.get(key);
@@ -594,6 +662,12 @@ function groupCharacterActions(
 
     if (action.type === ActionInput.Travel) continue;
     if (!validActions.includes(action.type)) {
+      console.log("Character action not in validActions, defaulting to rest", {
+        characterId: character.id,
+        characterName: typeof character.name === 'string' ? character.name : character.name?.en,
+        actionType: action.type,
+        validActions: validActions.map(a => String(a)),
+      });
       groups.resting.push(character);
       continue;
     }
@@ -632,7 +706,7 @@ function groupCharacterActions(
         break;
 
       case ActionInput.Read:
-        groups.reading.push(character);
+        groups.reading.push({ character, bookId: action.bookId });
         break;
 
       case ActionInput.Craft:
@@ -656,6 +730,10 @@ function groupCharacterActions(
       case ActionInput.Weaving:
       case ActionInput.Enchanting:
         groups.artisanActions.push({ character, actionInput: action.type });
+        break;
+
+      case ActionInput.AdventureGuildQuest:
+        groups.guildActions.push(character);
         break;
     }
   }
@@ -778,16 +856,41 @@ function processCharacterGroups(
   // Solo Artisan
   for (const { character, actionInput } of groups.artisanActions) {
     const results = resolveGroupRandomEvent([character], events.artisan, () =>
-      handelArtisanAction(character, context),
+      handelArtisanAction(character, context, actionInput),
     );
     allNews.push(...results);
   }
 
   // Rest
+  if (groups.resting.length > 0) {
+    console.log("Processing resting characters", {
+      restingCount: groups.resting.length,
+      characterIds: groups.resting.map(c => c.id),
+      characterNames: groups.resting.map(c => typeof c.name === 'string' ? c.name : c.name?.en),
+      needsBefore: groups.resting.map(c => ({
+        id: c.id,
+        mood: c.needs.mood.current,
+        energy: c.needs.energy.current,
+        satiety: c.needs.satiety.current,
+      })),
+    });
+  }
   for (const c of groups.resting) {
+    const moodBefore = c.needs.mood.current;
+    const energyBefore = c.needs.energy.current;
     const result = resolveGroupRandomEvent([c], events.rest, () =>
       handleRestAction([c], ActionInput.Rest, context),
     );
+    console.log("After rest action", {
+      characterId: c.id,
+      characterName: typeof c.name === 'string' ? c.name : c.name?.en,
+      moodBefore,
+      moodAfter: c.needs.mood.current,
+      energyBefore,
+      energyAfter: c.needs.energy.current,
+      moodChange: c.needs.mood.current - moodBefore,
+      energyChange: c.needs.energy.current - energyBefore,
+    });
     allNews.push(...result);
   }
 
@@ -796,12 +899,12 @@ function processCharacterGroups(
   // Grouping just like the same as RE, worst bad natural good best, each with multiple possible events, and we randomly pick.
   // These resolve functions might need to receive the location or at least set of possible events from location itself
   if (groups.strolling.length > 0) {
-    const result: News[] = resolveStrollingAction();
+    const result: News[] = resolveStrollingAction(groups.strolling, context);
     allNews.push(...result);
   }
 
   if (groups.tavern.length > 0) {
-    const result: News[] = resolveTavernAction();
+    const result: News[] = resolveTavernAction(groups.tavern, context);
     allNews.push(...result);
   }
 
@@ -834,8 +937,14 @@ function processCharacterGroups(
     allNews.push(...result);
   });
 
-  groups.reading.forEach((c) => {
-    const result = handleReadAction(c);
+  groups.reading.forEach(({ character, bookId }) => {
+    const result = handleReadAction(character, bookId, context);
+    allNews.push(...result);
+  });
+
+  // Guild actions (generate quest offers)
+  groups.guildActions.forEach((character) => {
+    const result = handleGuildAction(character, context, "generateOffer");
     allNews.push(...result);
   });
 

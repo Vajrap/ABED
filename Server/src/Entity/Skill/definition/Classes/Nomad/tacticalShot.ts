@@ -9,7 +9,6 @@ import { getTarget } from "src/Entity/Battle/getTarget";
 import type { TurnResult } from "../../../types";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
@@ -77,7 +76,7 @@ export const tacticalShot = new NomadSkill({
 
     if (isTargetFrontRow) {
       // Front row: Throw hot sand (true damage + blind)
-      const trueDamage = roll(1).d(2).total;
+      const trueDamage = user.roll({ amount: 1, face: 2, applyBlessCurse: false });
 
       const damageOutput = {
         damage: trueDamage,
@@ -145,8 +144,8 @@ export const tacticalShot = new NomadSkill({
 
       const damageOutput = {
         damage: Math.floor(totalDamage * positionModifier),
-        hit: rollTwenty().total,
-        crit: rollTwenty().total,
+        hit: user.rollTwenty({}),
+        crit: user.rollTwenty({}),
         type: DamageType.pierce,
         isMagic: false,
       };

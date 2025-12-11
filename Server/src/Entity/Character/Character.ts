@@ -37,6 +37,7 @@ import { roll, rollTwenty } from "src/Utils/Dice.ts";
 import { statMod } from "src/Utils/statMod.ts";
 import { Weapon } from "src/Entity/Item";
 import type { ItemId } from "../Item/type.ts";
+import type { ResourceType } from "../../InterFacesEnumsAndTypes/Enums/Resource";
 import {
   ArmorClass,
   getEquipment,
@@ -55,6 +56,9 @@ import { bareHand } from "../Item/Equipment/Weapon/BareHand/definition/bareHand.
 import { bodyRepository } from "../Item/Equipment/Armor/Body/repository.ts";
 import { RaceEnum } from "../../InterFacesEnumsAndTypes/Enums";
 import type { PortraitData } from "../../InterFacesEnumsAndTypes/PortraitData";
+import type { Quest } from "../Quest/Quest";
+import type { QuestOffer } from "../Quest/QuestOffer";
+import type { Bounty } from "../Bounty/Bounty";
 
 export class Character {
   id: string = "";
@@ -108,10 +112,32 @@ export class Character {
   relations: Map<string, { value: number; status: RelationStatusEnum }> =
     new Map();
   traits: Map<TraitEnum, number> = new Map();
+  
+  // Quest tracking
+  quests: {
+    active: Map<string, Quest>;
+    completed: Set<string>;
+  } = {
+    active: new Map(),
+    completed: new Set(),
+  };
+  
+  // Quest offers (pending quests that can be accepted)
+  questOffers: Map<string, QuestOffer> = new Map();
+  
+  // Bounty tracking
+  bounties: {
+    active: Map<string, Bounty>;
+    completed: Set<string>;
+  } = {
+    active: new Map(),
+    completed: new Set(),
+  };
 
   inventorySize: { base: number; bonus: number } = { base: 20, bonus: 0 };
   inventory: Map<ItemId | string, number> = new Map(); // Can be base ItemId or unique instance ID (UUID) for crafted items
   itemInstances: Map<string, ItemId> = new Map();
+  materialResources: Map<ResourceType, number> = new Map(); // Resource storage (ore, wood, herbs, etc.)
   equipments: {
     headWear: HeadWearId | null;
     body: BodyId | null;
@@ -373,34 +399,84 @@ export class Character {
     return { heal: later - prior };
   }
 
-  rollSave(stat: AttributeKey, mode: "norm" | "adv" | "dis" = "norm") {
+  roll(data: {
+    face: number,
+    amount: number,
+    mode?: "norm" | "adv" | "dis",
+    stat?: AttributeKey,
+    applyBlessCurse?: boolean, // NEW: default true
+  }): number {
+    let dice = roll(data.amount).d(data.face);
     const hasBless = this.buffsAndDebuffs.buffs.entry.has(BuffEnum.bless);
     const hasCursed = this.buffsAndDebuffs.debuffs.entry.has(DebuffEnum.cursed);
-
-    let rollRes = rollTwenty();
-
-    if (mode === "norm") {
+    
+    // Apply bless/curse only if applyBlessCurse is true (default) AND mode is "norm"
+    if (data.applyBlessCurse !== false && data.mode === "norm") {
       if (hasBless && !hasCursed) {
-        rollRes = rollRes.adv();
+        dice = dice.adv();
       } else if (!hasBless && hasCursed) {
-        rollRes = rollRes.dis();
+        dice = dice.dis();
       }
     }
+    
+    // Explicit mode overrides (for advantage/disadvantage from other sources)
+    if (data.mode === "adv") dice = dice.adv();
+    if (data.mode === "dis") dice = dice.dis();
 
-    if (mode === "adv") rollRes = rollRes.adv();
-    if (mode === "dis") rollRes = rollRes.dis();
-
-    // Luck "lucky break" mechanic: roll d20 + luck mod first, if > 15 add luck mod/2 to save
-    const luckMod = statMod(this.attribute.getTotal("luck"));
-    let luckBonus = 0;
-    if (luckMod > 0) {
-      const luckCheck = rollTwenty().total + luckMod;
-      if (luckCheck > 15) {
-        luckBonus = Math.floor(luckMod / 2);
-      }
+    if (data.stat) {
+      return statMod(this.attribute.getTotal(data.stat)) + dice.total;
     }
 
-    return statMod(this.attribute.getTotal(stat)) + rollRes.total + luckBonus;
+    return dice.total;
+  }
+
+  rollTwenty(data: {
+    mode?: "norm" | "adv" | "dis",
+    stat?: AttributeKey,
+    applyBlessCurse?: boolean, // NEW: default true
+  }): number {
+    return this.roll({
+      face: 20,
+      amount: 1,
+      mode: data.mode,
+      stat: data.stat,
+      applyBlessCurse: data.applyBlessCurse,
+    });
+  }
+
+  rollSave(stat: AttributeKey, mode?: "norm" | "adv" | "dis"): number {
+    return this.rollTwenty({
+      mode: mode,
+      stat: stat,
+    });
+  }
+
+  /**
+   * Add resources to character's resource storage
+   */
+  addMaterialResource(type: ResourceType, amount: number): void {
+    const current = this.materialResources.get(type) || 0;
+    this.materialResources.set(type, current + amount);
+  }
+
+  /**
+   * Remove resources from character's resource storage
+   * Returns true if successful, false if insufficient resources
+   */
+  removeMaterialResource(type: ResourceType, amount: number): boolean {
+    const current = this.materialResources.get(type) || 0;
+    if (current < amount) {
+      return false;
+    }
+    this.materialResources.set(type, current - amount);
+    return true;
+  }
+
+  /**
+   * Get current amount of a resource type
+   */
+  getMaterialResource(type: ResourceType): number {
+    return this.materialResources.get(type) || 0;
   }
 }
 
@@ -420,6 +496,8 @@ export type CharacterBreathingSkillObject = {
 type BuffAndDebuffRecord = {
   value: number;
   counter: number;
+  isPerm?: boolean; // Permanent buff/debuff that decays over phases
+  permValue?: number; // Number of phases remaining (decays each phase)
 };
 
 type CharacterBuffsAndDebuffs = {

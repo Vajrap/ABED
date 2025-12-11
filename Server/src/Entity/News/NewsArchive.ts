@@ -9,6 +9,7 @@ import { GameTime } from "../../Game/GameTime/GameTime";
 import { locationGraph } from "../Location/LocationGraph";
 import { rollTwenty } from "../../Utils/Dice";
 import { db } from "../../Database/connection";
+import { gameTimeToPhaseIndex } from "../../Utils/GameTimeUtils";
 import {
   newsArchive as newsArchiveTable,
   characterNewsKnowledge as characterNewsKnowledgeTable,
@@ -355,6 +356,46 @@ export class NewsArchive {
     let news = this.getNewsAtLocation(location, {
       minSignificance: filters?.minSignificance,
       minFreshness: filters?.minFreshness,
+    });
+
+    // Filter by read status
+    if (filters?.onlyUnread) {
+      const known = this.characterKnowledge.get(characterId) ?? new Set();
+      news = news.filter((n) => !known.has(n.id));
+    }
+
+    return news;
+  }
+
+  /**
+   * Get news by ID
+   */
+  getNewsById(newsId: string): News | null {
+    const record = this.newsById.get(newsId);
+    return record ? record.news : null;
+  }
+
+  /**
+   * Get news for a character by phase index range
+   * Filters news that fall within the specified phase range
+   */
+  getNewsForCharacterByPhaseRange(
+    characterId: string,
+    location: LocationsEnum,
+    fromPhaseIndex: number,
+    toPhaseIndex: number,
+    filters?: {
+      onlyUnread?: boolean;
+    },
+  ): News[] {
+    let news = this.getNewsAtLocation(location, {
+      minFreshness: 0, // Get all news regardless of freshness
+    });
+
+    // Filter by phase range
+    news = news.filter((n) => {
+      const newsPhaseIndex = gameTimeToPhaseIndex(n.ts);
+      return newsPhaseIndex >= fromPhaseIndex && newsPhaseIndex <= toPhaseIndex;
     });
 
     // Filter by read status

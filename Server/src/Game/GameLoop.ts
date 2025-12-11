@@ -1,6 +1,7 @@
 import { GameTime } from "./GameTime/GameTime";
 import type { DayOfWeek, TimeOfDay } from "../InterFacesEnumsAndTypes/Time";
 import {
+  News,
   type NewsDistribution,
   newsArrayToStructure,
 } from "../Entity/News/News";
@@ -204,6 +205,126 @@ async function processEvents(
 ): Promise<NewsDistribution> {
   Report.info(`Processing events for day=${day}, phase=${phase}`);
 
+  // Apply base needs decrement per phase (before processing actions)
+  // Satiety: -3 per phase, Energy: -2 per phase, Mood: No auto-decay
+  const { characterManager } = await import("./CharacterManager");
+  const { BuffEnum, DebuffEnum } = await import("../Entity/BuffsAndDebuffs/enum");
+  const { createNews } = await import("../Entity/News/News");
+  const { NewsSignificance, NewsPropagation } = await import("../InterFacesEnumsAndTypes/NewsEnums");
+  
+  const phaseDecayNews: News[] = [];
+  
+  for (const character of characterManager.characters) {
+    character.needs.decSatiety(3);
+    character.needs.decEnergy(2);
+    // Mood does not auto-decay
+    
+    // Process permanent buff/debuff decay
+    // Iterate through buffs with isPerm === true
+    for (const [buffId, entry] of character.buffsAndDebuffs.buffs.entry.entries()) {
+      if (entry.isPerm && entry.permValue !== undefined && entry.permValue > 0) {
+        entry.permValue -= 1;
+        
+        // Remove if expired
+        if (entry.permValue <= 0) {
+          // Only remove if value is also 0 (no battle effect remaining)
+          if (entry.value <= 0) {
+            character.buffsAndDebuffs.buffs.entry.delete(buffId);
+          } else {
+            // Clear permValue but keep buff for battle
+            entry.isPerm = false;
+            entry.permValue = undefined;
+          }
+          
+          // Create news event for expiring blessing
+          if (buffId === BuffEnum.bless) {
+            if (!character.location) {
+              continue; // Skip if no location
+            }
+            const location = locationManager.locations[character.location];
+            if (!location) {
+              continue; // Skip if location not found
+            }
+            const context = {
+              region: location.region,
+              subRegion: location.subRegion,
+              location: character.location,
+              partyId: character.partyID || "",
+              characterIds: [character.id],
+            };
+            phaseDecayNews.push(
+              createNews({
+                scope: {
+                  kind: "privateScope",
+                  characterId: character.id,
+                },
+                content: {
+                  en: `${character.name?.en || character.name}'s blessing has faded.`,
+                  th: `${character.name?.th || character.name} พรที่ได้รับได้จางหายไป`,
+                },
+                context,
+                significance: NewsSignificance.MINOR,
+                propagation: NewsPropagation.PRIVATE,
+              })
+            );
+          }
+        }
+      }
+    }
+    
+    // Iterate through debuffs with isPerm === true
+    for (const [debuffId, entry] of character.buffsAndDebuffs.debuffs.entry.entries()) {
+      if (entry.isPerm && entry.permValue !== undefined && entry.permValue > 0) {
+        entry.permValue -= 1;
+        
+        // Remove if expired
+        if (entry.permValue <= 0) {
+          // Only remove if value is also 0 (no battle effect remaining)
+          if (entry.value <= 0) {
+            character.buffsAndDebuffs.debuffs.entry.delete(debuffId);
+          } else {
+            // Clear permValue but keep debuff for battle
+            entry.isPerm = false;
+            entry.permValue = undefined;
+          }
+          
+          // Create news event for expiring curse
+          if (debuffId === DebuffEnum.cursed) {
+            if (!character.location) {
+              continue; // Skip if no location
+            }
+            const location = locationManager.locations[character.location];
+            if (!location) {
+              continue; // Skip if location not found
+            }
+            const context = {
+              region: location.region,
+              subRegion: location.subRegion,
+              location: character.location,
+              partyId: character.partyID || "",
+              characterIds: [character.id],
+            };
+            phaseDecayNews.push(
+              createNews({
+                scope: {
+                  kind: "privateScope",
+                  characterId: character.id,
+                },
+                content: {
+                  en: `${character.name?.en || character.name}'s curse has lifted.`,
+                  th: `${character.name?.th || character.name} คำสาปได้หายไป`,
+                },
+                context,
+                significance: NewsSignificance.MINOR,
+                propagation: NewsPropagation.PRIVATE,
+              })
+            );
+          }
+        }
+      }
+    }
+  }
+
   const enc: NewsDistribution = await locationManager.processEncounters(
     day,
     phase,
@@ -216,8 +337,14 @@ async function processEvents(
 
   const tra: NewsDistribution = await travelManager.allTravel(day, phase);
   const rail: NewsDistribution = await railTravelManager.allTravel(day, phase);
+  
+  // Convert phase decay news to NewsDistribution and merge
+  const { newsArrayToStructure } = await import("../Entity/News/News");
+  const phaseDecayNewsStruct = phaseDecayNews.length > 0 
+    ? newsArrayToStructure(phaseDecayNews)
+    : { privateScope: new Map(), partyScope: new Map(), locationScope: new Map(), subRegionScope: new Map(), regionScope: new Map(), worldScope: [] };
 
-  return mergeNewsStructures(enc, act, tra, rail);
+  return mergeNewsStructures(enc, act, tra, rail, phaseDecayNewsStruct);
 }
 
 async function sendPartyData(news: NewsDistribution) {
@@ -232,6 +359,7 @@ async function processPhaseInternal(options: ProcessPhaseOptions): Promise<void>
 
   GameTime.synchronize(now);
 
+  // TODO:
   if (!skipBacklog && !force) {
     const lastProcessed = GameTime.getLastProcessedPhaseIndex();
     const currentPhase = GameTime.getCurrentPhaseIndex();

@@ -28,6 +28,10 @@ export function handleTrainArtisans(
       rollTwenty().total +
       statMod(character.attribute.getStat("intelligence").total);
 
+    // Apply needs changes: Energy -6, Mood -2 (strenuous activity)
+    character.needs.decEnergy(6);
+    character.needs.decMood(2);
+
     stat.exp += expGained;
     if (stat.exp >= expNeeded) {
       stat.exp -= expNeeded;

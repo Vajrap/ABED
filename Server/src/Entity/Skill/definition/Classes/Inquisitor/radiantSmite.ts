@@ -9,7 +9,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { InquisitorSkill } from "./index";
 import { CharacterAlignmentEnum, CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
@@ -82,24 +81,24 @@ export const radiantSmite = new InquisitorSkill({
 
     
     
-    const baseDiceDamage = roll(1).d(6).total;
+    const baseDiceDamage = actor.roll({ amount: 1, face: 6, applyBlessCurse: false });
     const levelMultiplier = skillLevelMultiplier(skillLevel);
     const attributeMod = (willMod + planarMod) / 2;
     const totalDamage = Math.max(0, Math.floor((baseDiceDamage + attributeMod) * levelMultiplier));
 
     // Bonus damage against undead/fiends
     const isUndeadOrFiend = target.type === CharacterType.undead || target.type === CharacterType.fiend;
-    let bonusDamage = isUndeadOrFiend ? roll(1).d(4).total : 0;
+    let bonusDamage = isUndeadOrFiend ? actor.roll({ amount: 1, face: 4, applyBlessCurse: false }) : 0;
 
     const evilAlignments = [CharacterAlignmentEnum.Cruel, CharacterAlignmentEnum.Vile, CharacterAlignmentEnum.Tyrant, CharacterAlignmentEnum.Infernal];
     const isTargetEvil = evilAlignments.includes(target.alignment.alignment());
-    bonusDamage += isTargetEvil ? roll(1).d(4).total : 0;
+    bonusDamage += isTargetEvil ? actor.roll({ amount: 1, face: 4, applyBlessCurse: false }) : 0;
 
 
     const damageOutput = {
       damage: totalDamage + bonusDamage,
-      hit: rollTwenty().total + controlMod,
-      crit: rollTwenty().total + luckMod,
+      hit: actor.rollTwenty({}) + controlMod,
+      crit: actor.rollTwenty({}) + luckMod,
       type: DamageType.radiance,
       isMagic: true,
     };

@@ -171,6 +171,14 @@ export interface NPCTemplate {
       description: string;
     }>;
   };
+
+  // Quest Giver Support
+  availableQuests?: string[]; // Quest definition IDs this NPC can give
+  questGiverDialogue?: {
+    greeting?: { en: string; th: string }; // Greeting when player talks to NPC
+    questOffer?: Record<string, { en: string; th: string }>; // Quest ID -> dialogue when offering (using Record instead of Map for JSON serialization)
+    questComplete?: Record<string, { en: string; th: string }>; // Quest ID -> dialogue when turning in
+  };
 }
 
 /**

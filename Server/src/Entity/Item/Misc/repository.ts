@@ -1,4 +1,5 @@
 import { gold } from "./Gold";
+import { ancientKey, secretPackage } from "./QuestItem";
 import type { ItemMisc } from "./Misc";
 import {
   BoneId,
@@ -9,6 +10,7 @@ import {
   LeatherId,
   OreId,
   PlankId,
+  QuestItemId,
   RawGemId,
   SkinId,
   ThreadId,
@@ -58,6 +60,8 @@ import {
 
 export const miscRepository: Record<MiscItemId, ItemMisc> = {
   [GoldId.gold]: gold,
+  [QuestItemId.ancientKey]: ancientKey,
+  [QuestItemId.secretPackage]: secretPackage,
 
   [WoodId.Oak]: woodOak,
   [WoodId.Pine]: woodPine,

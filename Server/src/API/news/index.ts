@@ -3,6 +3,13 @@ import Report from "../../Utils/Reporter";
 import { SessionService } from "../../Services/SessionService";
 import { characterManager } from "../../Game/CharacterManager";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
+import { UserService } from "../../Database/Services/userService";
+import {
+  parseLastNewsReceived,
+  formatLastNewsReceived,
+  getCurrentPhaseIndex,
+} from "../../Utils/GameTimeUtils";
+import { GameTime } from "../../Game/GameTime/GameTime";
 
 // Schema for markRead request
 const MarkReadSchema = t.Object({
@@ -74,28 +81,64 @@ export const newsRoutes = new Elysia({ prefix: "/news" })
         return { success: false, messageKey: "party.notFound" };
       }
 
-      // 4. Get news from news archive
+      // 4. Get news from news archive using phase-based fetching
       const { newsArchiveService } = await import("../../Entity/News/NewsArchive");
       const location = party.location as LocationsEnum;
 
-      // Get all news at location (that character can see)
-      const allNews = newsArchiveService.getNewsForCharacter(
+      // Calculate phase range from lastNewsReceived
+      const currentPhaseIndex = getCurrentPhaseIndex();
+      let fromPhaseIndex = 0;
+      
+      // Try to parse lastNewsReceived as phase index
+      const lastPhaseIndex = parseLastNewsReceived(user.lastNewsReceived);
+      
+      if (lastPhaseIndex !== null) {
+        // Use parsed phase index
+        fromPhaseIndex = lastPhaseIndex;
+      } else if (user.lastNewsReceived) {
+        // Try to look up news ID and get its phase index
+        try {
+          const news = newsArchiveService.getNewsById(user.lastNewsReceived);
+          if (news) {
+            const { gameTimeToPhaseIndex } = await import("../../Utils/GameTimeUtils");
+            fromPhaseIndex = gameTimeToPhaseIndex(news.ts);
+          }
+        } catch (error) {
+          Report.warn("Failed to parse lastNewsReceived as news ID", {
+            lastNewsReceived: user.lastNewsReceived,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          // Fall back to 0 (fetch all)
+          fromPhaseIndex = 0;
+        }
+      }
+      
+      // Calculate phases to fetch (max 96 phases)
+      const phasesToFetch = Math.min(currentPhaseIndex - fromPhaseIndex, 96);
+      const actualFromPhase = Math.max(0, currentPhaseIndex - phasesToFetch);
+      
+      // Fetch news using phase range
+      const allNews = newsArchiveService.getNewsForCharacterByPhaseRange(
         character.id,
         location,
-        {
-          minFreshness: 0, // Get all news regardless of freshness
-        }
+        actualFromPhase,
+        currentPhaseIndex,
       );
 
       // Get unseen news (only unread)
-      const unseenNews = newsArchiveService.getNewsForCharacter(
+      const unseenNews = newsArchiveService.getNewsForCharacterByPhaseRange(
         character.id,
         location,
+        actualFromPhase,
+        currentPhaseIndex,
         {
           onlyUnread: true,
-          minFreshness: 0,
         }
       );
+
+      // Update lastNewsReceived to current phase index
+      const newLastNewsReceived = formatLastNewsReceived(currentPhaseIndex);
+      await UserService.updateLastNewsReceived(user.id, newLastNewsReceived, user.id);
 
       return {
         success: true,

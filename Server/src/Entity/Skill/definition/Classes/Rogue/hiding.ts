@@ -6,7 +6,6 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { RogueSkill } from "./index";
 import { statMod } from "src/Utils/statMod";
-import { rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const hiding = new RogueSkill({
@@ -64,8 +63,9 @@ export const hiding = new RogueSkill({
     const dc = baseDC + highestEnemyIntMod + rowModifier;
     
     // Roll D20 + dex mod
+    // Skill check - apply bless/curse automatically
     const dexMod = statMod(actor.attribute.getTotal("dexterity"));
-    const rollResult = rollTwenty().total;
+    const rollResult = actor.rollTwenty({});
     const totalRoll = rollResult + dexMod;
     
     if (totalRoll >= dc) {

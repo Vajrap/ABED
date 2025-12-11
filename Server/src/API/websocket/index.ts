@@ -96,6 +96,10 @@ export const websocketRoutes = new Elysia({ prefix: "/ws" })
         // Register connection
         connectionManager.register(user.id, ws as any, context);
 
+        // Send initial quest state
+        const { questStatePostman } = await import("../../Entity/Quest/QuestStatePostman");
+        questStatePostman.sendInitialQuestState(user.id, character);
+
         Report.info("WebSocket connection established", {
           userId: user.id,
           characterId: character.id,

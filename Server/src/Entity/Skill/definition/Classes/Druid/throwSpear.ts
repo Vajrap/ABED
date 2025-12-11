@@ -9,7 +9,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
-import { rollTwenty } from "src/Utils/Dice";
 import { DruidSkill } from "./index";
 
 export const throwSpear = new DruidSkill({
@@ -92,8 +91,8 @@ export const throwSpear = new DruidSkill({
 
     // Note: this skill doesn't have level multiplier but add the level into damage directly
     damageOutput.damage = Math.floor((damageOutput.damage * rangeMultiplier) + skillLevel);
-    damageOutput.hit = rollTwenty().total + damageOutput.hit;
-    damageOutput.crit = rollTwenty().total + damageOutput.crit;
+    damageOutput.hit = actor.rollTwenty({}) + damageOutput.hit;
+    damageOutput.crit = actor.rollTwenty({}) + damageOutput.crit;
 
     const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
     const message = buildCombatMessage(

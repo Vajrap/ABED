@@ -9,7 +9,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { MageSkill } from "./index";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
@@ -82,9 +81,10 @@ export const fireBolt = new MageSkill({
     const burnDC = 8 + planarMod;
 
     // Calculate base damage
+    // Damage dice - don't apply bless/curse
     const totalDamage = Math.max(
       0,
-      (roll(1).d(6).total + planarMod) * skillLevelMultiplier(skillLevel),
+      (actor.roll({ amount: 1, face: 6, applyBlessCurse: false }) + planarMod) * skillLevelMultiplier(skillLevel),
     );
 
     // Hit comes from control mod
@@ -94,10 +94,11 @@ export const fireBolt = new MageSkill({
     const critBonus = luckMod;
 
     // Create damage output
+    // Hit/Crit rolls - apply bless/curse automatically
     const damageOutput = {
       damage: Math.floor(totalDamage),
-      hit: rollTwenty().total + hitBonus, // DC 13 base
-      crit: rollTwenty().total + critBonus,
+      hit: actor.rollTwenty({}) + hitBonus, // DC 13 base
+      crit: actor.rollTwenty({}) + critBonus,
       type: DamageType.fire,
       isMagic: true,
     };
@@ -114,7 +115,8 @@ export const fireBolt = new MageSkill({
     if (totalDamageResult.isHit) {
       const burnSave = target.rollSave('endurance')
       if (burnSave < burnDC) {
-        const burnStacks = roll(2).d(1).total;
+        // Random quantity - don't apply bless/curse
+        const burnStacks = target.roll({ amount: 2, face: 1, applyBlessCurse: false });
         const burnResult = buffsAndDebuffsRepository.burn.appender(
           target,
           {

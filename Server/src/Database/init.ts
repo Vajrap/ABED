@@ -120,6 +120,9 @@ async function loadGameState(): Promise<void> {
       Report.info("✅ Game state loaded from database");
     } else {
       // Create default game state in database
+      GameTime.synchronize();
+      const currentPhase = GameTime.getCurrentPhaseIndex();
+
       const insertedRows = await db
         .insert(gameStateTable)
         .values({
@@ -144,8 +147,8 @@ async function loadGameState(): Promise<void> {
       }
 
       gameState.id = inserted.id;
-      gameState.lastProcessedPhaseIndex = inserted.lastProcessedPhase ?? 0;
-      GameTime.setLastProcessedPhaseIndex(inserted.lastProcessedPhase ?? 0);
+      gameState.lastProcessedPhaseIndex = inserted.lastProcessedPhase ?? currentPhase;
+      GameTime.setLastProcessedPhaseIndex(inserted.lastProcessedPhase ?? currentPhase);
       Report.info("✅ Default game state created in database");
     }
   } catch (error: any) {

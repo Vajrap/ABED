@@ -1,6 +1,5 @@
 import type { DiceEnum } from "../../InterFacesEnumsAndTypes/Enums";
 import { TierEnum } from "../../InterFacesEnumsAndTypes/Tiers";
-import { roll } from "../../Utils/Dice";
 import { statMod } from "../../Utils/statMod";
 import type { Character } from "../Character/Character";
 import type { Skill } from "./Skill";
@@ -98,7 +97,8 @@ function learnSkill(character: Character, skill: Skill): boolean {
   const rawProgress = character.skillLearningProgress.get(skill.id);
   let progress: number = rawProgress !== undefined ? rawProgress : 0;
   const { base, bonusDice } = getBaseAndBonusRange(skill.tier);
-  const randomBonus = roll(1).d(bonusDice).total;
+  // Random bonus - don't apply bless/curse (it's progress gain, not a skill check)
+  const randomBonus = character.roll({ amount: 1, face: bonusDice, applyBlessCurse: false });
   const intBonus = Math.round(
     statMod(character.attribute.getTotal("intelligence") / 2),
   );

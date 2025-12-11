@@ -19,6 +19,7 @@ export const bless = new BuffDef({
             actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.bless, {
                 value: value,
                 counter: 0,
+                // isPerm and permValue can be set separately for world buffs
             });
         } else {
             entry.value += value;

@@ -40,6 +40,7 @@ import { ARMOR_SLOT_BONUS_PROFILE } from "./armorBonusConfig";
 import { persistCraftedItemInstance } from "./itemInstancePersistence";
 import Report from "src/Utils/Reporter";
 import { itemRepository } from "src/Entity/Item/repository";
+import { QuestProgressTracker } from "../../Entity/Quest/QuestProgressTracker";
 
 const armorComponentOrder = ["primary", "secondary", "tertiary", "accent"] as const;
 
@@ -197,6 +198,9 @@ function startArmorCraftingCalculation(
   // addItemInstance maps instanceId -> baseItemId for lookup
   actor.addItemInstance(instanceId, baseItemId);
   actor.addItemToInventory(instanceId, 1);
+  
+  // Update quest progress for craft objectives
+  QuestProgressTracker.onItemAcquired(actor, baseItemId, 1, "craft");
 
   if (process.env.NODE_ENV !== "test") {
     void persistCraftedItemInstance({

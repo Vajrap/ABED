@@ -25,7 +25,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WitchSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
@@ -100,7 +99,7 @@ export const chaosBinding = new WitchSkill({
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const levelMultiplier = skillLevelMultiplier(skillLevel);
     
-    const baseDiceDamage = roll(1).d(4).total;
+    const baseDiceDamage = actor.roll({ amount: 1, face: 4, applyBlessCurse: false });
     const totalDamage = Math.max(0, Math.floor((baseDiceDamage + intMod) * levelMultiplier));
 
     const damageOutput = {

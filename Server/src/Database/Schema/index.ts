@@ -12,6 +12,7 @@ export * from "./npc_memory";
 export * from "./chat";
 export * from "./npc_character_relation";
 export * from "./npc_summary";
+export * from "./quest";
 
 // Export database tables for migrations and queries
 export { users } from "./user";
@@ -28,6 +29,8 @@ export { npcMemory } from "./npc_memory";
 export { chatRooms, chatLogs, publicChatLogs } from "./chat";
 export { npcCharacterRelations } from "./npc_character_relation";
 export { npcSummary } from "./npc_summary";
+export { shops } from "./shop";
+export { questDefinitions } from "./quest";
 
 // Re-export types for convenience
 export type { User, InsertUser } from "./user";
@@ -43,3 +46,5 @@ export type { NPCMemory, InsertNPCMemory } from "./npc_memory";
 export type { ChatRoom, InsertChatRoom, ChatLog, InsertChatLog, PublicChatLog, InsertPublicChatLog } from "./chat";
 export type { NPCCharacterRelation, InsertNPCCharacterRelation } from "./npc_character_relation";
 export type { NPCSummary, InsertNPCSummary } from "./npc_summary";
+export type { Shop, InsertShop } from "./shop";
+export type { QuestDefinitionDB, InsertQuestDefinition } from "./quest";

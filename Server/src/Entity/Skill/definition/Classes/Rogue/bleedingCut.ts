@@ -13,7 +13,6 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { RogueSkill } from "./index";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { roll } from "src/Utils/Dice";
 
 export const bleedingCut = new RogueSkill({
   id: RogueSkillId.BleedingCut,
@@ -100,7 +99,7 @@ export const bleedingCut = new RogueSkill({
 
     if (saveRoll < dc) {
       // Save failed: apply bleed
-      const bleedStacks = roll(1).d(3).total;
+      const bleedStacks = target.roll({ amount: 1, face: 3, applyBlessCurse: false });
       debuffsRepository.bleed.appender(target, { turnsAppending: bleedStacks });
       bleedMessage = ` ${target.name.en} failed the save and is bleeding!`;
     }

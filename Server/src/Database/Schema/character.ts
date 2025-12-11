@@ -56,6 +56,7 @@ export const characters = pgTable("characters", {
   inventorySize: jsonb("inventory_size").default({ base: 20, bonus: 0 }).notNull(),
   inventory: jsonb("inventory").default({}).notNull(),
   equipments: jsonb("equipments").default({}).notNull(),
+  materialResources: jsonb("material_resources").default({}).notNull(), // Resource storage: { "ore": 10, "wood": 5, ... }
   
   // Character state
   statTracker: integer("stat_tracker").default(0).notNull(),

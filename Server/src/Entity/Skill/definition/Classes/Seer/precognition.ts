@@ -7,7 +7,6 @@ import type { TurnResult } from "../../../types";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { statMod } from "src/Utils/statMod";
-import { rollTwenty } from "src/Utils/Dice";
 
 export const precognition = new SeerSkill({
   id: SeerSkillId.Precognition,
@@ -47,7 +46,7 @@ export const precognition = new SeerSkill({
     // At level 7: roll d20 + LUK mod, if passed, gain 1 more turn
     if (skillLevel >= 7) {
       const luckMod = statMod(user.attribute.getTotal("luck"));
-      const roll = rollTwenty().total + luckMod;
+      const roll = user.rollTwenty({}) + luckMod;
       // Typically DC would be around 10-12, but we'll use 10 as base
       if (roll > 10) {
         turns = 2;

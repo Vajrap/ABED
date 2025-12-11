@@ -12,6 +12,7 @@ export enum SwordId {
   LongSword = "LongSword",
   Rapier = "Rapier",
   GreatSword = "GreatSword",
+  RelicSword = "RelicSword",
 }
 
 export enum BladeId {

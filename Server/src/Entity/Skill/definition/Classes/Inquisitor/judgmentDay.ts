@@ -9,7 +9,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { InquisitorSkill } from "./index";
 import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
@@ -89,7 +88,7 @@ export const judgmentDay = new InquisitorSkill({
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const luckMod = statMod(actor.attribute.getTotal("luck"));
     
-    const baseDiceDamage = roll(2).d(skillLevel >= 5 ? 8 : 6).total;
+    const baseDiceDamage = actor.roll({ amount: 2, face: skillLevel >= 5 ? 8 : 6, applyBlessCurse: false });
     const levelMultiplier = 1 + (0.15 * skillLevel);
     const attributeMod = willMod + planarMod;
     let totalDamage = Math.max(0, Math.floor(baseDiceDamage + (attributeMod * levelMultiplier)));
@@ -103,12 +102,12 @@ export const judgmentDay = new InquisitorSkill({
 
     // Bonus damage against undead/fiends
     const isUndeadOrFiend = target.type === CharacterType.undead || target.type === CharacterType.fiend;
-    const bonusDamage = isUndeadOrFiend ? roll(1).d(8).total : 0;
+    const bonusDamage = isUndeadOrFiend ? actor.roll({ amount: 1, face: 8, applyBlessCurse: false }) : 0;
 
     const damageOutput = {
       damage: totalDamage + bonusDamage,
-      hit: rollTwenty().total + controlMod,
-      crit: rollTwenty().total + luckMod,
+      hit: actor.rollTwenty({}) + controlMod,
+      crit: actor.rollTwenty({}) + luckMod,
       type: DamageType.radiance,
       isMagic: true,
     };

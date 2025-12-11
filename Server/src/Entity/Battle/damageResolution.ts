@@ -69,7 +69,6 @@ import { buffsRepository } from "../BuffsAndDebuffs/repository";
 import { getBattleStatistics } from "./BattleContext";
 import type { BattleStatistics } from "./BattleStatistics";
 import { traitRepository } from "src/Entity/Trait/repository";
-import { roll } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { ArmorClass } from "../Item/Equipment/Armor/Armor";
 import { bodyRepository } from "src/Entity/Item/Equipment/Armor/Body/repository";
@@ -153,7 +152,8 @@ function applyPreDamageModifiers(
   ) {
     // Both buff and debuff are active - add bonus damage
     const intMod = curseMarkActive.counter || 0;
-    const bonusDamage = Math.floor(intMod / 2) + roll(1).d(4).total; // INT mod/2 + 1d4
+    // Damage calculation - don't apply bless/curse
+    const bonusDamage = Math.floor(intMod / 2) + attacker.roll({ amount: 1, face: 4, applyBlessCurse: false }); // INT mod/2 + 1d4
     damageOutput.damage += bonusDamage;
 
     Report.debug(
@@ -483,8 +483,9 @@ function checkCounterAttacks(
       const dexMod = statMod(target.attribute.getTotal("dexterity"));
       const bareHaneMod = statMod(target.proficiencies.getTotal("bareHand"));
       const levelScalar = skillLevelMultiplier(skillLevel);
+      // Damage calculation - don't apply bless/curse
       const counterDamage =
-        (roll(1).d(6).total + dexMod + bareHaneMod) * levelScalar;
+        (target.roll({ amount: 1, face: 6, applyBlessCurse: false }) + dexMod + bareHaneMod) * levelScalar;
 
       const counterDamageOutput: DamageInput = {
         damage: Math.max(0, Math.floor(counterDamage)),
@@ -731,7 +732,8 @@ function applyFinalModifiers(
   // Exposed debuff: Add 1d3 extra damage from all sources
   const exposed = target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.exposed);
   if (exposed && exposed.value > 0) {
-    const exposedBonus = roll(1).d(3).total;
+    // Damage calculation - don't apply bless/curse
+    const exposedBonus = target.roll({ amount: 1, face: 3, applyBlessCurse: false });
     damage += exposedBonus;
     Report.debug(`        🎯 Exposed! Additional ${exposedBonus} damage (1d3)`);
   }

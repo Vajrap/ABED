@@ -281,6 +281,16 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
     character.equipments = record.equipments as any;
   }
 
+  // Restore resources (database stores as JSONB)
+  if ((record as any).material_resources) {
+    const resourcesData = (record as any).material_resources as any;
+    if (typeof resourcesData === 'object' && !Array.isArray(resourcesData)) {
+      for (const [resourceType, amount] of Object.entries(resourcesData)) {
+        character.materialResources.set(resourceType as any, amount as number);
+      }
+    }
+  }
+
   // Restore relations (database stores as JSONB)
   if (record.relations) {
     character.relations = record.relations as any;

@@ -14,7 +14,6 @@ import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { SpellbladeSkill } from "./index";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
 
@@ -108,9 +107,11 @@ export const edgeBurst = new SpellbladeSkill({
       else if (skillLevel === 4) diceConfig = { dice: 1, face: 8 };
       else diceConfig = { dice: 2, face: 4 }; // level 5+
 
-      baseDamage = roll(diceConfig.dice).d(diceConfig.face).total;
-      hitValue = rollTwenty().total + statMod(actor.attribute.getTotal("control"));
-      critValue = rollTwenty().total + statMod(actor.attribute.getTotal("luck"));
+      // Damage dice - don't apply bless/curse
+      baseDamage = actor.roll({ amount: diceConfig.dice, face: diceConfig.face, applyBlessCurse: false });
+      // Hit/Crit rolls - apply bless/curse automatically
+      hitValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("control"));
+      critValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("luck"));
     } else {
       // Has weapon: use weapon damage
       const type = getWeaponDamageType(weapon.weaponType);
@@ -123,7 +124,8 @@ export const edgeBurst = new SpellbladeSkill({
     // Add 1d2 per edge charge stack
     let edgeChargeDamage = 0;
     for (let i = 0; i < edgeChargeStacks; i++) {
-      edgeChargeDamage += roll(1).d(2).total;
+      // Random quantity - don't apply bless/curse
+      edgeChargeDamage += actor.roll({ amount: 1, face: 2, applyBlessCurse: false });
     }
     const rawDamage = baseDamage + planarMod + edgeChargeDamage;
     const scaledDamage = Math.max(0, rawDamage * levelScalar);

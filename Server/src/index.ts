@@ -22,6 +22,13 @@ import { updateTitleRoutes } from "./API/character/updateTitle";
 import { chatRoutes } from "./API/chat";
 import { battleRoutes } from "./API/battle";
 import { websocketRoutes } from "./API/websocket";
+import { actionsRoutes } from "./API/actions";
+import { networkTestRoutes } from "./API/networkTest";
+import { playgroundRoutes } from "./playground/api";
+import { itemRoutes } from "./API/item";
+import { shopRoutes } from "./API/shop";
+import { questRoutes } from "./API/quest";
+import { loadQuestDefinitions } from "./Entity/Quest/loadQuestDefinitions";
 
 dotenv.config();
 
@@ -31,6 +38,9 @@ async function startServer() {
   try {
     // Initialize database first
     await initializeDatabase();
+
+    // Load quest definitions into registry
+    loadQuestDefinitions();
 
     const game = new Game();
     await game.start();
@@ -70,6 +80,12 @@ async function startServer() {
           .use(updateTitleRoutes)
           .use(chatRoutes)
           .use(battleRoutes)
+          .use(actionsRoutes)
+          .use(networkTestRoutes)
+          .use(playgroundRoutes)
+          .use(itemRoutes)
+          .use(shopRoutes)
+          .use(questRoutes)
       )
       // Global error handler
       .onError(({ code, error, set }) => {

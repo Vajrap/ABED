@@ -21,7 +21,8 @@ import {
 import { ActionSelectionModal } from "./ActionSelectionModal";
 import { getActionById } from "@/config/actions";
 
-const DAYS = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6"];
+// Day names matching DayOfWeek enum: laoh, rowana, aftree, udur, matris, seethar
+const DAYS = ["Laoh", "Rowana", "Aftree", "Udur", "Matris", "Seethar"];
 const PHASES = [
   { name: "Morning", icon: WbSunny, color: "#ff9933" }, // Orange - sunrise
   { name: "Afternoon", icon: WbSunnyTwoTone, color: "#ffcc00" }, // Yellow - bright sun
@@ -43,6 +44,9 @@ export interface ActionScheduleModalProps {
     evening: string[];
     night: string[];
   }; // Phase-specific actions from backend
+  initialSchedule?: Record<string, string>; // Initial schedule to load (from character.actionSequence)
+  currentDay?: number; // Current day index (0-5), where 0=laoh, 1=rowana, etc.
+  currentPhase?: number; // Current phase index (0-3), where 0=morning, 1=afternoon, 2=evening, 3=night
 }
 
 /**
@@ -58,11 +62,24 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
   hasRailStation = true, // Default to true for now (can be disabled later)
   characterSkills,
   availableActionsByPhase,
+  initialSchedule,
+  currentDay,
+  currentPhase,
 }) => {
   const theme = useTheme();
   const [schedule, setSchedule] = useState<Record<string, string>>({});
   const [selectionModalOpen, setSelectionModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ day: number; phase: number } | null>(null);
+
+  // Initialize schedule from initialSchedule prop when modal opens
+  React.useEffect(() => {
+    if (open && initialSchedule) {
+      setSchedule(initialSchedule);
+    } else if (open && !initialSchedule) {
+      // Reset to empty if no initial schedule
+      setSchedule({});
+    }
+  }, [open, initialSchedule]);
 
   const handleCellClick = (day: number, phase: number) => {
     setSelectedSlot({ day, phase });
@@ -189,6 +206,10 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
                   const actionDef = actionId ? getActionById(actionId) : null;
                   const ActionIcon = actionDef?.icon || null;
                   
+                  // Check if this is the current phase slot
+                  const isCurrentPhase = currentDay !== undefined && currentPhase !== undefined &&
+                    dayIndex === currentDay && phaseIndex === currentPhase;
+                  
                   return (
                     <Box
                       key={`cell-${dayIndex}-${phaseIndex}`}
@@ -202,21 +223,34 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
                         padding: 1,
                         cursor: "pointer",
                         borderRadius: 1.5,
-                        border: actionDef
+                        border: isCurrentPhase
+                          ? `4px solid #ffcc00` // Broader yellow border for current phase
+                          : actionDef
                           ? `2px solid ${theme.palette.tertiary.main}`
                           : `2px solid ${alpha(theme.palette.text.disabled, 0.3)}`,
-                        backgroundColor: actionDef
+                        backgroundColor: isCurrentPhase
+                          ? alpha("#ffcc00", 0.2) // Light yellow background for current phase
+                          : actionDef
                           ? alpha(theme.palette.tertiary.main, 0.15)
                           : alpha("#fff", 0.3),
                         transition: "all 0.2s ease-out",
                         height: "13vh",
                         position: "relative",
                         overflow: "hidden",
+                        boxShadow: isCurrentPhase
+                          ? `0 0 16px ${alpha("#ffcc00", 0.5)}` // Yellow glow for current phase
+                          : "none",
 
                         "&:hover": {
-                          backgroundColor: alpha(theme.palette.tertiary.main, 0.2),
-                          border: `2px solid ${theme.palette.tertiary.main}`,
-                          boxShadow: `0 0 12px ${alpha(theme.palette.tertiary.main, 0.3)}`,
+                          backgroundColor: isCurrentPhase
+                            ? alpha("#ffcc00", 0.25)
+                            : alpha(theme.palette.tertiary.main, 0.2),
+                          border: isCurrentPhase
+                            ? `4px solid #ffcc00`
+                            : `2px solid ${theme.palette.tertiary.main}`,
+                          boxShadow: isCurrentPhase
+                            ? `0 0 20px ${alpha("#ffcc00", 0.6)}`
+                            : `0 0 12px ${alpha(theme.palette.tertiary.main, 0.3)}`,
                           transform: "scale(1.05)",
                           zIndex: 1,
                         },

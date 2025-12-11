@@ -9,6 +9,7 @@ import { rollTwenty } from "../../Utils/Dice";
 import { statMod } from "../../Utils/statMod";
 import { mobDropTables } from "../Character/MOBs/dropTables";
 import { MOBEnum } from "../Character/MOBs/enums";
+import { QuestProgressTracker } from "../Quest/QuestProgressTracker";
 
 /**
  * Loot pool item - item that will be distributed to winning party
@@ -318,6 +319,9 @@ function distributeLoot(winner: Party, lootPool: LootPoolItem[]): ItemDropAndLoo
     const recipient = shuffled[currentIndex % shuffled.length];
     if (recipient) {
       recipient.addItemToInventory(loot.itemId, loot.quantity);
+      
+      // Update quest progress for collect objectives
+      QuestProgressTracker.onItemAcquired(recipient, loot.itemId, loot.quantity, "loot");
       
       // Track what this winner received
       const winnerEntry = winnerMap.get(recipient.id);

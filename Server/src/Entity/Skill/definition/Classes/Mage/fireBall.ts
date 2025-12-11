@@ -10,7 +10,6 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { MageSkill } from "./index";
 
 export const fireBall = new MageSkill({
@@ -56,8 +55,8 @@ export const fireBall = new MageSkill({
   ) => {
     // Determine number of targets (1-6, weighted toward 1-3)
     // Roll 2d6, if both are <=3, use first die, else sum them
-    const roll1 = roll(6).d(1).total;
-    const roll2 = roll(6).d(1).total;
+    const roll1 = actor.roll({ amount: 1, face: 6, applyBlessCurse: false });
+    const roll2 = actor.roll({ amount: 1, face: 6, applyBlessCurse: false });
     let numTargets: number;
 
     if (roll1 <= 3 || roll2 <= 3) {
@@ -95,7 +94,7 @@ export const fireBall = new MageSkill({
 
     for (const target of targets) {
       // Calculate base damage
-      const baseDiceDamage = roll(12).d(1).total;
+      const baseDiceDamage = actor.roll({ amount: 1, face: 12, applyBlessCurse: false });
       const skillLevelBonus = 0.5 * skillLevel;
       const totalDamage = Math.max(
         0,
@@ -111,8 +110,8 @@ export const fireBall = new MageSkill({
       // Create damage output
       const damageOutput = {
         damage: Math.floor(totalDamage),
-        hit: rollTwenty().total - 3 + hitBonus,
-        crit: rollTwenty().total + critBonus,
+        hit: actor.rollTwenty({}) - 3 + hitBonus,
+        crit: actor.rollTwenty({}) + critBonus,
         type: DamageType.fire,
         isMagic: true,
       };
@@ -129,7 +128,7 @@ export const fireBall = new MageSkill({
       if (totalDamageResult.isHit) {
         const burnSave = target.rollSave('endurance')
         if (burnSave < burnDC) {
-          const burnStacks = roll(2).d(1).total;
+          const burnStacks = target.roll({ amount: 2, face: 1, applyBlessCurse: false });
           // Actually apply the burn debuff
           const burnResult = buffsAndDebuffsRepository.burn.appender(target, { turnsAppending: burnStacks });
           burnMessage = burnResult.en;

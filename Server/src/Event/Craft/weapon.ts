@@ -32,6 +32,7 @@ import {ARMOR_SLOT_BONUS_PROFILE} from "./armorBonusConfig";
 import {ItemCost} from "src/Entity/Item/Subclass/ItemCost";
 import {persistCraftedItemInstance} from "./itemInstancePersistence";
 import Report from "src/Utils/Reporter";
+import { QuestProgressTracker } from "../../Entity/Quest/QuestProgressTracker";
 
 const weaponComponentOrder = ["blade", "handle", "grip", "guard", "core"] as const;
 type WeaponComponentKey = (typeof weaponComponentOrder)[number];
@@ -303,6 +304,9 @@ function startWeaponCraftingCalculation(
   // addItemInstance maps instanceId -> baseItemId for lookup
   actor.addItemInstance(instanceId, baseItemId);
   actor.addItemToInventory(instanceId, 1);
+  
+  // Update quest progress for craft objectives
+  QuestProgressTracker.onItemAcquired(actor, baseItemId, 1, "craft");
 
   if (process.env.NODE_ENV !== "test") {
     void persistCraftedItemInstance({

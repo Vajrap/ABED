@@ -10,7 +10,6 @@ import { statMod } from "src/Utils/statMod";
 import type { TurnResult } from "../../../types";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import type { ElementResourceKey } from "src/InterFacesEnumsAndTypes/Enums";
 
@@ -68,13 +67,15 @@ export const threadSnip = new SeerSkill({
     
     // Calculate damage: (1d4 + CHA mod) × skillLevelMultiplier
     const chaMod = statMod(user.attribute.getTotal("charisma"));
-    const diceDamage = roll(1).d(4).total;
+    // Damage dice - don't apply bless/curse
+    const diceDamage = user.roll({ amount: 1, face: 4, applyBlessCurse: false });
     const levelScalar = skillLevelMultiplier(skillLevel);
     const totalDamage = Math.floor((diceDamage + chaMod) * levelScalar);
     
     // Calculate hit/crit
-    const hitRoll = rollTwenty().total;
-    const critRoll = rollTwenty().total;
+    // Hit/Crit rolls - apply bless/curse automatically
+    const hitRoll = user.rollTwenty({});
+    const critRoll = user.rollTwenty({});
     
     const damageOutput = {
       damage: totalDamage,
@@ -89,8 +90,9 @@ export const threadSnip = new SeerSkill({
     // Roll for element steal: D14 - skill level (so at level 1, roll 1d13, at level 2, roll 1d12, etc.)
     // Note: Description says "roll D14 (-1 per skill level) dice", meaning roll 1d(14-skillLevel)
     // The DC is the dice face itself (need to roll the max or close to it)
+    // Skill check - apply bless/curse automatically (this is a skill check, not damage)
     const diceFace = Math.max(1, 14 - skillLevel);
-    const stealRoll = roll(1).d(diceFace).total;
+    const stealRoll = user.roll({ amount: 1, face: diceFace });
     // Need to roll >= diceFace to pass (at level 1: roll 1d13, need >= 13; at level 2: roll 1d12, need >= 12)
     const dc = diceFace;
     let stolenElement: ElementResourceKey | null = null;
@@ -107,9 +109,9 @@ export const threadSnip = new SeerSkill({
       }
       
       if (availableElements.length > 0) {
-        // Randomly select one element
-        const randomIndex = Math.floor(Math.random() * availableElements.length);
-        stolenElement = availableElements[randomIndex]!;
+        // Randomly select one element - don't apply bless/curse
+        const randomRoll = user.roll({ amount: 1, face: availableElements.length, applyBlessCurse: false });
+        stolenElement = availableElements[randomRoll - 1]!; // Convert 1-based to 0-based index
         
         // Steal 1 element from target
         if (target.resources[stolenElement] !== undefined) {

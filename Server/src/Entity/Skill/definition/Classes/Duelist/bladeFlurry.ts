@@ -10,7 +10,6 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
-import { roll } from "src/Utils/Dice";
 import { DuelistSkill } from "./index";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
@@ -105,7 +104,7 @@ export const bladeFlurry = new DuelistSkill({
       const positionModifier = getPositionModifier(actor.position, target.position, weapon);
       
       // Damage per hit: 1d4 + DEX mod * skillScalar
-      const baseDamage = (roll(weaponDamage.dice).d(weaponDamage.face).total * weaponDamagePercentage) + dexMod * levelScalar;
+      const baseDamage = (actor.roll({ amount: weaponDamage.dice, face: weaponDamage.face, applyBlessCurse: false }) * weaponDamagePercentage) + dexMod * levelScalar;
       const hitDamage = Math.floor((baseDamage + dexMod * levelScalar) * positionModifier);
 
       const damageOutput = {

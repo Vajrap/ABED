@@ -10,7 +10,6 @@ import { statMod } from "src/Utils/statMod";
 import type { TurnResult } from "../../../types";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const explosiveBolt = new EngineerSkill({
@@ -73,13 +72,13 @@ export const explosiveBolt = new EngineerSkill({
 
     // Calculate main damage: (1d8 + DEX mod) × skillLevelMultiplier
     const dexMod = statMod(user.attribute.getTotal("dexterity"));
-    const diceDamage = roll(1).d(8).total;
+    const diceDamage = user.roll({ amount: 1, face: 8, applyBlessCurse: false });
     const levelScalar = skillLevelMultiplier(skillLevel);
     const totalDamage = Math.floor((diceDamage + dexMod) * levelScalar);
 
     // Calculate hit/crit
-    const hitRoll = rollTwenty().total;
-    const critRoll = rollTwenty().total;
+    const hitRoll = user.rollTwenty({});
+    const critRoll = user.rollTwenty({});
 
     const damageOutput = {
       damage: totalDamage,

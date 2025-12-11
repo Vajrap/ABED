@@ -19,6 +19,7 @@ export const cursed = new DebuffDef({
             actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.cursed, {
                 value: value,
                 counter: 0,
+                // isPerm and permValue can be set separately for world debuffs
             });
         } else {
             entry.value += value;

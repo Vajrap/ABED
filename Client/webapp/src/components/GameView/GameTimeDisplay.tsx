@@ -26,8 +26,9 @@ export const GameTimeDisplay: React.FC<GameTimeDisplayProps> = ({ gameTime }) =>
   };
 
   // Get day name (1-6) - game has 6 days per week
+  // Matching DayOfWeek enum: laoh, rowana, aftree, udur, matris, seethar
   const getDayName = (dayOfWeek: number): string => {
-    const days = ["Moonday", "Fireday", "Waterday", "Earthday", "Windday", "Lightday"];
+    const days = ["Laoh", "Rowana", "Aftree", "Udur", "Matris", "Seethar"];
     return days[dayOfWeek - 1] || `Day ${dayOfWeek}`;
   };
 

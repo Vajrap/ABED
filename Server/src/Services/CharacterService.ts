@@ -19,6 +19,7 @@ import { PartyService } from "./PartyService";
 import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import { partyManager } from "../Game/PartyManager";
 import { characterManager } from "../Game/CharacterManager";
+import { locationRepository } from "../Entity/Location/Location/repository";
 import { PlayableBackgroundEnum, PlayableClassEnum, PlayableRaceEnum } from "src/API/characterCreation/enums";
 import { classBonus } from "src/API/characterCreation/classes";
 import { backgroundBonus } from "src/API/characterCreation/background";
@@ -27,6 +28,7 @@ import { equip } from "src/Utils/equip";
 import { activeEpithet } from "src/Entity/Character/Subclass/Title/logics/active";
 import { activeRole } from "src/Entity/Character/Subclass/Title/logics/active";
 import type { PortraitData } from "../InterFacesEnumsAndTypes/PortraitData";
+import Report from "../Utils/Reporter";
 
 export interface CharacterCreationData {
   name: string;
@@ -59,6 +61,21 @@ export class CharacterService {
       characterManager.addCharacter(character);
       partyManager.addParty(party);
 
+      // 3.5. Register party at location
+      const location = locationRepository[LocationsEnum.WaywardInn];
+      if (location) {
+        location.partyMovesIn(party);
+        Report.debug("Party registered at location", {
+          partyId: party.partyID,
+          locationId: location.id,
+        });
+      } else {
+        Report.warn("Location not found when registering party", {
+          locationId: LocationsEnum.WaywardInn,
+          partyId: party.partyID,
+        });
+      }
+
       // 4. Save to database
       const insertCharacter = this.characterToInsertCharacter(character);
       await this.saveCharacterToDatabase(insertCharacter);
@@ -82,12 +99,12 @@ export class CharacterService {
    * Convert Character entity to InsertCharacter for database storage
    */
   private static characterToInsertCharacter(character: Character): InsertCharacter {
-    // Build insert object - exclude location since it may not exist in older DB schemas
-    // Truncate all varchar fields to their schema limits
+    // Build insert object - truncate all varchar fields to their schema limits
     const insertData: any = {
       id: character.id,
       userId: character.userId, // Can be null for NPCs
       partyID: character.partyID,
+      location: character.location || null, // Include location if it exists
 
       // Basic info - truncate all varchar fields
       name: String(character.name?.en || character.name || '').substring(0, 255),
@@ -97,8 +114,7 @@ export class CharacterService {
       level: character.level,
       portrait: character.portrait,
       background: String(character.background || '').substring(0, 100),
-      characterPrompt: null, // Can be set for NPCs separately
-      // location is excluded - will be added via migration later
+      // characterPrompt is not in characters table - it's in npc_memory table
 
       // Character systems - serialize to JSON
       alignment: character.alignment as any,
@@ -107,6 +123,7 @@ export class CharacterService {
       battleStats: character.battleStats as any,
       elements: character.elements as any,
       proficiencies: character.proficiencies as any,
+      saveRolls: character.saveRolls as any,
       needs: character.needs as any,
       vitals: character.vitals as any,
       fame: character.fame as any,
@@ -136,6 +153,7 @@ export class CharacterService {
       inventorySize: character.inventorySize as any,
       inventory: character.inventory as any,
       equipments: character.equipments as any,
+      materialResources: character.materialResources as any,
 
       // State
       statTracker: character.statTracker,
@@ -274,6 +292,7 @@ export class CharacterService {
     const inventorySizeJson = JSON.stringify(char.inventorySize || { base: 20, bonus: 0 });
     const inventoryJson = JSON.stringify(char.inventory || {});
     const equipmentsJson = JSON.stringify(char.equipments || {});
+    const materialResourcesJson = JSON.stringify(char.materialResources || {});
 
     // Use parameterized queries with proper JSON casting
     // Pass JSON strings as parameters and cast them in SQL
@@ -285,7 +304,7 @@ export class CharacterService {
         action_sequence, informations, skills, active_skills, conditional_skills,
         conditional_skills_condition, skill_learning_progress, breathing_skills,
         active_breathing_skill, breathing_skills_learning_progress, planar_aptitude,
-        relations, traits, inventory_size, inventory, equipments, stat_tracker, ab_guage,
+        relations, traits, inventory_size, inventory, equipments, material_resources, stat_tracker, ab_guage,
         created_at, updated_at, created_by, updated_by
       ) VALUES (
         ${char.id}, ${char.userId}, ${char.partyID || null},
@@ -306,7 +325,7 @@ export class CharacterService {
         ${sql.raw(`'${planarAptitudeJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${relationsJson.replace(/'/g, "''")}'::jsonb`)},
         ${sql.raw(`'${traitsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${inventorySizeJson.replace(/'/g, "''")}'::jsonb`)},
         ${sql.raw(`'${inventoryJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${equipmentsJson.replace(/'/g, "''")}'::jsonb`)},
-        ${char.statTracker || 0}, ${char.abGuage || 0},
+        ${sql.raw(`'${materialResourcesJson.replace(/'/g, "''")}'::jsonb`)}, ${char.statTracker || 0}, ${char.abGuage || 0},
         NOW(), NOW(), ${String(char.createdBy || 'system').substring(0, 255)}, ${String(char.updatedBy || 'system').substring(0, 255)}
       ) RETURNING *
     `);

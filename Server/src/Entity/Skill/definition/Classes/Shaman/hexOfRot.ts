@@ -23,7 +23,6 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { ShamanSkill } from "./index";
 
@@ -95,7 +94,7 @@ export const hexOfRot = new ShamanSkill({
     // Calculate damage
     const planarMod = statMod(actor.attribute.getTotal("planar"));
     const controlMod = statMod(actor.attribute.getTotal("control"));
-    const damageRoll = roll(1).d(4).total;
+    const damageRoll = actor.roll({ amount: 1, face: 4, applyBlessCurse: false });
     const totalDamage = damageRoll + planarMod + 0.5 * skillLevel;
 
     const damageOutput = {
@@ -111,7 +110,7 @@ export const hexOfRot = new ShamanSkill({
     // Check for hex debuff (DC10 + control mod willpower save)
     let hexMessage = "";
     const hexDC = 10 + controlMod;
-    const willpowerSave = rollTwenty().total;
+    const willpowerSave = target.rollTwenty({});
     if (willpowerSave < hexDC + statMod(target.attribute.getTotal("willpower"))) {
       // Target fails save - reduce endurance (TODO: implement endurance debuff)
       hexMessage = ` ${target.name.en} was hexed! Endurance reduced by 2 (not yet implemented)`;

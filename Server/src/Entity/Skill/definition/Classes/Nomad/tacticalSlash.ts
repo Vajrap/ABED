@@ -9,7 +9,6 @@ import { getTarget } from "src/Entity/Battle/getTarget";
 import type { TurnResult } from "../../../types";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
@@ -82,7 +81,7 @@ export const tacticalSlash = new NomadSkill({
       const weaponDamage = weaponDamageOutput.damage;
 
       // Calculate damage: (weapon damage + attribute modifier(This comes from getWeaponDamageOutput) + 1d4) × skillLevelMultiplier
-      const diceBonus = roll(1).d(4).total;
+      const diceBonus = user.roll({ amount: 1, face: 4, applyBlessCurse: false });
       const levelScalar = skillLevelMultiplier(skillLevel);
       const totalDamage = Math.floor((weaponDamage + diceBonus) * levelScalar);
 
@@ -94,8 +93,8 @@ export const tacticalSlash = new NomadSkill({
 
       const damageOutput = {
         damage: Math.floor(totalDamage * positionModifier),
-        hit: rollTwenty().total,
-        crit: rollTwenty().total,
+        hit: user.rollTwenty({}),
+        crit: user.rollTwenty({}),
         type: DamageType.fire,
         isMagic: true,
       };
@@ -108,7 +107,7 @@ export const tacticalSlash = new NomadSkill({
         const dc = skillLevel >= 5 ? 12 : 10;
         const saveRoll = target.rollSave("endurance");
         if (saveRoll < dc) {
-          const burnStacks = roll(1).d(3).total;
+          const burnStacks = target.roll({ amount: 1, face: 3, applyBlessCurse: false });
           debuffsRepository.burn.appender(target, { turnsAppending: burnStacks });
           burnMessage = ` ${target.name.en} failed the save and is burning!`;
         }

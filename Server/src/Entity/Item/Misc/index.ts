@@ -365,4 +365,10 @@ export enum GoldId {
   gold = "gold",
 }
 
-export type MiscItemId = ResourceId | GoldId;
+// Quest Items - special items used in quests
+export enum QuestItemId {
+  ancientKey = "ancient_key",
+  secretPackage = "secret_package",
+}
+
+export type MiscItemId = ResourceId | GoldId | QuestItemId;

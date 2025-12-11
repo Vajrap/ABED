@@ -52,6 +52,10 @@ export function handleTrainSkill(
       rollTwenty().total +
       statMod(character.attribute.getStat("intelligence").total);
 
+    // Apply needs changes: Energy -6, Mood -2 (strenuous activity)
+    character.needs.decEnergy(6);
+    character.needs.decMood(2);
+
     skill.exp += expGained;
     if (skill.exp >= expNeeded) {
       skill.exp -= expNeeded;
