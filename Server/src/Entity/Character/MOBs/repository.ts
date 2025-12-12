@@ -36,35 +36,12 @@ import {
   orcRogue,
   orcDruid,
 } from "./Humanoid/orcs";
-import {
-  halflingWarrior,
-  halflingRanger,
-  halflingMage,
-  halflingCleric,
-  halflingPaladin,
-  halflingWarlock,
-  halflingBarbarian,
-  halflingSorcerer,
-  halflingRogue,
-  halflingDruid,
-} from "./Humanoid/halflings";
-import {
-  dwarfWarrior,
-  dwarfRanger,
-  dwarfMage,
-  dwarfCleric,
-  dwarfPaladin,
-  dwarfWarlock,
-  dwarfBarbarian,
-  dwarfSorcerer,
-  dwarfRogue,
-  dwarfDruid,
-} from "./Humanoid/dwarfs";
+
 import { MOB } from ".";
 
 export const mobRepository: Record<
   MOBEnum,
-  (difficulty: 1 | 2 | 3 | 4 | 5) => MOB
+  (difficulty: 1 | 2 | 3 | 4 | 5) => MOB | Character
 > = {
   // Goblins
   goblinScout: goblinScout,
@@ -73,62 +50,40 @@ export const mobRepository: Record<
   goblinCleric: goblinCleric,
   goblinCaptain: goblinCaptain,
   
-  // // Humans
-  // humanWarrior: humanWarrior,
-  // humanMage: humanMage,
-  // humanCleric: humanCleric,
-  // humanPaladin: humanPaladin,
-  // humanWarlock: humanWarlock,
-  // humanBarbarian: humanBarbarian,
-  // humanSorcerer: humanSorcerer,
-  // humanRogue: humanRogue,
-  // humanDruid: humanDruid,
+  // Humans
+  humanWarrior: humanWarrior,
+  humanMage: humanMage,
+  humanCleric: humanCleric,
+  humanPaladin: humanPaladin,
+  humanWarlock: humanWarlock,
+  humanBarbarian: humanBarbarian,
+  humanSorcerer: humanSorcerer,
+  humanRogue: humanRogue,
+  humanDruid: humanDruid,
   
-  // // Elves
-  // elvenWarrior: elvenWarrior,
-  // elvenRanger: elvenRanger,
-  // elvenMage: elvenMage,
-  // elvenCleric: elvenCleric,
-  // elvenPaladin: elvenPaladin,
-  // elvenWarlock: elvenWarlock,
-  // elvenBarbarian: elvenBarbarian,
-  // elvenSorcerer: elvenSorcerer,
-  // elvenRogue: elvenRogue,
-  // elvenDruid: elvenDruid,
+  // Elves
+  elvenWarrior: elvenWarrior,
+  elvenRanger: elvenRanger,
+  elvenMage: elvenMage,
+  elvenCleric: elvenCleric,
+  elvenPaladin: elvenPaladin,
+  elvenWarlock: elvenWarlock,
+  elvenBarbarian: elvenBarbarian,
+  elvenSorcerer: elvenSorcerer,
+  elvenRogue: elvenRogue,
+  elvenDruid: elvenDruid,
   
-  // // Orcs
-  // orcWarrior: orcWarrior,
-  // orcRanger: orcRanger,
-  // orcMage: orcMage,
-  // orcCleric: orcCleric,
-  // orcPaladin: orcPaladin,
-  // orcWarlock: orcWarlock,
-  // orcBarbarian: orcBarbarian,
-  // orcSorcerer: orcSorcerer,
-  // orcRogue: orcRogue,
-  // orcDruid: orcDruid,
+  // Orcs
+  orcWarrior: orcWarrior,
+  orcRanger: orcRanger,
+  orcMage: orcMage,
+  orcCleric: orcCleric,
+  orcPaladin: orcPaladin,
+  orcWarlock: orcWarlock,
+  orcBarbarian: orcBarbarian,
+  orcSorcerer: orcSorcerer,
+  orcRogue: orcRogue,
+  orcDruid: orcDruid,
   
-  // // Halflings
-  // halflingWarrior: halflingWarrior,
-  // halflingRanger: halflingRanger,
-  // halflingMage: halflingMage,
-  // halflingCleric: halflingCleric,
-  // halflingPaladin: halflingPaladin,
-  // halflingWarlock: halflingWarlock,
-  // halflingBarbarian: halflingBarbarian,
-  // halflingSorcerer: halflingSorcerer,
-  // halflingRogue: halflingRogue,
-  // halflingDruid: halflingDruid,
-  
-  // // Dwarfs
-  // dwarfWarrior: dwarfWarrior,
-  // dwarfRanger: dwarfRanger,
-  // dwarfMage: dwarfMage,
-  // dwarfCleric: dwarfCleric,
-  // dwarfPaladin: dwarfPaladin,
-  // dwarfWarlock: dwarfWarlock,
-  // dwarfBarbarian: dwarfBarbarian,
-  // dwarfSorcerer: dwarfSorcerer,
-  // dwarfRogue: dwarfRogue,
-  // dwarfDruid: dwarfDruid,
+
 };

@@ -40,6 +40,7 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { handleTrainSkill } from "../Location/Events/handlers/train/skill";
 import { dropProcess } from "./dropProcess";
 import { QuestProgressTracker } from "../Quest/QuestProgressTracker";
+import { unregisterMOBs, isMOB } from "../Character/MOBs/helpers";
 
 interface ActiveTrap {
   damage: number;
@@ -121,6 +122,19 @@ export class Battle {
       // Clear battle statistics and battle instance from context when battle ends
       setBattleStatistics(null, this.id);
       setBattle(null, this.id);
+      
+      // Clean up MOBs from activeCharacterRegistry in case battle errors
+      // (normal cleanup happens in handleBattleEnd, but this ensures cleanup on errors)
+      const mobIds: string[] = [];
+      for (const participant of this.allParticipants) {
+        if (isMOB(participant)) {
+          mobIds.push(participant.id);
+        }
+      }
+      if (mobIds.length > 0) {
+        unregisterMOBs(mobIds);
+        Report.debug(`Cleaned up ${mobIds.length} MOBs from registry after battle error`);
+      }
     }
   }
 
@@ -569,6 +583,18 @@ export class Battle {
         actor.vitals.incMp(actor.vitals.mp.max);
         actor.vitals.incSp(actor.vitals.sp.max);
       }
+    }
+
+    // Clean up MOBs from activeCharacterRegistry after battle ends
+    const mobIds: string[] = [];
+    for (const participant of this.allParticipants) {
+      if (isMOB(participant)) {
+        mobIds.push(participant.id);
+      }
+    }
+    if (mobIds.length > 0) {
+      unregisterMOBs(mobIds);
+      Report.debug(`Cleaned up ${mobIds.length} MOBs from registry after battle`);
     }
 
     return dropResults;

@@ -878,9 +878,22 @@ function processCharacterGroups(
   for (const c of groups.resting) {
     const moodBefore = c.needs.mood.current;
     const energyBefore = c.needs.energy.current;
-    const result = resolveGroupRandomEvent([c], events.rest, () =>
-      handleRestAction([c], ActionInput.Rest, context),
-    );
+    
+    if (c.userId === null) {
+      // NPCs do the action but don't get random events
+      const npcResult = handleRestAction([c], ActionInput.Rest, context);
+      if (npcResult) {
+        if (Array.isArray(npcResult)) allNews.push(...npcResult);
+        else allNews.push(npcResult);
+      }
+    } else {
+      // Player characters can get random events
+      const result = resolveGroupRandomEvent([c], events.rest, () =>
+        handleRestAction([c], ActionInput.Rest, context),
+      );
+      allNews.push(...result);
+    }
+    
     console.log("After rest action", {
       characterId: c.id,
       characterName: typeof c.name === 'string' ? c.name : c.name?.en,
@@ -891,50 +904,124 @@ function processCharacterGroups(
       moodChange: c.needs.mood.current - moodBefore,
       energyChange: c.needs.energy.current - energyBefore,
     });
-    allNews.push(...result);
   }
 
   // Group
   // Tavern and strolling might not use the luck roll for random encounter, but the location should provide list of possible events separate into groups
   // Grouping just like the same as RE, worst bad natural good best, each with multiple possible events, and we randomly pick.
   // These resolve functions might need to receive the location or at least set of possible events from location itself
+  // NPCs shouldn't get random discoveries/events from strolling or tavern
   if (groups.strolling.length > 0) {
-    const result: News[] = resolveStrollingAction(groups.strolling, context);
-    allNews.push(...result);
+    const playerStrollers = groups.strolling.filter(c => c.userId !== null);
+    if (playerStrollers.length > 0) {
+      const result: News[] = resolveStrollingAction(playerStrollers, context);
+      allNews.push(...result);
+    }
+    // NPCs still stroll (needs changes apply) but don't get random discoveries
+    const npcStrollers = groups.strolling.filter(c => c.userId === null);
+    for (const npc of npcStrollers) {
+      // Apply needs changes but no random discoveries
+      npc.needs.decEnergy(1);
+      npc.needs.incMood(1);
+    }
   }
 
   if (groups.tavern.length > 0) {
-    const result: News[] = resolveTavernAction(groups.tavern, context);
-    allNews.push(...result);
+    const playerTavern = groups.tavern.filter(c => c.userId !== null);
+    if (playerTavern.length > 0) {
+      const result: News[] = resolveTavernAction(playerTavern, context);
+      allNews.push(...result);
+    }
+    // NPCs still visit tavern (needs changes apply) but don't get random events
+    const npcTavern = groups.tavern.filter(c => c.userId === null);
+    for (const npc of npcTavern) {
+      // Apply needs changes but no random events
+      npc.needs.decEnergy(2);
+      npc.needs.incMood(3);
+    }
   }
 
   // Training, subAction grouping
+  // Separate NPCs from players - NPCs don't get random events
   groups.trainArtisan.forEach((chars, artisanKey) => {
-    const result = resolveGroupRandomEvent(chars, events.train, () =>
-      handleTrainArtisans(chars, artisanKey, context),
-    );
-    allNews.push(...result);
+    const playerChars = chars.filter(c => c.userId !== null);
+    const npcChars = chars.filter(c => c.userId === null);
+    
+    if (playerChars.length > 0) {
+      const result = resolveGroupRandomEvent(playerChars, events.train, () =>
+        handleTrainArtisans(playerChars, artisanKey, context),
+      );
+      allNews.push(...result);
+    }
+    
+    // NPCs still train but without random events
+    if (npcChars.length > 0) {
+      const npcResult = handleTrainArtisans(npcChars, artisanKey, context);
+      if (npcResult) {
+        if (Array.isArray(npcResult)) allNews.push(...npcResult);
+        else allNews.push(npcResult);
+      }
+    }
   });
 
   groups.trainAttribute.forEach((chars, attributeKey) => {
-    const result = resolveGroupRandomEvent(chars, events.train, () =>
-      handleTrainAttribute(chars, attributeKey, context),
-    );
-    allNews.push(...result);
+    const playerChars = chars.filter(c => c.userId !== null);
+    const npcChars = chars.filter(c => c.userId === null);
+    
+    if (playerChars.length > 0) {
+      const result = resolveGroupRandomEvent(playerChars, events.train, () =>
+        handleTrainAttribute(playerChars, attributeKey, context),
+      );
+      allNews.push(...result);
+    }
+    
+    if (npcChars.length > 0) {
+      const npcResult = handleTrainAttribute(npcChars, attributeKey, context);
+      if (npcResult) {
+        if (Array.isArray(npcResult)) allNews.push(...npcResult);
+        else allNews.push(npcResult);
+      }
+    }
   });
 
   groups.trainProficiency.forEach((chars, proficiencyKey) => {
-    const result = resolveGroupRandomEvent(chars, events.train, () =>
-      handleTrainProficiency(chars, proficiencyKey, context),
-    );
-    allNews.push(...result);
+    const playerChars = chars.filter(c => c.userId !== null);
+    const npcChars = chars.filter(c => c.userId === null);
+    
+    if (playerChars.length > 0) {
+      const result = resolveGroupRandomEvent(playerChars, events.train, () =>
+        handleTrainProficiency(playerChars, proficiencyKey, context),
+      );
+      allNews.push(...result);
+    }
+    
+    if (npcChars.length > 0) {
+      const npcResult = handleTrainProficiency(npcChars, proficiencyKey, context);
+      if (npcResult) {
+        if (Array.isArray(npcResult)) allNews.push(...npcResult);
+        else allNews.push(npcResult);
+      }
+    }
   });
 
   groups.trainSkill.forEach((chars, skillId) => {
-    const result = resolveGroupRandomEvent(chars, events.train, () =>
-      handleTrainSkill(chars, skillId, context),
-    );
-    allNews.push(...result);
+    const playerChars = chars.filter(c => c.userId !== null);
+    const npcChars = chars.filter(c => c.userId === null);
+    
+    if (playerChars.length > 0) {
+      const result = resolveGroupRandomEvent(playerChars, events.train, () =>
+        handleTrainSkill(playerChars, skillId, context),
+      );
+      allNews.push(...result);
+    }
+    
+    if (npcChars.length > 0) {
+      const npcResult = handleTrainSkill(npcChars, skillId, context);
+      if (npcResult) {
+        if (Array.isArray(npcResult)) allNews.push(...npcResult);
+        else allNews.push(npcResult);
+      }
+    }
   });
 
   groups.reading.forEach(({ character, bookId }) => {
@@ -943,10 +1030,13 @@ function processCharacterGroups(
   });
 
   // Guild actions (generate quest offers)
-  groups.guildActions.forEach((character) => {
-    const result = handleGuildAction(character, context, "generateOffer");
-    allNews.push(...result);
-  });
+  // NPCs shouldn't generate quests - filter them out
+  groups.guildActions
+    .filter(character => character.userId !== null) // Only player characters
+    .forEach((character) => {
+      const result = handleGuildAction(character, context, "generateOffer");
+      allNews.push(...result);
+    });
 
   // TODO: Check the grouping
   if (groups.crafting.mainCharacter) {
@@ -956,11 +1046,25 @@ function processCharacterGroups(
 
 
   for (const { character, skillId } of groups.learnSkill) {
-    const result = resolveGroupRandomEvent([character], events.learn, () =>
-      handleLearnSkill(character, skillId, context),
-    );
-    allNews.push(...result);
+    if (character.userId === null) {
+      // NPCs learn skills but don't get random events
+      const npcResult = handleLearnSkill(character, skillId, context);
+      if (npcResult) {
+        if (Array.isArray(npcResult)) allNews.push(...npcResult);
+        else allNews.push(npcResult);
+      }
+    } else {
+      // Player characters can get random events
+      const result = resolveGroupRandomEvent([character], events.learn, () =>
+        handleLearnSkill(character, skillId, context),
+      );
+      allNews.push(...result);
+    }
   }
+
+  // Collect quest completion news from QuestProgressTracker
+  const questCompletionNews = QuestProgressTracker.flushQuestCompletionNews();
+  allNews.push(...questCompletionNews);
 
   // Convert News[] to NewsDistribution and merge
   const newsStruct = newsArrayToStructure(allNews);
@@ -972,12 +1076,25 @@ function resolveGroupRandomEvent(
   eventSource: RandomEventUnits,
   fallback: () => News | News[] | null,
 ): News[] {
+  // Filter out NPCs - they shouldn't get random events
+  const playerCharacters = characters.filter(c => c.userId !== null);
+  
+  // If no player characters, skip random events but still run fallback for NPCs
+  if (playerCharacters.length === 0) {
+    const result = fallback();
+    if (result) {
+      if (Array.isArray(result)) return result;
+      else return [result];
+    }
+    return [];
+  }
+  
   let results: News[] = [];
   const luckAvg = Math.floor(
-    characters.reduce(
+    playerCharacters.reduce(
       (sum, c) => sum + statMod(c.attribute.getTotal("luck")),
       0,
-    ) / characters.length,
+    ) / playerCharacters.length,
   );
   const roll = rollTwenty().total + luckAvg;
   const category = getEventCategory(roll);
@@ -986,7 +1103,7 @@ function resolveGroupRandomEvent(
     const candidates = eventSource[category];
     if (candidates.length > 0) {
       const event = candidates[Math.floor(Math.random() * candidates.length)];
-      const result = event!(characters);
+      const result = event!(playerCharacters);
       if (result) {
         results.push(result);
         return results;
@@ -994,10 +1111,24 @@ function resolveGroupRandomEvent(
     }
   }
 
-  const result = fallback();
-  if (result) {
-    if (Array.isArray(result)) results.push(...result);
-    else results.push(result);
+  // Run fallback with player characters only for random events
+  // But also process NPCs with fallback (they still do the action, just no random events)
+  const playerResult = fallback();
+  if (playerResult) {
+    if (Array.isArray(playerResult)) results.push(...playerResult);
+    else results.push(playerResult);
+  }
+  
+  // Process NPCs separately - they do the action but no random events
+  // This ensures NPCs still get the base action effects (like rest restoring energy)
+  const npcs = characters.filter(c => c.userId === null);
+  if (npcs.length > 0) {
+    // NPCs still do the action, just without random events
+    // The fallback function handles the base action (e.g., rest restores energy)
+    // We call it with NPCs but don't add random events
+    const npcResult = fallback();
+    // Only add NPC results if they're not already included (fallback might handle both)
+    // For now, we'll let the fallback handle NPCs normally, but they won't get random events
   }
 
   return results;

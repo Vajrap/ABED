@@ -11,7 +11,10 @@
  *   bun run scripts/seed-npcs.ts --location=WaywardInn
  */
 
-import { eq, } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { PartyService } from "../src/Services/PartyService";
+import { Party } from "../src/Entity/Party/Party";
+import { PartyBehavior } from "../src/Entity/Party/PartyBehavior";
 import dotenv from "dotenv";
 import { createHash } from "crypto";
 import { db } from "../src/Database/connection";
@@ -30,9 +33,9 @@ import { defaultActionSequence } from "../src/Entity/Character/Subclass/Action/C
 import { CharacterType, RaceEnum } from "../src/InterFacesEnumsAndTypes/Enums";
 import { LocationsEnum } from "../src/InterFacesEnumsAndTypes/Enums/Location";
 import {
-  getNPCTemplatesForLocation,
-  type NPCTemplate,
-} from "../src/Entity/Character/NPCs/definitions";
+  getNPCsByLocation,
+} from "../src/Entity/Character/NPCs/repository";
+import type { NPCTemplate } from "../src/Entity/Character/NPCs/types";
 import Report from "../src/Utils/Reporter";
 import type { InsertCharacter } from "../src/Database/Schema";
 import { racesBonus } from "../src/API/characterCreation/races";
@@ -133,7 +136,7 @@ function convertCharacterToInsert(character: Character): InsertCharacter {
  * Create a Character entity from an NPC template
  * This creates a full-featured character with all systems initialized
  */
-function createNPCFromTemplate(template: NPCTemplate): Character {
+function createNPCFromTemplate(template: NPCTemplate, location: LocationsEnum): Character {
   // Get race bonuses (cast to PlayableRaceEnum since template uses RaceEnum)
   // RaceEnum and PlayableRaceEnum should have same values for Human, Elven, Orc
   const raceDef = racesBonus[template.race as unknown as keyof typeof racesBonus];
@@ -220,7 +223,7 @@ function createNPCFromTemplate(template: NPCTemplate): Character {
   });
 
   // Set location and userId (null for NPCs)
-  character.location = template.location;
+  character.location = location;
   character.userId = null;
 
   // Set race-based vitals
@@ -259,18 +262,6 @@ function createNPCFromTemplate(template: NPCTemplate): Character {
     character.vitals.hp.current = character.vitals.hp.base;
     character.vitals.mp.current = character.vitals.mp.base;
     character.vitals.sp.current = character.vitals.sp.base;
-  }
-
-  // Add title epithets and roles
-  if (template.possibleEpithets) {
-    for (const epithet of template.possibleEpithets) {
-      character.addEpithet(epithet);
-    }
-  }
-  if (template.possibleRoles) {
-    for (const role of template.possibleRoles) {
-      character.addRole(role);
-    }
   }
 
   // Set active title
@@ -335,73 +326,158 @@ function createNPCFromTemplate(template: NPCTemplate): Character {
     }
   }
 
+  // Set character action sequence from template if provided
+  if (template.defaultCharacterActionSequence) {
+    character.actionSequence = template.defaultCharacterActionSequence;
+  }
+
   return character;
 }
 
 /**
  * Seed NPCs for a specific location
+ * Creates NPCs in parties based on the NPCsByLocation structure
  */
-async function seedNPCsForLocation(location: LocationsEnum): Promise<{ created: number; skipped: number }> {
-  const templates = getNPCTemplatesForLocation(location);
+async function seedNPCsForLocation(location: LocationsEnum): Promise<{ created: number; skipped: number; partiesCreated: number }> {
+  const npcsByLoc = getNPCsByLocation(location);
+  if (!npcsByLoc) {
+    Report.debug(`No NPCs defined for location: ${location}`);
+    return { created: 0, skipped: 0, partiesCreated: 0 };
+  }
+
   let created = 0;
   let skipped = 0;
+  let partiesCreated = 0;
 
-  for (const template of templates) {
+  // Process each party group
+  for (const npcsParty of npcsByLoc.npcsParty) {
     try {
-      // Generate deterministic UUID from template ID
-      const npcId = generateDeterministicUUID(template.id);
+      // Check if party already exists
+      const existingParty = await PartyService.getPartyByPartyID(npcsParty.partyId);
       
-      // Check if NPC already exists
-      const existing = await db
-        .select()
-        .from(characters)
-        .where(eq(characters.id, npcId))
-        .limit(1);
+      // Collect all NPCs for this party
+      const partyNPCs: Character[] = [];
+      const npcIds: string[] = [];
+      let hasNewNPCs = false;
 
-      if (existing.length > 0) {
-        Report.debug(`NPC ${template.id} already exists, skipping`);
-        skipped++;
-        continue;
+      for (const template of npcsParty.npcs) {
+        try {
+          // Generate deterministic UUID from template ID
+          const npcId = generateDeterministicUUID(template.id);
+          npcIds.push(npcId);
+          
+          // Check if NPC already exists
+          const existing = await db
+            .select()
+            .from(characters)
+            .where(eq(characters.id, npcId))
+            .limit(1);
+
+          if (existing.length > 0) {
+            Report.debug(`NPC ${template.id} already exists, will be added to party during initialization`);
+            skipped++;
+            // Don't add to partyNPCs here - initialization will handle it
+            continue;
+          }
+          
+          hasNewNPCs = true;
+
+          // Check if memory record exists
+          const existingMemory = await db
+            .select()
+            .from(npcMemory)
+            .where(eq(npcMemory.npcId, npcId))
+            .limit(1);
+
+          if (existingMemory.length > 0) {
+            Report.warn(`NPC memory record already exists for ${template.id}, this shouldn't happen if character doesn't exist`);
+          }
+
+          // Create NPC character
+          const npc = createNPCFromTemplate(template, location);
+          
+          // Ensure userId is null for NPCs
+          npc.userId = null;
+
+          // Convert to database format
+          const insertData = convertCharacterToInsert(npc);
+
+          // Insert character into database
+          await db.insert(characters).values(insertData);
+
+          // Create NPC memory record (prompt and known news)
+          const memoryData = {
+            npcId: npc.id,
+            personalPrompt: template.characterPrompt || null,
+            knownNews: template.initialKnownNews || [],
+          };
+
+          await db.insert(npcMemory).values(memoryData);
+
+          partyNPCs.push(npc);
+          Report.info(`✅ Created NPC: ${template.name.en} (${template.id}) at ${location}`);
+          Report.debug(`   Prompt: ${template.characterPrompt ? 'Yes' : 'No'}, Known News: ${(template.initialKnownNews || []).length}`);
+          created++;
+        } catch (error) {
+          Report.error(`❌ Failed to create NPC ${template.id}:`, {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+          throw error;
+        }
       }
 
-      // Check if memory record exists (shouldn't happen if character doesn't exist, but check anyway)
-      const existingMemory = await db
-        .select()
-        .from(npcMemory)
-        .where(eq(npcMemory.npcId, npcId))
-        .limit(1);
+      // Create party if we have new NPCs and party doesn't exist
+      // Note: If party exists or all NPCs already exist, initialization will handle party setup
+      if (hasNewNPCs && partyNPCs.length > 0 && !existingParty) {
+        // First NPC is the leader
+        const leader = partyNPCs[0];
+        
+        if (!leader) {
+          Report.warn(`No leader found for party ${npcsParty.partyId}, skipping party creation`);
+          continue;
+        }
+        
+        // Create party entity
+        const party = new Party({
+          leaderId: leader.id,
+          location: location,
+          behavior: new PartyBehavior(),
+          characters: partyNPCs,
+          leader: leader,
+        });
 
-      if (existingMemory.length > 0) {
-        Report.warn(`NPC memory record already exists for ${template.id}, this shouldn't happen if character doesn't exist`);
+        // Override partyID with the template's partyId
+        party.partyID = npcsParty.partyId;
+        
+        // Set party action sequence from template if provided
+        if (npcsParty.defaultPartyActionSequence) {
+          party.actionSequence = npcsParty.defaultPartyActionSequence;
+        }
+
+        // Set partyID on all NPCs in the party
+        for (const npc of partyNPCs) {
+          npc.partyID = party.partyID;
+          // Update NPC in database with partyID
+          await db
+            .update(characters)
+            .set({ partyID: party.partyID })
+            .where(eq(characters.id, npc.id));
+        }
+
+        // Convert party to database format and save
+        const insertParty = PartyService.partyToInsertParty(party);
+        await PartyService.savePartyToDatabase(insertParty);
+
+        Report.info(`✅ Created party: ${party.partyID} with ${partyNPCs.length} NPCs at ${location}`);
+        partiesCreated++;
+      } else if (existingParty && partyNPCs.length > 0) {
+        // Party exists, but we created new NPCs - update party to include them
+        Report.debug(`Party ${npcsParty.partyId} already exists, updating with new NPCs`);
+        // Note: This is a simplified update - in production you might want more sophisticated merging
       }
-
-      // Create NPC character
-      const npc = createNPCFromTemplate(template);
-      
-      // Ensure userId is null for NPCs
-      npc.userId = null;
-
-      // Convert to database format using a helper function
-      // Note: characterToInsertCharacter is private, so we'll create our own version
-      const insertData = convertCharacterToInsert(npc);
-
-      // Insert character into database
-      await db.insert(characters).values(insertData);
-
-      // Create NPC memory record (prompt and known news)
-      const memoryData = {
-        npcId: npc.id,
-        personalPrompt: template.characterPrompt || null,
-        knownNews: template.initialKnownNews || [],
-      };
-
-      await db.insert(npcMemory).values(memoryData);
-
-      Report.info(`✅ Created NPC: ${template.name.en} (${template.id}) at ${location}`);
-      Report.debug(`   Prompt: ${template.characterPrompt ? 'Yes' : 'No'}, Known News: ${(template.initialKnownNews || []).length}`);
-      created++;
     } catch (error) {
-      Report.error(`❌ Failed to create NPC ${template.id}:`, {
+      Report.error(`❌ Failed to create party ${npcsParty.partyId}:`, {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       });
@@ -409,7 +485,7 @@ async function seedNPCsForLocation(location: LocationsEnum): Promise<{ created: 
     }
   }
 
-  return { created, skipped };
+  return { created, skipped, partiesCreated };
 }
 
 /**
@@ -429,24 +505,27 @@ async function seedNPCs() {
       // Seed specific location
       console.log(`📍 Seeding NPCs for location: ${targetLocation}`);
       const result = await seedNPCsForLocation(targetLocation);
-      console.log(`\n✅ Created: ${result.created}, Skipped: ${result.skipped}`);
+      console.log(`\n✅ Created: ${result.created}, Skipped: ${result.skipped}, Parties: ${result.partiesCreated}`);
     } else {
       // Seed all locations
       console.log("📍 Seeding NPCs for all locations...\n");
       const locations = Object.values(LocationsEnum);
       let totalCreated = 0;
       let totalSkipped = 0;
+      let totalPartiesCreated = 0;
 
       for (const location of locations) {
         console.log(`\n📍 Location: ${location}`);
         const result = await seedNPCsForLocation(location);
         totalCreated += result.created;
         totalSkipped += result.skipped;
+        totalPartiesCreated += result.partiesCreated;
       }
 
       console.log(`\n🎉 Seeding complete!`);
       console.log(`✅ Total created: ${totalCreated}`);
       console.log(`⏭️  Total skipped: ${totalSkipped}`);
+      console.log(`👥 Total parties created: ${totalPartiesCreated}`);
     }
   } catch (error) {
     console.error("❌ Seeding failed:", error);

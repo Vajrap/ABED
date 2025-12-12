@@ -6,7 +6,7 @@ import {
   CharacterVitals,
   Vital,
 } from "src/Entity/Character/Subclass/Vitals/CharacterVitals.ts";
-import { makeAttribute, makeProficiencies, scaleByDifficulty } from "../helpers";
+import { makeAttribute, makeProficiencies, scaleByDifficulty, registerMOB } from "../helpers";
 import { CharacterBattleStats } from "../../Subclass/Stats/CharacterBattleStats";
 import { CharacterElements } from "../../Subclass/Stats/CharacterElements";
 import { CharacterFame } from "../../Subclass/Fame/CharacterFame";
@@ -118,6 +118,9 @@ export function elvenWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -217,6 +220,9 @@ export function elvenRanger(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -315,6 +321,9 @@ export function elvenMage(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -418,6 +427,9 @@ export function elvenCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -516,6 +528,9 @@ export function elvenPaladin(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -616,6 +631,9 @@ export function elvenWarlock(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -714,6 +732,9 @@ export function elvenBarbarian(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -814,6 +835,9 @@ export function elvenSorcerer(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -912,6 +936,9 @@ export function elvenRogue(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -1014,6 +1041,9 @@ export function elvenDruid(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }

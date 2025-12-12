@@ -6,7 +6,7 @@ import {
   CharacterVitals,
   Vital,
 } from "src/Entity/Character/Subclass/Vitals/CharacterVitals.ts";
-import { makeAttribute, makeProficiencies, scaleByDifficulty } from "../helpers";
+import { makeAttribute, makeProficiencies, scaleByDifficulty, registerMOB } from "../helpers";
 import { CharacterBattleStats } from "../../Subclass/Stats/CharacterBattleStats";
 import { CharacterElements } from "../../Subclass/Stats/CharacterElements";
 import { CharacterFame } from "../../Subclass/Fame/CharacterFame";
@@ -93,6 +93,9 @@ export function humanWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warrior", difficulty);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -190,6 +193,9 @@ export function humanMage(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Mage", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -265,6 +271,9 @@ export function humanCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Cleric", difficulty);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -343,6 +352,9 @@ export function humanPaladin(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipDirect(character, HammerId.Scepter, CharacterEquipmentSlot.rightHand);
   equipDirect(character, BodyId.ChainShirt, CharacterEquipmentSlot.body);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -440,6 +452,9 @@ export function humanWarlock(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Warlock", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -515,6 +530,9 @@ export function humanBarbarian(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Barbarian", difficulty);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -612,6 +630,9 @@ export function humanSorcerer(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Sorcerer", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -708,6 +729,9 @@ export function humanRogue(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipMOB(character, "Rogue", difficulty);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -780,6 +804,10 @@ export function humanDruid(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipDirect(character, SpearId.Javelin, CharacterEquipmentSlot.rightHand);
   equipDirect(character, BodyId.PaddedArmor, CharacterEquipmentSlot.body);
+  
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -853,6 +881,10 @@ export function humanDuelist(difficulty: 1 | 2 | 3 | 4 | 5) {
   // Equip weapon and armor based on difficulty
   equipDirect(character, BladeId.Katana, CharacterEquipmentSlot.rightHand);
   equipDirect(character, BodyId.PaddedArmor, CharacterEquipmentSlot.body);
+  
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -916,7 +948,7 @@ export function humanGuardian(difficulty: 1 | 2 | 3 | 4 | 5) {
   character.race = RaceEnum.Human;
 
   character.activeSkills = [
-    {id: WarriorSkillId.Bash, level: 1, exp: 0},
+    {id: WarriorSkillId.Cleave, level: 1, exp: 0},
     {id: GuardianSkillId.ShieldUp, level: 1, exp: 0},
     {id: GuardianSkillId.Taunt, level: 1, exp: 0},
   ];
@@ -927,5 +959,9 @@ export function humanGuardian(difficulty: 1 | 2 | 3 | 4 | 5) {
   equipDirect(character, ShieldId.Buckler, CharacterEquipmentSlot.leftHand);
   equipDirect(character, HammerId.Scepter, CharacterEquipmentSlot.rightHand);
   equipDirect(character, BodyId.ChainShirt, CharacterEquipmentSlot.body);
+  
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }

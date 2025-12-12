@@ -162,6 +162,13 @@
       "when": 1736424000000,
       "tag": "0023_create_quest_definitions_table",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1736427600000,
+      "tag": "0024_change_characters_party_id_to_varchar",
+      "breakpoints": true
     }
   ]
 }

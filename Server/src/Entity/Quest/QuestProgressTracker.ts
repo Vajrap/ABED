@@ -4,7 +4,7 @@ import type { Quest, QuestObjective } from "./Quest";
 import { QuestType, QuestStatus } from "./Quest";
 import type { ItemId } from "../Item/type";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
-import { createNews } from "../News/News";
+import { createNews, type News } from "../News/News";
 import { NewsSignificance, NewsPropagation } from "../../InterFacesEnumsAndTypes/NewsEnums";
 import { locationManager } from "../Location/Manager/LocationManager";
 import Report from "../../Utils/Reporter";
@@ -15,6 +15,9 @@ import { questStatePostman } from "./QuestStatePostman";
  * Automatically updates quest objectives when characters complete actions
  */
 export class QuestProgressTracker {
+  // Static collection for quest completion news generated during a phase
+  // This gets flushed and added to news distribution during phase processing
+  private static questCompletionNews: News[] = [];
   /**
    * Handle battle completion - update kill objectives
    */
@@ -231,22 +234,23 @@ export class QuestProgressTracker {
 
   /**
    * Check if quest is complete and generate news if so
+   * Returns the news if quest was just completed, null otherwise
    */
   static checkQuestCompletion(
     character: Character,
     quest: Quest,
-  ): void {
+  ): News | null {
     if (quest.isComplete() && quest.status === QuestStatus.Active) {
       // Generate news that quest is ready to turn in
       // Note: Quest remains in "active" until manually turned in at guild
       try {
         if (!character.location) {
-          return; // Can't generate news without location
+          return null; // Can't generate news without location
         }
 
         const location = locationManager.locations[character.location];
         if (!location) {
-          return; // Location not found
+          return null; // Location not found
         }
 
         const context = {
@@ -271,17 +275,32 @@ export class QuestProgressTracker {
           propagation: NewsPropagation.PRIVATE,
         });
 
-        // Note: News will be distributed through the normal news system
-        // This is just creating the news object - it needs to be added to the news distribution
+        // Store news for collection during phase processing
+        this.questCompletionNews.push(news);
+        
         Report.debug(`Quest completed: ${quest.name.en} for character ${character.id}`);
+        return news;
       } catch (error) {
         Report.error("Error generating quest completion news", {
           characterId: character.id,
           questId: quest.id,
           error: error instanceof Error ? error.message : String(error),
         });
+        return null;
       }
     }
+    return null;
+  }
+
+  /**
+   * Collect and flush all quest completion news generated during the current phase
+   * This should be called during phase processing to add quest news to the distribution
+   */
+  static flushQuestCompletionNews(): News[] {
+    const news = [...this.questCompletionNews];
+    this.questCompletionNews = [];
+    return news;
   }
 }
+
 

@@ -1,4 +1,5 @@
 export enum NPCEnums {
-    noBody = "noBody",
-    
+    thomas = 'thomas',
+    sarah = 'sarah',
+    luna = 'luna',
 }

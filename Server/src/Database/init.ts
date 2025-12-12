@@ -15,6 +15,28 @@ import { GameTime } from "../Game/GameTime/GameTime";
 import { sql } from "drizzle-orm";
 import { loadCharactersFromDatabase } from "../Utils/CharacterDatabaseLoader";
 import { loadPartiesFromDatabase } from "../Utils/PartyDatabaseLoader";
+import { join } from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import { 
+  getNPCsByLocation, 
+  getNPCsPartiesForLocation 
+} from "../Entity/Character/NPCs/repository";
+import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
+import { PartyService } from "../Services/PartyService";
+import { Party } from "../Entity/Party/Party";
+import { PartyBehavior } from "../Entity/Party/PartyBehavior";
+import { characterManager } from "../Game/CharacterManager";
+import { createHash } from "crypto";
+import { eq } from "drizzle-orm";
+import { characters } from "./Schema";
+
+// Get the directory of the current file (works in both CommonJS and ESM)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Resolve migrations folder path relative to this file's location
+const migrationsFolder = join(__dirname, "migrations");
 
 export async function initializeDatabase(): Promise<void> {
   Report.info("🚀 Initializing database...");
@@ -33,13 +55,19 @@ export async function initializeDatabase(): Promise<void> {
 
       try {
         // Run migrations to create tables
-        await migrate(db, { migrationsFolder: "./src/Database/migrations" });
+        Report.debug("Running migrations from folder", { migrationsFolder });
+        await migrate(db, { migrationsFolder });
         Report.info("✅ Database tables created successfully");
-      } catch (migrationError) {
-        Report.warn(
-          "⚠️  Migration runner failed, attempting manual table creation...",
-          { error: migrationError },
+      } catch (migrationError: any) {
+        Report.error(
+          "⚠️  Migration runner failed",
+          { 
+            error: migrationError?.message || String(migrationError),
+            stack: migrationError?.stack,
+            migrationsFolder,
+          },
         );
+        Report.warn("Attempting manual table creation as fallback...");
         await createTablesManually();
       }
     } else {
@@ -47,10 +75,52 @@ export async function initializeDatabase(): Promise<void> {
 
       // Still try to run migrations in case there are new ones
       try {
-        await migrate(db, { migrationsFolder: "./src/Database/migrations" });
+        Report.debug("Checking for new migrations", { migrationsFolder });
+        await migrate(db, { migrationsFolder });
         Report.info("✅ Database migrations up to date");
-      } catch (migrationError) {
-        Report.info("ℹ️  No new migrations to apply");
+      } catch (migrationError: any) {
+        // Check if it's a "no migrations" error or a real error
+        const errorMessage = migrationError?.message || String(migrationError);
+        if (errorMessage.includes("ENOENT") || errorMessage.includes("does not exist")) {
+          Report.error("❌ Migrations folder not found", { 
+            migrationsFolder,
+            error: errorMessage,
+          });
+          throw migrationError; // Re-throw if folder doesn't exist
+        } else if (errorMessage.includes("already applied") || errorMessage.includes("No new migrations")) {
+          Report.info("ℹ️  No new migrations to apply");
+        } else {
+          // Real error - log it but don't fail startup
+          // Drizzle migrate() can silently fail if migrations are out of sync
+          Report.warn("⚠️  Migration check encountered an issue", {
+            error: errorMessage,
+            stack: migrationError?.stack,
+            migrationsFolder,
+          });
+          Report.info("💡 If migrations are missing, run: bun run scripts/run-missing-migrations.ts");
+        }
+      }
+      
+      // Verify critical columns exist (sanity check)
+      try {
+        const client = await pool.connect();
+        const columnCheck = await client.query(`
+          SELECT column_name 
+          FROM information_schema.columns 
+          WHERE table_name = 'characters' 
+          AND column_name IN ('material_resources', 'location')
+        `);
+        const existingColumns = columnCheck.rows.map((r: any) => r.column_name);
+        client.release();
+        
+        if (!existingColumns.includes('material_resources')) {
+          Report.warn("⚠️  material_resources column missing. Run: bun run scripts/run-missing-migrations.ts");
+        }
+        if (!existingColumns.includes('location')) {
+          Report.warn("⚠️  location column missing. Run: bun run scripts/run-missing-migrations.ts");
+        }
+      } catch (verifyError) {
+        Report.warn("⚠️  Could not verify column existence", { error: verifyError });
       }
     }
 
@@ -74,6 +144,9 @@ async function loadGameDataFromDatabase(): Promise<void> {
     // Load Characters (must be loaded first as parties depend on them)
     await loadCharactersFromDatabase();
     
+    // Initialize NPC parties (ensure NPCs are grouped into parties based on templates)
+    await initializeNPCParties();
+    
     // Load Parties (depends on characters being loaded)
     await loadPartiesFromDatabase();
 
@@ -92,6 +165,153 @@ async function loadGameDataFromDatabase(): Promise<void> {
     Report.info("✅ Game data loaded successfully");
   } catch (error) {
     Report.error("❌ Error loading game data", { error });
+    throw error;
+  }
+}
+
+/**
+ * Generate a deterministic UUID from a string (template ID)
+ * Uses SHA-256 hash to create a consistent UUID v4-like format
+ * This ensures the same template ID always generates the same UUID
+ */
+function generateDeterministicUUID(input: string): string {
+  const namespace = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"; // NPC namespace
+  
+  const hash = createHash("sha256")
+    .update(namespace + input)
+    .digest("hex");
+  
+  const hex = hash.substring(0, 32);
+  return [
+    hex.substring(0, 8),
+    hex.substring(8, 12),
+    "4" + hex.substring(13, 16), // Version 4
+    ((parseInt(hex.substring(16, 18), 16) & 0x3f) | 0x80).toString(16).padStart(2, "0") + hex.substring(18, 20), // Variant bits
+    hex.substring(20, 32),
+  ].join("-");
+}
+
+/**
+ * Initialize NPC parties based on template definitions
+ * Ensures NPCs loaded from database are properly grouped into parties
+ */
+async function initializeNPCParties(): Promise<void> {
+  Report.info("👥 Initializing NPC parties...");
+  
+  try {
+    let partiesCreated = 0;
+    let partiesUpdated = 0;
+    
+    // Iterate through all locations
+    for (const location of Object.values(LocationsEnum)) {
+      const npcsByLoc = getNPCsByLocation(location);
+      if (!npcsByLoc) {
+        continue; // No NPCs defined for this location
+      }
+      
+      // Process each party group
+      for (const npcsParty of npcsByLoc.npcsParty) {
+        try {
+          // Get all NPC characters for this party from characterManager
+          const partyNPCs: any[] = [];
+          
+          for (const template of npcsParty.npcs) {
+            const npcId = generateDeterministicUUID(template.id);
+            const npc = characterManager.getCharacterByID(npcId);
+            
+            if (npc && !npc.userId) { // Only NPCs (not player characters)
+              partyNPCs.push(npc);
+            }
+          }
+          
+          if (partyNPCs.length === 0) {
+            Report.debug(`No NPCs found for party ${npcsParty.partyId} at ${location}`);
+            continue;
+          }
+          
+          // Check if party already exists
+          const existingParty = await PartyService.getPartyByPartyID(npcsParty.partyId);
+          
+          if (!existingParty) {
+            // Create new party
+            const leader = partyNPCs[0];
+            
+            const party = new Party({
+              leaderId: leader.id,
+              location: location,
+              behavior: new PartyBehavior(),
+              characters: partyNPCs,
+              leader: leader,
+            });
+            
+            // Override partyID with the template's partyId
+            party.partyID = npcsParty.partyId;
+            
+            // Set party action sequence from template if provided
+            if (npcsParty.defaultPartyActionSequence) {
+              party.actionSequence = npcsParty.defaultPartyActionSequence;
+            }
+            
+            // Set partyID on all NPCs in the party
+            for (const npc of partyNPCs) {
+              npc.partyID = party.partyID;
+              // Update NPC in database with partyID
+              await db
+                .update(characters)
+                .set({ partyID: party.partyID })
+                .where(eq(characters.id, npc.id));
+            }
+            
+            // Save party to database
+            const insertParty = PartyService.partyToInsertParty(party);
+            await PartyService.savePartyToDatabase(insertParty);
+            
+            // Register party in partyManager
+            const { partyManager } = await import("../Game/PartyManager");
+            partyManager.addParty(party);
+            
+            // Register party at its location
+            const { locationRepository } = await import("../Entity/Location/Location/repository");
+            const locationEntity = locationRepository[location];
+            if (locationEntity) {
+              locationEntity.partyMovesIn(party);
+            }
+            
+            Report.info(`✅ Created NPC party: ${party.partyID} with ${partyNPCs.length} NPCs at ${location}`);
+            partiesCreated++;
+          } else {
+            // Party exists - ensure all NPCs are assigned to it
+            let needsUpdate = false;
+            
+            for (const npc of partyNPCs) {
+              if (npc.partyID !== npcsParty.partyId) {
+                npc.partyID = npcsParty.partyId;
+                await db
+                  .update(characters)
+                  .set({ partyID: npcsParty.partyId })
+                  .where(eq(characters.id, npc.id));
+                needsUpdate = true;
+              }
+            }
+            
+            if (needsUpdate) {
+              Report.debug(`Updated NPCs to be in party ${npcsParty.partyId}`);
+              partiesUpdated++;
+            }
+          }
+        } catch (error) {
+          Report.error(`❌ Failed to initialize party ${npcsParty.partyId}:`, {
+            error: error instanceof Error ? error.message : String(error),
+            location,
+          });
+          // Continue with other parties even if one fails
+        }
+      }
+    }
+    
+    Report.info(`✅ NPC party initialization complete: ${partiesCreated} created, ${partiesUpdated} updated`);
+  } catch (error) {
+    Report.error("❌ Error initializing NPC parties", { error });
     throw error;
   }
 }

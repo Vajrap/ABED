@@ -1,6 +1,9 @@
 import { CharacterAttributes } from "../Subclass/Stats/CharacterAttributes";
 import { CharacterProficiencies } from "../Subclass/Stats/CharacterProficiencies";
 import type { ProficiencyKey } from "src/InterFacesEnumsAndTypes/Enums";
+import { MOB } from "./index";
+import { activeCharacterRegistry } from "../repository";
+import type { Character } from "../Character";
 
 export function makeAttribute(data: {
   charisma: number;
@@ -49,4 +52,31 @@ export function scaleByDifficulty(
   const scaled = base + (difficulty - 1) * (base * 0.1); // +10% per difficulty
   const randomFactor = 1 + (Math.random() * 2 - 1) * variance; // ±variance%
   return Math.round(scaled * randomFactor);
+}
+
+/**
+ * Register a MOB in the activeCharacterRegistry
+ * Call this when creating MOBs for battles so they can be found via getCharacter()
+ * Accepts both MOB instances and Character instances used as MOBs
+ */
+export function registerMOB(mob: MOB | Character): void {
+  activeCharacterRegistry[mob.id] = mob;
+}
+
+/**
+ * Unregister MOBs from activeCharacterRegistry
+ * Call this when battle ends to clean up temporary MOBs and prevent memory leaks
+ */
+export function unregisterMOBs(mobIds: string[]): void {
+  for (const id of mobIds) {
+    delete activeCharacterRegistry[id];
+  }
+}
+
+/**
+ * Check if a character is a MOB (temporary battle character)
+ * Uses the isMob property that all MOB instances have
+ */
+export function isMOB(character: Character): boolean {
+  return (character as any).isMob === true;
 }

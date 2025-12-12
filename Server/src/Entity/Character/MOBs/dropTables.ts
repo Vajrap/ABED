@@ -101,10 +101,121 @@ export const mobDropTables: Record<MOBEnum, MOBDropTable> = {
       },
     ],
   },
-  
-  // TODO: Add drop tables for all other MOBs (humans, elves, orcs, halflings, dwarfs)
-  // For now, they have empty drop tables
-  // Note: These are commented out in the enum, so they won't compile yet
-  // Uncomment and add drop tables when those MOBs are implemented
+  [MOBEnum.humanWarrior]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.humanMage]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.humanCleric]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.humanPaladin]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.humanWarlock]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.humanBarbarian]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.humanSorcerer]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.humanRogue]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.humanDruid]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenWarrior]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenRanger]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenMage]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenCleric]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenPaladin]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenWarlock]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenBarbarian]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenSorcerer]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenRogue]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.elvenDruid]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcWarrior]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcRanger]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcMage]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcCleric]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcPaladin]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcWarlock]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcBarbarian]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcSorcerer]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcRogue]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  },
+  [MOBEnum.orcDruid]: {
+    mobId: MOBEnum.goblinScout,
+    drops: []
+  }
 };
 

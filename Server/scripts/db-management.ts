@@ -6,6 +6,9 @@ import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import dotenv from "dotenv";
+import { join } from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +16,13 @@ dotenv.config();
 const DATABASE_URL =
   process.env.DATABASE_URL ||
   "postgres://abed_user:abed_password@localhost:40316/abed_db";
+
+// Get the directory of the current file (works in both CommonJS and ESM)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Resolve migrations folder path relative to Server directory
+const migrationsFolder = join(__dirname, "..", "src", "Database", "migrations");
 
 class DatabaseManager {
   private pool: Pool;
@@ -176,11 +186,17 @@ class DatabaseManager {
   async runMigrations(): Promise<boolean> {
     try {
       console.log("📦 Running database migrations...");
-      await migrate(this.db, { migrationsFolder: "./src/Database/migrations" });
+      console.log(`📁 Migrations folder: ${migrationsFolder}`);
+      await migrate(this.db, { migrationsFolder });
       console.log("✅ Migrations completed successfully");
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Migrations failed:", error);
+      console.error("Error details:", {
+        message: error?.message,
+        stack: error?.stack,
+        migrationsFolder,
+      });
       return false;
     }
   }

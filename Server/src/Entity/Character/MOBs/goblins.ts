@@ -10,7 +10,7 @@ import {
   CharacterVitals,
   Vital,
 } from "src/Entity/Character/Subclass/Vitals/CharacterVitals.ts";
-import { makeAttribute, makeProficiencies, scaleByDifficulty } from "./helpers";
+import { makeAttribute, makeProficiencies, scaleByDifficulty, registerMOB } from "./helpers";
 import { CharacterBattleStats } from "../Subclass/Stats/CharacterBattleStats";
 import { CharacterElements } from "../Subclass/Stats/CharacterElements";
 import { CharacterFame } from "../Subclass/Fame/CharacterFame";
@@ -191,6 +191,9 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
   equipDirect(character, BladeId.Scimitar, CharacterEquipmentSlot.rightHand);
   equipDirect(character, BodyId.LeatherArmor, CharacterEquipmentSlot.body);
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -302,6 +305,9 @@ export function goblinWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
   equipDirect(character, shieldId, CharacterEquipmentSlot.leftHand);
   equipDirect(character, swordId, CharacterEquipmentSlot.rightHand);
   equipDirect(character, armorId, CharacterEquipmentSlot.body);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -420,6 +426,9 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
     CharacterEquipmentSlot.headWear,
   );
 
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }
 
@@ -513,6 +522,9 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
     equipDirect(character, ShieldId.Buckler, CharacterEquipmentSlot.leftHand);
   }
   equipDirect(character, BodyId.LeatherArmor, CharacterEquipmentSlot.body);
+
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
 
   return character;
 }
@@ -609,5 +621,9 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
   );
 
   // Skills will be added once commander and shout-type actions are defined
+  
+  // Register MOB in activeCharacterRegistry
+  registerMOB(character);
+
   return character;
 }

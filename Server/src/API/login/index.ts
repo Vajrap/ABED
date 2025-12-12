@@ -55,7 +55,10 @@ export const loginRoutes = new Elysia({ prefix: "/login" })
         }
 
         // Verify password using bcrypt
-        const passwordValid = await UserService.verifyPassword(password, user.password);
+        const passwordValid = await UserService.verifyPassword(
+          password,
+          user.password,
+        );
         if (!passwordValid) {
           Report.warn("Login attempt with invalid credentials", {
             userId: user.id,
@@ -71,9 +74,7 @@ export const loginRoutes = new Elysia({ prefix: "/login" })
         // Extract client information for session tracking
         const userAgent = headers["user-agent"] || "Unknown";
         const ipAddress =
-          headers["x-forwarded-for"] ||
-          headers["x-real-ip"] ||
-          "Unknown";
+          headers["x-forwarded-for"] || headers["x-real-ip"] || "Unknown";
 
         // Create new session (this will invalidate other sessions)
         const { session, token } = await SessionService.createSession(
@@ -93,7 +94,8 @@ export const loginRoutes = new Elysia({ prefix: "/login" })
           token,
         };
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         const errorStack = error instanceof Error ? error.stack : undefined;
         Report.error("Login error", {
           error: errorMessage,
@@ -112,5 +114,5 @@ export const loginRoutes = new Elysia({ prefix: "/login" })
     },
     {
       body: LoginSchema,
-    }
+    },
   );
