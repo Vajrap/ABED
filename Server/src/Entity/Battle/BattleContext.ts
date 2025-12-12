@@ -1,5 +1,12 @@
 import type { BattleStatistics } from "./BattleStatistics";
-import type { Battle } from "./Battle";
+
+/**
+ * Minimal interface for Battle type to avoid circular dependency
+ * BattleContext only needs the id property from Battle
+ */
+interface BattleLike {
+  id: string;
+}
 
 /**
  * Battle context for passing battle-specific data to skills
@@ -10,7 +17,7 @@ import type { Battle } from "./Battle";
  * Also maintains a "current battle ID" for the currently executing turn.
  */
 const battleStatisticsMap: Map<string, BattleStatistics> = new Map();
-const battleMap: Map<string, Battle> = new Map();
+const battleMap: Map<string, BattleLike> = new Map();
 let currentBattleId: string | null = null; // Set per turn execution
 
 /**
@@ -54,8 +61,9 @@ export function getBattleStatistics(battleId?: string): BattleStatistics | null 
 
 /**
  * Set the current battle instance for a specific battle (called by Battle class)
+ * Uses BattleLike interface to avoid circular dependency
  */
-export function setBattle(battle: Battle | null, battleId?: string): void {
+export function setBattle(battle: BattleLike | null, battleId?: string): void {
   if (!battleId && battle) {
     battleId = battle.id;
   }
@@ -75,8 +83,9 @@ export function setBattle(battle: Battle | null, battleId?: string): void {
  * Get the current battle instance (used by skills that need battle-level access)
  * If battleId is provided, gets that specific battle
  * Otherwise, uses the current battle ID from turn execution context
+ * Returns BattleLike to avoid circular dependency - callers can cast to Battle if needed
  */
-export function getBattle(battleId?: string): Battle | null {
+export function getBattle(battleId?: string): BattleLike | null {
   const id = battleId || currentBattleId;
   if (id) {
     return battleMap.get(id) || null;

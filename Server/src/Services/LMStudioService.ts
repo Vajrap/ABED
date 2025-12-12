@@ -41,7 +41,9 @@ export interface LMStudioResponse {
 }
 
 // LM Studio API configuration
-const LM_STUDIO_BASE_URL = process.env.LM_STUDIO_URL || "http://192.168.1.122:1234";
+// Since we run in Docker with host network mode, localhost works directly
+// Set LM_STUDIO_URL environment variable to override if needed
+const LM_STUDIO_BASE_URL = process.env.LM_STUDIO_URL || "http://localhost:1234";
 const LM_STUDIO_MODEL = process.env.LM_STUDIO_MODEL || "local-model"; // Model name, can be configured
 const LM_STUDIO_TIMEOUT = 30000; // 30 seconds timeout
 
@@ -66,11 +68,15 @@ interface LMStudioAPIResponse {
 export async function callLMStudio(
   request: LMStudioRequest
 ): Promise<LMStudioResponse> {
-  Report.debug("LM Studio API call", {
+  const apiUrl = `${LM_STUDIO_BASE_URL}/v1/chat/completions`;
+  
+  Report.info("LM Studio API call starting", {
     npcId: request.npcId,
     npcName: request.npcName,
     promptLength: request.prompt.length,
-    url: `${LM_STUDIO_BASE_URL}/v1/chat/completions`,
+    url: apiUrl,
+    baseUrl: LM_STUDIO_BASE_URL,
+    model: LM_STUDIO_MODEL,
   });
 
   try {
@@ -117,13 +123,26 @@ Respond naturally and in character based on the context provided. Keep responses
       });
     }
 
-    const response = await fetch(`${LM_STUDIO_BASE_URL}/v1/chat/completions`, {
+    Report.debug("Sending fetch request to LM Studio", {
+      url: apiUrl,
+      method: "POST",
+      bodySize: JSON.stringify(requestBody).length,
+      hasTools: !!(request.tools && request.tools.length > 0),
+    });
+    
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
       signal: AbortSignal.timeout(LM_STUDIO_TIMEOUT),
+    });
+    
+    Report.debug("LM Studio fetch response received", {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
     });
 
     if (!response.ok) {
@@ -222,15 +241,28 @@ Respond naturally and in character based on the context provided. Keep responses
       toolCalls: parsedToolCalls,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const isNetworkError = errorMessage.includes("fetch") || 
+                          errorMessage.includes("network") ||
+                          errorMessage.includes("ECONNREFUSED") ||
+                          errorMessage.includes("ENOTFOUND") ||
+                          errorMessage.includes("timeout");
+    
     Report.error("LM Studio call failed", {
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
       stack: error instanceof Error ? error.stack : undefined,
       npcId: request.npcId,
+      npcName: request.npcName,
+      url: apiUrl,
+      baseUrl: LM_STUDIO_BASE_URL,
+      isNetworkError,
+      errorType: error?.constructor?.name,
+      hint: isNetworkError ? "Check if LM Studio is running and accessible. If running in Docker, you may need to use 'host.docker.internal' instead of local IP." : undefined,
     });
     return {
       success: false,
       response: "",
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
     };
   }
 }

@@ -1,6 +1,7 @@
 import { Equipment } from "./Equipment";
 import type { EquipmentId } from "./types";
 import { Weapon } from "./Weapon";
+import { Armor } from "./Armor/Armor";
 import { WeaponId } from "./Weapon/type";
 import { weaponRepository } from "./Weapon/repository";
 import { bodyRepository } from "./Armor/Body/repository";
@@ -30,15 +31,26 @@ export const equipmentRepository: Record<EquipmentId, Equipment> = {
   ...utilRepository,
 };
 
+/**
+ * Get equipment by EquipmentId or UUID string (for crafted instances)
+ * First checks base equipment repository, then falls back to item instance repository for crafted instances
+ */
 export function getEquipment(id: EquipmentId | string): Equipment | null {
-  const equipment = equipmentRepository[id as EquipmentId];
-  if (equipment) {
-    return equipment;
+  // First try base equipment repository (for EquipmentId enum values)
+  const baseEquipment = equipmentRepository[id as EquipmentId];
+  if (baseEquipment) {
+    return baseEquipment;
   }
-  const instance = getItemInstance(id as string);
-  if (instance) {
-    return instance;
+  
+  // If not found and id is a string (could be UUID for crafted instance), try item instance repository
+  // Import getItemInstance directly to avoid circular dependency through Item/repository.ts
+  if (typeof id === "string") {
+    const instance = getItemInstance(id);
+    if (instance && (instance instanceof Weapon || instance instanceof Armor)) {
+      return instance;
+    }
   }
+  
   return null;
 }
 

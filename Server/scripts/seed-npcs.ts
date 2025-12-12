@@ -16,7 +16,6 @@ import { PartyService } from "../src/Services/PartyService";
 import { Party } from "../src/Entity/Party/Party";
 import { PartyBehavior } from "../src/Entity/Party/PartyBehavior";
 import dotenv from "dotenv";
-import { createHash } from "crypto";
 import { db } from "../src/Database/connection";
 import { characters, npcMemory } from "../src/Database/Schema";
 import { Character } from "../src/Entity/Character/Character";
@@ -34,6 +33,7 @@ import { CharacterType, RaceEnum } from "../src/InterFacesEnumsAndTypes/Enums";
 import { LocationsEnum } from "../src/InterFacesEnumsAndTypes/Enums/Location";
 import {
   getNPCsByLocation,
+  generateDeterministicUUID,
 } from "../src/Entity/Character/NPCs/repository";
 import type { NPCTemplate } from "../src/Entity/Character/NPCs/types";
 import Report from "../src/Utils/Reporter";
@@ -49,32 +49,6 @@ dotenv.config();
 const DATABASE_URL =
   process.env.DATABASE_URL ||
   "postgres://abed_user:abed_password@localhost:40316/abed_db";
-
-/**
- * Generate a deterministic UUID from a string (template ID)
- * Uses SHA-256 hash to create a consistent UUID v4-like format
- * This ensures the same template ID always generates the same UUID
- */
-function generateDeterministicUUID(input: string): string {
-  // Create a namespace UUID for NPCs (arbitrary but consistent)
-  const namespace = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"; // NPC namespace
-  
-  // Hash the namespace + input
-  const hash = createHash("sha256")
-    .update(namespace + input)
-    .digest("hex");
-  
-  // Format as UUID v4 (but deterministic)
-  // Take first 32 hex chars and format as UUID
-  const hex = hash.substring(0, 32);
-  return [
-    hex.substring(0, 8),
-    hex.substring(8, 12),
-    "4" + hex.substring(13, 16), // Version 4
-    ((parseInt(hex.substring(16, 18), 16) & 0x3f) | 0x80).toString(16).padStart(2, "0") + hex.substring(18, 20), // Variant bits
-    hex.substring(20, 32),
-  ].join("-");
-}
 
 /**
  * Convert Character to InsertCharacter format

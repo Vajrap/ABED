@@ -15,7 +15,7 @@ import { MonkSkill } from "./index";
 import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
 import { ArmorClass } from "src/Entity/Item/Equipment/Armor/Armor";
 import { bodyRepository } from "src/Entity/Item/Equipment/Armor/Body/repository";
-import { skillRepository } from "../../../repository";
+import { palmStrike } from "./palmStrike";
 
 export const flurryOfBlows = new MonkSkill({
   id: MonkSkillId.FlurryOfBlows,
@@ -135,8 +135,8 @@ export const flurryOfBlows = new MonkSkill({
       
       if (palmStrikeLevel > 0) {
         // Deal damage FROM Palm Strike level
-        const palmStrikeSkill = skillRepository[MonkSkillId.PalmStrike];
-        if (palmStrikeSkill) {
+        // Import palmStrike directly to avoid circular dependency with skillRepository
+        if (palmStrike) {
           // Simulate Palm Strike damage calculation
           const diceFace = palmStrikeLevel >= 5 ? 8 : 6;
           const baseDamage = roll(1).d(diceFace).total;

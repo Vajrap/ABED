@@ -9,14 +9,17 @@ services:
       - ./Server:/app/Server
       - ./logs:/var/log/app
     command: bun --inspect src/index.ts
-    ports:
-      - "7890:7890"
-      - "6499:6499"  # Debug port for VS Code attachment
+    # Use host network mode so container can access host services via localhost
+    # This allows LM Studio running on host to be accessed as localhost:1234
+    # Note: ports mapping is not needed/used with host network mode
+    network_mode: host
     restart: unless-stopped
     depends_on:
       - postgres
     environment:
-      - DATABASE_URL=postgres://abed_user:abed_password@postgres:5432/abed_db
+      # Postgres still accessible via localhost since we're using host network
+      - DATABASE_URL=postgres://abed_user:abed_password@localhost:40316/abed_db
+      - LM_STUDIO_URL=http://localhost:1234
 
   postgres:
     image: postgres:15

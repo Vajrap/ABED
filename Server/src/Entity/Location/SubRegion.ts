@@ -11,10 +11,12 @@ import type { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import type { WeatherInterpreter } from "./Weather/types";
 import Report from "../../Utils/Reporter";
+import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
 export class SubRegion {
   id: SubRegionEnum;
   region: RegionEnum;
+  description: L10N;
   locations: LocationsEnum[];
   speedBonus: SubRegionSpeedBonus;
   volatility: WeatherVolatility;
@@ -26,6 +28,7 @@ export class SubRegion {
   constructor(
     id: SubRegionEnum,
     region: RegionEnum,
+    description: L10N,
     locations: LocationsEnum[],
     speedBonus: SubRegionSpeedBonus,
     volatility: WeatherVolatility,
@@ -33,6 +36,7 @@ export class SubRegion {
   ) {
     this.id = id;
     this.region = region;
+    this.description = description;
     this.locations = locations;
     this.speedBonus = speedBonus;
     this.volatility = volatility;
@@ -43,8 +47,10 @@ export class SubRegion {
   getWeather(weatherScale: number): Weather {
     const season = GameTime.getCurrentGameSeason();
     const seasonalWeather = this.weatherInterpretation[season];
-    
-    const sortedKeys = Object.keys(seasonalWeather).map(Number).sort((a, b) => b - a); // DESC
+
+    const sortedKeys = Object.keys(seasonalWeather)
+      .map(Number)
+      .sort((a, b) => b - a); // DESC
 
     for (const key of sortedKeys) {
       if (key <= weatherScale) {
@@ -80,12 +86,14 @@ export class SubRegion {
         Report.warn(`  Location ${locaEnum} not found in repository`);
         continue;
       }
-      
+
       const updateVal = card.value + getRandomWeatherDeviant();
       const oldWeatherScale = location.weatherScale;
       location.weatherScale += updateVal;
-      
-      Report.debug(`  Location ${locaEnum}: weather scale ${oldWeatherScale} -> ${location.weatherScale} (change: +${updateVal})`);
+
+      Report.debug(
+        `  Location ${locaEnum}: weather scale ${oldWeatherScale} -> ${location.weatherScale} (change: +${updateVal})`,
+      );
 
       const news = createNews({
         scope: {
@@ -108,7 +116,9 @@ export class SubRegion {
       allNews.push(news);
     }
 
-    Report.debug(`  Generated ${allNews.length} weather news items for ${this.id}`);
+    Report.debug(
+      `  Generated ${allNews.length} weather news items for ${this.id}`,
+    );
     return allNews;
   }
 

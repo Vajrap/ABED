@@ -2,7 +2,7 @@ import { Weapon } from "../Weapon/Weapon";
 import { Armor } from "../Armor/Armor";
 import type { ItemInstance } from "../../../../Database/Schema/item_instances";
 import Report from "../../../../Utils/Reporter";
-import { getEquipment } from "../repository";
+import type { Equipment } from "../Equipment";
 import {
   cloneArmorInstance,
   cloneWeaponInstance,
@@ -24,7 +24,10 @@ export const itemInstanceRepository: Map<string, Weapon | Armor> = new Map();
  */
 export function loadItemInstance(dbInstance: ItemInstance): Weapon | Armor | null {
   try {
-    const baseEquipment = getEquipment(dbInstance.baseItemId);
+    // Lazy import to avoid circular dependency
+    // Import equipmentRepository only when needed (at runtime, not module load time)
+    const { equipmentRepository } = require("../repository");
+    const baseEquipment: Equipment | undefined = equipmentRepository[dbInstance.baseItemId];
     if (!baseEquipment) {
       Report.error("Failed to load item instance: base equipment not found", {
         itemInstanceId: dbInstance.id,

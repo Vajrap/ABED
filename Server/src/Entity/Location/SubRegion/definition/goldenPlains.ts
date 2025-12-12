@@ -3,6 +3,7 @@ import { RegionEnum } from "src/InterFacesEnumsAndTypes/Enums/Region";
 import { Weather } from "src/InterFacesEnumsAndTypes/Weather";
 import { SeasonEnum } from "src/InterFacesEnumsAndTypes/Time";
 import { WeatherInterpreter } from "../../Weather/types";
+import { SubRegion } from "../../SubRegion";
 
 const weatherInterpreter: WeatherInterpreter = {
   [SeasonEnum.Seeding]: {
@@ -84,16 +85,19 @@ const weatherInterpreter: WeatherInterpreter = {
   },
 };
 
-// Define goldenPlains data without importing SubRegion class to avoid circular dependency
-export const goldenPlainsData = {
-  id: SubRegionEnum.GoldenPlains,
-  region: RegionEnum.CentralPlain,
-  locations: [], // Empty locations array to avoid circular dependency
-  speedBonus: {
+export const goldenPlains = new SubRegion(
+  SubRegionEnum.GoldenPlains,
+  RegionEnum.CentralPlain,
+  {
+    en: "The Golden Plains are the fertile heartlands of Fyonar, dotted with villages, farmlands, and crossroads inns. Greengate Station ties them to the rail network, while places like Brayhorn Village and Stonecross Manor show both the prosperity and old weight of the land. It is the safest stretch of the plains, though travelers still keep watch for wandering beasts and bandits.",
+    th: "",
+  },
+  [],
+  {
     caravan: 0,
     walk: 0,
     horse: 0,
   },
-  volatility: "BALANCE" as const,
-  weatherInterpretation: weatherInterpreter,
-};
+  "BALANCE",
+  weatherInterpreter,
+);

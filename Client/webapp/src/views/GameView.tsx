@@ -7,6 +7,7 @@ import {
 } from "@/components/GameView";
 import { ActionScheduleModal } from "@/components/GameView/ActionScheduleModal";
 import { websocketService } from "@/services/websocketService";
+import { questService } from "@/services/questService";
 
 export const GameView: React.FC = () => {
   const theme = useTheme();
@@ -33,8 +34,26 @@ export const GameView: React.FC = () => {
   useEffect(() => {
     websocketService.connect();
 
-    // Cleanup: disconnect WebSocket when leaving game view
+    // Register quest state update handler
+    const unsubscribeQuestState = websocketService.onMessage("QUEST_STATE_UPDATE", (message) => {
+      const questStateData = message.data;
+      if (questStateData) {
+        // Convert expiresAt strings to Date objects if needed
+        const questOffers = questStateData.questOffers?.map((offer: any) => ({
+          ...offer,
+          expiresAt: typeof offer.expiresAt === "string" ? offer.expiresAt : new Date(offer.expiresAt).toISOString(),
+        })) || [];
+        
+        questService.updateQuestState({
+          activeQuests: questStateData.activeQuests || [],
+          questOffers: questOffers,
+        });
+      }
+    });
+
+    // Cleanup: disconnect WebSocket and unsubscribe handlers when leaving game view
     return () => {
+      unsubscribeQuestState();
       websocketService.disconnect();
     };
   }, []);
@@ -69,13 +88,9 @@ export const GameView: React.FC = () => {
         {/* Left: Sidebar */}
         <GameSidebar
           onScheduleClick={() => setScheduleModalOpen(true)}
-          onStatsClick={() => console.log("Stats clicked")}
           onSkillsClick={() => console.log("Skills clicked")}
           onInventoryClick={() => console.log("Inventory clicked")}
           onNewsClick={() => console.log("News clicked")}
-          onTravelClick={() => console.log("Travel clicked")}
-          onSettingsClick={() => console.log("Settings clicked")}
-          onLogoutClick={handleLogout}
         />
 
         {/* Center: Party Display */}

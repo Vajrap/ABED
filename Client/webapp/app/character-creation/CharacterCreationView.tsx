@@ -324,7 +324,8 @@ const HAIR_COLORS = [
 ];
 
 // Feature flag to enable/disable redirects (useful for debugging/fixing the page)
-const ENABLE_REDIRECTS = process.env.NEXT_PUBLIC_ENABLE_CHARACTER_CREATION_REDIRECTS !== "false";
+// const ENABLE_REDIRECTS = process.env.NEXT_PUBLIC_ENABLE_CHARACTER_CREATION_REDIRECTS !== "false";
+const ENABLE_REDIRECTS = false
 
 export default function CharacterCreationView() {
   const router = useRouter();

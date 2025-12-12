@@ -203,6 +203,12 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
           const callbackRoomId = roomId;
 
           // Fire and forget - process NPC response asynchronously
+          Report.debug("Calling LM Studio", {
+            npcId: recipient.id,
+            url: process.env.LM_STUDIO_URL || "http://localhost:1234",
+            promptLength: combinedPrompt.length,
+          });
+          
           callLMStudio(lmRequest)
             .then(async (lmResponse) => {
               if (lmResponse.success) {
@@ -400,7 +406,11 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
             .catch((error) => {
               Report.error("LM Studio call failed", {
                 npcId: recipient.id,
+                recipientName: npcName,
                 error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined,
+                url: process.env.LM_STUDIO_URL || "http://localhost:1234",
+                errorType: error?.constructor?.name,
               });
             });
 

@@ -888,9 +888,9 @@ function processCharacterGroups(
       }
     } else {
       // Player characters can get random events
-      const result = resolveGroupRandomEvent([c], events.rest, () =>
-        handleRestAction([c], ActionInput.Rest, context),
-      );
+    const result = resolveGroupRandomEvent([c], events.rest, () =>
+      handleRestAction([c], ActionInput.Rest, context),
+    );
       allNews.push(...result);
     }
     
@@ -915,7 +915,7 @@ function processCharacterGroups(
     const playerStrollers = groups.strolling.filter(c => c.userId !== null);
     if (playerStrollers.length > 0) {
       const result: News[] = resolveStrollingAction(playerStrollers, context);
-      allNews.push(...result);
+    allNews.push(...result);
     }
     // NPCs still stroll (needs changes apply) but don't get random discoveries
     const npcStrollers = groups.strolling.filter(c => c.userId === null);
@@ -930,7 +930,7 @@ function processCharacterGroups(
     const playerTavern = groups.tavern.filter(c => c.userId !== null);
     if (playerTavern.length > 0) {
       const result: News[] = resolveTavernAction(playerTavern, context);
-      allNews.push(...result);
+    allNews.push(...result);
     }
     // NPCs still visit tavern (needs changes apply) but don't get random events
     const npcTavern = groups.tavern.filter(c => c.userId === null);
@@ -950,8 +950,8 @@ function processCharacterGroups(
     if (playerChars.length > 0) {
       const result = resolveGroupRandomEvent(playerChars, events.train, () =>
         handleTrainArtisans(playerChars, artisanKey, context),
-      );
-      allNews.push(...result);
+    );
+    allNews.push(...result);
     }
     
     // NPCs still train but without random events
@@ -971,8 +971,8 @@ function processCharacterGroups(
     if (playerChars.length > 0) {
       const result = resolveGroupRandomEvent(playerChars, events.train, () =>
         handleTrainAttribute(playerChars, attributeKey, context),
-      );
-      allNews.push(...result);
+    );
+    allNews.push(...result);
     }
     
     if (npcChars.length > 0) {
@@ -991,8 +991,8 @@ function processCharacterGroups(
     if (playerChars.length > 0) {
       const result = resolveGroupRandomEvent(playerChars, events.train, () =>
         handleTrainProficiency(playerChars, proficiencyKey, context),
-      );
-      allNews.push(...result);
+    );
+    allNews.push(...result);
     }
     
     if (npcChars.length > 0) {
@@ -1011,8 +1011,8 @@ function processCharacterGroups(
     if (playerChars.length > 0) {
       const result = resolveGroupRandomEvent(playerChars, events.train, () =>
         handleTrainSkill(playerChars, skillId, context),
-      );
-      allNews.push(...result);
+    );
+    allNews.push(...result);
     }
     
     if (npcChars.length > 0) {
@@ -1034,9 +1034,9 @@ function processCharacterGroups(
   groups.guildActions
     .filter(character => character.userId !== null) // Only player characters
     .forEach((character) => {
-      const result = handleGuildAction(character, context, "generateOffer");
-      allNews.push(...result);
-    });
+    const result = handleGuildAction(character, context, "generateOffer");
+    allNews.push(...result);
+  });
 
   // TODO: Check the grouping
   if (groups.crafting.mainCharacter) {
@@ -1055,10 +1055,10 @@ function processCharacterGroups(
       }
     } else {
       // Player characters can get random events
-      const result = resolveGroupRandomEvent([character], events.learn, () =>
-        handleLearnSkill(character, skillId, context),
-      );
-      allNews.push(...result);
+    const result = resolveGroupRandomEvent([character], events.learn, () =>
+      handleLearnSkill(character, skillId, context),
+    );
+    allNews.push(...result);
     }
   }
 

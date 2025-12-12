@@ -11,8 +11,8 @@ import { callLMStudio, type LMStudioRequest } from "./LMStudioService";
 import type { ChatHistoryEntry } from "./ChatHistoryService";
 import type { NPCImpression } from "./NPCCharacterRelationService";
 import { characterManager } from "../Game/CharacterManager";
-import { getNPCTemplateById } from "../Entity/Character/NPCs/definitions";
 import Report from "../Utils/Reporter";
+import { getNPCTemplateById } from "src/Entity/Character/NPCs/repository";
 
 export interface NPCEvent {
   type: string;

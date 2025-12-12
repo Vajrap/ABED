@@ -6,7 +6,6 @@ import type { ItemId } from "../Item/type";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { createNews, type News } from "../News/News";
 import { NewsSignificance, NewsPropagation } from "../../InterFacesEnumsAndTypes/NewsEnums";
-import { locationManager } from "../Location/Manager/LocationManager";
 import Report from "../../Utils/Reporter";
 import { questStatePostman } from "./QuestStatePostman";
 
@@ -248,7 +247,10 @@ export class QuestProgressTracker {
           return null; // Can't generate news without location
         }
 
-        const location = locationManager.locations[character.location];
+        // Lazy import to avoid circular dependency
+        // Location/repository → Location → handleArtisans → foraging → QuestProgressTracker
+        const { locationRepository } = require("../Location/Location/repository");
+        const location = locationRepository[character.location];
         if (!location) {
           return null; // Location not found
         }

@@ -6,11 +6,11 @@
  */
 
 import type { Character } from "../Entity/Character/Character";
-import { getNPCTemplateById, getNPCTemplateByUUID } from "../Entity/Character/NPCs/definitions";
 import { getNPCImpression, type NPCImpression } from "./NPCCharacterRelationService";
 import { characterManager } from "../Game/CharacterManager";
 import type { LMStudioTool } from "./LMStudioService";
 import Report from "../Utils/Reporter";
+import { getNPCTemplateById, getNPCTemplateByUUID } from "src/Entity/Character/NPCs/repository";
 
 export interface JoinCriteria {
   canJoin: boolean;

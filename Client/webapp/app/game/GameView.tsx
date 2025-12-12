@@ -17,6 +17,8 @@ import { CharacterStatsModal } from "@/components/GameView/CharacterStatsModal";
 import { actionService } from "@/services/actionService";
 import { gameDataService } from "@/services/gameDataService";
 import { characterService } from "@/services/characterService";
+import { websocketService } from "@/services/websocketService";
+import { questService } from "@/services/questService";
 import type { PartyInterface, CharacterInterface, GameTimeInterface, News } from "@/types/api";
 import type { LocationData } from "@/services/locationService";
 import type { CharacterStatsView } from "@/types/game";
@@ -181,6 +183,40 @@ export default function GameView() {
 
     fetchData();
   }, [router, isCheckingAuth]);
+
+  // Initialize WebSocket connection and quest state handler
+  useEffect(() => {
+    // Connect WebSocket if not already connected
+    if (!websocketService.isConnected()) {
+      websocketService.connect();
+    }
+
+    // Register quest state update handler
+    const unsubscribeQuestState = websocketService.onMessage("QUEST_STATE_UPDATE", (message) => {
+      const questStateData = message.data;
+      if (questStateData) {
+        // Convert expiresAt to ISO string if it's a Date object
+        const questOffers = questStateData.questOffers?.map((offer: any) => ({
+          ...offer,
+          expiresAt: typeof offer.expiresAt === "string" 
+            ? offer.expiresAt 
+            : new Date(offer.expiresAt).toISOString(),
+        })) || [];
+        
+        questService.updateQuestState({
+          activeQuests: questStateData.activeQuests || [],
+          questOffers: questOffers,
+        });
+      }
+    });
+
+    // Cleanup: unsubscribe handler when component unmounts
+    return () => {
+      unsubscribeQuestState();
+      // Note: We don't disconnect WebSocket here as it might be used by other components
+      // WebSocket will be disconnected when user logs out
+    };
+  }, []);
 
   // Keyboard shortcuts - Must be before any conditional returns to maintain hook order
   useEffect(() => {

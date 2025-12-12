@@ -20,14 +20,14 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { 
   getNPCsByLocation, 
-  getNPCsPartiesForLocation 
+  getNPCsPartiesForLocation,
+  generateDeterministicUUID
 } from "../Entity/Character/NPCs/repository";
 import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import { PartyService } from "../Services/PartyService";
 import { Party } from "../Entity/Party/Party";
 import { PartyBehavior } from "../Entity/Party/PartyBehavior";
 import { characterManager } from "../Game/CharacterManager";
-import { createHash } from "crypto";
 import { eq } from "drizzle-orm";
 import { characters } from "./Schema";
 
@@ -167,28 +167,6 @@ async function loadGameDataFromDatabase(): Promise<void> {
     Report.error("❌ Error loading game data", { error });
     throw error;
   }
-}
-
-/**
- * Generate a deterministic UUID from a string (template ID)
- * Uses SHA-256 hash to create a consistent UUID v4-like format
- * This ensures the same template ID always generates the same UUID
- */
-function generateDeterministicUUID(input: string): string {
-  const namespace = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"; // NPC namespace
-  
-  const hash = createHash("sha256")
-    .update(namespace + input)
-    .digest("hex");
-  
-  const hex = hash.substring(0, 32);
-  return [
-    hex.substring(0, 8),
-    hex.substring(8, 12),
-    "4" + hex.substring(13, 16), // Version 4
-    ((parseInt(hex.substring(16, 18), 16) & 0x3f) | 0x80).toString(16).padStart(2, "0") + hex.substring(18, 20), // Variant bits
-    hex.substring(20, 32),
-  ].join("-");
 }
 
 /**
