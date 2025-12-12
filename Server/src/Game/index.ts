@@ -20,8 +20,4 @@ export class Game {
     await runSchedule();
     Report.info(`Server is up and running at ${new Date().toLocaleString()}`);
   }
-
-  public async save() {
-    // await saveGameStateToDB();
-  }
 }

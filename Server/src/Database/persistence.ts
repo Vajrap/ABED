@@ -3,7 +3,9 @@ import { persistGameStateSnapshot } from "./gameStateStore";
 import { newsArchiveService } from "../Entity/News/NewsArchive";
 import { market } from "../Entity/Market/Market";
 import { characterManager } from "../Game/CharacterManager";
+import { partyManager } from "../Game/PartyManager";
 import { CharacterService } from "../Services/CharacterService";
+import { PartyService } from "../Services/PartyService";
 import { db } from "./connection";
 import {
   marketState,
@@ -138,6 +140,27 @@ async function persistCharactersSnapshot(): Promise<void> {
   Report.info(`✅ Persisted ${charactersToSave.length} characters to database`);
 }
 
+async function persistPartiesSnapshot(): Promise<void> {
+  const partiesToSave = partyManager.parties;
+  Report.debug(`Persisting ${partiesToSave.length} parties to database...`);
+  
+  for (const party of partiesToSave) {
+    try {
+      const insertParty = PartyService.partyToInsertParty(party);
+      await PartyService.updateParty(party.partyID, insertParty);
+    } catch (error) {
+      Report.error(`Failed to persist party ${party.partyID}`, { 
+        error, 
+        partyID: party.partyID,
+        errorMessage: error instanceof Error ? error.message : String(error)
+      });
+      throw error; // Re-throw to be caught by run() wrapper
+    }
+  }
+  
+  Report.info(`✅ Persisted ${partiesToSave.length} parties to database`);
+}
+
 export async function saveDailyState(): Promise<void> {
   const errors: Array<{ scope: string; error: unknown }> = [];
 
@@ -155,6 +178,7 @@ export async function saveDailyState(): Promise<void> {
   await run("marketState", persistMarketStateSnapshot);
   await run("resourceProduction", persistResourceProductionSnapshot);
   await run("characters", persistCharactersSnapshot);
+  await run("parties", persistPartiesSnapshot);
 
   if (errors.length === 0) {
     Report.info("Daily state persistence completed successfully");
