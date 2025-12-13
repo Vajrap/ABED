@@ -8,6 +8,9 @@ services:
     volumes:
       - ./Server:/app/Server
       - ./logs:/var/log/app
+      # Exclude node_modules from host mount to avoid platform mismatch
+      # node_modules will be installed in the container for the correct platform
+      - /app/Server/node_modules
     command: bun --inspect src/index.ts
     # Use host network mode so container can access host services via localhost
     # This allows LM Studio running on host to be accessed as localhost:1234
@@ -22,7 +25,7 @@ services:
       - LM_STUDIO_URL=http://localhost:1234
 
   postgres:
-    image: postgres:15
+    image: pgvector/pgvector:pg15
     container_name: ABED_POSTGRES
     ports:
       - "40316:5432"
@@ -32,6 +35,7 @@ services:
       POSTGRES_PASSWORD: abed_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./Server/docker/postgres-init.sql:/docker-entrypoint-initdb.d/init-vector.sql
     restart: unless-stopped
 
 #  loki:

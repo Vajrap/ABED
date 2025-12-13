@@ -1,0 +1,27 @@
+# Exclude node_modules from Docker build context
+# They will be installed inside the container for the correct platform
+Server/node_modules
+node_modules
+
+# Exclude other build artifacts
+Server/dist
+Server/.next
+Server/.cache
+*.log
+.env.local
+.env.*.local
+
+# Exclude git
+.git
+.gitignore
+
+# Exclude IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Exclude OS files
+.DS_Store
+Thumbs.db
+
