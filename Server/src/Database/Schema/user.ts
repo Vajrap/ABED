@@ -6,6 +6,7 @@ export const users = pgTable("users", {
   password: varchar("password", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }),
   lastNewsReceived: varchar("last_news_received", { length: 255 }),
+  tier: varchar("tier", { length: 20 }).default("free").notNull(), // 'free', 'vip', 'premium', etc.
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   createdBy: varchar("created_by", { length: 255 }).notNull(),

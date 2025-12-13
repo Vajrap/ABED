@@ -28,6 +28,7 @@ import { playgroundRoutes } from "./playground/api";
 import { itemRoutes } from "./API/item";
 import { shopRoutes } from "./API/shop";
 import { questRoutes } from "./API/quest";
+import { adminRoutes } from "./API/admin";
 import { loadQuestDefinitions } from "./Entity/Quest/loadQuestDefinitions";
 
 dotenv.config();
@@ -86,6 +87,7 @@ async function startServer() {
           .use(itemRoutes)
           .use(shopRoutes)
           .use(questRoutes)
+          .use(adminRoutes)
       )
       // Global error handler
       .onError(({ code, error, set }) => {

@@ -1,16 +1,17 @@
 import { Elysia, t } from "elysia";
 import Report from "../../Utils/Reporter";
+import { ChatFlowLogger } from "../../Utils/ChatFlowLogger";
 import { SessionService } from "../../Services/SessionService";
 import { characterManager } from "../../Game/CharacterManager";
 import { buildNPCChatPrompt, getAvailableTools } from "../../Services/ChatPromptBuilder";
-import { callLMStudio, type LMStudioRequest, type LMStudioToolCall } from "../../Services/LMStudioService";
+import { callLLM, type LLMRequest, type LLMToolCall } from "../../Services/LLMService";
 import { connectionManager } from "../../Entity/Connection/connectionManager";
 import { getOrCreateChatRoom, logPrivateMessage, logPublicMessage } from "../../Services/ChatLoggingService";
 import { getOrCreateNPCRelation, updateNPCRelation, summarizeRelationshipImpression } from "../../Services/NPCCharacterRelationService";
 import { shouldSummarizeConversation, summarizeConversationHistory } from "../../Services/ChatSummarizationService";
 import { isThreateningMessage, requestBattleInitiation } from "../../Services/BattleInitiationService";
 import { executeTool, type ToolContext, type ToolExecutionResult } from "../../Services/ToolExecutionService";
-import { randomUUID } from "crypto";
+import { checkRateLimit } from "../../Services/ChatRateLimitService";
 
 /**
  * Chat API Routes
@@ -129,70 +130,106 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
 
         // 6. Handle NPC chat (LLM integration)
         if (isNPCChat && recipient) {
-          Report.info("NPC chat detected - routing to LLM handler", {
-            senderId: sender.id,
-            recipientId: recipient.id,
-            recipientName: typeof recipient.name === 'string' ? recipient.name : recipient.name?.en,
+          const npcName = typeof recipient.name === 'string' ? recipient.name : recipient.name?.en || "NPC";
+          const playerName = typeof sender.name === 'string' ? sender.name : sender.name?.en || "Player";
+          
+          // Initialize chat flow logger
+          const flowLogger = new ChatFlowLogger({
+            npcId: recipient.id,
+            npcName,
+            playerId: sender.id,
+            playerName,
           });
 
-          // Step 1: Get or create chat room and log player's message
+          // Step 0: Check rate limit (per player, not per NPC-player pair)
+          const rateLimitResult = await checkRateLimit(sender.id);
+          if (!rateLimitResult.allowed) {
+          const tierLabel = rateLimitResult.tier === "vip" || rateLimitResult.tier === "premium" ? "VIP" : "Free";
+          const rateLimitMessage = `I need a moment to think. Let's continue this conversation later. (${tierLabel} tier: ${rateLimitResult.remaining}/${rateLimitResult.maxExchanges} exchanges remaining this phase, resets next phase)`;
+            
+            // Log rate limit message
+            const roomId = await getOrCreateChatRoom(sender.id, recipient.id, true);
+            await logPrivateMessage(roomId, recipient.id, sender.id, rateLimitMessage);
+            
+            // Send via WebSocket
+            const connection = connectionManager.getConnectionByUserId(user.id);
+            if (connection) {
+              connection.ws.send(JSON.stringify({
+                type: "CHAT_MESSAGE",
+                data: {
+                  id: `chat-${Date.now()}`,
+                  scope: "private",
+                  senderId: recipient.id,
+                  senderName: npcName,
+                  senderPortrait: recipient.portrait,
+                  content: rateLimitMessage,
+                  timestamp: new Date().toISOString(),
+                  recipientId: sender.id,
+                },
+              }));
+            }
+            
+            return {
+              success: true,
+              message: "Rate limit message sent",
+            };
+          }
+
+          // Step 1: Log user message
+          flowLogger.logUserMessage(content);
+
+          // Step 2: Get or create chat room and log player's message
           const roomId = await getOrCreateChatRoom(sender.id, recipient.id, true);
           await logPrivateMessage(roomId, sender.id, recipient.id, content);
 
-          // Step 2: Get or create NPC-Character relation (for first meeting)
+          // Step 3: Get or create NPC-Character relation (for first meeting)
           await getOrCreateNPCRelation(recipient.id, sender.id);
 
-          // Step 3: Check if message is threatening (before building prompt)
-          const isThreatening = isThreateningMessage(content);
-          let battleRequestId: string | null = null;
-          let battleId: string | null = null;
+          // // Step 4: Check if message is threatening (before building prompt)
+          // const isThreatening = isThreateningMessage(content);
+          // let battleRequestId: string | null = null;
+          // let battleId: string | null = null;
 
-          if (isThreatening) {
-            // Request battle initiation and auto-start it
-            const locationId = sender.location || recipient.location || "WaywardInn";
-            const battleResult = await requestBattleInitiation(
-              recipient.id,
-              sender.id,
-              `You have threatened me: "${content}"`,
-              locationId,
-              true // autoStart = true - immediately start battle without waiting for confirmation
-            );
+          // if (isThreatening) {
+          //   // Request battle initiation and auto-start it
+          //   const locationId = sender.location || recipient.location || "WaywardInn";
+          //   const battleResult = await requestBattleInitiation(
+          //     recipient.id,
+          //     sender.id,
+          //     `You have threatened me: "${content}"`,
+          //     locationId,
+          //     true // autoStart = true - immediately start battle without waiting for confirmation
+          //   );
             
-            if (battleResult) {
-              battleRequestId = battleResult.requestId;
-              battleId = battleResult.battleId || null;
-            }
+          //   if (battleResult) {
+          //     battleRequestId = battleResult.requestId;
+          //     battleId = battleResult.battleId || null;
+          //   }
             
-            Report.info("Threatening message detected, battle initiation requested", {
-              npcId: recipient.id,
-              npcName: typeof recipient.name === 'string' ? recipient.name : recipient.name?.en,
-              playerId: sender.id,
-              playerName: typeof sender.name === 'string' ? sender.name : sender.name?.en,
-              message: content,
-              battleRequestId,
-              battleId,
-              locationId,
-            });
-          }
+          //   Report.info("Threatening message detected, battle initiation requested", {
+          //     npcId: recipient.id,
+          //     npcName,
+          //     playerId: sender.id,
+          //     playerName,
+          //     message: content,
+          //     battleRequestId,
+          //     battleId,
+          //     locationId,
+          //   });
+          // }
 
-          // Step 4: Build comprehensive prompt (includes history, player info, impression)
+          // Step 5: Build comprehensive prompt (includes history, player info, impression)
           const combinedPrompt = await buildNPCChatPrompt(recipient.id, sender, content);
 
-          // Step 5: Get available tools for this NPC
+          // Step 6: Get available tools for this NPC
           const availableTools = getAvailableTools(recipient.id);
+          const toolNames = availableTools.map(t => t.function.name);
 
-          Report.info("NPC chat prompt built", {
-            npcId: recipient.id,
-            promptLength: combinedPrompt.length,
-            availableToolsCount: availableTools.length,
-            toolNames: availableTools.map(t => t.function.name),
-            hasTools: availableTools.length > 0,
-            messagePreview: content.substring(0, 50),
-          });
+          // Step 7: Log prompt built
+          flowLogger.logPromptBuilt(combinedPrompt, toolNames);
 
-          // Step 6: Call LM Studio with tools (async, don't wait)
-          const npcName = typeof recipient.name === 'string' ? recipient.name : recipient.name?.en || "NPC";
-          const lmRequest: LMStudioRequest = {
+          // Step 8: Call LM Studio with tools (async, don't wait)
+          const lmRequest: LLMRequest = {
             prompt: combinedPrompt,
             npcId: recipient.id,
             npcName,
@@ -203,16 +240,15 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
           const callbackRoomId = roomId;
 
           // Fire and forget - process NPC response asynchronously
-          Report.debug("Calling LM Studio", {
-            npcId: recipient.id,
-            url: process.env.LM_STUDIO_URL || "http://localhost:1234",
-            promptLength: combinedPrompt.length,
-          });
-          
-          callLMStudio(lmRequest)
+          callLLM(lmRequest)
             .then(async (lmResponse) => {
               if (lmResponse.success) {
-                // Step 7: Process tool calls if any
+                // Step 9: Log initial NPC response (if any)
+                if (lmResponse.response && lmResponse.response.trim().length > 0) {
+                  flowLogger.logNPCResponse(lmResponse.response);
+                }
+
+                // Step 10: Process tool calls if any
                 let confirmationRequestId: string | null = null;
                 let confirmationData: any = null;
 
@@ -220,15 +256,13 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
                 let needsFollowUpCall = false;
 
                 if (lmResponse.toolCalls && lmResponse.toolCalls.length > 0) {
-                  Report.info("Processing tool calls from LLM", {
-                    npcId: recipient.id,
-                    toolCallCount: lmResponse.toolCalls.length,
-                  });
-
                   // Execute each tool call and collect results
-                  const toolResults: Array<{ toolCall: LMStudioToolCall; result: ToolExecutionResult }> = [];
+                  const toolResults: Array<{ toolCall: LLMToolCall; result: ToolExecutionResult }> = [];
                   
                   for (const toolCall of lmResponse.toolCalls) {
+                    // Log tool call
+                    flowLogger.logToolCall(toolCall.name, toolCall.arguments);
+
                     const toolContext: ToolContext = {
                       npcId: recipient.id,
                       playerId: sender.id,
@@ -237,6 +271,14 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
 
                     const toolResult = await executeTool(toolCall, toolContext);
                     toolResults.push({ toolCall, result: toolResult });
+
+                    // Log tool result
+                    flowLogger.logToolResult(
+                      toolCall.name,
+                      toolResult.success,
+                      toolResult.result,
+                      toolResult.error
+                    );
 
                     if (toolResult.success && toolResult.shouldSendConfirmation && toolResult.confirmationData) {
                       // Store confirmation request
@@ -254,10 +296,6 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
                   // If LLM didn't generate a response (only called tools), make follow-up call with tool results
                   if (!lmResponse.response || lmResponse.response.trim().length === 0) {
                     needsFollowUpCall = true;
-                    Report.info("LLM only called tools without response, making follow-up call", {
-                      npcId: recipient.id,
-                      toolCallCount: toolResults.length,
-                    });
 
                     // Build follow-up prompt with tool results
                     const toolResultsText = toolResults.map(({ toolCall, result }) => {
@@ -279,25 +317,28 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
                     // Make follow-up call with tool results
                     const followUpPrompt = `${combinedPrompt}\n\nTool execution results:\n${toolResultsText}\n\nNow respond naturally to the player based on these tool results. If you cannot join their party, explain why in character (e.g., "I don't know you well enough yet" or "I need more trust before joining").`;
                     
-                    const followUpRequest: LMStudioRequest = {
+                    // Log follow-up prompt
+                    flowLogger.logFollowUpPrompt(
+                      followUpPrompt,
+                      toolResults.map(tr => ({
+                        toolName: tr.toolCall.name,
+                        result: tr.result,
+                      }))
+                    );
+                    
+                    const followUpRequest: LLMRequest = {
                       prompt: followUpPrompt,
                       npcId: recipient.id,
                       npcName,
                       // Don't include tools in follow-up - we already checked
                     };
 
-                    const followUpResponse = await callLMStudio(followUpRequest);
+                    const followUpResponse = await callLLM(followUpRequest);
                     if (followUpResponse.success && followUpResponse.response) {
                       finalResponse = followUpResponse.response;
-                      Report.info("Follow-up LLM call successful", {
-                        npcId: recipient.id,
-                        responseLength: finalResponse.length,
-                      });
+                      flowLogger.logFollowUpResponse(finalResponse);
                     } else {
-                      Report.warn("Follow-up LLM call failed, using tool result message", {
-                        npcId: recipient.id,
-                        error: followUpResponse.error,
-                      });
+                      flowLogger.logError("Follow-up LLM call", followUpResponse.error || "Unknown error");
                       // Fallback: use tool result message
                       const firstResult = toolResults[0]?.result;
                       if (firstResult?.success && firstResult.result) {
@@ -307,32 +348,36 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
                   }
                 }
 
-                // Step 8: Log NPC's response (use finalResponse which may include follow-up)
+                // Step 11: Log NPC's final response (use finalResponse which may include follow-up)
+                if (finalResponse && finalResponse !== lmResponse.response) {
+                  // Only log if it's different from initial response (i.e., it's a follow-up)
+                  flowLogger.logNPCResponse(finalResponse);
+                }
                 await logPrivateMessage(callbackRoomId, recipient.id, sender.id, finalResponse);
 
                 // Step 9: Get current relation to check conversation count
+                // Note: Impression updates are now handled by AI via updateImpression tool (slow, sparingly)
                 const relation = await getOrCreateNPCRelation(recipient.id, sender.id);
                 const currentCount = relation.conversationCount;
 
-                // Step 10: Update NPC-Character relation (increment conversation count)
+                // Step 11: Update NPC-Character relation (increment conversation count)
                 await updateNPCRelation(recipient.id, sender.id, {
-                  // Could update affection/closeness based on conversation tone, etc.
-                  // For now, just track that conversation happened
+                  // Impression already updated above
                 });
 
-                // Step 11: Check if conversation summarization is needed
+                // Step 12: Check if conversation summarization is needed
                 const needsSummarization = await shouldSummarizeConversation(recipient.id, sender.id);
                 if (needsSummarization) {
                   await summarizeConversationHistory(recipient.id, sender.id);
                 }
 
-                // Step 12: Periodically summarize relationship (every 5 conversations)
+                // Step 13: Periodically summarize relationship (every 5 conversations)
                 // Check after increment (currentCount + 1)
                 if ((currentCount + 1) % 5 === 0) {
                   await summarizeRelationshipImpression(recipient.id, sender.id);
                 }
 
-                // Step 13: Send WebSocket message to user when LM Studio responds
+                // Step 14: Send WebSocket message to user when LM Studio responds
                 const connection = connectionManager.getConnectionByUserId(user.id);
                 const npcResponseName = typeof recipient.name === 'string' ? recipient.name : recipient.name?.en || "NPC";
                 
@@ -361,21 +406,21 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
                   }
 
                   // Add battle request if applicable
-                  if (battleRequestId) {
-                    npcResponseMessage.battleRequest = {
-                      requestId: battleRequestId,
-                      ...(battleId && { battleId }), // Include battleId if battle was auto-started
-                    };
-                  }
+                  // if (battleRequestId) {
+                  //   npcResponseMessage.battleRequest = {
+                  //     requestId: battleRequestId,
+                  //     ...(battleId && { battleId }), // Include battleId if battle was auto-started
+                  //   };
+                  // }
 
                   try {
                     Report.info("Sending NPC chat response via WebSocket", {
                       userId: user.id,
                       npcId: recipient.id,
                       npcName: typeof recipient.name === 'string' ? recipient.name : recipient.name?.en,
-                      messageLength: lmResponse.response.length,
+                      messageLength: finalResponse ? finalResponse.length : 0,
                       hasConfirmation: !!confirmationRequestId,
-                      hasBattleRequest: !!battleRequestId,
+                      // hasBattleRequest: !!battleRequestId,
                       confirmationType: confirmationData?.type,
                     });
                     connection.ws.send(JSON.stringify(npcResponseMessage));
@@ -397,21 +442,11 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
                   });
                 }
               } else {
-                Report.error("LM Studio returned error", {
-                  npcId: recipient.id,
-                  error: lmResponse.error,
-                });
+                flowLogger.logError("LM Studio call", lmResponse.error || "Unknown error");
               }
             })
             .catch((error) => {
-              Report.error("LM Studio call failed", {
-                npcId: recipient.id,
-                recipientName: npcName,
-                error: error instanceof Error ? error.message : String(error),
-                stack: error instanceof Error ? error.stack : undefined,
-                url: process.env.LM_STUDIO_URL || "http://localhost:1234",
-                errorType: error?.constructor?.name,
-              });
+              flowLogger.logError("LM Studio processing", error instanceof Error ? error.message : String(error));
             });
 
           // Step 5: Return immediately (don't wait for LM Studio)

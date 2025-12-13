@@ -184,6 +184,7 @@ export async function updateNPCRelation(
     closeness?: number;
     relationTitle?: string | null;
     lastConversationSummary?: string | null;
+    conversationSummaries?: any[];
     addImportantEvent?: any;
     lastSummarizedExchange?: number;
   }
@@ -214,6 +215,9 @@ export async function updateNPCRelation(
     }
     if (updates.lastSummarizedExchange !== undefined) {
       updateData.lastSummarizedExchange = updates.lastSummarizedExchange;
+    }
+    if (updates.conversationSummaries !== undefined) {
+      updateData.conversationSummaries = updates.conversationSummaries;
     }
     if (updates.addImportantEvent) {
       // Get current events and add new one

@@ -348,7 +348,7 @@ export function getPendingBattleRequest(requestId: string): BattleInitiationRequ
  * Get LLM tool definition for initiateBattle
  * Returns OpenAI-compatible tool schema for LLM function calling
  */
-export function getBattleInitiationToolDefinition(): import("./LMStudioService").LMStudioTool {
+export function getBattleInitiationToolDefinition(): import("./LLMService").LLMTool {
   return {
     type: "function",
     function: {

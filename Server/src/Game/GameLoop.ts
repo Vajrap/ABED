@@ -415,6 +415,10 @@ async function processPhaseInternal(options: ProcessPhaseOptions): Promise<void>
 
     await sendPartyData(allNews);
     await persistLastProcessedPhase(GameTime.getCurrentPhaseIndex());
+    
+    // Reset chat rate limits for new phase (exchange counts reset each phase)
+    const { resetRateLimitsForNewPhase } = await import("../Services/ChatRateLimitService");
+    await resetRateLimitsForNewPhase();
 
     loopMetrics.successfulRuns++;
     loopMetrics.lastDurationMs = Math.round(nowMs() - startMs);

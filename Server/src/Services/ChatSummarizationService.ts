@@ -6,11 +6,11 @@
  */
 
 import { db } from "../Database/connection";
-import { chatRooms, chatLogs } from "../Database/Schema";
-import { eq, and, or, desc, asc } from "drizzle-orm";
+import { chatRooms, chatLogs, npcCharacterRelations } from "../Database/Schema";
+import { eq, and, or, asc } from "drizzle-orm";
 import { getChatHistoryForAI, type ChatHistoryEntry } from "./ChatHistoryService";
 import { summarizeConversation } from "./LLMSummarizationService";
-import { updateNPCRelation } from "./NPCCharacterRelationService";
+import { updateNPCRelation, getNPCImpression } from "./NPCCharacterRelationService";
 import Report from "../Utils/Reporter";
 
 // Configuration
@@ -27,7 +27,6 @@ export async function shouldSummarizeConversation(
 ): Promise<boolean> {
   try {
     // Get relation to check conversation count and last summarized exchange
-    const { getNPCImpression } = await import("./NPCCharacterRelationService");
     const relation = await getNPCImpression(npcId, characterId);
     
     if (!relation) {
@@ -121,7 +120,6 @@ export async function summarizeConversationHistory(
     }
 
     // Get relation to get previous summary and current exchange count
-    const { getNPCImpression } = await import("./NPCCharacterRelationService");
     const relation = await getNPCImpression(npcId, characterId);
     const previousSummary = relation?.lastConversationSummary || null;
     const currentExchangeCount = relation ? Math.floor(relation.conversationCount / 2) : 0;
@@ -139,9 +137,34 @@ export async function summarizeConversationHistory(
       return previousSummary;
     }
 
+    // Get current conversation summaries array from database
+    const [dbRelation] = await db
+      .select({ conversationSummaries: npcCharacterRelations.conversationSummaries })
+      .from(npcCharacterRelations)
+      .where(
+        and(
+          eq(npcCharacterRelations.npcId, npcId),
+          eq(npcCharacterRelations.characterId, characterId)
+        )
+      )
+      .limit(1);
+    
+    const currentSummaries = (dbRelation?.conversationSummaries as any[]) || [];
+    
+    // Add new summary to array
+    const newSummaryEntry = {
+      timestamp: new Date().toISOString(),
+      summary,
+      messageCount: entriesToSummarize.length,
+      exchangeCount: currentExchangeCount,
+    };
+    
+    const updatedSummaries = [...currentSummaries, newSummaryEntry];
+    
     // Update conversation summary in relation and track exchange count
     await updateNPCRelation(npcId, characterId, {
       lastConversationSummary: summary,
+      conversationSummaries: updatedSummaries,
       lastSummarizedExchange: currentExchangeCount,
     });
 
@@ -181,7 +204,6 @@ export async function getChatHistoryWithSummary(
     const recentMessages = await getChatHistoryForAI(npcId, characterId, exchangeCount);
 
     // Get summary from relation (don't trigger summarization here - it's done separately)
-    const { getNPCImpression } = await import("./NPCCharacterRelationService");
     const relation = await getNPCImpression(npcId, characterId);
     const summary = relation?.lastConversationSummary || null;
 

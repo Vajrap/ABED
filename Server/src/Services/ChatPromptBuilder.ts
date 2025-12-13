@@ -11,29 +11,30 @@ import { getChatHistoryWithSummary } from "./ChatSummarizationService";
 import { getNPCImpression, type NPCImpression } from "./NPCCharacterRelationService";
 import { getEquipment } from "../Entity/Item/Equipment/repository";
 import { SubRegionEnum } from "../InterFacesEnumsAndTypes/Enums/SubRegion";
-import { getJoinCriteria } from "./NPCPartyJoinService";
 import { getNPCLifeSummary } from "./NPCSummaryService";
 import type { ChatHistoryEntry } from "./ChatHistoryService";
-import { getJoinPartyToolDefinition } from "./NPCPartyJoinService";
+// Note: getJoinPartyToolDefinition removed - party joining is now a direct player action via UI, not an AI tool
 import { getBattleInitiationToolDefinition } from "./BattleInitiationService";
-import type { LMStudioTool } from "./LMStudioService";
+import { getImpressionUpdateToolDefinition } from "./ImpressionUpdateTool";
+import type { LLMTool } from "./LLMService";
 import Report from "../Utils/Reporter";
+import { characterManager } from "src/Game/CharacterManager";
 
 /**
  * Get available tools for NPC chat
  * Returns array of tool definitions that the LLM can call
  */
-export function getAvailableTools(npcId: string): LMStudioTool[] {
-  const tools: LMStudioTool[] = [];
+export function getAvailableTools(npcId: string): LLMTool[] {
+  const tools: LLMTool[] = [];
   
-  // Add checkJoinParty tool if NPC can join parties
-  const joinCriteria = getJoinCriteria(npcId);
-  if (joinCriteria && joinCriteria.canJoin) {
-    tools.push(getJoinPartyToolDefinition());
-  }
+  // Note: checkJoinParty is NOT an AI tool - it's a direct player action via UI button
+  // Players initiate party invitations through the UI, not through chat
   
   // Add initiateBattle tool - all NPCs can defend themselves
   tools.push(getBattleInitiationToolDefinition());
+  
+  // Add updateImpression tool - AI can update impressions (slowly, sparingly)
+  tools.push(getImpressionUpdateToolDefinition());
   
   return tools;
 }
@@ -47,117 +48,22 @@ export async function buildNPCChatPrompt(
   userMessage: string
 ): Promise<string> {
   try {
-    const promptParts: string[] = [];
-
-    // 1. NPC Character Prompt
+    // Load all required data upfront
+    const npc = characterManager.getCharacterByID(npcId);
     const npcMemory = await getNPCMemory(npcId, true);
-    if (npcMemory?.personalPrompt) {
-      promptParts.push(`NPC Character: ${npcMemory.personalPrompt}\n`);
-    } else {
-      const npcName = typeof character.name === 'string' ? character.name : character.name?.en || "NPC";
-      promptParts.push(`You are ${npcName}, a character in this world.\n`);
-    }
-
-    // 1a. NPC Life Summary (what they've been through)
-    const lifeSummary = await getNPCLifeSummary(npcId);
-    if (lifeSummary) {
-      promptParts.push(`Your Recent Experiences:\n${lifeSummary}\n`);
-    }
-
-    // 2. Known News Context
-    if (npcMemory?.newsDetails && npcMemory.newsDetails.length > 0) {
-      promptParts.push("Your Knowledge:\n");
-      npcMemory.newsDetails.forEach((news) => {
-        if (news.context) {
-          promptParts.push(`- ${news.context}\n`);
-        }
-      });
-      promptParts.push("\n");
-    }
-
-    // 3. Get NPC impression (used in both player context and impression sections)
     const impression = await getNPCImpression(npcId, character.id);
+    const { summary, recentMessages } = await getChatHistoryWithSummary(npcId, character.id,5);
 
-    // 4. Get join party criteria (if NPC can join parties)
-    const joinCriteria = getJoinCriteria(npcId);
-    if (joinCriteria) {
-      Report.debug("Join party criteria found for NPC", {
-        npcId,
-        canJoin: joinCriteria.canJoin,
-        hasHiring: !!joinCriteria.hiring,
-        hiringAmount: joinCriteria.hiring,
-      });
-    }
-
-    // 5. Player Character Information
-    promptParts.push("About the Player:\n");
-    promptParts.push(formatPlayerContext(character, npcId, impression));
-    promptParts.push("\n");
-
-    // 6. NPC-Character Impression
-    promptParts.push("Your Impression of This Player:\n");
-    promptParts.push(formatNPCImpression(impression));
-    promptParts.push("\n");
-
-    // 7. Join Party Information (if applicable)
-    if (joinCriteria && joinCriteria.canJoin) {
-      promptParts.push("Party Joining:\n");
-      promptParts.push(formatJoinPartyInfo(joinCriteria, impression));
-      promptParts.push("\n");
-    }
-
-    // 8. Chat History (with summary if available)
-    const { summary, recentMessages } = await getChatHistoryWithSummary(npcId, character.id, 10);
-    
-    promptParts.push("Recent Conversation:\n");
-    if (summary) {
-      promptParts.push(`Previous conversation summary: ${summary}\n\n`);
-    }
-    promptParts.push(formatChatHistory(recentMessages));
-    promptParts.push("\n");
-
-    // 9. Behavioral Guidelines
-    promptParts.push("Important Behavioral Guidelines:\n");
-    promptParts.push("- Stay true to your character's personality, values, and boundaries\n");
-    promptParts.push("- You have the right to refuse inappropriate requests\n");
-    promptParts.push("- If someone makes threats, sexual advances, or disrespects you, respond assertively\n");
-    promptParts.push("- You can call for help (like Thomas or guards) if threatened\n");
-    promptParts.push("- You can refuse service or ask someone to leave if they're being inappropriate\n");
-    promptParts.push("- If someone becomes violent or threatening, you may need to defend yourself\n");
-    promptParts.push("- Do NOT be overly accommodating to inappropriate behavior - maintain your dignity and boundaries\n");
-    promptParts.push("\n");
-
-    // 9. Available Tools (if any)
-    const availableTools = getAvailableTools(npcId);
-    if (availableTools.length > 0) {
-      promptParts.push("Available Actions (USE THESE TOOLS WHEN APPROPRIATE):\n");
-      availableTools.forEach((tool) => {
-        promptParts.push(`- ${tool.function.name}: ${tool.function.description}\n`);
-      });
-      promptParts.push("\n");
-      promptParts.push("CRITICAL INSTRUCTIONS FOR TOOL USE:\n");
-      promptParts.push("\n");
-      promptParts.push("1. PARTY JOINING:\n");
-      promptParts.push("If the player asks you to join their party, go on an adventure together, requests you to be part of their group, or says things like:\n");
-      promptParts.push("- 'join my party'\n");
-      promptParts.push("- 'come with me'\n");
-      promptParts.push("- 'let's go together'\n");
-      promptParts.push("- 'come on join my party'\n");
-      promptParts.push("- 'will you join me'\n");
-      promptParts.push("You MUST call the checkJoinParty tool FIRST before responding. Do NOT just agree or decline - use the tool to check requirements.\n");
-      promptParts.push(`To call the tool, use: checkJoinParty(npcId="${npcId}", playerId="${character.id}")\n\n`);
-      promptParts.push("2. BATTLE INITIATION:\n");
-      promptParts.push("If the player threatens you, attacks you, or makes violent/aggressive statements, you MUST call the initiateBattle tool. Examples:\n");
-      promptParts.push("- 'I'll kill you', 'Die now', 'Attack you'\n");
-      promptParts.push("- Threats with commands like 'Die now, woman!'\n");
-      promptParts.push("- Any violent or aggressive language directed at you\n");
-      promptParts.push("You have the right to defend yourself. Call initiateBattle when threatened.\n");
-      promptParts.push(`To call the tool, use: initiateBattle(npcId="${npcId}", playerId="${character.id}", reason="Player threatened me: [their message]")\n\n`);
-    }
-
-    // 10. Current User Message
-    promptParts.push(`Player says: "${userMessage}"\n\n`);
-    promptParts.push("Respond naturally as this NPC character would, maintaining your character's boundaries and dignity:");
+    // Build each section using helper functions
+    const promptParts: string[] = [];
+    promptParts.push(await buildNPCCharacterSection(npcId, npc, npcMemory));
+    promptParts.push(buildNPCKnowledgeSection(npcMemory));
+    promptParts.push(buildPlayerContextSection(character, npcId, impression));
+    promptParts.push(buildImpressionSection(impression));
+    promptParts.push(buildConversationHistorySection(summary, recentMessages));
+    promptParts.push(buildBehavioralGuidelinesSection());
+    promptParts.push(buildToolsSection(npcId, character.id));
+    promptParts.push(buildUserMessageSection(userMessage));
 
     const fullPrompt = promptParts.join("");
 
@@ -183,65 +89,199 @@ export async function buildNPCChatPrompt(
 }
 
 /**
+ * Build NPC character and personality section
+ */
+async function buildNPCCharacterSection(
+  npcId: string,
+  npc: Character,
+  npcMemory: Awaited<ReturnType<typeof getNPCMemory>>
+): Promise<string> {
+  const parts: string[] = [];
+
+  if (npcMemory?.personalPrompt) {
+    parts.push(`NPC Character: ${npcMemory.personalPrompt}\n`);
+  } else {
+    parts.push(`You are ${npc.name.en}, a character in this world.\n`);
+  }
+
+  parts.push("You speak and act based on your own experiences and observations, not on hidden system rules.\n");
+  parts.push("You are a living character who can change your mind, reassess situations, and respond to new information. Past interactions inform you but don't lock you into patterns. Each conversation is a fresh opportunity to respond authentically.\n");
+
+  const lifeSummary = await getNPCLifeSummary(npcId);
+  if (lifeSummary) {
+    parts.push(`These experiences inform your perspective, but do not dictate how you must respond in this conversation.\n:\n${lifeSummary}\n`);
+  }
+
+  return parts.join("");
+}
+
+/**
+ * Build NPC knowledge/news section
+ */
+function buildNPCKnowledgeSection(
+  npcMemory: Awaited<ReturnType<typeof getNPCMemory>>
+): string {
+  if (!npcMemory?.newsDetails || npcMemory.newsDetails.length === 0) {
+    return "";
+  }
+
+  const parts: string[] = ["Your Knowledge:\n"];
+  npcMemory.newsDetails.forEach((news) => {
+    if (news.context) {
+      parts.push(`- ${news.context}\n`);
+    }
+  });
+  parts.push("\n");
+
+  return parts.join("");
+}
+
+/**
+ * Build player context section
+ */
+function buildPlayerContextSection(
+  character: Character,
+  npcId: string,
+  impression: NPCImpression | null
+): string {
+  const parts: string[] = [
+    "The player who's talking to you is:\n",
+    formatPlayerContext(character, npcId, impression),
+    "\n"
+  ];
+  return parts.join("");
+}
+
+/**
+ * Build NPC impression section
+ */
+function buildImpressionSection(impression: NPCImpression | null): string {
+  const parts: string[] = [
+    formatNPCImpression(impression),
+    "\n"
+  ];
+  return parts.join("");
+}
+
+/**
+ * Build conversation history section
+ */
+function buildConversationHistorySection(
+  summary: string | null,
+  recentMessages: ChatHistoryEntry[]
+): string {
+  const parts: string[] = ["Recent Conversation:\n"];
+
+  if (summary) {
+    parts.push(`Previous conversations (older than recent messages below): ${summary}\n\n`);
+    parts.push("Focus on the recent messages below - they represent the current state of your relationship.\n\n");
+  }
+
+  parts.push(formatChatHistory(recentMessages));
+  parts.push("\n");
+
+  return parts.join("");
+}
+
+/**
+ * Build behavioral guidelines section
+ */
+function buildBehavioralGuidelinesSection(): string {
+  const parts: string[] = [
+    "Important Behavioral Guidelines:\n",
+    "- Stay true to your character's personality, values, and boundaries\n",
+    "- You can change your opinion of someone based on their current actions, not just past interactions\n",
+    "- You have the right to refuse inappropriate requests\n",
+    "- Act as if you are an actual character in the world with free will and emotions\n",
+    "\n"
+  ];
+  return parts.join("");
+}
+
+/**
+ * Build available tools section
+ */
+function buildToolsSection(npcId: string, playerId: string): string {
+  const availableTools = getAvailableTools(npcId);
+  if (availableTools.length === 0) {
+    return "";
+  }
+
+  const parts: string[] = [
+    "Available Actions (USE THESE TOOLS WHEN APPROPRIATE):\n"
+  ];
+
+  availableTools.forEach((tool) => {
+    parts.push(`- ${tool.function.name}: ${tool.function.description}\n`);
+  });
+
+  parts.push("\n");
+  parts.push("CRITICAL INSTRUCTIONS FOR TOOL USE:\n");
+  parts.push("\n");
+  parts.push("1. BATTLE INITIATION:\n");
+  parts.push("If the player threatens you, attacks you, or makes violent/aggressive statements, you MUST call the initiateBattle tool. Examples:\n");
+  parts.push("- 'I'll kill you', 'Die now', 'Attack you'\n");
+  parts.push("- Threats with commands like 'Die now, woman!'\n");
+  parts.push("- Any violent or aggressive language directed at you\n");
+  parts.push("You have the right to defend yourself. Call initiateBattle when threatened.\n");
+  parts.push(`To call the tool, use: initiateBattle(npcId="${npcId}", playerId="${playerId}", reason="Player threatened me: [their message]")\n\n`);
+
+  return parts.join("");
+}
+
+/**
+ * Build user message section
+ */
+function buildUserMessageSection(userMessage: string): string {
+  return `Player says: "${userMessage}"\n\nRespond naturally as this NPC character would, maintaining your character's boundaries and dignity:`;
+}
+
+/**
  * Format player character context for AI
  */
 function formatPlayerContext(player: Character, npcId: string, impression: NPCImpression | null): string {
   const context: string[] = [];
 
+  context.push(`Level: ${player.level}, `);
+  context.push(`Gender: ${player.gender}, `);
+  context.push(`Race: ${player.race}\n`);
   // Basic info
   const playerName = typeof player.name === 'string' 
     ? player.name 
     : player.name?.en || "Unknown";
-  context.push(`Name: ${playerName}`);
+  context.push(`Name: ${playerName}\n`);
 
   // Level, Race, Gender
-  context.push(`Level: ${player.level}`);
-  context.push(`Race: ${player.race}`);
-  context.push(`Gender: ${player.gender}`);
 
   // Title
   const titleStr = player.title.string();
   if (titleStr.en || titleStr.th) {
-    context.push(`Title: ${titleStr.en || titleStr.th}`);
+    context.push(`Title: ${titleStr.en || titleStr.th}\n`);
   }
 
   // Fame - format properly with regions and tiers
   const fameInfo = formatFame(player.fame);
   if (fameInfo) {
-    context.push(`Fame: ${fameInfo}`);
+    context.push(`Fame: ${fameInfo}\n`);
   } else {
-    context.push(`Fame: Unknown or no reputation yet`);
+    context.push(`Fame: Unknown or no reputation yet\n`);
   }
 
-  // NPC-Character Relation (from NPC's perspective, from database)
+  // Simple relationship label only (no numbers, detailed info is in impression section)
   if (impression) {
     const relationTitle = impression.relationTitle || "stranger";
-    context.push(`How you know them: ${relationTitle} (Affection: ${impression.affection}/100, Closeness: ${impression.closeness}/100)`);
-    if (impression.conversationCount > 0) {
-      context.push(`Times you've spoken: ${impression.conversationCount}`);
-    }
+    context.push(`You know them as: ${relationTitle}\n`);
   } else {
-    context.push(`How you know them: This is your first meeting (stranger)`);
-  }
-
-  // Traits
-  if (player.traits && player.traits.size > 0) {
-    const traitsList: string[] = [];
-    player.traits.forEach((value, trait) => {
-      traitsList.push(`${trait}: ${value}`);
-    });
-    if (traitsList.length > 0) {
-      context.push(`Traits: ${traitsList.join(", ")}`);
-    }
+    context.push(`You know them as: stranger (first meeting)\n`);
   }
 
   // Equipment (all visible items)
   const equipment = formatEquipment(player.equipments);
   if (equipment) {
-    context.push(`Appearance/Equipment: ${equipment}`);
+    context.push(`Equipping with: ${equipment}, `);
   }
 
-  return context.join("\n");
+  return context.join("");
 }
 
 /**
@@ -419,75 +459,11 @@ function formatSubRegionName(region: SubRegionEnum): string {
 }
 
 /**
- * Format join party information for AI context
- */
-function formatJoinPartyInfo(
-  criteria: Awaited<ReturnType<typeof getJoinCriteria>>,
-  impression: NPCImpression | null
-): string {
-  if (!criteria) {
-    return "You cannot join parties.";
-  }
-
-  const parts: string[] = [];
-
-  if (!criteria.canJoin) {
-    return "You cannot join parties.";
-  }
-
-  parts.push("You are available to join this player's party, but there are conditions:");
-
-  // Payment requirement
-  if (criteria.hiring && criteria.hiring > 0) {
-    parts.push(`- They must pay you ${criteria.hiring} gold to hire you as a mercenary`);
-  }
-
-  // Relationship requirements
-  if (impression) {
-    if (criteria.closeness !== undefined) {
-      const met = impression.closeness >= criteria.closeness;
-      parts.push(
-        `- ${met ? "✓" : "✗"} Closeness requirement: ${criteria.closeness} (current: ${impression.closeness})`
-      );
-    }
-    if (criteria.affection !== undefined) {
-      const met = impression.affection >= criteria.affection;
-      parts.push(
-        `- ${met ? "✓" : "✗"} Affection requirement: ${criteria.affection} (current: ${impression.affection})`
-      );
-    }
-  } else {
-    if (criteria.closeness && criteria.closeness > 0) {
-      parts.push(`- ✗ Closeness requirement: ${criteria.closeness} (current: 0 - first meeting)`);
-    }
-    if (criteria.affection && criteria.affection > 0) {
-      parts.push(`- ✗ Affection requirement: ${criteria.affection} (current: 0 - first meeting)`);
-    }
-  }
-
-  // Quest requirement
-  if (criteria.haveQuest) {
-    parts.push(`- ✗ Must complete quest: ${criteria.haveQuest}`);
-  }
-
-  // Custom conditions
-  if (criteria.customConditions && criteria.customConditions.length > 0) {
-    criteria.customConditions.forEach((condition) => {
-      parts.push(`- ${condition.description}`);
-    });
-  }
-
-  parts.push("\nIf the player asks you to join their party, evaluate these conditions. If they're met (or if payment is offered), you can agree. Otherwise, explain what's needed.");
-
-  return parts.join("\n");
-}
-
-/**
  * Format NPC impression for AI context
  */
 function formatNPCImpression(impression: Awaited<ReturnType<typeof getNPCImpression>>): string {
   if (!impression) {
-    return "You don't recognize this person yet. This is your first meeting - they are a stranger to you.";
+    return "You don't recognize this person yet. This is your first meeting - they are a stranger to you.\nRemember: Your impression can evolve. New interactions matter more than past assumptions.";
   }
 
   const parts: string[] = [];
@@ -496,28 +472,24 @@ function formatNPCImpression(impression: Awaited<ReturnType<typeof getNPCImpress
   const relationTitle = impression.relationTitle || "stranger";
   parts.push(`You consider them: ${relationTitle}`);
 
-  // Affection and closeness
-  parts.push(`Your feelings: Affection ${impression.affection}/100, Closeness ${impression.closeness}/100`);
+  // Affection and closeness - present as current state
+  parts.push(`Current feelings: Affection ${impression.affection}/100, Closeness ${impression.closeness}/100`);
 
-  // Conversation count
-  if (impression.conversationCount > 0) {
-    parts.push(`You have spoken ${impression.conversationCount} time${impression.conversationCount > 1 ? 's' : ''} before`);
-  } else {
+  // If this is first time
+  if (impression.conversationCount === 0) {
     parts.push(`This is your first conversation with them`);
   }
 
-  // Last conversation summary
-  if (impression.lastConversationSummary) {
-    parts.push(`Recent interactions: ${impression.lastConversationSummary}`);
-  }
-
-  // Important events
+  // Important events (keep these as they're factual)
   if (impression.importantEvents && impression.importantEvents.length > 0) {
     const eventDescriptions = impression.importantEvents
       .map((event: any) => event.description || JSON.stringify(event))
       .join(", ");
     parts.push(`Notable events: ${eventDescriptions}`);
   }
+
+  // Add closing agency language
+  parts.push("Remember: Your impression can evolve. New interactions matter more than past summaries.");
 
   return parts.join("\n");
 }
@@ -537,4 +509,3 @@ function formatChatHistory(history: ChatHistoryEntry[]): string {
 
   return formatted;
 }
-

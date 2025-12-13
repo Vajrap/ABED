@@ -7,7 +7,7 @@
  * - Relationship Summaries (character-NPC impressions)
  */
 
-import { callLMStudio, type LMStudioRequest } from "./LMStudioService";
+import { callLLM, type LLMRequest } from "./LLMService";
 import type { ChatHistoryEntry } from "./ChatHistoryService";
 import type { NPCImpression } from "./NPCCharacterRelationService";
 import { characterManager } from "../Game/CharacterManager";
@@ -72,13 +72,13 @@ Create a concise summary (2-3 paragraphs) of what ${npcName} has been through, f
 
 Maintain consistency with their personality. Write in third person about ${npcName}.`;
 
-    const lmRequest: LMStudioRequest = {
+    const lmRequest: LLMRequest = {
       prompt,
       npcId,
       npcName,
     };
 
-    const response = await callLMStudio(lmRequest);
+    const response = await callLLM(lmRequest);
     
     if (!response.success || !response.response) {
       Report.error("Failed to summarize NPC life", {
@@ -136,26 +136,33 @@ export async function summarizeConversation(
     const prompt = `Summarize this conversation between ${npcName} and ${playerName}.
 
 ${previousSummary 
-  ? `Previous conversation summary:\n${previousSummary}\n\nConversation to summarize:` 
+  ? `Previous conversation summary (for continuity only, may contain outdated tone):
+  ${previousSummary}`  
   : `This is a new conversation. Conversation to summarize:`}
 
-${conversationText}
+${`Conversation to summarize (primary source of truth):\n${conversationText}`}
 
-Create a concise summary (1-2 sentences) covering:
-- Main topics discussed
-- Important decisions or agreements
-- Relationship changes or notable moments
-- Any commitments, quests, or tasks mentioned
+Create a concise, factual summary (1-2 sentences) covering:
+- Main topics discussed (what was talked about)
+- Important decisions or agreements (what was decided)
+- Notable events or actions (what happened)
+- Any commitments, quests, or tasks mentioned (what was promised or requested)
 
-Keep it brief and focused on what matters for future conversations.`;
+IMPORTANT: Focus on FACTS and EVENTS, not emotional states or prescriptive judgments.
+- Use neutral language: "${playerName} did X" or "${playerName} said Y", not "${playerName} is X" or "${playerName} feels Y"
+- Avoid prescriptive emotional language like "feels like a glitch", "completely out of control", or definitive character judgments
+- Example of good summary: "${playerName} offered ale multiple times. ${npcName} declined each time, explaining a preference for libraries over taverns."
+- Example of bad summary: "${playerName}'s presence feels cold and uninviting. ${npcName} finds them completely out of control."
 
-    const lmRequest: LMStudioRequest = {
+Keep it brief, factual, and focused on what matters for future conversations.`;
+
+    const lmRequest: LLMRequest = {
       prompt,
       npcId,
       npcName,
     };
 
-    const response = await callLMStudio(lmRequest);
+    const response = await callLLM(lmRequest);
     
     if (!response.success || !response.response) {
       Report.error("Failed to summarize conversation", {
@@ -240,13 +247,13 @@ Create a 2-3 sentence summary of how ${npcName} views ${playerName}, including:
 
 Write from ${npcName}'s perspective, in first person.`;
 
-    const lmRequest: LMStudioRequest = {
+    const lmRequest: LLMRequest = {
       prompt,
       npcId,
       npcName,
     };
 
-    const response = await callLMStudio(lmRequest);
+    const response = await callLLM(lmRequest);
     
     if (!response.success || !response.response) {
       Report.error("Failed to summarize relationship", {

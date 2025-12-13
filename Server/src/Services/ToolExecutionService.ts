@@ -5,11 +5,12 @@
  * Routes tool calls to appropriate handlers and returns results.
  */
 
-import type { LMStudioToolCall } from "./LMStudioService";
+import type { LLMToolCall } from "./LLMService";
 import { checkJoinCriteria, type JoinEvaluationResult } from "./NPCPartyJoinService";
 import { characterManager } from "../Game/CharacterManager";
 import { requestPaymentConfirmation } from "./MCPConfirmationService";
 import { requestBattleInitiation } from "./BattleInitiationService";
+import { executeUpdateImpression } from "./ImpressionUpdateTool";
 import Report from "../Utils/Reporter";
 
 export interface ToolContext {
@@ -34,7 +35,7 @@ export interface ToolExecutionResult {
  * Execute a tool call from LLM
  */
 export async function executeTool(
-  toolCall: LMStudioToolCall,
+  toolCall: LLMToolCall,
   context: ToolContext
 ): Promise<ToolExecutionResult> {
   try {
@@ -51,6 +52,9 @@ export async function executeTool(
       
       case "initiateBattle":
         return await executeInitiateBattle(toolCall, context);
+      
+      case "updateImpression":
+        return await executeUpdateImpression(toolCall, context);
       
       default:
         Report.warn("Unknown tool call", {
@@ -78,7 +82,7 @@ export async function executeTool(
  * Execute checkJoinParty tool
  */
 async function executeCheckJoinParty(
-  toolCall: LMStudioToolCall,
+  toolCall: LLMToolCall,
   context: ToolContext
 ): Promise<ToolExecutionResult> {
   try {
@@ -180,7 +184,7 @@ async function executeCheckJoinParty(
  * Execute initiateBattle tool
  */
 async function executeInitiateBattle(
-  toolCall: LMStudioToolCall,
+  toolCall: LLMToolCall,
   context: ToolContext
 ): Promise<ToolExecutionResult> {
   try {

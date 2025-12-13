@@ -8,7 +8,7 @@
 import type { Character } from "../Entity/Character/Character";
 import { getNPCImpression, type NPCImpression } from "./NPCCharacterRelationService";
 import { characterManager } from "../Game/CharacterManager";
-import type { LMStudioTool } from "./LMStudioService";
+import type { LLMTool } from "./LLMService";
 import Report from "../Utils/Reporter";
 import { getNPCTemplateById, getNPCTemplateByUUID } from "src/Entity/Character/NPCs/repository";
 
@@ -70,7 +70,7 @@ export interface MCPToolDefinition {
  * Get LLM tool definition for checkJoinParty
  * Returns OpenAI-compatible tool schema for LLM function calling
  */
-export function getJoinPartyToolDefinition(): LMStudioTool {
+export function getJoinPartyToolDefinition(): LLMTool {
   return {
     type: "function",
     function: {

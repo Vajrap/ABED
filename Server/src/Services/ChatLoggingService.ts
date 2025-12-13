@@ -45,6 +45,9 @@ export async function getOrCreateChatRoom(
         isNPCChat,
       })
       .returning();
+    if (!newRoom) {
+      throw new Error("Failed to create new chat room");
+    }
 
     Report.debug("Created new chat room", {
       roomId: newRoom.id,

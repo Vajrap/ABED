@@ -29,6 +29,7 @@ import { activeEpithet } from "src/Entity/Character/Subclass/Title/logics/active
 import { activeRole } from "src/Entity/Character/Subclass/Title/logics/active";
 import type { PortraitData } from "../InterFacesEnumsAndTypes/PortraitData";
 import Report from "../Utils/Reporter";
+import { initializeRateLimit } from "./ChatRateLimitService";
 
 export interface CharacterCreationData {
   name: string;
@@ -82,6 +83,9 @@ export class CharacterService {
 
       const insertParty = PartyService.partyToInsertParty(party);
       await PartyService.savePartyToDatabase(insertParty);
+
+      // 4.5. Initialize rate limit for player
+      await initializeRateLimit(character.id);
 
       // 5. Return success, no need for character data, FE will fetch it later
       return {

@@ -13,6 +13,8 @@ export * from "./chat";
 export * from "./npc_character_relation";
 export * from "./npc_summary";
 export * from "./quest";
+export * from "./chat_rate_limits";
+export * from "./lore_embeddings";
 
 // Export database tables for migrations and queries
 export { users } from "./user";
@@ -31,6 +33,8 @@ export { npcCharacterRelations } from "./npc_character_relation";
 export { npcSummary } from "./npc_summary";
 export { shops } from "./shop";
 export { questDefinitions } from "./quest";
+export { chatRateLimits } from "./chat_rate_limits";
+export { loreEmbeddings } from "./lore_embeddings";
 
 // Re-export types for convenience
 export type { User, InsertUser } from "./user";
@@ -48,3 +52,5 @@ export type { NPCCharacterRelation, InsertNPCCharacterRelation } from "./npc_cha
 export type { NPCSummary, InsertNPCSummary } from "./npc_summary";
 export type { Shop, InsertShop } from "./shop";
 export type { QuestDefinitionDB, InsertQuestDefinition } from "./quest";
+export type { ChatRateLimit, InsertChatRateLimit } from "./chat_rate_limits";
+export type { LoreEmbedding, InsertLoreEmbedding } from "./lore_embeddings";
