@@ -12,14 +12,15 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { MageSkill } from "./index";
+import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const arcaneBolt = new MageSkill({
   id: MageSkillId.ArcaneBolt,
   name: { en: "Arcane Bolt", th: "ลูกเวทมนตร์" },
   description: {
     text: {
-      en: "Unleash a focused bolt of raw arcane energy.\nDeal <FORMULA> arcane damage.",
-      th: "ปล่อยลูกพลังงานเวทมนตร์ดิบ\nสร้างความเสียหายอาร์เคน <FORMULA>",
+      en: "Unleash a focused bolt of raw arcane energy.\nDeal <FORMULA> arcane damage.\n.Given self {5}1d2:1{/} <BuffArcaneCharge> stacks.",
+      th: "ปล่อยลูกพลังงานเวทมนตร์ดิบ\nสร้างความเสียหายอาร์เคน <FORMULA>\nได้รับ <BuffArcaneCharge> สแตค {5}1d2:1{/}",
     },
     formula: {
       en: "({5}'1d8':'1d6'{/} + <PlanarMod>) × <SkillLevelMultiplier>",
@@ -43,24 +44,27 @@ export const arcaneBolt = new MageSkill({
         targets: [],
       };
     }
-    const planarMod = statMod(actor.attribute.getTotal("planar"));
-    const controlMod = statMod(actor.attribute.getTotal("control"));
-    const luckMod = statMod(actor.attribute.getTotal("luck"));
-    const baseDiceDamage = roll(1).d(skillLevel === 5 ? 8 : 6).total;
+    const baseDiceDamage = actor.roll({
+      amount: 1,
+      face: 6,
+      stat: 'planar'
+    })
     const totalDamage = Math.max(
       0,
-      (baseDiceDamage + planarMod) * skillLevelMultiplier(skillLevel),
+      (baseDiceDamage) * skillLevelMultiplier(skillLevel),
     );
-    const hitBonus = controlMod;
-    const critBonus = luckMod;
     const damageOutput = {
       damage: Math.floor(totalDamage),
-      hit: rollTwenty().total + hitBonus,
-      crit: rollTwenty().total + critBonus,
+      hit: actor.rollTwenty({ stat: 'control' }),
+      crit: actor.rollTwenty({ stat: 'luck' }),
       type: DamageType.arcane,
       isMagic: true,
     };
     const totalDamageResult = resolveDamage(actor.id, target.id, damageOutput, location);
+    const arcaneCharge = skillLevel >= 5 ? actor.roll({ amount: 1, face: 2 }) : 1;
+
+    buffsAndDebuffsRepository.arcaneCharge.appender(actor, { turnsAppending: arcaneCharge });
+
     const turnResult: TurnResult = {
       content: {
         en: `${buildCombatMessage(actor, target, { en: `Arcane Bolt`, th: `ลูกเวทมนตร์` }, totalDamageResult).en}`,

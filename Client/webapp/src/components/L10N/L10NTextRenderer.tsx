@@ -1,7 +1,34 @@
 import React from "react";
-import { Tooltip, Box, Typography, alpha, useTheme } from "@mui/material";
-import { L10NContent } from "@/data/mockNewsData";
+import { Tooltip, Box, Typography, alpha, useTheme, type Theme } from "@mui/material";
 import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
+import type { CharacterInterface, L10NContent } from "@/types/api";
+
+// Entity types for tooltips (lightweight versions from L10N entities)
+interface LocationEntity {
+  name: { en: string; th?: string };
+  description?: { en: string; th?: string };
+  region: string;
+  subRegion: string;
+}
+
+interface SkillEntity {
+  name: { en: string; th?: string };
+  description?: string;
+  tier: number;
+  cost?: number;
+}
+
+interface ItemEntity {
+  name: { en: string; th?: string };
+  description?: { en: string; th?: string };
+  rarity: string;
+}
+
+interface PartyEntity {
+  name: { en: string; th?: string };
+  memberCount: number;
+  members?: CharacterInterface[];
+}
 
 export interface L10NTextRendererProps {
   content: L10NContent;
@@ -148,7 +175,7 @@ function renderEntityTooltip(
   type: "char" | "loc" | "skill" | "item" | "party",
   id: string | undefined,
   entities: L10NContent["entities"],
-  theme: any
+  theme: Theme
 ): React.ReactNode {
   if (!id || !entities) return null;
 
@@ -159,7 +186,7 @@ function renderEntityTooltip(
 
       return (
         <Box sx={{ maxWidth: 300, p: 1 }}>
-          {charData.portraitUrl && (
+          {charData.portrait && (
             <Box
               sx={{
                 display: "flex",
@@ -177,9 +204,9 @@ function renderEntityTooltip(
                 }}
               >
                 <PortraitRenderer
-                  portrait={charData.portraitUrl}
+                  portrait={charData.portrait}
                   size="100%"
-                  alt={charData.name.en}
+                  alt={typeof charData.name === 'string' ? charData.name : charData.name?.en || 'Character'}
               />
               </Box>
             </Box>
@@ -193,7 +220,7 @@ function renderEntityTooltip(
               mb: 0.5,
             }}
           >
-            {charData.name.en}
+            {typeof charData.name === 'string' ? charData.name : charData.name?.en || 'Unknown'}
           </Typography>
           <Typography
             sx={{
@@ -214,10 +241,10 @@ function renderEntityTooltip(
                 color: theme.palette.text.disabled,
               }}
             >
-              {charData.title.en}
+              {typeof charData.title === 'string' ? charData.title : charData.title?.en || charData.title?.th || ''}
             </Typography>
           )}
-          {charData.lastSeenLocation && (
+          {(charData as any).location && (
             <Typography
               sx={{
                 fontFamily: "Crimson Text, serif",
@@ -226,7 +253,7 @@ function renderEntityTooltip(
                 mt: 0.5,
               }}
             >
-              Last seen: {charData.lastSeenLocation}
+              Location: {(charData as any).location}
             </Typography>
           )}
         </Box>
@@ -234,7 +261,7 @@ function renderEntityTooltip(
     }
 
     case "loc": {
-      const locData = entities.locs?.[id];
+      const locData = entities.locs?.[id] as LocationEntity | undefined;
       if (!locData) return null;
 
       return (
@@ -276,7 +303,7 @@ function renderEntityTooltip(
     }
 
     case "skill": {
-      const skillData = entities.skills?.[id];
+      const skillData = entities.skills?.[id] as SkillEntity | undefined;
       if (!skillData) return null;
 
       return (
@@ -301,7 +328,7 @@ function renderEntityTooltip(
                 mb: 0.5,
               }}
             >
-              {skillData.description.en}
+              {skillData.description}
             </Typography>
           )}
           <Typography
@@ -319,7 +346,7 @@ function renderEntityTooltip(
     }
 
     case "item": {
-      const itemData = entities.items?.[id];
+      const itemData = entities.items?.[id] as ItemEntity | undefined;
       if (!itemData) return null;
 
       return (
@@ -361,7 +388,7 @@ function renderEntityTooltip(
     }
 
     case "party": {
-      const partyData = entities.parties?.[id];
+      const partyData = entities.parties?.[id] as PartyEntity | undefined;
       if (!partyData) return null;
 
       return (
@@ -388,7 +415,7 @@ function renderEntityTooltip(
           </Typography>
           {partyData.members && partyData.members.length > 0 && (
             <Box sx={{ mt: 1 }}>
-              {partyData.members.slice(0, 5).map((member, idx) => (
+              {partyData.members.slice(0, 5).map((member: CharacterInterface, idx: number) => (
                 <Typography
                   key={idx}
                   sx={{
@@ -543,4 +570,3 @@ export const L10NTextRenderer: React.FC<L10NTextRendererProps> = ({
     </Box>
   );
 };
-

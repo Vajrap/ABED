@@ -9,6 +9,7 @@ import type { ClientContext } from "../../Entity/Connection/connectionManager";
 import { PartyService } from "../../Services/PartyService";
 import { getPendingConfirmation, handleMCPResponse } from "../../Services/MCPConfirmationService";
 import { handleBattleConfirmation } from "../../Services/BattleInitiationService";
+import { GoldId } from "src/Entity/Item/Misc";
 
 /**
  * WebSocket API Routes
@@ -213,13 +214,15 @@ async function handlePartyInvitationResponse(
 
     // Process payment if required
     if (request.amount && request.amount > 0) {
-      // TODO: Deduct gold from player inventory
-      // For now, we'll just log it
-      Report.info("Processing payment for party invitation", {
-        userId: context.userId,
-        amount: request.amount,
-        currency: request.currency,
-      });
+      const characterGold = player.inventory.get(GoldId.gold) || 0;
+      if (characterGold < request.amount) {
+        Report.warn("Player has insufficient gold for party invitation", {
+          userId: context.userId,
+          amount: request.amount,
+        });
+        return;
+      }
+      player.inventory.set(GoldId.gold, characterGold - request.amount);
     }
 
     // Add NPC to party

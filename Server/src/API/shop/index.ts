@@ -167,8 +167,13 @@ export const shopRoutes = new Elysia({ prefix: "/shop" })
         const totalCost = unitPrice * body.quantity;
 
         // Check if character has enough gold
-        // TODO: Implement gold/currency system
-        // For now, assume character has infinite gold (placeholder)
+        const characterGold = character.inventory.get(GoldId.gold) || 0;
+        if (characterGold < totalCost) {
+          set.status = 400;
+          return { success: false, error: "Insufficient gold" };
+        } else {
+          character.inventory.set(GoldId.gold, characterGold - totalCost);
+        }
 
         // Remove item from shop inventory
         shop.removeItem(body.itemId as any, body.quantity);
@@ -268,8 +273,9 @@ export const shopRoutes = new Elysia({ prefix: "/shop" })
         // Add item to shop inventory
         shop.addItem(body.itemId as any, body.quantity);
 
-        // TODO: Add gold to character
-        // character.gold += totalValue;
+        // Add gold to character
+        const characterGold = character.inventory.get(GoldId.gold) || 0;
+        character.inventory.set(GoldId.gold, characterGold + totalValue);
 
         // Persist character to database
         await CharacterService.updateCharacterInDatabase(character);

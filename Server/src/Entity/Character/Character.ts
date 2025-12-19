@@ -400,8 +400,8 @@ export class Character {
   }
 
   roll(data: {
-    face: number,
     amount: number,
+    face: number,
     mode?: "norm" | "adv" | "dis",
     stat?: AttributeKey,
     applyBlessCurse?: boolean, // NEW: default true

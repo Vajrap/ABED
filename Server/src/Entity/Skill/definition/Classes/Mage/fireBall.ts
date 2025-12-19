@@ -30,7 +30,7 @@ export const fireBall = new MageSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.uncommon,
+  tier: TierEnum.rare,
   consume: {
     hp: 0,
     mp: 5,

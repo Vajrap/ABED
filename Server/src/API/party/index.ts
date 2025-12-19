@@ -7,6 +7,7 @@ import { mapPartyToInterface } from "../../Utils/PartyMapper";
 import { checkJoinCriteria, requestJoinParty, getPartyJoinMCPTools, getCheckJoinPartyMCPTool, getAcceptPartyMCPTool } from "../../Services/NPCPartyJoinService";
 import { PartyService } from "../../Services/PartyService";
 import { requestPaymentConfirmation, handleMCPResponse } from "../../Services/MCPConfirmationService";
+import { GoldId } from "src/Entity/Item/Misc";
 
 export const partyRoutes = new Elysia({ prefix: "/party" })
   .onError(({ code, error, set }) => {
@@ -272,8 +273,15 @@ export const partyRoutes = new Elysia({ prefix: "/party" })
         }
 
         // 6. Process payment (if required)
-        // TODO: Deduct gold from player inventory/character
-        // For now, we'll just proceed
+        if (evaluation.requiresPayment && evaluation.paymentAmount) {
+          const characterGold = player.inventory.get(GoldId.gold) || 0;
+          if (characterGold < evaluation.paymentAmount) {
+            set.status = 400;
+            return { success: false, messageKey: "party.insufficientGold" };
+          }
+          player.inventory.set(GoldId.gold, characterGold - evaluation.paymentAmount);
+        }
+        
 
         // 7. Add NPC to party
         const added = PartyService.addNPCToParty(player.partyID, npcId);
@@ -508,7 +516,14 @@ export const partyRoutes = new Elysia({ prefix: "/party" })
         }
 
         // 6. Process payment (if required)
-        // TODO: Deduct gold from player inventory/character
+        if (evaluation.requiresPayment && evaluation.paymentAmount) {
+          const characterGold = player.inventory.get(GoldId.gold) || 0;
+          if (characterGold < evaluation.paymentAmount) {
+            set.status = 400;
+            return { success: false, messageKey: "party.insufficientGold" };
+          }
+          player.inventory.set(GoldId.gold, characterGold - evaluation.paymentAmount);
+        }
 
         // 7. Add NPC to party
         const added = PartyService.addNPCToParty(player.partyID, body.npcId);

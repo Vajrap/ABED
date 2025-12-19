@@ -575,7 +575,8 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                         body: equipmentBySlot.body?.itemId || equipmentBySlot.body?.id || null,
                         weapon: equipmentBySlot.rightHand?.itemId || equipmentBySlot.rightHand?.id || equipmentBySlot.leftHand?.itemId || equipmentBySlot.leftHand?.id || null,
                       }}
-                      size={150}
+                      size={200}
+                      style={{ right: -10, top: 10 }}
                       animated={true}
                     />
                   </Box>
