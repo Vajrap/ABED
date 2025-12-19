@@ -5,9 +5,9 @@ import { Character } from "src/Entity/Character/Character";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { rollTwenty } from "src/Utils/Dice";
-import { statMod } from "src/Utils/statMod";
 import { ActorEffect, TargetEffect } from "src/Entity/Skill/effects";
+import { getTarget } from "src/Entity/Battle/getTarget";
+import { statMod } from "src/Utils/statMod";
 
 export const bless = new ClericSkill({
     id: ClericSkillId.Bless,
@@ -17,19 +17,20 @@ export const bless = new ClericSkill({
     },
     description: {
         text: {
-            en: "Ask for the Blessing from Laoh, <BuffBlessing> all ally for 2 turns. \n{5}\nThe user [b]throw DC10 + <WILmod>, if success, gain +1 order.[/b]{/}",
-            th: "อธิษฐานขอการอวยพรจากลาโอห์ เพื่อนร่วมทีมทั้งหมดได้รับสถานะ '<BuffBlessing>' 2 เทิร์น \n{5}\nหลังจากใช้ ทอย [b]DC10 + <WILmod>[/b] หากผ่านจะได้รับ +1 order{/}",
+            en: "Ask for the Blessing from Laoh, <BuffBlessing> allies for 2 turns. The number of allies is determined by the actor's Charisma modifier, at least 1 ally.",
+            th: "อธิษฐานขอการอวยพรจากลาโอห์ เพื่อนร่วมทีมทั้งหมดได้รับสถานะ '<BuffBlessing>' 2 เทิร์น จำนวนพันธมิตรจะถูกกำหนดโดย modifier ของความสะท้อนตน อย่างน้อย 1 คน",
         },
     },
     requirement: {},
     equipmentNeeded: [],
-    tier: TierEnum.uncommon,
+    tier: TierEnum.common,
+    cooldown: 3,
     consume: {
         hp: 0,
         mp: 4,
         sp: 0,
         elements: [
-            {element: 'order', value: 3},
+            {element: 'order', value: 1},
         ],
     },
     produce: {
@@ -48,25 +49,19 @@ export const bless = new ClericSkill({
         _location: LocationsEnum,
     ) => {
         // Bless affects all allies, charisma enhances the blessing's reach and effectiveness
-        const alliesToBless = actorParty.filter(ally => !ally.vitals.isDead);
+        // At least 1 ally
+        const alliesToBless = getTarget(actor, actorParty, _targetParty, 'ally').many(Math.max(1, Math.floor(statMod(actor.attribute.getTotal("charisma")))))
         
         for (const ally of alliesToBless) {
             buffsRepository[BuffEnum.bless].appender(ally, { turnsAppending: 2 });
-        }
-        let gainOrder = false;
-        if (skillLevel >= 5) {
-            if (rollTwenty().total + statMod(actor.attribute.getTotal("willpower")) >= 10) {
-                gainOrder = true;
-                actor.resources.order += 1;
-            }
         }
         const blessedNames = alliesToBless.map(ally => ally.name.en).join(", ");
         const blessedNamesTh = alliesToBless.map(ally => ally.name.th).join(", ");
         
         return {
             content: {
-                en: `${actor.name.en} blessed ${blessedNames} for 2 turns.${gainOrder ? ` ${actor.name.en} also gained +1 order` : ""}`,
-                th: `${actor.name.th} อวยพร ${blessedNamesTh} เป็นเวลา 2 เทิร์น${gainOrder ? ` ${actor.name.th} ก็ได้รับ +1 order` : ""}`,
+                en: `${actor.name.en} blessed ${blessedNames} for 2 turns.`,
+                th: `${actor.name.th} อวยพร ${blessedNamesTh} เป็นเวลา 2 เทิร์น`,
             },
             actor: {
                 actorId: actor.id,

@@ -7,12 +7,12 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { statMod } from "src/Utils/statMod";
-import { rollTwenty, roll } from "src/Utils/Dice";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { ClericSkill } from "./index";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
+import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const radiance = new ClericSkill({
   id: ClericSkillId.Radiance,
@@ -22,8 +22,8 @@ export const radiance = new ClericSkill({
   },
   description: {
     text: {
-      en: "Unleash a flash of consecrated light dealing <FORMULA>. \nDeal additional [b]{5}'1d4 + 2':'1d4'{/}[/b] if the target is undead or fiend.",
-      th: "ปล่อยแสงศักดิ์สิทธิ์ สร้างความเสียหาย <FORMULA> \nสร้างความเสียหายเพิ่มเติม [b]{5}'1d4 + 2':'1d4'{/}[/b] หากเป้าหมายเป็น undead หรือ fiend",
+      en: "Unleash a flash of consecrated light dealing <FORMULA>. \nDeal additional [b]1d4[/b] if the target is undead or fiend.",
+      th: "ปล่อยแสงศักดิ์สิทธิ์ สร้างความเสียหาย <FORMULA> \nสร้างความเสียหายเพิ่มเติม [b]1d4[/b] หากเป้าหมายเป็น undead หรือ fiend",
     },
     formula: {
       en: "(1d6 + <WILmod>) × <SkillLevelMultiplier>",
@@ -32,7 +32,7 @@ export const radiance = new ClericSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.uncommon,
+  tier: TierEnum.common,
   consume: {
     hp: 0,
     mp: 2,
@@ -74,24 +74,26 @@ export const radiance = new ClericSkill({
       };
     }
 
-    const willpowerMod = statMod(actor.attribute.getTotal("willpower"));
-    const baseRoll = roll(1).d(6).total;
-    let totalDamage = Math.max(
-      0,
-      (baseRoll + willpowerMod) * skillLevelMultiplier(skillLevel),
-    );
+    let totalDamage = actor.roll({
+      amount: 1,
+      face: 6,
+      stat: "willpower",
+    }) * skillLevelMultiplier(skillLevel);
 
     if (
       target.type === CharacterType.undead ||
       target.type === CharacterType.fiend
     ) {
-      totalDamage += roll(1).d(4).total + skillLevel === 5 ? 2 : 0;
+      totalDamage += actor.roll({
+        amount: 1,
+        face: 4,
+      });
     }
 
     const damageOutput = {
       damage: Math.floor(totalDamage),
-      hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
-      crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
+      hit: actor.rollTwenty({stat: "control"}),
+      crit: actor.rollTwenty({stat: "luck"}),
       type: DamageType.radiance,
       isMagic: true,
     };
@@ -102,6 +104,9 @@ export const radiance = new ClericSkill({
       damageOutput,
       location,
     );
+
+    // Gain 1 Faith stack
+    buffsRepository[BuffEnum.faith].appender(actor, { turnsAppending: 1 });
 
     return {
       content: buildCombatMessage(

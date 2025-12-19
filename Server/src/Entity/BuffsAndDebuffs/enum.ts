@@ -27,6 +27,10 @@ export enum BuffEnum {
   curseMarkActive = "curseMarkActive",
   exposeWeaknessActive = "exposeWeaknessActive",
   precognition = "precognition",
+
+  arcaneCharge = "arcaneCharge",
+  faith = "faith",
+  holyWater = "holyWater",
 }
 
 export enum DebuffEnum {

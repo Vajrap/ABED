@@ -46,6 +46,9 @@ import { mendSpiritCooldown } from "./definitions/debuffs/mendSpiritCooldown";
 import { critDef } from "./definitions/debuffs/critDef";
 import { bearTrap } from "./definitions/debuffs/bearTrap";
 import { blind } from "./definitions/debuffs/blind";
+import { arcaneCharge } from "./definitions/buffs/arcaneCharge";
+import { faith } from "./definitions/buffs/faith";
+import { holyWater } from "./definitions/buffs/holyWater";
 
 export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.haste]: haste,
@@ -74,6 +77,8 @@ export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.curseMarkActive]: curseMarkActive,
   [BuffEnum.exposeWeaknessActive]: exposeWeaknessActive,
   [BuffEnum.precognition]: precognition,
+  [BuffEnum.arcaneCharge]: arcaneCharge,
+  [BuffEnum.faith]: faith,
 };
 
 export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {

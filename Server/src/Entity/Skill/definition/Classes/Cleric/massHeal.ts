@@ -16,8 +16,8 @@ export const massHeal = new ClericSkill({
   },
   description: {
     text: {
-      en: "Cast a mass healing spell, restore all living allies. \nHeals for <FORMULA>. \n{4}\nThen [b]removes one random debuff[/b] from each healed ally.{/}",
-      th: "ร่ายเวทย์มนต์รักษาหมู่ ฟื้นฟูเพื่อนร่วมทีมทุกคนที่ยังมีชีวิต \nรักษา <FORMULA> \n{4}\nจากนั้น[b]ลบหนึ่งดีบัฟแบบสุ่ม[/b]จากพันธมิตรที่ได้รับการรักษาแต่ละคน{/}",
+      en: "Cast a mass healing spell, restore all living allies. \nHeals for <FORMULA>. \n{5}\nThen [b]removes one random debuff[/b] from each healed ally.{/}",
+      th: "ร่ายเวทย์มนต์รักษาหมู่ ฟื้นฟูเพื่อนร่วมทีมทุกคนที่ยังมีชีวิต \nรักษา <FORMULA> \n{5}\nจากนั้น[b]ลบหนึ่งดีบัฟแบบสุ่ม[/b]จากพันธมิตรที่ได้รับการรักษาแต่ละคน{/}",
     },
     formula: {
       en: "1d6 + (<WILmod> + <CHAmod>) / 2 + skill level",
@@ -26,7 +26,7 @@ export const massHeal = new ClericSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.rare,
+  tier: TierEnum.uncommon,
   cooldown: 4,
   consume: {
     hp: 0,
@@ -74,15 +74,13 @@ export const massHeal = new ClericSkill({
 
     for (const ally of livingAllies) {
       // Healing effectiveness enhanced by charisma (inspiring presence)
-      const healAmount = Math.max(
-        1,
-        roll(1).d(6).total + totalMod + skillLevel,
-      );
-      const before = ally.vitals.hp.current;
+      const healAmount = actor.roll({
+        amount: 1,
+        face: 6,
+      }) + totalMod + skillLevel;
       ally.vitals.incHp(healAmount);
-      const actualHeal = ally.vitals.hp.current - before;
 
-      if (skillLevel >= 4) {
+      if (skillLevel >= 5) {
         const debuffs = Array.from(ally.buffsAndDebuffs.debuffs.entry.keys());
         if (debuffs.length > 0) {
           const randomId = debuffs[Math.floor(Math.random() * debuffs.length)]!;

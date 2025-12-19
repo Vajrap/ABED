@@ -8,10 +8,10 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll } from "src/Utils/Dice";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { statMod } from "src/Utils/statMod";
 import { ClericSkill } from "./index";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const turnUndead = new ClericSkill({
   id: ClericSkillId.TurnUndead,
@@ -31,7 +31,7 @@ export const turnUndead = new ClericSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.rare,
+  tier: TierEnum.uncommon,
   consume: {
     hp: 0,
     mp: 5,
@@ -44,7 +44,13 @@ export const turnUndead = new ClericSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+      {
+        element: "neutral",
+        min: 1,
+        max: 1,
+      },
+    ],
   },
   exec: (
     actor: Character,
@@ -75,11 +81,15 @@ export const turnUndead = new ClericSkill({
 
     if (!isUndead) {
       // Non-undead: deal 1d4 true damage
-      const damage = roll(1).d(4).total + willpowerMod;
+      const damage = actor.roll({
+        amount: 1,
+        face: 4,
+        stat: "willpower",
+      });
       const damageOutput = {
         damage,
-        hit: roll(1).d(20).total + statMod(actor.attribute.getTotal("control")),
-        crit: roll(1).d(20).total + statMod(actor.attribute.getTotal("luck")),
+        hit: actor.rollTwenty({stat: "control"}),
+        crit: actor.rollTwenty({stat: "luck"}),
         type: DamageType.radiance,
         trueDamage: true,
       };
@@ -101,8 +111,12 @@ export const turnUndead = new ClericSkill({
       };
     }
 
-    // Undead target: caster makes willpower saving throw
-    const dc = skillLevel >= 5 ? 12 : 10;
+    // Undead target: target makes willpower saving throw
+    // DC = 10 + faith stacks (12 at level 5)
+    const faithEntry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.faith);
+    const faithStacks = faithEntry?.value || 0;
+    const baseDC = skillLevel >= 5 ? 12 : 10;
+    const dc = baseDC + faithStacks;
     const saveRoll = target.rollSave("willpower");
 
     if (saveRoll < dc) {
@@ -116,6 +130,14 @@ export const turnUndead = new ClericSkill({
       };
 
       const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
+
+      // Consume 1 Faith stack
+      if (faithEntry && faithEntry.value > 0) {
+        faithEntry.value -= 1;
+        if (faithEntry.value === 0) {
+          actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.faith);
+        }
+      }
 
       const combatMsg = buildCombatMessage(actor, target, { en: "Turn Undead", th: "ขับไล่ผี" }, damageResult);
       return {
@@ -136,7 +158,11 @@ export const turnUndead = new ClericSkill({
       };
     } else {
       // Save failed: deal 1d12 holy damage
-      const damage = roll(1).d(12).total + willpowerMod;
+      const damage = actor.roll({
+        amount: 1,
+        face: 12,
+        stat: "willpower",
+      });
       const damageOutput = {
         damage,
         hit: 999,
@@ -146,6 +172,15 @@ export const turnUndead = new ClericSkill({
       };
 
       const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
+      
+      // Consume 1 Faith stack (even on successful save)
+      if (faithEntry && faithEntry.value > 0) {
+        faithEntry.value -= 1;
+        if (faithEntry.value === 0) {
+          actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.faith);
+        }
+      }
+
       const combatMsg = buildCombatMessage(actor, target, { en: "Turn Undead", th: "ขับไล่ผี" }, damageResult);
 
       return {

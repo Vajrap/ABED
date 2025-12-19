@@ -727,7 +727,7 @@ function applyFinalModifiers(
   context: DamageResolutionContext,
   damage: number,
 ): number {
-  const { target, damageOutput } = context;
+  const { attacker, target, damageOutput } = context;
 
   // Exposed debuff: Add 1d3 extra damage from all sources
   const exposed = target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.exposed);
@@ -736,6 +736,17 @@ function applyFinalModifiers(
     const exposedBonus = target.roll({ amount: 1, face: 3, applyBlessCurse: false });
     damage += exposedBonus;
     Report.debug(`        🎯 Exposed! Additional ${exposedBonus} damage (1d3)`);
+  }
+
+  // Holy Water buff: Add holy damage to weapon attacks
+  // Check if attacker has Holy Water buff and it's a weapon attack (isMagic === false or undefined)
+  const holyWater = attacker.buffsAndDebuffs.buffs.entry.get(BuffEnum.holyWater);
+  if (holyWater && holyWater.value > 0 && !damageOutput.isMagic) {
+    // Add 1d4 + WIL mod holy damage
+    const willMod = statMod(attacker.attribute.getTotal("willpower"));
+    const holyBonus = attacker.roll({ amount: 1, face: 4, applyBlessCurse: false }) + willMod;
+    damage += holyBonus;
+    Report.debug(`        💧 Holy Water! Additional ${holyBonus} holy damage (1d4 + WIL mod)`);
   }
 
   return damage;
