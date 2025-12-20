@@ -35,7 +35,7 @@ export const burningHand = new MageSkill({
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
-    mp: 3,
+    mp: 4,
     sp: 0,
     elements: [
       {
@@ -51,7 +51,7 @@ export const burningHand = new MageSkill({
     elements: [
       {
         element: "chaos",
-        min: 0,
+        min: 1,
         max: 1,
       },
     ],

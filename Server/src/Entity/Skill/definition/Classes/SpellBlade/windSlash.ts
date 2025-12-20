@@ -1,7 +1,6 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SpellbladeSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
-import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
@@ -14,8 +13,7 @@ import { SpellbladeSkill } from "./index";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
-import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
-import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
+import { getPlanarEdgeLikeDamage } from "src/Utils/getPlanarEdgeLikeDamage";
 
 export const windSlash = new SpellbladeSkill({
   id: SpellbladeSkillId.WindSlash,
@@ -38,8 +36,8 @@ export const windSlash = new SpellbladeSkill({
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
-    mp: 0,
-    sp: 0,
+    mp: 2,
+    sp: 2,
     elements: [
       { element: "wind", value: 1 },
     ],
@@ -76,38 +74,12 @@ export const windSlash = new SpellbladeSkill({
     }
 
     const weapon = actor.getWeapon();
-    const isBareHand = weapon.id === BareHandId.BareHand;
-    const planarMod = statMod(actor.attribute.getTotal("planar"));
     const levelScalar = skillLevelMultiplier(skillLevel);
 
-    // Calculate Planar Edge-like damage
-    let baseDamage = 0;
-    let hitValue = 0;
-    let critValue = 0;
-    if (isBareHand) {
-      // No weapon: use skill level dice
-      let diceConfig: { dice: number; face: number };
-      if (skillLevel === 1) diceConfig = { dice: 1, face: 6 };
-      else if (skillLevel === 2) diceConfig = { dice: 1, face: 6 };
-      else if (skillLevel === 3) diceConfig = { dice: 1, face: 8 };
-      else if (skillLevel === 4) diceConfig = { dice: 1, face: 8 };
-      else diceConfig = { dice: 2, face: 4 }; // level 5+
+    // Get Planar Edge-like damage (base dice + planar mod, no skill multiplier yet)
+    const { baseDamage, hit: hitValue, crit: critValue } = getPlanarEdgeLikeDamage(actor, weapon);
 
-      // Damage dice - don't apply bless/curse
-      baseDamage = actor.roll({ amount: diceConfig.dice, face: diceConfig.face, applyBlessCurse: false });
-      // Hit/Crit rolls - apply bless/curse automatically
-      hitValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("control"));
-      critValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("luck"));
-    } else {
-      // Has weapon: use weapon damage
-      const type = getWeaponDamageType(weapon.weaponType);
-      const weaponDamage = getWeaponDamageOutput(actor, weapon, type);
-      baseDamage = weaponDamage.damage;
-      hitValue = weaponDamage.hit;
-      critValue = weaponDamage.crit;
-    }
-
-    let rawDamage = baseDamage + planarMod;
+    let rawDamage = baseDamage;
     // At level 5, add 0.5 damage per edge charge stack (rounded down)
     if (skillLevel >= 5) {
       const edgeChargeEntry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.edgeCharge);
@@ -129,6 +101,7 @@ export const windSlash = new SpellbladeSkill({
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
 
     // Check for bleed application
+    const planarMod = statMod(actor.attribute.getTotal("planar"));
     const dc = 7 + planarMod;
     const saveRoll = target.rollSave("endurance");
     let bleedMessage = "";

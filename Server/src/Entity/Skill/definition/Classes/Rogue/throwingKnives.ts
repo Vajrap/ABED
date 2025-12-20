@@ -8,10 +8,8 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { RogueSkill } from "./index";
-import { statMod } from "src/Utils/statMod";
-import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll, rollTwenty } from "src/Utils/Dice";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const throwingKnives = new RogueSkill({
   id: RogueSkillId.ThrowingKnives,
@@ -21,12 +19,12 @@ export const throwingKnives = new RogueSkill({
   },
   description: {
     text: {
-      en: "Hurl a flurry of knives with deadly precision, striking multiple foes.\nThrow {5}'3':'2'{/} daggers at random targets, each dealing <FORMULA> pierce damage.\nTargets can be the same or different.",
-      th: "ขว้างมีดหลายเล่มด้วยความแม่นยำที่ร้ายแรง โจมตีศัตรูหลายคน\nขว้าง {5}'3':'2'{/} มีดกระทำศัตรูที่สุ่ม แต่ละคนสร้างความเสียหายแทง <FORMULA>\nเป้าหมายสามารถเป็นคนเดียวกันหรือต่างกัน",
+      en: "Hurl a flurry of knives with deadly precision, striking multiple foes.\nThrow 3 daggers at random targets, each dealing <FORMULA> pierce damage.\nTargets can be the same or different.",
+      th: "ขว้างมีดหลายเล่มด้วยความแม่นยำที่ร้ายแรง โจมตีศัตรูหลายคน\nขว้าง 3 มีดกระทำศัตรูที่สุ่ม แต่ละคนสร้างความเสียหายแทง <FORMULA>\nเป้าหมายสามารถเป็นคนเดียวกันหรือต่างกัน",
     },
     formula: {
-      en: "(1d4 + <DEXmod>) × <SkillLevelMultiplier>",
-      th: "(1d4 + <DEXmod>) × <SkillLevelMultiplier>",
+      en: "(1d3 + <DEXmod>) x <SkillLevelMultiplier>",
+      th: "(1d3 + <DEXmod>) x <SkillLevelMultiplier>",
     },
   },
   requirement: {},
@@ -43,7 +41,7 @@ export const throwingKnives = new RogueSkill({
     mp: 0,
     sp: 0,
     elements: [
-      {element: 'wind', min: 1, max: 1},
+      {element: 'neutral', min: 1, max: 1},
     ],
   },
   exec: (
@@ -53,29 +51,26 @@ export const throwingKnives = new RogueSkill({
     skillLevel: number,
     location: LocationsEnum,
   ): TurnResult => {
-    const numTargets = skillLevel >= 5 ? 3 : 2;
-    const dexMod = statMod(actor.attribute.getTotal("dexterity"));
-    const levelScalar = skillLevelMultiplier(skillLevel);
-    const bonusDamage = dexMod * levelScalar;
+    const numKnives = 3; // Always 3 knives (cantrip, no upgrade)
 
     const messages: string[] = [];
     const targetEffects: { actorId: string; effect: TargetEffect[] }[] = [];
 
     // Select random targets (can repeat)
-    for (let i = 0; i < numTargets; i++) {
+    for (let i = 0; i < numKnives; i++) {
       const target = getTarget(actor, actorParty, targetParty, "enemy").one();
       
       if (!target) {
         break; // No more valid targets
       }
 
-      const baseDamage = roll(1).d(4).total;
-      const totalDamage = Math.max(0, baseDamage + bonusDamage);
+      // Each knife deals 1d3 damage (no modifiers, cantrip)
+      const totalDamage = actor.roll({ amount: 1, face: 3, stat: "dexterity" }) * skillLevelMultiplier(skillLevel);
 
       const damageOutput = {
-        damage: Math.floor(totalDamage),
-        hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
-        crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
+        damage: totalDamage,
+        hit: actor.rollTwenty({stat: 'dexterity'}),
+        crit: actor.rollTwenty({stat: 'luck'}),
         type: DamageType.pierce,
         isMagic: false,
       };

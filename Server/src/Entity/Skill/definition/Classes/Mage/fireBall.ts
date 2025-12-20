@@ -44,7 +44,9 @@ export const fireBall = new MageSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+      {element: "fire", min: 1, max: 1},
+    ],
   },
   exec: (
     actor: Character,

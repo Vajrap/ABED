@@ -849,6 +849,12 @@ function updateAbGaugeAndDecideTurnTaking(actor: Character): boolean {
     abGaugeIncrement += actor.roll({ amount: 1, face: 4, applyBlessCurse: false });
   }
 
+  // Tailwind: each stack increases AB gauge gain
+  const tailwindEntry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.tailwind);
+  if (tailwindEntry && tailwindEntry.value > 0) {
+    abGaugeIncrement += tailwindEntry.value;
+  }
+
   actor.abGauge += abGaugeIncrement;
 
   if (actor.abGauge >= 100) {

@@ -16,7 +16,7 @@ export const precognition = new SeerSkill({
   },
   description: {
     text: {
-      en: "See the future, gain Precognition buff for 1 turn.{5} With special effect, when the attack missed, you gain 1 order.{7} when used, roll a d20 + <LUKmod> if passed, gain 1 more turn of Precognition buff",
+      en: "See the future, gain Precognition buff for 1 turn. Next attacker that targets you must roll their LUK save vs DC10 + your LUK mod + (skill level - 1) or it will miss.{5} If the attacker misses, you gain 1 order.{7} When used, roll a d20 + LUK mod. If passed (DC10), gain 1 more turn of Precognition buff.",
       th: "คาดการณ์อนาคต, ได้รับพระการันตี Precognition ของ 1 รอบ: การคาดการณ์: ศัตรูต� procon",
     },
   },
@@ -43,17 +43,21 @@ export const precognition = new SeerSkill({
   exec: (user: Character, userParty: Character[], targetParty: Character[], skillLevel: number, location: LocationsEnum): TurnResult => {
     let turns = 1;
     
-    // At level 7: roll d20 + LUK mod, if passed, gain 1 more turn
+    // At level 7: roll d20 + LUK mod, if passed (DC10), gain 1 more turn
     if (skillLevel >= 7) {
       const luckMod = statMod(user.attribute.getTotal("luck"));
       const roll = user.rollTwenty({}) + luckMod;
-      // Typically DC would be around 10-12, but we'll use 10 as base
       if (roll > 10) {
         turns = 2;
       }
     }
     
-    buffsAndDebuffsRepository.precognition.appender(user, { turnsAppending: turns, universalCounter: skillLevel >= 5 ? 1 : 0 });
+    // Store skill level in counter, and flag for level 5 upgrade (gain order on miss)
+    // We'll calculate LUK mod in damageResolution when needed
+    buffsAndDebuffsRepository.precognition.appender(user, { 
+      turnsAppending: turns, 
+      universalCounter: skillLevel, // Store skill level
+    });
     
     return {
       content: {

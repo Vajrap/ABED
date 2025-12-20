@@ -32,7 +32,7 @@ export const mendSpirit = new ShamanSkill({
   cooldown: 3,
   consume: {
     hp: 0,
-    mp: 0,
+    mp: 2,
     sp: 0,
     elements: [],
   },
@@ -87,12 +87,13 @@ export const mendSpirit = new ShamanSkill({
 
     const baseHeal = (roll(1).d(4).total + statMod(actor.attribute.getTotal("willpower"))) * skillLevelMultiplier(skillLevel);
 
-    if (sideEffect <= 11) {
-      // Full healing
+    if (sideEffect <= 10) {
+      // Full healing (roll <= 10 means <= 10, so 11+ is the halved case)
+      healAmount = Math.floor(baseHeal);
       target.vitals.incHp(healAmount);
       message = `${target.name.en} healed for ${healAmount} HP.`;
     } else {
-      // Heal is halved, + 1 chaos
+      // Heal is halved, + 1 chaos (roll 11+)
       healAmount = Math.floor(baseHeal / 2);
       target.resources.chaos += 1;
       target.vitals.incHp(healAmount);

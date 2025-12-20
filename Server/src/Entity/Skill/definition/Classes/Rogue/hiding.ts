@@ -16,8 +16,8 @@ export const hiding = new RogueSkill({
   },
   description: {
     text: {
-      en: "Melt into the shadows, becoming one with the darkness.\nRoll D20 + <DEXmod> against DC{5}'8':'10'{/} + highest enemy INTmod + {5}'3':'5'{/} if in front row.\nIf passed, gain <BuffHiding> for 2 turns.",
-      th: "ละลายเข้ากับเงามืด กลายเป็นหนึ่งเดียวกับความมืด\nทอย D20 + <DEXmod> กับ DC{5}'8':'10'{/} + INTmod สูงสุดของศัตรู + {5}'3':'5'{/} หากอยู่ในแถวหน้า\nหากสำเร็จ ได้รับ <BuffHiding> 2 เทิร์น",
+      en: "Melt into the shadows, becoming one with the darkness.\nRoll D20 + <DEXmod> against DC{5}'8':'10'{/} + highest enemy INTmod + {5}'3':'5'{/} if in front row.\nIf passed, gain <BuffHiding> for 1 turn.",
+      th: "ละลายเข้ากับเงามืด กลายเป็นหนึ่งเดียวกับความมืด\nทอย D20 + <DEXmod> กับ DC{5}'8':'10'{/} + INTmod สูงสุดของศัตรู + {5}'3':'5'{/} หากอยู่ในแถวหน้า\nหากสำเร็จ ได้รับ <BuffHiding> 1 เทิร์น",
     },
   },
   requirement: {},
@@ -26,9 +26,9 @@ export const hiding = new RogueSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 2,
+    sp: 3,
     elements: [
-        {element: 'wind', value: 2},
+        {element: 'neutral', value: 2},
     ],
   },
   produce: {
@@ -69,8 +69,8 @@ export const hiding = new RogueSkill({
     const totalRoll = rollResult + dexMod;
     
     if (totalRoll >= dc) {
-      // Success: Get hiding buff for 2 turns
-      buffsAndDebuffsRepository.hiding.appender(actor, { turnsAppending: 2 });
+      // Success: Get hiding buff for 1 turn
+      buffsAndDebuffsRepository.hiding.appender(actor, { turnsAppending: 1 });
       
       return {
         content: {

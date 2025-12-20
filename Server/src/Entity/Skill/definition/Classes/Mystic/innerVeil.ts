@@ -16,27 +16,24 @@ export const innerVeil = new MysticSkill({
   },
   description: {
     text: {
-      en: "Weave a protective veil of planar energy around a frontline ally, obscuring them from enemy sight.\Give <BuffInnerVeil> for {5}'3':'2'{/} turns.",
-      th: "ถักทอผ้าคลุมป้องกันจากพลังงานระนาบรอบพันธมิตรแถวหน้า ทำให้ศัตรูมองไม่เห็น\nได้รับ <BuffInnerVeil> เป็นเวลา {5}'3':'2'{/} เทิร์น",
+      en: "Weave a protective veil of planar energy around a frontline ally, obscuring them from enemy sight.\nGain <BuffInnerVeil> for 1 turn.",
+      th: "ถักทอผ้าคลุมป้องกันจากพลังงานระนาบรอบพันธมิตรแถวหน้า ทำให้ศัตรูมองไม่เห็น\nได้รับ <BuffInnerVeil> เป็นเวลา 1 เทิร์น",
     },
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.uncommon,
+  tier: TierEnum.common,
   consume: {
     hp: 0,
-    mp: 4,
+    mp: 2,
     sp: 0,
-    elements: [
-      { element: "wind", value: 1 },
-      { element: "neutral", value: 1 },
-    ],
+    elements: [],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [{ element: "neutral", min: 1, max: 1 }],
   },
   exec: (
     actor: Character,
@@ -64,9 +61,8 @@ export const innerVeil = new MysticSkill({
       };
     }
 
-    // Apply Inner Veil buff
-    const duration = skillLevel >= 5 ? 3 : 2;
-    buffsAndDebuffsRepository.innerVeil.appender(target, { turnsAppending: duration });
+    // Apply Inner Veil buff for 1 turn (cantrip, no upgrade)
+    buffsAndDebuffsRepository.innerVeil.appender(target, { turnsAppending: 1 });
 
     return {
       content: {

@@ -37,7 +37,6 @@
  * Phase 7: Shields & Absorption
  *   - Taunt (generate fire resource)
  *   - Spell Parry (reduce magic damage, grant Edge Charge)
- *   - Arcane Shield (absorb damage)
  *   - Aegis Shield (mitigate per stack)
  *   - Planar Absorption (absorb magic, convert to resources)
  * 
@@ -61,11 +60,10 @@ import { statMod } from "src/Utils/statMod";
 import Report from "src/Utils/Reporter";
 import { locationRepository } from "src/Entity/Location/Location/repository.ts";
 import {
-  BuffAndDebuffEnum,
   BuffEnum,
   DebuffEnum,
 } from "../BuffsAndDebuffs/enum";
-import { buffsRepository } from "../BuffsAndDebuffs/repository";
+import { buffsRepository, buffsAndDebuffsRepository } from "../BuffsAndDebuffs/repository";
 import { getBattleStatistics } from "./BattleContext";
 import type { BattleStatistics } from "./BattleStatistics";
 import { traitRepository } from "src/Entity/Trait/repository";
@@ -74,6 +72,7 @@ import { ArmorClass } from "../Item/Equipment/Armor/Armor";
 import { bodyRepository } from "src/Entity/Item/Equipment/Armor/Body/repository";
 import type { Character } from "../Character/Character";
 import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
+import { roll } from "src/Utils/Dice";
 
 export interface DamageResult {
   actualDamage: number;
@@ -89,6 +88,7 @@ export interface DamageInput {
   type: DamageType;
   isMagic?: boolean;
   trueDamage?: boolean;
+  ignorePDEF?: number; // Amount of pDEF to ignore during physical damage mitigation
 }
 
 interface DamageResolutionContext {
@@ -198,6 +198,24 @@ function applyPreDamageModifiers(
       `        ⚖️ Expose Weakness Active removed (Exposed persists for JudgmentDay)`,
     );
   }
+
+  // Challenger / Challenged interaction: If attacker has Challenger buff and target has Challenged debuff, add hit and crit bonus
+  const challenger = attacker.buffsAndDebuffs.buffs.entry.get(
+    BuffEnum.challenger,
+  );
+  const challenged = target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.challenged);
+  if (
+    challenger &&
+    challenger.value > 0 &&
+    challenged &&
+    challenged.value > 0
+  ) {
+    damageOutput.hit += 2;
+    damageOutput.crit += 2;
+    Report.debug(
+      `        ⚔️ Challenger! +2 hit and +2 crit bonus (attacker has Challenger, target has Challenged)`,
+    );
+  }
 }
 
 // ============================================================================
@@ -207,22 +225,28 @@ function applyPreDamageModifiers(
 function checkHitAndDodge(
   context: DamageResolutionContext,
 ): DamageResult | null {
-  const { target, damageOutput } = context;
-  // Precognition auto dodge
+  const { attacker, target, damageOutput } = context;
+  // Precognition: Attacker must roll their LUK save vs DC10 + target's LUK mod + (skill level - 1)
   const precognition = target.buffsAndDebuffs.buffs.entry.get(
     BuffEnum.precognition,
   );
   if (precognition && precognition.value > 0) {
-    const saveRoll = target.rollSave("luck");
-    const dc = 10;
+    const skillLevel = precognition.counter || 1;
+    const targetLuckMod = statMod(target.attribute.getTotal("luck"));
+    const dc = 10 + targetLuckMod + (skillLevel - 1);
+    
+    // Attacker (not target!) must roll their LUK save
+    const saveRoll = attacker.rollSave("luck");
     const dodged = saveRoll >= dc;
+    
+    // Remove precognition after checking (it only works once)
+    target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.precognition);
+    
     if (dodged) {
-      if (precognition.counter === 1) {
-        // Gain 1 order
+      // Attack misses - at level 5+, gain 1 order
+      if (skillLevel >= 5) {
         target.resources.order += 1;
       }
-      // Remove precognition
-      target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.precognition);
       // Return missed
       return {
         actualDamage: 0,
@@ -230,6 +254,32 @@ function checkHitAndDodge(
         isHit: false,
         isCrit: false,
       };
+    }
+    // If save failed, attack proceeds normally (buff already removed)
+  }
+
+  // Foreseen: First attack or debuff that would hit must roll LUK save vs DC8 + caster's LUK mod
+  const foreseen = target.buffsAndDebuffs.buffs.entry.get(
+    BuffEnum.foreseen,
+  );
+  if (foreseen && foreseen.value > 0) {
+    const casterLuckMod = foreseen.counter || 0;
+    const dc = 8 + casterLuckMod;
+    const saveRoll = target.rollSave("luck");
+    const dodged = saveRoll >= dc;
+    if (dodged) {
+      // Remove foreseen (it only works once)
+      target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.foreseen);
+      // Return missed
+      return {
+        actualDamage: 0,
+        damageType: damageOutput.type,
+        isHit: false,
+        isCrit: false,
+      };
+    } else {
+      // Save failed - attack proceeds, but still remove foreseen (it only works once)
+      target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.foreseen);
     }
   }
 
@@ -372,10 +422,14 @@ function applyMitigation(context: DamageResolutionContext): number {
 }
 
 function getPhysicalMitigation(context: DamageResolutionContext): { baseMitigation: number, ifMagicAptitudeMultiplier: number } {
-  const { target } = context;
+  const { target, damageOutput } = context;
+  const basePDEF = target.battleStats.getTotal("pDEF");
+  const ignorePDEF = damageOutput.ignorePDEF || 0;
+  const effectivePDEF = Math.max(0, basePDEF - ignorePDEF);
+  
   return {
     baseMitigation:
-      target.battleStats.getTotal("pDEF") +
+      effectivePDEF +
       statMod(target.attribute.getTotal("endurance")),
     ifMagicAptitudeMultiplier: 1,
   }
@@ -531,6 +585,52 @@ function checkCounterAttacks(
     }
   }
 
+  // Arcane Shield: Save-based negation (END save)
+  const arcaneShield = target.buffsAndDebuffs.buffs.entry.get(
+    BuffEnum.arcaneShield,
+  );
+  if (arcaneShield && arcaneShield.value > 0) {
+    const planarMod = arcaneShield.counter || 0;
+    const saveRoll = target.rollSave("endurance");
+    const dc = damageOutput.hit || 10; // Use attacker's hit roll as DC
+    
+    if (saveRoll + planarMod >= dc) {
+      // Save passed: negate attack and gain 1 Arcane Charge stack
+      buffsAndDebuffsRepository.arcaneCharge.appender(target, { turnsAppending: 1 });
+      
+      // Remove Arcane Shield after checking (it only works once per stack)
+      arcaneShield.value -= 1;
+      if (arcaneShield.value === 0) {
+        target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.arcaneShield);
+      }
+      
+      Report.debug(
+        `        🛡️ Arcane Shield! ${target.name.en} negated the attack with END save (${saveRoll} + ${planarMod} >= ${dc})!`,
+      );
+      
+      // Record the negated attack as a miss
+      if (stats) {
+        stats.recordDamageDealt(attackerId, targetId, 0, false, false);
+      }
+      
+      return {
+        actualDamage: 0,
+        damageType: damageOutput.type,
+        isHit: false, // Attack was negated
+        isCrit: false,
+      };
+    } else {
+      // Save failed: remove one stack and continue with normal damage
+      arcaneShield.value -= 1;
+      if (arcaneShield.value === 0) {
+        target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.arcaneShield);
+      }
+      Report.debug(
+        `        ❌ Arcane Shield failed! ${target.name.en} failed the END save (${saveRoll} + ${planarMod} < ${dc}).`,
+      );
+    }
+  }
+
   // Parry & Riposte: Check before other damage mitigation
   const parry = target.buffsAndDebuffs.buffs.entry.get(BuffEnum.parry);
   if (parry && parry.value > 0 && !damageOutput.isMagic) {
@@ -626,18 +726,19 @@ function applyShieldsAndAbsorption(
     target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.spellParry);
   }
 
-  // Arcane Shield: Absorb damage up to shield value
-  const arcaneShield = target.buffsAndDebuffs.buffs.entry.get(
-    BuffEnum.arcaneShield,
-  );
-  if (arcaneShield) {
-    const absorbed = Math.min(damage, arcaneShield.value);
-    damage -= absorbed;
-    arcaneShield.value -= absorbed;
 
-    if (arcaneShield.value <= 0) {
-      target.buffsAndDebuffs.buffs.entry.delete(BuffEnum.arcaneShield);
-    }
+  // Ward of Protection: Reduce damage by (3 + WIL mod / 2) per attack, up to 5 stacks per turn
+  const wardOfProtection = target.buffsAndDebuffs.buffs.entry.get(
+    BuffEnum.wardOfProtection,
+  );
+  if (wardOfProtection && wardOfProtection.value > 0 && wardOfProtection.counter < 5) {
+    const willMod = statMod(target.attribute.getTotal("willpower"));
+    const reduction = 3 + Math.floor(willMod / 2);
+    damage = Math.max(0, damage - reduction);
+    wardOfProtection.counter += 1; // Increment counter (stacks used this turn)
+    Report.debug(
+      `        🛡️ Ward of Protection! Damage reduced by ${reduction} (${damage} remaining, ${wardOfProtection.counter}/5 stacks used)`,
+    );
   }
 
   // Aegis Shield: Each stack can mitigate 5 + (willpower mod) points of incoming damage
@@ -749,6 +850,26 @@ function applyFinalModifiers(
     Report.debug(`        💧 Holy Water! Additional ${holyBonus} holy damage (1d4 + WIL mod)`);
   }
 
+  // Arcane Battery buff: Add +1 damage per stack to all arcane damage attacks
+  if (damageOutput.type === DamageType.arcane) {
+    const arcaneBattery = attacker.buffsAndDebuffs.buffs.entry.get(BuffEnum.arcaneBattery);
+    if (arcaneBattery && arcaneBattery.value > 0) {
+      const batteryBonus = arcaneBattery.value;
+      damage += batteryBonus;
+      Report.debug(`        🔋 Arcane Battery! Additional ${batteryBonus} damage (+1 per stack)`);
+    }
+  }
+
+  // HexMark debuff: Add +1d3 extra chaos damage from all sources
+  const hexMark = target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.hexMark);
+  if (hexMark && hexMark.value > 0) {
+    const hexMarkBonus = roll(1).d(3).total;
+    damage += hexMarkBonus;
+    Report.debug(
+      `        🔮 HexMark! Additional ${hexMarkBonus} chaos damage (1d3)`,
+    );
+  }
+
   return damage;
 }
 
@@ -776,6 +897,18 @@ function applyDamage(
 
   // Reduce target HP
   target.vitals.decHp(finalDamage);
+
+  // Battle Hardened: When attacked during Battle Hardened, Rage duration is extended by 1 turn
+  const battleHardened = target.buffsAndDebuffs.buffs.entry.get(BuffEnum.battleHardened);
+  if (battleHardened && battleHardened.value > 0) {
+    const rage = target.buffsAndDebuffs.buffs.entry.get(BuffEnum.rage);
+    if (rage && rage.value > 0) {
+      rage.value += 1;
+      Report.debug(
+        `        🛡️ Battle Hardened! Rage duration extended by 1 turn (now ${rage.value} turns)`,
+      );
+    }
+  }
 
   // Record statistics if tracker is provided
   if (stats) {

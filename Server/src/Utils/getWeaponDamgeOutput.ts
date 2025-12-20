@@ -11,6 +11,7 @@ type DamageOutPut = {
   hit: number;
   crit: number;
   type: DamageType;
+  ignorePDEF?: number;
 };
 
 export function getWeaponDamageOutput(

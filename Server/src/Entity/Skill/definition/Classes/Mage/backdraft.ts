@@ -20,8 +20,8 @@ export const backdraft = new MageSkill({
   },
   description: {
     text: {
-      en: "Ignite the flames already burning on your enemies, causing them to explode in a violent backdraft.\nTargets all enemies with <DebuffBurn>.\nDeal <FORMULA> fire damage per burn stack, then remove all burn stacks.\n[b]Heal yourself[/b] for total damage × (0.1 × skill level) {5} + 1d2 per stack: + 1 per stack{/}",
-      th: "จุดไฟที่กำลังลุกไหม้บนศัตรู ทำให้ระเบิดเป็นไฟย้อนกลับอย่างรุนแรง\nโจมตีศัตรูทั้งหมดที่มี <DebuffBurn>\nสร้างความเสียหายไฟ <FORMULA> ต่อสแตคเผาไหม้ จากนั้นลบสแตคเผาไหม้ทั้งหมด\n[b]ฟื้นฟูตัวเอง[/b] ความเสียหายทั้งหมด × (0.1 × เลเวลสกิล) {5} + 1d2 ต่อสแตค: + 1 ต่อสแตค{/}", 
+      en: "Ignite the flames already burning on your enemies, causing them to explode in a violent backdraft.\nTargets all enemies with <DebuffBurn>.\nDeal <FORMULA> inferno damage per burn stack, then remove all burn stacks.\n[b]Heal yourself[/b] for total damage × (0.1 × skill level) {5} + 1d2 per stack: + 1 per stack{/}",
+      th: "จุดไฟที่กำลังลุกไหม้บนศัตรู ทำให้ระเบิดเป็นไฟย้อนกลับอย่างรุนแรง\nโจมตีศัตรูทั้งหมดที่มี <DebuffBurn>\nสร้างความเสียหายอินเฟอร์โน <FORMULA> ต่อสแตคเผาไหม้ จากนั้นลบสแตคเผาไหม้ทั้งหมด\n[b]ฟื้นฟูตัวเอง[/b] ความเสียหายทั้งหมด × (0.1 × เลเวลสกิล) {5} + 1d2 ต่อสแตค: + 1 ต่อสแตค{/}", 
     },
     formula: {
       en: "total damage × (0.1 × skill level) {5}+ 1d2 per stack:+ 1 per stack{/}",
@@ -36,7 +36,8 @@ export const backdraft = new MageSkill({
     mp: 3,
     sp: 0,
     elements: [
-      {element: "chaos", value: 2},
+      {element: "fire", value: 1},
+      {element: "chaos", value: 1},
     ],
   },
   produce: {
@@ -89,7 +90,7 @@ export const backdraft = new MageSkill({
           damage: burnStacks + (skillLevel === 5 ? roll(1).d(2).total : 0),
           hit: 999,
           crit: 0,
-          type: DamageType.fire,
+          type: DamageType.inferno,
           isMagic: true,
         };
 

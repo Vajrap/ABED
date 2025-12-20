@@ -19,7 +19,7 @@ export const chaoticBlessing = new ShamanSkill({
   },
   description: {
     text: {
-      en: "Channel the chaotic forces of the planes, unleashing unpredictable energy.\n50% chance to deal <FORMULA> chaos damage to all enemies, or heal all allies for <FORMULA> HP.\n{5}\nHealed allies [r]roll DC10 WILsave[/r], if passed, [b]gain +1 chaos[/b].\nDamaged enemies [r]roll DC10 WILsave[/r], if failed, [r]lose 1 random resource[/r].{/}",
+      en: "Channel the chaotic forces of the planes, unleashing unpredictable energy.\n50% chance to deal <FORMULA> chaos damage to all enemies, or heal all allies for <FORMULA> HP.\n{5}\nHealed allies [r]roll DC10 WILsave[/r], if passed, [b]give self +1 chaos[/b].\nDamaged enemies [r]roll DC10 WILsave[/r], if failed, [r]lose 1 random resource[/r].{/}",
       th: "ควบคุมพลังแห่งระนาบที่ยุ่งเหยิง ปลดปล่อยพลังงานที่คาดเดาไม่ได้\n50% โอกาสสร้างความเสียหาย chaos <FORMULA> ให้ศัตรูทั้งหมด หรือรักษาพันธมิตรทั้งหมด <FORMULA> HP\n{5}\nพันธมิตรที่ได้รับการรักษา: ทอย [r]WILsave DC10[/r] หากสำเร็จ [b]ได้รับ +1 chaos[/b]\nศัตรูที่ถูกโจมตี: ทอย [r]WILsave DC10[/r] หากล้มเหลว [r]สูญเสียทรัพยากรแบบสุ่ม 1 หน่วย[/r]{/}",
     },
     formula: {
@@ -32,7 +32,7 @@ export const chaoticBlessing = new ShamanSkill({
   tier: TierEnum.uncommon,
   consume: {
     hp: 0,
-    mp: 0,
+    mp: 4,
     sp: 0,
     elements: [
       { element: "chaos", value: 1 },
@@ -83,14 +83,21 @@ export const chaoticBlessing = new ShamanSkill({
         };
         
         const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
-        const saved = rollTwenty().total + target.saveRolls.getTotal('willpower') >= 10;
         const msg = buildCombatMessage(actor, target, { en: "Chaotic Blessing", th: "พรแห่งความยุ่งเหยิง" }, damageResult);
-        if (!saved) {
-          const resource = Object.keys(target.resources)[Math.floor(Math.random() * Object.keys(target.resources).length)];
-          if (target.resources[resource as keyof typeof target.resources] > 0) { 
-            target.resources[resource as keyof typeof target.resources] -= 1;
-            msg.en += ` ${target.name.en} lost 1 ${resource}!`;
-            msg.th += ` ${target.name.th} สูญเสีย 1 ${resource}!`;
+        
+        // Level 5: Damaged enemies roll DC10 WIL save, if failed lose 1 random resource
+        if (skillLevel >= 5 && damageResult.isHit) {
+          const saveResult = target.rollSave("willpower");
+          if (saveResult < 10) {
+            // Save failed - lose 1 random resource
+            const resourceKeys = Object.keys(target.resources) as Array<keyof typeof target.resources>;
+            const nonZeroResources = resourceKeys.filter(key => target.resources[key] > 0);
+            if (nonZeroResources.length > 0) {
+              const resource = nonZeroResources[Math.floor(Math.random() * nonZeroResources.length)]!;
+              target.resources[resource] -= 1;
+              msg.en += ` ${target.name.en} lost 1 ${resource}!`;
+              msg.th += ` ${target.name.th} สูญเสีย 1 ${resource}!`;
+            }
           }
         }
         messages.push(msg.en);
@@ -103,11 +110,16 @@ export const chaoticBlessing = new ShamanSkill({
             roll(1).d(skillLevel >= 5 ? 8 : 6).total +
             additionalDamage * levelScalar;
           ally.vitals.incHp(Math.floor(total));
-          const getChaos = rollTwenty().total;
-          let msg = `${ally.name.en} healed for ${total} HP!`;
-          if (getChaos >= 10) {
-            ally.resources.chaos += 1;
-            msg += ` ${ally.name.en} gained 1 Chaos!`;
+          let msg = `${ally.name.en} healed for ${Math.floor(total)} HP!`;
+          
+          // Level 5: Healed allies roll DC10 WIL save, if passed gain +1 chaos
+          if (skillLevel >= 5) {
+            const saveResult = ally.rollSave("willpower");
+            if (saveResult >= 10) {
+              // Save passed - gain +1 chaos
+              actor.resources.chaos += 1;
+              msg += ` ${actor.name.en} gained 1 Chaos!`;
+            }
           }
           messages.push(msg);
         }

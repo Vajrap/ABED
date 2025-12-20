@@ -1,7 +1,6 @@
 import { TierEnum } from "src/InterFacesEnumsAndTypes/Tiers";
 import { SpellbladeSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
-import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import type { TurnResult } from "../../../types";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getTarget } from "src/Entity/Battle/getTarget";
@@ -9,13 +8,11 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
-import { getWeaponDamageType } from "src/Utils/getWeaponDamageType";
-import { statMod } from "src/Utils/statMod";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { SpellbladeSkill } from "./index";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
-import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
+import { getPlanarEdgeLikeDamage } from "src/Utils/getPlanarEdgeLikeDamage";
 
 export const edgeBurst = new SpellbladeSkill({
   id: SpellbladeSkillId.EdgeBurst,
@@ -38,10 +35,11 @@ export const edgeBurst = new SpellbladeSkill({
   tier: TierEnum.rare,
   consume: {
     hp: 0,
-    mp: 0,
-    sp: 0,
+    mp: 2,
+    sp: 2,
     elements: [
-      { element: "chaos", value: 2 },
+      { element: "wind", value: 1 },
+      { element: "fire", value: 1 },
     ],
   },
   produce: {
@@ -90,36 +88,10 @@ export const edgeBurst = new SpellbladeSkill({
     }
 
     const weapon = actor.getWeapon();
-    const isBareHand = weapon.id === BareHandId.BareHand;
-    const planarMod = statMod(actor.attribute.getTotal("planar"));
     const levelScalar = skillLevelMultiplier(skillLevel);
 
-    // Calculate base damage (weapon or Planar Edge dice)
-    let baseDamage = 0;
-    let hitValue = 0;
-    let critValue = 0;
-    if (isBareHand) {
-      // No weapon: use skill level dice
-      let diceConfig: { dice: number; face: number };
-      if (skillLevel === 1) diceConfig = { dice: 1, face: 6 };
-      else if (skillLevel === 2) diceConfig = { dice: 1, face: 6 };
-      else if (skillLevel === 3) diceConfig = { dice: 1, face: 8 };
-      else if (skillLevel === 4) diceConfig = { dice: 1, face: 8 };
-      else diceConfig = { dice: 2, face: 4 }; // level 5+
-
-      // Damage dice - don't apply bless/curse
-      baseDamage = actor.roll({ amount: diceConfig.dice, face: diceConfig.face, applyBlessCurse: false });
-      // Hit/Crit rolls - apply bless/curse automatically
-      hitValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("control"));
-      critValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("luck"));
-    } else {
-      // Has weapon: use weapon damage
-      const type = getWeaponDamageType(weapon.weaponType);
-      const weaponDamage = getWeaponDamageOutput(actor, weapon, type);
-      baseDamage = weaponDamage.damage;
-      hitValue = weaponDamage.hit;
-      critValue = weaponDamage.crit;
-    }
+    // Get Planar Edge-like damage (base dice + planar mod, no skill multiplier yet)
+    const { baseDamage, hit: hitValue, crit: critValue } = getPlanarEdgeLikeDamage(actor, weapon);
 
     // Add 1d2 per edge charge stack
     let edgeChargeDamage = 0;
@@ -127,7 +99,7 @@ export const edgeBurst = new SpellbladeSkill({
       // Random quantity - don't apply bless/curse
       edgeChargeDamage += actor.roll({ amount: 1, face: 2, applyBlessCurse: false });
     }
-    const rawDamage = baseDamage + planarMod + edgeChargeDamage;
+    const rawDamage = baseDamage + edgeChargeDamage;
     const scaledDamage = Math.max(0, rawDamage * levelScalar);
 
     const damageOutput = {

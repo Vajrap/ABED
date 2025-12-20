@@ -25,7 +25,7 @@ export const reversalPalm = new MysticSkill({
   },
   requirement: {},
   equipmentNeeded: ["bareHand"],
-  tier: TierEnum.rare,
+  tier: TierEnum.common,
   consume: {
     hp: 0,
     mp: 0,

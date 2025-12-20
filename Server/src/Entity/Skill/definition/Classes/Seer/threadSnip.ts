@@ -21,7 +21,7 @@ export const threadSnip = new SeerSkill({
   },
   description: {
     text: {
-      en: "Look into the planar thread and pulled it away from an enemy: Deal <FORMULA> to an enemy, roll D14 (-1 per skill level) dice. If passed, randomly steal 1 element from the enemy",
+      en: "Look into the planar thread and pulled it away from an enemy: Deal <FORMULA> to an enemy, roll DC14 (-1 per skill level) dice. If passed, randomly steal 1 element from the enemy",
       th: "มองไปยังสายใยพลังพลานาบของศัตรู และตัดมันออก: สร้างความเสียหาย <FORMULA> ให้ศัตรู, ทอยลูกเต๋า D14 (-1 ต่อเลเวลสกิล). หากสำเร็จ, สุ่มคัดลอกธาตุหนึ่งจากศัตรู",
     },
     formula: {
@@ -87,17 +87,12 @@ export const threadSnip = new SeerSkill({
     
     const damageResult = resolveDamage(user.id, target.id, damageOutput, location);
     
-    // Roll for element steal: D14 - skill level (so at level 1, roll 1d13, at level 2, roll 1d12, etc.)
-    // Note: Description says "roll D14 (-1 per skill level) dice", meaning roll 1d(14-skillLevel)
-    // The DC is the dice face itself (need to roll the max or close to it)
-    // Skill check - apply bless/curse automatically (this is a skill check, not damage)
-    const diceFace = Math.max(1, 14 - skillLevel);
-    const stealRoll = user.roll({ amount: 1, face: diceFace });
-    // Need to roll >= diceFace to pass (at level 1: roll 1d13, need >= 13; at level 2: roll 1d12, need >= 12)
-    const dc = diceFace;
+    let dc = 14 - skillLevel;
+    const stealRoll = user.rollTwenty({});
+
     let stolenElement: ElementResourceKey | null = null;
     
-    if (stealRoll >= dc && target.resources) {
+    if (stealRoll > dc && target.resources) {
       // Find available elements
       const availableElements: ElementResourceKey[] = [];
       const elementKeys: ElementResourceKey[] = ["fire", "water", "earth", "wind", "order", "chaos", "neutral"];

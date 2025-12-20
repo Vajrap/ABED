@@ -25,12 +25,12 @@ export const advancingPaceSkill = new KnightSkill({
   tier: TierEnum.rare,
   consume: {
     hp: 0,
-    mp: 0,
+    mp: 3,
     sp: 4,
     elements: [
       {
         element: "neutral",
-        value: 2,
+        value: 3,
       },
     ],
   },
@@ -38,7 +38,13 @@ export const advancingPaceSkill = new KnightSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+      {
+        element: "fire",
+        min: 1,
+        max: 1,
+      },
+    ],
   },
   exec: (
     actor: Character,
@@ -73,13 +79,18 @@ export const advancingPaceSkill = new KnightSkill({
       actor,
       {
         turnsAppending: skillLevel >= 5 ? 4 : 3,
+        universalCounter: skillLevel >= 5 ? 1 : 0,
       },
     );
 
+    // Gain AB gauge immediately (+5 at level <5, +10 at level 5)
+    const abGaugeGain = skillLevel >= 5 ? 10 : 5;
+    actor.abGauge = Math.min(100, actor.abGauge + abGaugeGain);
+
     return {
       content: {
-        en: `${actor.name.en} advances their pace for ${skillLevel >= 5 ? 4 : 3} turns`,
-        th: `${actor.name.th} เร่งจังหวะก้าว ${skillLevel >= 5 ? 4 : 3} เทิร์น`,
+        en: `${actor.name.en} advances their pace for ${skillLevel >= 5 ? 4 : 3} turns and gains +${abGaugeGain} AB gauge!`,
+        th: `${actor.name.th} เร่งจังหวะก้าว ${skillLevel >= 5 ? 4 : 3} เทิร์น และได้รับ +${abGaugeGain} AB gauge!`,
       },
       actor: {
         actorId: actor.id,

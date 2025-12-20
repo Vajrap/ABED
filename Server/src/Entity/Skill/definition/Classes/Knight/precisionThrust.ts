@@ -37,7 +37,7 @@ export const precisionThrust = new KnightSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 4,
+    sp: 3,
     elements: [
       {
         element: "fire",

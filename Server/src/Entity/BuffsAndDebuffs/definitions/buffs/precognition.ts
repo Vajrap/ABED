@@ -9,23 +9,28 @@ export const precognition = new BuffDef({
     th: "การคาดการณ์",
   },
   description: {
-    en: "When attacked roll <FORMULA> if passed, the attack will miss. {<COUNTER===1>} With special effect, when the attack missed, you gain 1 order.{/}",
-    th: "เมื่อถูกโจมตี ทอย <FORMULA> หากสำเร็จ การโจมตีจะล้มเหลว {<COUNTER===1>} มีผลพิเศษพิเศษ เมื่อการโจมตีล้มเหลว คุณจะได้รับ 1 ออเดอร์{/}",
+    en: "Next attacker that targets you must roll their LUK save vs DC10 + your LUK mod + (skill level - 1) or it will miss. Removed after checking.{<COUNTER>=5} If the attacker misses, you gain 1 order.{/}",
+    th: "ผู้โจมตีที่โจมตีคุณต้องทอย LUK save เทียบกับ DC10 + LUK mod ของคุณ + (ระดับทักษะ - 1) มิฉะนั้นการโจมตีจะพลาด ลบออกหลังการตรวจสอบ{<COUNTER>=5} หากผู้โจมตีพลาด คุณจะได้รับ 1 order{/}",
   },
-  formula: "<LUKsave> vs DC 10",
+  formula: "Attacker's <LUKsave> vs DC10 + your LUK mod + (skill level - 1)",
   appender: function (actor: Character, options: AppenderOptions): L10N {
-    const { turnsAppending: value, universalCounter: counter } = options;
+    const { turnsAppending: value, universalCounter: skillLevel = 1 } = options;
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.precognition);
     let isFirst = false;
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.precognition, {
         value: value,
-        counter: counter || 0,
+        counter: skillLevel, // Store skill level in counter
       });
       isFirst = true;
     } else {
       entry.value += value;
+      // Keep the higher skill level if extending
+      if (skillLevel > entry.counter) {
+        entry.counter = skillLevel;
+      }
     }
+
 
     return {
       en: `${actor.name.en} gained Precognition buff for ${value} turn(s)${isFirst ? "." : " (extended)."}`,

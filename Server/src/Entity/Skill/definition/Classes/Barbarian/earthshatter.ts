@@ -21,8 +21,8 @@ export const earthshatter = new BarbarianSkill({
   },
   description: {
     text: {
-      en: "Slam the ground with your weapon, sending a shock wave to the enemy line dealing damage all enemy in a line. \nDeals <FORMULA> blunt damage to each target. \nEach target [r]rolls DC8 ENDsave or becomes <DebuffDazed> for 1 turn.[/r]",
-      th: "กระแทกพื้นด้วยอาวุธอย่างรุนแรง ส่งคลื่นสั่นสะเทือนใส่ศัตรูแถวหน้า \nสร้างความเสียหาย <FORMULA> ให้ศัตรูแถวหน้าทุกคน \nเป้าหมายแต่ละคนทอย [r]DC8 ENDsave ไม่ผ่านจะติด <DebuffDazed> 1 เทิร์น[/r]",
+      en: "Slam the ground with your weapon, sending a shock wave to the enemy line dealing damage all enemy in a line. \nDeals <FORMULA> blunt damage to each target. \nEach target [r]rolls {5}DC12:DC10{/} ENDsave or becomes <DebuffDazed> for 1 turn.[/r]",
+      th: "กระแทกพื้นด้วยอาวุธอย่างรุนแรง ส่งคลื่นสั่นสะเทือนใส่ศัตรูแถวหน้า \nสร้างความเสียหาย <FORMULA> ให้ศัตรูแถวหน้าทุกคน \nเป้าหมายแต่ละคนทอย [r]{5}DC12:DC10{/} ENDsave ไม่ผ่านจะติด <DebuffDazed> 1 เทิร์น[/r]",
     },
     formula: {
       en: "({5}'1d10':'1d8'{/} + <STRmod>) × <SkillLevelMultiplier>",
@@ -70,7 +70,7 @@ export const earthshatter = new BarbarianSkill({
     const diceFace = skillLevel >= 5 ? 10 : 8;
     const strMod = statMod(actor.attribute.getTotal("strength"));
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const dc = 8;
+    const dc = skillLevel >= 5 ? 12 : 10;
 
     const targetEffects: { actorId: string; effect: TargetEffect[] }[] = [];
     const targetMessagesEn: string[] = [];

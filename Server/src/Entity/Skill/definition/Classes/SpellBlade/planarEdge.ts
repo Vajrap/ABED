@@ -8,14 +8,11 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
-import { statMod } from "src/Utils/statMod";
-import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { SpellbladeSkill } from "./index";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
-import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
+
+import { getPlanarEdgeLikeDamage } from "src/Utils/getPlanarEdgeLikeDamage";
 
 export const planarEdge = new SpellbladeSkill({
   id: SpellbladeSkillId.PlanarEdge,
@@ -29,8 +26,8 @@ export const planarEdge = new SpellbladeSkill({
       th: "ควบคุมพลังงานระนาบเข้าสู่ขอบอาวุธ สร้างใบมีดจากพลังอาร์เคนบริสุทธิ์\nสร้างความเสียหายอาร์เคน <FORMULA>\n[b]ได้รับ <BuffEdgeCharge> 1 สแตค[/b] (สูงสุด 5 สแตค)\nลูกเต๋าความเสียหายของสกิลนี้ขึ้นอยู่กับความเสียหายกายภาพของอาวุธที่ถือ แต่ถ้าหากไม่ได้ถืออาวุธอยู่ ลูกเต๋าความเสียหายจะเป็น (1d6, 1d6, 1d8, 1d8, 2d4) ขึ้นอยู่กับเลเวลของสกิล",
     },
     formula: {
-      en: "(Damage Dice + <PlanarMod> + <BuffEdgeCharge> stacks) × <SkillLevelMultiplier>",
-      th: "(ลูกเต๋าความเสียหาย + <PlanarMod> + สแตค <BuffEdgeCharge>) × <SkillLevelMultiplier>",
+      en: "Damage Dice + <PlanarMod>",
+      th: "ลูกเต๋าความเสียหาย + <PlanarMod>",
     },
   },
   requirement: {},
@@ -38,7 +35,7 @@ export const planarEdge = new SpellbladeSkill({
   tier: TierEnum.common,
   consume: {
     hp: 0,
-    mp: 0,
+    mp: 2,
     sp: 0,
     elements: [],
   },
@@ -47,7 +44,7 @@ export const planarEdge = new SpellbladeSkill({
     mp: 0,
     sp: 0,
     elements: [
-      { element: "wind", min: 1, max: 1 },
+      { element: "neutral", min: 1, max: 1 },
     ],
   },
   exec: (
@@ -74,34 +71,12 @@ export const planarEdge = new SpellbladeSkill({
     }
 
     const weapon = actor.getWeapon();
-    const isBareHand = weapon.id === BareHandId.BareHand;
-    const planarMod = statMod(actor.attribute.getTotal("planar"));
-    const levelScalar = skillLevelMultiplier(skillLevel);
 
-    // Get Edge Charge stacks
-    const edgeChargeEntry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.edgeCharge);
-    const edgeChargeStacks = edgeChargeEntry?.value || 0;
-
-    // TODO: Cantrip damage - should be 1d6 since it has special effect (Edge Charge)
-    // Currently varies by level, but should be consistent 1d6 for bare hand
-    // Damage dice - don't apply bless/curse
-    const baseDamage = 
-      isBareHand ? 
-        actor.roll({ amount: 1, face: 6, applyBlessCurse: false }) : // Should be 1d6 consistently (has special effect)
-      actor.roll({ 
-        amount: weapon.weaponData.damage.magicalDamageDice.dice, 
-        face: weapon.weaponData.damage.magicalDamageDice.face, 
-        applyBlessCurse: false 
-      });
-    // Hit/Crit rolls - apply bless/curse automatically
-    const hitValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("dexterity"));
-    const critValue = actor.rollTwenty({}) + statMod(actor.attribute.getTotal("luck"));
-
-    const rawDamage = baseDamage + planarMod + edgeChargeStacks;
-    const scaledDamage = Math.max(0, rawDamage * levelScalar);
+    // Get Planar Edge-like damage (base dice + planar mod, no skill multiplier, no Edge Charge)
+    const { baseDamage, hit: hitValue, crit: critValue } = getPlanarEdgeLikeDamage(actor, weapon);
 
     const damageOutput = {
-      damage: Math.floor(scaledDamage),
+      damage: baseDamage,
       hit: hitValue,
       crit: critValue,
       type: DamageType.arcane,

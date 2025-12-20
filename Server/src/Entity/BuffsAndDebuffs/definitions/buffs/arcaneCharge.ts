@@ -38,12 +38,11 @@ export const arcaneCharge = new BuffDef({
   },
 
   resolver: function (actor: Character): { canAct: boolean; content: L10N } {
-    // Aegis Pulse should be removed when it is used. Not depleted by itself.
-    const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.arcaneCharge);
-    // Don't decrease value by itself - it's removed when the skill is used
+    // Arcane Charge doesn't decrease automatically - it persists until consumed by skills
     // Only clean up if value is 0
-    if (entry && entry.value === 0 ) {
-      actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.aegisPulse);
+    const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.arcaneCharge);
+    if (entry && entry.value === 0) {
+      actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.arcaneCharge);
     }
 
     return {

@@ -51,7 +51,7 @@ export enum ClericSkillId {
    * **Tier:** Common (Cantrip)
    * 
    * Restore HP to an ally with least HP percentage.
-   * - **Healing:** 1d4 + WIL mod
+   * - **Healing:** (1d4 + WIL mod) × skill level multiplier
    * - **Debuff Removal:** After heal, roll D20 + WIL mod vs DC13. On success, removes one random debuff from target.
    * - **Fallback:** If all allies are at full HP, performs basic attack instead.
    * - **Faith:** Gain 1 Faith stack on successful heal.
@@ -195,1305 +195,2408 @@ export enum ClericSkillId {
 }
 
 export enum SeerSkillId {
-  // Buff: Foreseen: first attack or debuff that would hit the target must roll a luk save vs DC8 + your lok mod
-  // If fail, the effect missed,
-  // Remove Foreseen after triggering
-  // Buff: lucky
-  // Debuff: BadLuck
-  // Both Lucky and Badluck did 'Nothing' bythemselves!
+  /**
+   * ## Seer System
+   * - **Foreseen Buff:** First attack or debuff that would hit the target must roll a LUK save vs DC8 + your LUK mod. If failed, the effect misses. Remove Foreseen after triggering.
+   * - **Lucky Buff:** Does nothing by itself, used by other skills (max 10 stacks).
+   * - **BadLuck Buff:** Does nothing by itself, used by other skills (max 10 stacks).
+   * - **PlanarGrab Buff:** Required for ThreadBacklash skill.
+   */
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Echo the planar energy around, dealing arcane damage to a target.
+   * - **Damage:** 1d6 + CHA mod × (1 + 0.1 × skill level) arcane damage
+   * - **On Hit:** Target must roll DC10 LUK save or decrease AB gauge by 10
+   * - **On Save Failed:** Gain 1 Lucky stack to self (reduce AB gauge by 10)
+   * - **On Save Success:** Gain 1 BadLuck stack to self
+   * 
+   * **Consume:** 3 MP
+   * **Produce:** 1 wind
+   */
   PlanarEcho = "PlanarEcho",
-  // Cantrip
-  // Desc: Echo the planar energy around, dealing 1d6 + <CHAmod> * (1 + 0.1 * skill level) arcane damage to a target.
-  // If hit, the target must roll DC10 LUKsave or decrease AB gauge by 10.
-  // If target failed to save, gain Lucky to self
 
   // -----------
-  // Foresight
+  // Foreseen Step
   // -----------
+  /**
+   * **Tier:** Common
+   * 
+   * Mark an ally with Foreseen buff for 1 turn.
+   * - **Foreseen Buff:** First attack or debuff that would hit the target must roll a LUK save vs DC8 + your LUK mod. If failed, the effect misses. Remove Foreseen after triggering.
+   * 
+   * **Consume:** 3 MP, 1 order
+   * **Produce:** 1 wind
+   */
   ForeseenStep = "ForeseenStep",
-  // Common:
-  // Mark an ally with Foreseen for 1 turn.
-  Misfortune = "Misfortune",
-  // Uncommon roll d20 + chamod VS 12 (10 at level 5) + enemy Luk mod
-  // If > deal 1d8 arcane damage and gain lucky
-  // else enemy gain 10AB gauge and give unlucky to self
-  TwistOutcome = "TwistOutcome",
-  // Rare check lucky and badLuck that you have. pick one that have most stack of equal, roll d20. > 10 === pick lucky
-  // if lucky was choosen, randomly heal one teammate with least hp percentage for (1d4 + lucky stack) * skill level mod
-  // if badluck was choose, deal slash damage on one random enemy for (1d8 + badluck) * skill level mod
-  // At level 7, use both buffs+debuffs together
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Attempt to strike an enemy with forth seeing eyes.
+   * - **Roll:** d20 + your LUK mod vs 12 + enemy LUK mod (10 + enemy LUK mod at level 5)
+   * - **On Success:** Deal 1d8 (1d10 at level 5) arcane damage and gain 1 Lucky stack.
+   * - **On Failure:** Enemy gains +10 AB gauge and you gain 1 BadLuck stack
+   * 
+   * **Consume:** 3 MP, 1 wind
+   * **Produce:** 1 order
+   */
+  FortuneStrike = "FortuneStrike",
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Twist the outcome by consuming your fortune stacks.
+   * - **Selection:** Check Lucky and BadLuck stacks. Pick the one with most stacks (if equal, roll d20 > 10 = pick Lucky)
+   * - **If Lucky Chosen:** Randomly heal one teammate with least HP percentage for (1d4 + Lucky stacks) × skill level multiplier
+   * - **If BadLuck Chosen:** Deal slash damage to one random enemy for (1d8 + BadLuck stacks) × skill level multiplier
+   * - **Level 7:** Use both buffs/debuffs together
+   * 
+   * **Consume:** 2 different elements (order + chaos), 0 elements produce (random 0-1)
+   */
+  TwistOutcome = "TwistOutcome",
+
+  /**
+   * **Tier:** Rare
+   * 
+   * See the future, gain Precognition buff for 1 turn.
+   * - **Precognition Buff:** Next attacker that targets you must roll their LUK save vs DC10 + your LUK mod + (skill level - 1) or it will surely miss. Remove the buff after checking.
+   * - **Level 5:** If the attacker misses, you gain 1 order
+   * - **Level 7:** When used, roll a d20 + LUK mod. If passed (DC10), gain 1 more turn of Precognition buff
+   * 
+   * **Consume:** 1 order, 1 wind
+   * **Produce:** 1 water
+   */
   Precognition = "Precognition",
-  // Rare
-  // Desc: See the future, gain Precognition buff for 1 turn:
-  // Procognition: next attacker that target you must roll their LUKsave vs DC10+<your LUKmod>+(skill level - 1) or it will surely miss, remove the buff after checking.
-  // At level 5 if the attacker miss, you gain 1 order
-  // At level 7 when used, roll a d20 + <LUKmod> if passed, gain 1 more turn of Precognition buff
 
   // -----------
   // Manipulator
   // -----------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Look into the planar thread and pull it away from an enemy.
+   * - **Damage:** 1d4 + CHA mod arcane damage
+   * - **Steal Element:** Roll d14 (-1 per skill level) dice. If passed (DC10), randomly steal 1 element from the enemy
+   * 
+   * **Consume:** 1 wind
+   * **Produce:** 0-1 neutral (random)
+   */
   ThreadSnip = "ThreadSnip",
-  // Uncommon
-  // Desc: Look into the planar thread and pulled it away from an enemy: Deal 1d4 + <CHAmod> to an enemy, roll D14 (-1 per skill level) dice. If passed, randomly steal 1 element from the enemy
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Grab onto the planar thread with bare hands, risking misfortune.
+   * - **Save:** Roll DC 15 - skill level LUK save
+   * - **On Fail:** Gain 2 stacks of BadLuck
+   * - **On Success:** Roll 3d3 (each die represents order, water, and wind). Gain resource equal to (roll - 1) for each (0-2). Gain PlanarGrab buff
+   * 
+   * **Consume:** 1 wind
+   * **Produce:** None (resources come from skill effect)
+   */
   GrabOnPlanarThreadWithBareHand = "GrabOnPlanarThreadWithBareHand",
-  // Rare
-  // Desc: Roll DC 15 - skill level Luk save
-  // on fail roll, gain 2 stack of badluck
-  // on success, roll 3d3, each dice represent order, water and wind, gain resource equal to the roll - 1 (0 - 2): Gain PlanarGrab buff
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Release the stored planar energy in a devastating backlash.
+   * - **Requirement:** Must have PlanarGrab buff
+   * - **Effect:** Consume ALL elemental resources you have
+   * - **Damage:** For each element consumed, deal 1d6 arcane damage to a random enemy
+   * - **Consequences:**
+   *   - If total resources consumed ≤ 2: Gain 1 BadLuck stack
+   *   - If total resources consumed ≥ 5: Gain 1 Lucky stack
+   * - **After Use:** Remove PlanarGrab buff
+   * 
+   * **Consume:** 0 elements (consumes all elemental resources via skill effect), PlanarGrab buff
+   * **Produce:** None
+   */
   ThreadBacklash = "ThreadBacklash",
-  // Rare:
-  // Need PlabarGrab
-  // Consume ALL elemental resources. one have
-  // for each element consume deal 1d6 arcane damage to a random enemy.
-  // If total resources consumed ≤ 2:
-  //   gain 1 BadLuck.
-  // If total resources consumed ≥ 5:
-  //   gain 1 Lucky.
-  // remove planarGrab after use
 }
 
 export enum MageSkillId {
+  // ---------------
   // Arcane Elemental Skills
-  // Arcane Charge: (buff) Do nothing
+  // Arcane Charge: (buff) Does nothing, used by other skills
+  // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Launch a bolt of arcane energy.
+   * - **Damage:** (1d6 + planar mod) × skill level multiplier arcane damage to a target
+   * - **Effect:** Gain 1 Arcane Charge stack
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 neutral
+   */
   ArcaneBolt = "ArcaneBolt",
-  // Cantrip: 1d6 + planar mod arcane damage to a target. Gain Arcane Charge stack.
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Shield yourself with arcane energy.
+   * - **Effect:** Gain Arcane Shield buff for 1 turn
+   * - **Arcane Shield:** When attacked, roll d20 + planar mod END save. If passed, negate that attack and gain 1 Arcane Charge stack
+   * 
+   * **Consume:** 3 MP, 1 neutral
+   * **Produce:** 1 neutral
+   */
   ArcaneShield = "ArcaneShield",
-  // Uncommon: Gain Arcane Shield buff for 1 turn. Arcane Shield: When attacked, roll a d20 + planar mod ENDsave, if passed, negate that attack and gain 1 Arcane Charge stack.
+
+  /**
+   * **Tier:** Common
+   * 
+   * Shoot multiple arcane missiles at random targets.
+   * - **Missiles:** Shoot 3 arcane missiles at 3 random targets
+   * - **Damage per Missile:** 1d4 + planar mod arcane damage
+   * - **Level 5:** Each missile adds damage based on Arcane Charge stacks (rounded down)
+   * 
+   * **Consume:** 3 MP, 1 neutral
+   * **Produce:** 1 chaos
+   */
   ArcaneMissiles = "ArcaneMissiles",
-  // Common: Shoot 3 arcane missiles at 3 random targets, each deal 1d4 + planar mod arcane damage. At level 5, each missile add damage based on Arcane Charge stacks rounded down.
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Unleash a surge of planar energy across the front line.
+   * - **Damage:** 1d8 + planar mod arcane damage to all enemies in front row (+2 raw damage at level 5)
+   * - **Charge Bonus:** If arcane charge stacks ≥ 3, deal additional 1d4 damage and remove 3 charges
+   * 
+   * **Consume:** 4 MP, 2 neutral
+   * **Produce:** 1 chaos
+   */
   PlanarSurge = "PlanarSurge",
-  // Uncommon: Deal 1d8 + planar mod arcane damage to all enemies in the front row. If arcane charge stacks >= 3, deal additional 1d4 damage and remove 3 charges. At level 5 gain additional + 2 raw arcane damage.
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Convert Arcane Charges into sustained power.
+   * - **Effect:** Consume all Arcane Charge stacks, restore mana equal to stacks × 2
+   * - **Buff:** Gain Arcane Battery buff stacks for 3 turns (4 turns at level 5) based on consumed Arcane Charge stacks
+   * - **Arcane Battery:** Each stack gives +1 damage to all arcane damage attacks
+   * 
+   * **Consume:** 5 MP, all Arcane Charge stacks, 3 chaos
+   * **Produce:** 1 neutral
+   */
   ArcaneBattery = "ArcaneBattery",
-  // Rare: Consume all Arcane Charge Stacks, restore mana equal to stack * 2, and gain stacks of Arcane Battery buff for 3 turns (4 at level 5) based on the stack of Arcane Charge. Arcane Battery: Each stack gives additional 1 damage to all planar mod.
+
+  /**
+   * **Tier:** Epic
+   * 
+   * Unleash all stored arcane energy in a devastating eruption.
+   * - **Effect:** Consume all Arcane Charge stacks
+   * - **Damage:** Each stack deals 2d6 damage to random enemies
+   * 
+   * **Consume:** 6 MP, all Arcane Charge stacks, 3 chaos
+   * **Produce:** 1 neutral
+   */
   PlanarEruption = "PlanarEruption",
-  // Epic: Consume all Arcane Charge Stacks, Each stack deal 2d6 damage on random enemies
 
+  // ---------------
   // Fire Elemental Skills
-  // burn: (debuff) Take damage equal to burn stack every turn.
+  // Burn: (debuff) Take damage equal to burn stack every turn
+  // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Hurl a bolt of fire at a target.
+   * - **Damage:** (1d6 + planar mod) × skill level multiplier fire damage to a target
+   * - **Effect:** Chance to apply Burn debuff
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 fire
+   */
   FireBolt = "FireBolt",
-  // Cantrip: 1d6 + planar mod fire damage to a target. chance to burn.
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Unleash a wave of fire across the front line.
+   * - **Damage:** 1d8 + planar mod fire damage to all enemies in front row
+   * - **Save:** On hit, target must roll DC10 + planar mod END save or get 2-3 burn stacks
+   * 
+   * **Consume:** 4 MP, 2 fire
+   * **Produce:** 1 chaos
+   */
   BurningHand = "BurningHand",
-  // Uncommon: 1d8 + planar mod fire damage to all enemies in the front row. On hit, target must roll DC10 + planar mod ENDsave or get 2-3 burn stacks.
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Exploit existing burn effects to deal damage and heal.
+   * - **Damage:** Attack all enemies with burning debuff, dealing 1 or 1d2 per stack inferno damage
+   * - **Healing:** Heal self for total damage × (0.1 × skill level) (+ 1d2 per stack at level 5)
+   * 
+   * **Consume:** 3 MP, 1 fire, 1 chaos
+   * **Produce:** 1 fire
+   */
   Backdraft = "Backdraft",
-  // Uncommon: Attack all enemies with 'burning' 1 or 1d2 per stack fire damage. Then heal self for total damage × (0.1 × skill level) {5} + 1d2 per stack.
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Unleash a blazing sphere of fire that explodes upon impact.
+   * - **Targets:** Engulf 1–6 enemies in a devastating inferno
+   * - **Damage:** 1d12 + planar mod + 0.5 × skill level fire damage to each target
+   * - **Save:** On hit, target must roll DC10 + planar mod END save or get 1–2 burn stacks
+   * 
+   * **Consume:** 5 MP, 2 fire, 2 chaos
+   * **Produce:** 1 fire
+   */
   FireBall = "FireBall",
-  // Rare: Unleash a blazing sphere of fire that explodes upon impact, engulfing 1–6 enemies in a devastating inferno. Deal 1d12 + planar mod + 0.5 × skill level fire damage to each target. On hit, target must roll DC10 + planar mod ENDsave or get 1–2 burn stacks.
 
+  // ---------------
   // Water Elemental Skills
-  // Soaked: when attacked with lightning get * 2 damage, once soaked stacked to 5, take 1d6 true water damage.
+  // Soaked: When attacked with lightning, take ×2 damage. Once soaked stacks to 5, take 1d6 true water damage
+  // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Lash a target with water.
+   * - **Damage:** (1d6 + planar mod) × skill level multiplier water damage to a target
+   * - **Effect:** Chance to spill and heal an ally for 1d3 HP
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 water
+   */
   HydroLash = "HydroLash",
-  // Cantrip: 1d6 + planar mod water damage to a target. chance to spilled and heal an ally for 1d3.
+
+  /**
+   * **Tier:** Common
+   * 
+   * Blast a target with pressurized water.
+   * - **Damage:** 1d6 + planar mod water damage to a target
+   * - **Effect:** Add 1 Soaked debuff to target. If soaked reaches 5 stacks, trigger 1d6 true water damage
+   * 
+   * **Consume:** 3 MP, 1 water
+   * **Produce:** 1 neutral
+   */
   AquaBlast = "AquaBlast",
-  // Common: 1d6 + planar mod water damage to a target. add 1 soaked debuff, if soaked reached 5 stack and triggered damage,
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Release a flowing pulse of water that may chain between targets.
+   * - **Chain:** To chain, roll DC15 vs control + skill level
+   * - **Effect:** Deal 1d6 + planar + skill mod damage to enemies, or heal 1d3 + planar + skill mod HP to allies
+   * 
+   * **Consume:** 3 MP, 2 water
+   * **Produce:** 1 chaos
+   */
   CascadePulse = "CascadePulse",
-  // Uncommon: Release a flowing pulse of water that may chain between allies and enemies; To chain, roll DC15 vs control + skill level, Deal 1d6 + planar + skillmod or heal 1d3 + planar + skillmod
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Drag an enemy into overwhelming water pressure like abyssal depths.
+   * - **Damage:** 1d12 + planar + skill level mod water damage
+   * - **Soaked:** Add 2 stacks of Soaked debuff (3 stacks at level 5)
+   * 
+   * **Consume:** 4 MP, 2 water, 1 chaos
+   * **Produce:** 1 neutral
+   */
   CrushingDepths = "CrushingDepths",
-  // Rare: Drag an enemy into overwhelming water pressure like abyssal depths, deal massive 1d12 + planar + skillLvlMod damage and add 2 (3 at level 5) stacks of soaked.
 
+  // ---------------
   // Earth Elemental Skills
-  // Stone skin: +2 pDef
-  // StoneBounded: (debuff) +2 pDef but upon taking turn the character needs to roll DC12 str save or can't take turn, if the save success, remove stoneBounded debuff,
+  // Stone Skin: +2 pDEF
+  // StoneBounded: (debuff) +2 pDEF but upon taking turn must roll DC12 STR save or can't take turn. If save succeeds, remove StoneBounded debuff
+  // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Hurl a sharp fragment of stone at a target.
+   * - **Damage:** (1d6 + planar mod) × skill level multiplier earth damage to a target
+   * - **Effect:** Low chance to give self Stone Skin buff for 1 turn
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 earth
+   */
   StoneShard = "StoneShard",
-  // Cantrip: Hurl a sharp fragment of stone at a target, dealing 1d6 earth damage, have a low chance to give self a 'stone skin' for 1 turn
-  StoneSkin = "StoneSkin",
-  // Common: Give self 'Stone Skin' for 2 turns
-  EarthernGrip = "EarthernGrip",
-  // Uncommon: Melee: dealing 1d8 enemy in front row, if you have [stone skin], remove it and add [stoneBounded] to the enemy for 2 turns
-  TremorWave = "TremorWave",
-  // Uncommon: Send a ground shock through the front row, damaging enemies in front line with 1d8 earth damage:
 
+  /**
+   * **Tier:** Common
+   * 
+   * Harden your skin with stone-like protection.
+   * - **Effect:** Give self Stone Skin buff for 2 turns (+2 pDEF)
+   * 
+   * **Consume:** 2 MP 1 earth
+   * **Produce:** 1 order
+   */
+  StoneSkin = "StoneSkin",
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Grip an enemy with earthen power.
+   * - **Damage:** 1d8 earth damage to an enemy in front row (melee)
+   * - **Requirement:** Must have Stone Skin buff (removed after use)
+   * - **Effect:** Add StoneBounded debuff to the enemy for 2 turns
+   * 
+   * **Consume:** 3 SP, 1 earth, 1 order
+   * **Produce:** 1 neutral
+   */
+  EarthernGrip = "EarthernGrip",
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Send a ground shock through the front row.
+   * - **Damage:** 1d8 earth damage to all enemies in front line
+   * 
+   * **Consume:** 4 MP, 2 earth
+   * **Produce:** 1 neutral
+   */
+  TremorWave = "TremorWave",
+
+  // ---------------
   // Wind Elemental Skills
-  // Tailwind: (buff) each stack increase AB gauge gain, decrease every turn.
-  // WindFury: during windfury, Tailwind won't decrease.
+  // Tailwind: (buff) Each stack increases AB gauge gain, decreases every turn
+  // WindFury: During WindFury, Tailwind won't decrease
+  // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Slice a target with cutting wind.
+   * - **Damage:** (1d6 + planar mod) × skill level multiplier wind damage to a target
+   * - **Effect:** Gain 1 stack of Tailwind
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 wind
+   */
   WindSlice = "WindSlice",
-  // Cantrip: Deal 1d6 wind damage to a target. gain 1 stack of Tailwind.
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Create a sword out of wind and slash an enemy.
+   * - **Damage:** 1d8 wind damage to an enemy (melee)
+   * - **Save:** Enemy rolls DC10 save or gains 2 stacks of Bleed debuff
+   * 
+   * **Consume:** 3 SP, 1 neutral
+   * **Produce:** 1 wind
+   */
   GaleSlash = "GaleSlash",
-  // Uncommon: Melee: create a sword out of wind, dealing 1d8 damage to an enemy, enemy rolls DC10 saves or gain 2 stacks of bleed
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Release cutting winds that repeat based on your momentum.
+   * - **Damage:** 1d6 wind damage to an enemy
+   * - **Repeat:** Every 2 stacks of Tailwind will repeat the attack
+   * 
+   * **Consume:** 4 MP, 2 wind
+   * **Produce:** 1 neutral
+   */
   RazorGust = "RazorGust",
-  // Rare: Release cutting winds dealing 1d6 damage to an enemy. every 2 stacks of tailwind will repeat the attack.
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Enter a heightened flow state with wind energy.
+   * - **Effect:** Gain 2 stacks of Tailwind (3 stacks at level 7) and WindFury buff for 3 turns (4 turns at level 5)
+   * - **WindFury:** During WindFury, Tailwind won't decrease
+   * 
+   * **Consume:** 5 MP, 2 wind
+   * **Produce:** 1 neutral
+   */
   WindFury = "WindFury",
-  // Rare: Enter a heightened flow state where give 2 (3 at level 7) stack of Tailwind and WindFury buff for 3 turns (4 turns at level 5).
 }
 
 export enum MysticSkillId {
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Prepare a defensive palm technique.
+   * - **Effect:** Give self Reverse Palm buff for 1 turn
+   * - **Reverse Palm:** When attacked, roll d20 WIL save. If passed, deal 1d6 blunt damage + DEX mod × (1 + 0.1 × skill level) to the attacker and negate that attack, then remove the buff. If failed, remove the buff and take damage normally
+   * - **Requirement:** Must be barehand
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 neutral
+   */
   ReversalPalm = "ReversalPalm",
-  // Cantrip:
-  // Must be bare hand
-  // After using, give self a buff 'Reverse Palm' for 1 turn:
-  // Reverse Palm: when attacked, roll a d20 willpower save, if passed, deal 1d6 blunt damage + dex mod *(1 + 0.1 * skill level) to the attacker and negate that attack, Then remove the buff, if fail, remove the buff and take damage normally.
 
-  // -------------
+  // ---------------
   // Mist
-  // -------------
+  // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Shift like mist to a safer position.
+   * - **Movement:** Move to the backline if you are in the front row; if already in the back row, gain evasion instead
+   * - **Cleanse:** Remove Slow or Bind if present
+   * - **Dodge:** Gain +3 dodge roll for 1 turn (2 turns at skill level 5)
+   * 
+   * **Consume:** 3 SP, 1 neutral
+   * **Produce:** 1 wind
+   */
   MistStep = "MistStep",
-  // Uncommon
-  // “Shift like mist to a safer position. Move to the backline if you are in the front row; if already in the back row, gain evasion instead. Remove Slow or Bind if present. Gain +3 dodge roll for 1 turn (increases to 2 turns at skill level 5).”
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Pierce through the mist with precise strikes.
+   * - **Damage:** (1d8 + DEX mod) × skill level multiplier pierce damage to an enemy, front first
+   * - **Back Row Bonus:** If currently in back row, try moving to front row first. If move completed, add WIL mod to damage formula before × skill mod and get +2 dodge for 1 turn
+   * - **Requirement:** Must be barehand
+   * 
+   * **Consume:** 3 SP, 1 wind
+   * **Produce:** 1 water
+   */
   MistPierce = "MistPierce",
-  // Uncommon
-  // Attack deal (1d8 + dex mod) * level multiplier pierce damage (must be barehand) to an enemy front first
-  // If currently the user is in back row, try moving to front row first, if move completed add will mod to damage formular before * with skill mod and get + 2 dodge for 1 turn
 
-  // -------------
+  // ---------------
   // Absorber
-  // -------------
+  // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Gain planar absorption to convert incoming magic into resources.
+   * - **Effect:** Gain Planar Absorption buff for 2d3 stacks + INT mod + (0.01 × skill level)
+   * - **Absorption:** If attacked by a magic spell, absorb damage up to the stacks of Planar Absorption buff
+   * - **Resource Conversion:** Every 4 damage of each type that is absorbed is turned into 1 neutral resource
+   * 
+   * **Consume:** 3 MP 2 water
+   * **Produce:** 1 neutral
+   */
   PlanarAbsorption = "PlanarAbsorption",
-  // Gain 'Planar Absorption' buff for 2d3 stacks + intelligence mod + 0.01 times per skill level, If Attacked by a magic spell, absorb damage up to the stacks of planar absoprtion buff,
-  // Every 4 damage of each type that is absorbed turned into 1 neutral resource.
-  BorrowedMomentum = "BorrowedMomentum",
-  // Uncommon
-  // Deal 1d6 + dexmod * skill level modifier blunt damage (or palm strike damage), must be barehand, to an enemy
-  // If enemy has <= 50 AB gauge, gain + 15 ab gauge
-  // else decrease enemy AB gauge for 15 points
 
-  // -------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Borrow momentum from your enemy to enhance your own speed.
+   * - **Damage:** 1d6 + DEX mod × skill level modifier blunt damage (or palm strike damage) to an enemy
+   * - **AB Gauge Manipulation:** If enemy has ≤50 AB gauge, gain +15 AB gauge. Else, decrease enemy AB gauge by 15
+   * - **Requirement:** Must be barehand
+   * 
+   * **Consume:** 3 SP, 1 wind 1 water
+   * **Produce:** 1 neutral
+   */
+  BorrowedMomentum = "BorrowedMomentum",
+
+  // ---------------
   // Mind
-  // -------------
+  // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Cast a veil on one frontline ally, making them harder to target or hit. (+ 1 dodge roll for 1 turn)
+   * - **Effect:** Minor concealment/dodge/accuracy debuff to enemies targeting the veiled ally
+   * - **Role:** Soft-support defensive buff
+   * - **Target:** One frontline ally
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 neutral
+   */
   InnerVeil = "InnerVeil",
-  // Cast a veil on one frontline ally, make them harder to target or hit.
-  // (Minor concealment / dodge / accuracy debuff to enemy)
-  // Role: soft-support defensive buff.
 }
 
 export enum RogueSkillId {
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Throw knives at multiple targets.
+   * - **Targets:** Throw knives at 2 targets (4 targets at level 5)
+   * - **Damage per Knife:** 1d4 + DEX mod × skill level multiplier pierce damage
+   * - **Note:** Targets can be repeated (random selection)
+   * - **Range:** Any range
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 neutral
+   */
   ThrowingKnives = "ThrowingKnives",
-  // Cantrip
-  // Any range
-  // Throw knives at 2 targets, each deals 1d4 + Dex mod * (1 + 0.1 * skill level) pierce damage.
-  // target can be repeat, (so just get random again and again, no thing special here)
-  // at level 5, add 2 more knives to the throw
 
   // ---------------
   // Stealth
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Attempt to hide from enemies.
+   * - **Save:** Roll d20 + DEX mod vs DC10 + (highest enemy INT mod) + (row === 'front' ? 5 : 0) (DC8 + front row penalty 3 at level 5)
+   * - **Effect:** If passed, gain Hiding buff for 1 turns
+   * 
+   * **Consume:** 3 SP, 2 neutral
+   * **Produce:** 1 chaos
+   */
   Hiding = "Hiding",
-  // Uncommon
-  // Try to get hiding, roll D20 + dex mod, against 10 + (higest enemy int mod) + ( row === 'front' ? 5 : 0)
-  // if passed get hiding buff for 2 turns,
-  // at level 5, base DC = 8, front row penalty = 3
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike from stealth for devastating damage.
+   * - **Requirement:** Must have Hiding buff active
+   * - **Damage:** Deal weapon damage + DEX mod × skill level multiplier slash damage
+   * - **Bonus:** +50% damage when used from Hiding
+   * 
+   * **Consume:** 3 SP,
+   * **Produce:** 1 chaos
+   */
   Backstab = "Backstab",
 
   // ---------------
   // Melee
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Slash with a cut that causes bleeding.
+   * - **Damage:** Weapon damage + DEX mod × skill level multiplier slash damage
+   * - **Save:** Target must roll DC10 (DC12 at level 5) END save or get 1d3 bleed stacks
+   * - **Bleed Debuff:** Takes 1d3 damage per turn for 3 turns
+   * - **Requirement:** Requires sword, dagger, or blade
+   * 
+   * **Consume:** 3 SP, 2 neutral
+   * **Produce:** 1 wind
+   */
   BleedingCut = "BleedingCut",
-  // Uncommon
-  // require sword dagger or blade
-  // Deal weapons damage + Dex mod * (1 + 0.1 * skill level) slash
-  // target must roll DC10 (DC12 at lvl 5) Endurance save. or get 1d3 bleed stacks (debuff)
-  // Bleed: takes 1d3 damage per turn for 3 turns.
+
+  /**
+   * **Tier:** Common
+   * 
+   * Slice to cripple the enemy's movement.
+   * - **Damage:** Weapon damage + DEX mod × skill level multiplier slash damage
+   * - **Save:** Target must roll DC10 END save or lose 10 AB gauge
+   * - **Requirement:** Requires sword, dagger, or blade
+   * 
+   * **Consume:** 2 SP 2 neutral
+   * **Produce:** 1 wind
+   */
   CrippingSlice = "CrippingSlice",
-  // Common
-  // require sword dagger or blade
-  // Deal weapons damage + Dex mod * (1 + 0.1 * skill level) slash
-  // target must roll DC10 Endurance save. or lose 10 AB gauge
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike when the enemy is vulnerable.
+   * - **Damage:** Weapon damage
+   * - **Speed Bonus:** If target is slower than you, deal additional 1d4 + DEX mod damage
+   * - **Level 5:** Gain +15 AB gauge
+   * - **Requirement:** Requires sword, dagger, or blade
+   * 
+   * **Consume:** 3 SP, 2 wind
+   * **Produce:** 1 neutral
+   */
   OpportunistStrike = "OpportunistStrike",
-  // Uncommon
-  // require sword dagger or blade
-  // Deal weapons damage
-  // If target is slower than you get additional 1d4 + dex mod damage
-  // at level 5 gain +15 ab gauge
 
   // ---------------
   // Range
   // ---------------
+  /**
+   * **Tier:** Common
+   * Dash away while attacking, repositioning yourself.
+   * - **Movement:** Change position (front ↔ back)
+   * - **Effect:** Gain retreat buff, for 1 turn
+   * 
+   * **Consume:** 2 SP, 1 neutral
+   * **Produce:** 1 wind
+   */
   RetreatDash = "RetreatDash",
-  // Change position + get dodge
 
+  /**
+   * **Tier:** Common
+   * 
+   * Pin an enemy with a precise shot.
+   * - **Damage:** 1d6 + DEX mod pierce damage to a target
+   * - **Save:** Target must roll DC10 END save
+   * - **On Fail:** Target loses 10 AB gauge (15 at level 5)
+   * - **Requirement:** Requires ranged weapon (any range)
+   * 
+   * **Consume:** 2 SP 1 neutral
+   * **Produce:** 1 wind
+   */
   PinningShot = "PinningShot",
-  // Common
-  // Any range, requires ranged weapon
-  // Deal 1d6 + Dex mod pierce damage to a target
-  // Target must roll DC10 Endurance save
-  // On fail: target loses 10 AB gauge
-  // At level 5: AB loss increases to 15
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Split your shot to hit multiple targets.
+   * - **Primary Target:** Deal 1d6 + DEX mod pierce damage
+   * - **Second Target:** Select a second random enemy, deal half damage (rounded down)
+   * - **Bleed Bonus:** If the primary target is bleeding, second hit deals full damage instead
+   * - **Requirement:** Requires ranged weapon or throwing knives (any range)
+   * 
+   * **Consume:** 3 SP, 2 wind
+   * **Produce:** 1 neutral
+   */
   SplitTrajectory = "SplitTrajectory",
-  // Uncommon
-  // Any range, requires ranged weapon or throwing knives
-  // Choose a primary target:
-  // - Deal 1d6 + Dex mod pierce damage
-  // Then select a second random enemy:
-  // - Deal half damage (rounded down)
-  // If the primary target is bleeding, second hit deals full damage instead
 }
 
 export enum SpellbladeSkillId {
-  // and generate "Edge Charge". Buff
-  // Edge Charge buff maximum 5 stacks, no limit on duration.
-  
+  /**
+   * ## Edge Charge System
+   * Edge Charge is a buff that can stack up to 5 times, no limit on duration.
+   * - Scales damage of Planar Edge and "Planar Edge-like damage" skills
+   * - Gained from: ChargeSurge, SpellParry (when hit by spell)
+   * - Consumed by: EdgeBurst
+   */
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Strike with planar energy, the core spellblade technique.
+   * - **Damage:** Arcane damage, melee (see position modifier)
+   *   - **With Weapon:** Weapon's physical damage dice + planar mod
+   *   - **No Weapon:** Damage dice (1d6, 1d6, 1d8, 1d8, 2d4 for levels 1-5) + planar mod
+   * - **Effect:** Gain 1 Edge Charge stack (max 5 stacks)
+   * - **Note:** Damage dice scales with skill level, but damage does not get skill level multiplier. Other skills with "Planar Edge-like damage" benefit from your Planar Edge skill level by using the same dice.
+   * - **Requirement:** Must equip sword, blade, dagger, or barehand (no weapon)
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 neutral
+   */
   PlanarEdge = "PlanarEdge",
-  // Cantrip, auto attack, core idea for spell blade
-  // Dealing arcane damage, melee (see positionModifier)
-  // must equip sword, blade, dagger or barehand(no weapon)
-  // If weapon exist, deal weapon damage + planar mod + edge charge stacks * (1 + 0.1 * skill level) arcane damage.
-  // If no weapon, damage dice based on skill Level, 1d6, 1d6, 1d8, 1d8 and 2d4 (level 1-5) + planar mod + edge charge stacks * (1 + 0.1 * skill level) arcane damage.
-  // Note: Does NOT generate Edge Charges, but scales damage with existing Edge Charge stacks. Other skills with "Planar Edge-like damage" also benefit from Edge Charge stacks.
-  // Produce 1 neutral
-  
+
   // ------------
   // Swift blade
   // ------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Slash with wind-infused planar energy.
+   * - **Damage:** (Planar Edge-like damage) × skill level multiplier wind damage
+   * - **Save:** Target rolls DC8 + (user planar mod) END save or gets Bleed debuff for 1d2 turns
+   * - **Range:** Any range
+   * 
+   * **Consume:** 3 SP, 1 wind
+   * **Produce:** 1 neutral
+   */
   WindSlash = "WindSlash",
-  // Uncommon
-  // Any range
-  // Deal (Planar edge-like damage) * (1 + 0.1 * skill level) wind damage.
-  // consume 1 wind, produce natural
-  // Target roll DC8 + (user planar mod) endurance save or get bleed for 1d2 turn.
-  GaleRush = "GaleRush",
-  // Uncommon
-  // Melee, front first
-  // Deal (Planar edge-like damage) * (1 + 0.1 * skill level) wind damage.
-  // If wind resource exists, after use, get + 5 abgauge (+10 at level 5)
-  // consume 1 neutral, produce 1 wind
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Rush forward with gale force.
+   * - **Damage:** (Planar Edge-like damage) × skill level multiplier wind damage
+   * - **AB Gauge:** If wind resource exists, after use, gain +5 AB gauge (+10 at level 5)
+   * - **Range:** Melee, front first
+   * 
+   * **Consume:** 3 SP, 1 neutral
+   * **Produce:** 1 wind
+   */
+  GaleRush = "GaleRush",
 
   // --------------
   // Mage Hunter
   // --------------
+  /**
+   * **Tier:** Rare
+   * 
+   * Parry spells with planar expertise.
+   * - **Effect:** Gain Spell Parry buff for 1 turn
+   * - **Spell Parry:** Reduce next spell's damage by (5 + INT mod)
+   * - **Charge Gain:** If attacked by a spell, gain 1 Edge Charge (2 if 0 damage taken)
+   * - **Level 5:** Also gain 1 Edge Charge when used
+   * 
+   * **Consume:** 4 SP, 1 wind
+   * **Produce:** 1 chaos
+   */
   SpellParry = "SpellParry",
-  // rare
-  // Get Spell Parry buff for 1 turn.
-  // Spell Parry: reduce next spell’s damage by (5 + Int mod).
-  // If attacked by a spell, gain 1 Edge Charge (2 if 0 damage taken).
-  // At level 5 also produce 1 Edge Charge when used.
-  // Comsume 1 wind, produce 1 chaos
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Siphon planar energy and mana from enemy casters.
+   * - **Damage:** Weapon damage + planar mod × skill level multiplier arcane damage
+   * - **MP Damage:** Additionally, deal MP damage equal to (1d4 + INT mod + enemy planar mod / 2) × skill level multiplier arcane damage
+   * - **Caster Bonus:** If enemy's max MP > your max MP, deal additional 1d6 MP damage (targets casters who typically have higher max MP)
+   * 
+   * **Consume:** 5 SP, 2 chaos
+   * **Produce:** 1 neutral
+   */
   PlanarSiphon = "PlanarSiphon",
-  // Rare
-  // deal weapon damage + planar mod * skill level mod arcane damage
-  // Additionally, deal MP damage equal to (1d4 + int mod + enemy planar mod / 2) * skill level mod arcane damage
-  // If enemy's max MP > your max MP: deal additional 1d6 MP damage (targets casters who typically have higher max MP)
-  // consume 2 chaos, produce 1 neutral
-  
 
   // ---------------
   // Edge Charge
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Surge with edge charges, building up power.
+   * - **Effect:** Gain 1 Edge Charge (2 at level 5)
+   * - **Buff:** Also gain ChargeSurge buff for 3 turns, each turn gain +1 Edge Charge
+   * - **Cooldown:** 3 turns
+   * 
+   * **Consume:** 3 SP 2 wind
+   * **Produce:** 1 fire
+   */
   ChargeSurge = "ChargeSurge",
-  // Uncommon
-  // Gain 1 Edge Charge.  (2 at level 5).
-  // Also gain ChargeSurge buff for 3 turns, each turn gain +1 Edge Charge;
-  // 3 turns cooldown
+
+  /**
+   * **Tier:** Rare
+   * 
+   * Unleash all stored edge charges in a devastating burst.
+   * - **Effect:** Consume ALL Edge Charges (min 1)
+   * - **Damage:** Weapon damage (or same as Planar Edge) + Planar mod + (1d2 per Edge Charge stack) × skill level multiplier arcane damage
+   * - **Requirement:** Must equip sword, blade, dagger, or barehand (no weapon)
+   * - **Range:** Close range, melee (see position modifier)
+   * 
+   * **Consume:** 5 SP, 1 wind 1 fire
+   * **Produce:** 0
+   */
   EdgeBurst = "EdgeBurst",
-  // rare
-  // Consume ALL Edge Charges (min 1).
-  // Close range, melee (see positionModifier)
-  // must equip sword, blade, dagger or barehand(no weapon)
-  // Strike target for weapon dmg(or the same as Planar Edge) + Planar mod + (1d2 per edge charge stacks) * (1 + 0.1 * skill level) arcane damage.
-  // consume 2 chaos produce nothing
 }
 
 export enum ShamanSkillId {
-  // Ward: Reduce incoming damage by (3 + WIL mod / 2) per attack, up to 5 stacks per turn
+  /**
+   * ## Ward System
+   * Ward: Reduce incoming damage by (3 + WIL mod / 2) per attack, up to 5 stacks per turn
+   */
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Mend the spirit of an injured ally.
+   * - **Healing:** Heal a random injured ally for (1d4 + WIL mod) × skill level multiplier HP
+   * - **Chaos Roll:** Roll d20: if 11+, healing is halved and target gains +1 chaos instead
+   * - **Cooldown:** 3 turns
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 chaos
+   */
   MendSpirit = "MendSpirit",
-  // Cantrip
-  // Heal a random injured ally for (1d4 + WIL mod) * skill level multiplier HP.
-  // Roll D20: if 11+, healing is halved and target gains +1 chaos instead.
-  // produce 1 chaos, cooldown 3 turns
 
   // ---------------
   // Curse
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Mark an enemy with a hex sigil, making them vulnerable to curse effects.
+   * - **Effect:** Apply HexMark debuff to target for 2 turns (3 turns at level 5)
+   * - **HexMark:** While marked, target takes +1d3 extra chaos damage from all sources
+   * - **Curse Amplification:** If target already has Hexed or Cursed debuff when marked, deal 1d4 + planar mod chaos damage and extend those debuffs by 1 turn
+   * - **Level 5:** When any curse debuff is applied to a marked target, deal additional 1d2 chaos damage
+   * 
+   * **Consume:** 3 MP, 1 chaos
+   * **Produce:** 1 neutral
+   */
   HexMark = "HexMark",
-  // Uncommon: Mark an enemy with a hex sigil, making them vulnerable to curse effects.
-  // Apply HexMark debuff to target for 2 turns (3 at level 5).
-  // While marked, target takes +1d3 extra chaos damage from all sources.
-  // If target already has Hexed or Cursed debuff when marked, deal 1d4 + planar mod chaos damage and extend those debuffs by 1 turn.
-  // At level 5: When any curse debuff is applied to a marked target, deal additional 1d2 chaos damage.
-  // consume 1 chaos, produce 1 neutral
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Hex an enemy with rot, weakening them over time.
+   * - **Damage:** 1d4 + planar mod + 0.5 × skill level chaos damage to a target
+   * - **Save:** Target must roll DC10 + CONTROL mod WIL save or get Hexed debuff for 2 turns
+   * - **Hexed Debuff:** Reduces endurance by 2 and deals 1d2 damage per turn
+   * 
+   * **Consume:** 3 MP, 1 chaos
+   * **Produce:** 1 neutral
+   */
   HexOfRot = "HexOfRot",
-  // Uncommon: Deal 1d4 + planar mod + 0.5 * skill level chaos damage to a target.
-  // Target must roll DC10 + control mod WILsave or get Hexed debuff for 2 turns.
-  // Hexed: reduces endurance by 2 and deals 1d2 damage per turn.
-  // consume 1 chaos, produce 1 neutral
   
   // ---------------
   // Blessing
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Rattle spirits to heal your allies.
+   * - **Target:** Grant 1 + 1d(skillLevel) random allies SpiritRattle buff
+   * - **Duration:** (1 + floor(skillLevel × 0.5)) turns (capped at skillLevel)
+   * - **SpiritRattle Buff:** Heals for 1d4 + WIL mod at the start of each turn
+   * 
+   * **Consume:** 2 MP, 1 neutral
+   * **Produce:** 1 order
+   */
   HolyRattle = "SpiritRattle",
-  // Common: Grant 1 + 1d(skillLevel) random allies SpiritRattle buff for (1 + floor(skillLevel * 0.5)) turns (capped at skillLevel).
-  // SpiritRattle: heals for 1d4 + WIL mod at the start of each turn.
-  // consume 1 neutral, produce 1 order
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Cleanse an ally with blessing energy.
+   * - **Target:** 1 random ally with debuffs (2 at level 5)
+   * - **Cleanse:** Remove 1 random debuff from target (2 debuffs at level 5)
+   * - **Healing:** If debuff removed, heal target for 1d4 + WIL mod HP
+   * - **Fallback:** If no debuffs to remove, grant Bless buff for 1 turn instead
+   * 
+   * **Consume:** 3 MP, 2 neutral
+   * **Produce:** 1 order
+   */
   CleansingBlessing = "CleansingBlessing",
-  // Uncommon
-  // Target 1 random ally with debuffs (2 at level 5)
-  // Remove 1 random debuff from target (2 debuffs at level 5)
-  // If debuff removed, heal target for 1d4 + WIL mod HP
-  // If no debuffs to remove, grant Bless buff for 1 turn instead
-  // Consume 2 neutral, produce 1 order
+
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Ward allies with protective spirits.
+   * - **Target:** 1d2 allies (1d3 at level 5)
+   * - **Effect:** Grant Ward of Protection buff for 2 turns
+   * - **Ward of Protection:** Reduce incoming damage by (3 + WIL mod / 2) per attack, up to 5 stacks per turn
+   * 
+   * **Consume:** 2 MP, 1 neutral
+   * **Produce:** 1 order
+   */
   WardOfProtection = "WardOfProtection",
-  // Common
-  // Target 1d2 ally (1d3 at level 5)
-  // Grant Ward of Protection buff for 2 turn.
-  // Consume 1 neutral, produce 1 order
 
   // ---------------
   // Harmony
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Harmonize the opposing forces of Order and Chaos.
+   * 
+    * - **Balancing:**  
+    *   If you have both Order and Chaos, reduce the higher one until they are equal.
+    *   - Example: Order 3, Chaos 1 → Order 2, Chaos 2
+    *   - Example: Order 5, Chaos 0 → Order 3, Chaos 2
+    * 
+    * - **Damage:**  
+    *   Deal damage based on the amount balanced:
+    *   - Deal 1d6 damage of the *converted type*  
+    *   - Gain +1 damage per resource shifted
+    * 
+    * - **Perfect Balance:**  
+    *   If Order and Chaos are equal and greater than 0:
+    *   - Deal 1d4 Order damage **and** 1d4 Chaos damage
+    *   - Gain +1 damage per Order and Chaos resource
+    * 
+    * - **Fallback:**  
+    *   If you have no Order and no Chaos:
+    *   - Deal 1d6 neutral damage
+    * 
+    * 
+    * **Consume:** 2 MP  
+    * **Produce:** 0-1 chaos, 0-1 order
+   */
   Harmonization = "Harmonization",
-  // Common
-  // For every Order resource one have, turn it into Chaos
-  // For every Chaos resource one have, turn it into Order
-  // If the conversion >= 3 gain 1 natural
-  // 
-  DualNature = "DualNature",
-  // Uncommon
-  // Attack one enemy: Deal (1d6 + planar mod)
-  // if you have Order more than Chaos: deal additional damage equal to skill level
-  // if you have Chaos more than Order: heal random ally equal to skill level
-  // if your Order and Chaos are equal and > 0: both effects apply
-  ChaoticBlessing = "ChaoticBlessing",
-  // Uncommon: 50% chance to deal (1d8 at level 5, else 1d6) + ((WIL mod + Planar mod) / 2) * skill level multiplier chaos damage to all enemies,
-  // or heal all allies for the same amount.
-  // At level 5: Healed allies roll DC10 WILsave, if passed gain +1 chaos.
-  // At level 5: Damaged enemies roll DC10 WILsave, if failed lose 1 random resource.
-  // consume 1 chaos + 1 order, produce 0-2 neutral
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike with dual nature, balancing attack and healing.
+   * - **Damage:** Deal (1d6 + planar mod) × skill level multiplier damage to one enemy
+   * - **Order Dominance:** If you have Order more than Chaos, heal random ally equal to skill level
+   * - **Chaos Dominance:** If you have Chaos more than Order, deal additional damage equal to skill level
+   * - **The damage type will follow the dominant resource, if both are equal, deal arcane damage
+   * - **Balance:** If your Order and Chaos are equal and > 0, both effects apply
+   * 
+   * **Consume:** 3 MP, 1 order, 1 chaos
+   * **Produce:** 0-1 order, 0-1 chaos
+   */
+  DualNature = "DualNature",
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Channel chaotic blessing with unpredictable results.
+   * - **Effect:** 50% chance to deal (1d8 at level 5, else 1d6) + ((WIL mod + Planar mod) / 2) × skill level multiplier chaos damage to all enemies, or heal all allies for the same amount
+   * - **Level 5:** Healed allies roll DC10 WIL save, if passed gain +1 chaos
+   * - **Level 5:** Damaged enemies roll DC10 WIL save, if failed lose 1 random resource
+   * 
+   * **Consume:** 4 MP, 1 chaos, 1 order
+   * **Produce:** 0-2 neutral (random)
+   */
+  ChaoticBlessing = "ChaoticBlessing",
 }
 
 export enum BarbarianSkillId {
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Enter a state of Rage, gaining combat bonuses.
+   * - **Effect:** Gain Rage buff for 3 turns (4 turns at level 5)
+   * - **Rage Buff:** +2 pATK, -2 pDEF, -2 mDEF
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 fire
+   */
   Rage = "Rage",
-  // Cantrip,
-  // Gain Rage for upto 3 turns (pAtk + 2, pDef and mDef - 2). At lvl5: 4 turns
-  // Jump in and attack with full force. (weapon damage), -3 hit roll.
-  // consume 3 SP, produce 1 fire.
 
   // ---------------
   // BERSERKER
   // ---------------
+  /**
+   * **Tier:** Uncommon (Chain)
+   * 
+   * Swing your weapon recklessly, attacking multiple times.
+   * - **Hits:** 2 hits (3 hits at level 5)
+   * - **Damage per Hit:** (0.7 × weapon damage + STR mod) × (1 + 0.1 × skill level) × position modifier
+   * - **Hit Penalty:** -2 hit roll (removed at level 5)
+   * - **Requirement:** Must have sword, axe, blade, hammer, spear, or barehand equipped
+   * 
+   * **Consume:** 4 SP, 1 fire
+   * **Produce:** 1 neutral
+   */
   RecklessSwing = "RecklessSwing",
-  // Common
-  // Multi-hit melee.
-  // must have sword axe blade hammer spear barehand
-  // 2 hits (3 hits at lvl5), each (0.7×weapon + STR mod) * (1 + 0.1 * skill level) * (positionModifier) damage = weapon damage type , -3 hit roll.
-  // consume 4 SP 1 fire, produce 1 neutral
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike with blood-fueled frenzy, dealing increased damage when wounded.
+   * - **Damage:** Weapon damage + STR mod × skill level multiplier
+   * - **Low HP Bonus:** If HP ≤ 20% (40% at level 5), damage +25%
+   * - **On Kill:** Extend Rage duration by 1 turn
+   * 
+   * **Consume:** 4 SP, 2 fire
+   * **Produce:** 1 neutral
+   */
   BloodFrenzy = "BloodFrenzy",
-  // Uncommon
-  // Melee close range
-  // Deal weapon damage + str mod * skill level mod 
-  // If HP <= 20% (40% at level 5), damage += 25%
-  // If target was killed, Rage duration is extended by 1 turn.
 
   // ---------------
   // BRUTE
   // ---------------
+  /**
+   * **Tier:** Uncommon (Standalone)
+   * 
+   * Slam the ground with your weapon, creating a shockwave that damages all enemies in the front row.
+   * - **Damage:** 1d8 + STR mod (1d10 + STR mod at level 5) blunt damage to each target
+   * - **Save:** Each enemy rolls DC10 (DC12 at level 5) END save or gains Dazed debuff for 1 turn
+   * - **Requirement:** Must have sword, axe, blade, hammer, spear, or barehand equipped
+   * 
+   * **Consume:** 5 SP, 2 fire
+   * **Produce:** 1 earth
+   */
   Earthshatter = "Earthshatter",
-  // Uncommon
-  // AoE front row.
-  // 1d8 + STR mod (1d10 at lvl5).
-  // Enemies roll DC10 (DC12 lvl5) Fort save or Dazed 1 turn.
-  // consume 5 SP 1 fire, produce 1 earth.
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Attack one enemy with a powerful ground slam, affecting adjacent enemies.
+   * - **Damage:** 1d6 + STR mod × skill level multiplier blunt damage
+   * - **Target Save:** Target rolls DC10 + STR mod END save or gains Dazed debuff for 1 turn
+   * - **Splash Damage:** Adjacent enemies take 50% damage (75% at level 5) and roll DC5 END save or gain Dazed debuff for 1 turn
+   * 
+   * **Consume:** 4 SP, 2 earth
+   * **Produce:** 1 neutral
+   */
   GroundSlam = "GroundSlam",
-  // Uncommon
-  // Attack one enemy; deal 1d6 + str mod * skill level mod blunt damage.
-  // target must roll DC10 + str mod endurance save or get dazed for 1 turn.
-  // adjacent enemies take 50% damage and roll dc5 endurance save or get dazed for 1 turn.
-  // at leve 5, adjacent takes 75% damage instead
 
   // ---------------
   // Survivalist
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Gain defensive resilience through battle experience.
+   * - **Effect:** Gain Battle Hardened buff for 3 turns: +2 pDEF
+   * - **Rage Extension:** When attacked during Battle Hardened, Rage duration is extended by 1 turn
+   * - **Level 5 Bonus:** Also heal for 1d4 + END mod HP
+   * - **Cooldown:** 3 turns
+   * 
+   * **Consume:** 3 SP, 1 earth, 1 neutral
+   * **Produce:** 1 neutral
+   */
   BattleHardened = "BattleHardened",
-  // Uncommon
-  // Gain Battle Hardened buff for 3 turns: pDef + 2
-  // when attakced during Battle Hardened: Rage duration is extended by 1 turn.
-  // Cool down 3 turns
-  // If used at level 5, also heal for 1d4 + endurance mod HP
-  
 }
 
 export enum WarriorSkillId {
+  /**
+   * **Tier:** Common
+   * 
+   * Swing your weapon in a wide arc, cutting through all enemies in the front row.
+   * - **Damage:** 1.0× weapon damage (1.2× at level 5) + STR mod × position modifier
+   * - **Target:** All enemies in front row
+   * - **Requirement:** Must have sword, axe, or blade equipped
+   * 
+   * **Consume:** 2 neutral
+   * **Produce:** 1 wind
+   */
   Cleave = "Cleave",
-  // common
-  // consume 2 neutral, produce 1 wind
-  // Deal 1x weapon damage ((at level 5 = 1.2x), + str mod) * (skillScalar) * (positionModifier) attacking enemy to the 'front most row' (so the skill scalar must know which row we're attacking)
 
+  /**
+   * **Tier:** Common
+   * 
+   * Channel all your strength into a single devastating strike.
+   * - **Damage:** 1.3× weapon damage (1.5× at level 5) + STR mod × position modifier
+   * 
+   * **Consume:** 2 neutral
+   * **Produce:** 1 fire
+   */
   PowerStrike = "PowerStrike",
-  // Common
-  // consume 2 neutral, produce 1 fire
-  // ACTIVE — Strong single-target melee attack.
-  // Higher may be (1.3 and 1.5 at level 5 + str mod) * (skillScalar) * (posotionModifier)
-  // Bread-and-butter offensive skill.
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Let out a mighty battle cry that inspires you and your allies to fight harder.
+   * - **Target:** Self + allies (number of allies = CHA mod)
+   * - **Effect:** Affected targets gain WarCry buff for (LEAD mod) turns
+   * - **WarCry Buff:** +2 AGI, +2 STR;
+   * - **Self must not have WarCry buff to use this skill**
+   * 
+   * **Consume:** 3 SP, 2 fire
+   * **Produce:** 1 neutral
+   */
   WarCry = "WarCry",
-  // Uncommon
-  // ACTIVE — Battle shout that boosts self or team morale.
-  // Increases attack or action speed for a few turns.(+2 agi +2 str), 2 turns, 3 turns when level 5
 
   // ---------------
   // Weapon Master
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Adapt your attack to your weapon's nature, dealing special effect.
+   * - **Damage:** Weapon Physical damage: 
+   * - **Damage Type:** Weapon Physical damage type
+   * - **Special Effect:** Slash: DC 8 end save or bleed / Blunt: reduce target AB gauge by 10 / Pierce: negate 2 pDef (implement by reduce it before attack and give it back after attack?)
+   * 
+   * **Produce:** 1 neutral
+   */
   WeaponAdaptation = "WeaponAdaptation",
-  // Common
-  // Single target melee attack
-  // Deal weapon damage + STR mod * (1 + 0.1 * skill level) * skill level multiplier damage
-  // Damage type adapts to weapon: Slash (sword/blade), Pierce (spear), Blunt (hammer/axe)
-  // If you've used a different damage type in the previous 2 turns, deal +25% damage (encourages weapon switching)
-  // consume 2 neutral, produce 1 fire
-  // At level 5: Bonus damage increases to +35%
 
-  VersatileCombat = "VersatileCombat",
-  // Uncommon
-  // Self-buff for 3 turns (4 at level 5)
-  // Versatile Combat: When you deal damage, if it's a different damage type than your last attack, gain +1 STR for 1 turn (stacks up to +2 STR)
-  // Additionally, gain +2 hit roll while active
-  // consume 3 SP, 1 fire, produce 1 neutral
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike with adaptive technique, exploiting every aspect of your weapon.
+   * 
+   * - **Damage:** Weapon damage + (STR mod or DEX mod, whichever is higher) × skill level multiplier
+   * - **Additional Effect (based on weapon damage type):**
+   *   - **Slash:** Apply Bleed (DC8 END save negates DC 10 at level 5)
+   *   - **Blunt:** Reduce target AB gauge by 10 (15 at level 5)
+   *   - **Pierce:** Ignore 2 pDEF during this attack (Ignore 4 pDEF at level 5)
+   * 
+   * - **Versatility Bonus:**  
+   *   trigger **one additional effect** from another damage type (random, excluding the base one).
+   * 
+   * **Consume:** 3 SP, 2 neutral  
+   * **Produce:** 1 fire
+   */
+  VersatileStrike = "VersatileStrike",
 
   // ---------------
   // Battlefield Control
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Dominate the battlefield with overwhelming presence, slowing enemies.
+   * - **Damage:** (0.8× weapon damage (0.9× at level 5)) × skill level multiplier to all enemies in front row
+   * - **Save:** Each enemy rolls DC10 + STR mod END save or get -10 AB gauge (15 at level 5)
+   * 
+   * **Consume:** 4 SP, 2 neutral
+   * **Produce:** 1 earth
+   */
   BattlefieldDominance = "BattlefieldDominance",
-  // Uncommon
-  // AoE front row
-  // Deal (weapon damage * 0.8 + STR mod) * (1 + 0.1 * skill level) * skill level multiplier damage to all enemies in front row
-  // Enemies must roll DC10 + STR mod END save or gain Slow debuff for 2 turns
-  // consume 4 SP, 1 wind, produce 1 neutral
-  // At level 5: Damage becomes weapon damage * 0.9, and enemies who fail save also lose 10 AB gauge
 
+  /**
+   * **Tier:** Common
+   * 
+   * Strike while manipulating enemy positioning.
+   * - **Damage:** Weapon damage × skill level multiplier
+   * - **Front Row Push:** If target is in front row and you're in front row, push target to back row (if slot available) and deal +1d4 damage
+   * - **Back Row Pull:** If target is in back row, pull target to front row (if slot available) and deal +1d4 damage
+   * 
+   * **Consume:** 3 SP, 1 earth
+   * **Produce:** 1 fire
+   */
   PositioningStrike = "PositioningStrike",
-  // Common
-  // Single target melee attack
-  // Deal weapon damage + STR mod * (1 + 0.1 * skill level) * skill level multiplier damage
-  // If target is in front row and you're in front row: Push target to back row (if slot available) and deal +1d4 damage
-  // If target is in back row: Pull target to front row (if slot available) and deal +1d4 damage
-  // consume 3 SP, produce 1 earth
 
   // ---------------
   // Champion (1v1)
   // ---------------
-  DuelistChallenge = "DuelistChallenge",
-  // Uncommon
-  // Single target enemy
-  // Mark target with Exposed debuff for 3 turns (4 at level 5)
-  // Deal (weapon damage + STR mod) * (1 + 0.1 * skill level) * skill level multiplier damage
-  // While target has Exposed debuff from this skill: You gain +2 hit roll and +2 crit chance against them
-  // consume 3 SP, 1 fire, produce 1 neutral
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Challenge an enemy to single combat, exposing their weaknesses.
+   * - **Damage:** Weapon damage × skill level multiplier
+   * - **Must not have Challenger buff to use this skill**
+   * - **Effect:** Mark target with Challenged debuff and self with Challenger buff for 3 turns
+   * - **During target selection, the character with Challenged debuff or Challenger buff, if target one target, must look for the other side first, bypass taunt.
+   * - **Challenger buff:** +2 hit roll, +2 crit chance against Challenged target
+   * 
+   * **Consume:** 3 SP, 2 neutral
+   * **Produce:** 1 fire
+   */
+  ChallengeStrike = "ChallengeStrike",
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Deliver a devastating finishing strike that exploits enemy weaknesses.
+   * Must have Challenger buff to use this skill
+   * - **Damage:** 1.5× weapon damage + STR mod × skill level multiplier
+   * - **Challenged Bonus:** If target has Challenged debuff and self has Challenger buff, deal additional +50% damage (+75% at level 5) and remove Challenged debuff along with self Challenger buff
+   * 
+   * **Consume:** 5 SP, 2 fire
+   * **Produce:** 1 earth
+   */
   FinishingBlow = "FinishingBlow",
-  // Rare
-  // Single target melee attack
-  // Deal (weapon damage * 1.5 + STR mod) * (1 + 0.1 * skill level) * skill level multiplier damage
-  // If target has Exposed debuff: Deal additional +50% damage and remove Exposed debuff
-  // If target is below 30% HP: Deal +1d6 damage
-  // consume 5 SP, 2 fire, produce 1 neutral
-  // At level 5: Bonus damage against exposed targets becomes +75%
 }
 
 export enum KnightSkillId {
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Execute a precise thrust with your sword or spear.
+   * - **Damage:** Weapon damage + STR mod × skill level multiplier × position modifier pierce damage
+   * - **Hit Bonus:** +3 hit roll
+   * - **Debuff Bonus:** If enemy has any debuff, crit chance +2 (+4 at level 5)
+   * - **Requirement:** Must have sword or spear equipped
+   * - **Target:** One enemy, front first
+   * 
+   * **Consume:** 3 SP, 2 fire
+   * **Produce:** 1 earth
+   */
   PrecisionThrust = "PrecisionThrust",
-  // Uncommon
-  // Require sword, spear
-  // target one frontfirst
-  // Thrust the sword or spear right at one enemy dealing ((weapon damage + Str mod) * (1 + 0.1 * skill level)) * (positionModifier) pierce damage. with addtional +3 hit roll
-  // If enemy has any debuff, crit change + 2 (4 at level 5).
-  // consume 2 fire, produce 1 earth
 
-  AdvancingPace = "AdvancingPace",
-  // Rare
-  // must not already be under Advancing Pace
-  // The knight channels planar force into disciplined movement.
-  // Gain AdvancingPace buff for 3 turns.
-  //
-  // AdvancingPace:
-  // - AB gauge increases with 1d4 more
-  // - +2 Strength
-  // - -1 Defense (the knight overextends to maintain the pace)
-  // At level 5: AB speed becomes +35% and the DEF penalty is removed.
-  //
-  // consume: 4 SP, 3 MP, 3 natural
-  // produce: 1 fire
 
   // ---------------
   // Commander (Team Buff)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Issue a tactical command that hastens your allies.
+   * - **Target:** 1d2 + LEAD mod allies
+   * - **Effect:** Grant Haste buff for 2 turns (3 at level 5)
+   * - **Level 5:** Also grant +5 AB gauge immediately
+   * 
+   * **Consume:** 4 SP, 2 neutral
+   * **Produce:** 1 fire
+   */
   TacticalCommand = "TacticalCommand",
-  // Uncommon
-  // Target 1d2 + LEAD mod allies (1d3 + LEAD mod at level 5)
-  // Grant Haste buff for 2 turns (3 at level 5)
-  // Additionally, targets gain +1 STR while Haste is active
-  // consume 4 SP, 1 fire, produce 1 neutral
-  // At level 5: Also grant +5 AB gauge immediately
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Form your allies into a defensive battle formation.
+   * - **Effect:** All allies gain +2 pDEF and +2 mDEF for 3 turns (4 at level 5)
+   * - **Bonus:** All allies gain +1 to all saving throws while active
+   * 
+   * **Consume:** 5 SP, 2 neutral
+   * **Produce:** 1 earth
+   */
   BattleFormation = "BattleFormation",
-  // Rare
-  // All allies gain +2 pDEF and +2 mDEF for 3 turns (4 at level 5)
-  // Additionally, all allies gain +1 to all saving throws while active
-  // consume 5 SP, 2 fire, produce 1 earth
 
   // ---------------
   // Order (Charging/Advancing)
   // ---------------
-  RelentlessCharge = "RelentlessCharge",
-  // Common
-  // Melee attack, must move to front row if not already there
-  // Deal (weapon damage + STR mod) * (1 + 0.1 * skill level) * skill level multiplier damage
-  // If you have AdvancingPace buff: Deal +1d4 damage and gain +10 AB gauge
-  // consume 3 SP, produce 1 fire
-  // At level 5: Bonus damage increases to +1d6
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Channel planar force into disciplined movement, advancing with relentless pace.
+   * - **Effect:** Gain AdvancingPace buff for 3 turns (4 at level 5) (must not already have it)
+   * - **AdvancingPace Buff:**
+   *   - AB gauge increases with +1d4 per turn
+   *   - +2 STR
+   *   - -1 pDEF, -1 mDEF (overextending to maintain pace)
+   * - Gain +5 AB gauge immediately (10 at level 5)
+   * 
+   * **Consume:** 4 SP, 3 MP, 3 neutral
+   * **Produce:** 1 fire
+   */
+  AdvancingPace = "AdvancingPace",
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Charge relentlessly forward, striking with momentum.
+   * - **Damage:** Weapon damage × skill level multiplier
+   * - **Movement:** Must move to front row if not already there
+   * - **AdvancingPace Bonus:** If you have AdvancingPace buff, deal +1d4 damage (+1d6 at level 5) and gain +10 AB gauge
+   * 
+   * **Consume:** 3 SP, 1 fire
+   * **Produce:** 1 earth
+   */
+  RelentlessCharge = "RelentlessCharge",
+
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Advance with discipline, maintaining formation while attacking.
+   * - **Movement:** Move to front row (if available)
+   * - **Damage:** Deal weapon damage × skill level multiplier
+   * - **AdvancingPace Bonus:** If you have AdvancingPace buff, get defense up bonus for 1 turn
+   * 
+   * **Consume:** 4 SP, 1 earth
+   * **Produce:** 0-1 fire
+   */
   DisciplinedAdvance = "DisciplinedAdvance",
-  // Uncommon
-  // Move to front row (if available) and gain AdvancingPace buff for 2 turns (3 at level 5)
-  // Additionally, deal (weapon damage * 0.8 + STR mod) * (1 + 0.1 * skill level) damage to closest enemy
-  // consume 4 SP, 1 fire, produce 1 fire
 
   // ---------------
   // Oathbound (Shield, Conditional)
   // ---------------
+  /**
+   * **Tier:** Common
+   * 
+   * Strike while maintaining your shield defense.
+   * - **Damage:** Shield damage × skill level multiplier
+   * - **DefenseUp Bonus:** If you have DefenseUp buff, deal +25% damage and gain +5 AB gauge
+   * - **Level 5:** Also gain DefenseUp buff for 1 turn if you don't already have it
+   * - **Requirement:** Must equip shield
+   * 
+   * **Consume:** 2 SP, 1 neutral
+   * **Produce:** 1 earth
+   */
   ShieldedStrike = "ShieldedStrike",
-  // Common
-  // Must equip shield
-  // Single target melee attack
-  // Deal (weapon damage + STR mod) * (1 + 0.1 * skill level) * skill level multiplier damage
-  // If you have DefenseUp buff: Deal +25% damage and gain +5 AB gauge
-  // consume 2 SP, produce 1 earth
-  // At level 5: Also gain DefenseUp buff for 1 turn if you don't already have it
 
-  OathOfProtection = "OathOfProtection",
-  // Uncommon
-  // Must equip shield
-  // Target 1 random ally (2 at level 5)
-  // Grant DefenseUp buff for 2 turns (3 at level 5)
-  // Additionally, if target takes damage while DefenseUp is active, you gain +1 STR for 1 turn (max +2 STR, stacks)
-  // consume 3 SP, 1 earth, produce 1 neutral
+  /**
+   * **Tier:** Common
+   * 
+   * Bash your enemy with your shield, has chance to stun them for 1 turn
+   * - **Target:** 1 enemy, front first
+   * - **Damage:** Shield damage × skill level multiplier
+   * - **Save:** Target must roll DC7 + STR mod END save or become Stunned for 1 turn
+   * - **DefenseUp Bonus:** If you have DefenseUp buff, DC became 10 + STR mod
+   * - **Requirement:** Must equip shield
+   * 
+   * **Consume:** 3 SP, 1 earth
+   * **Produce:** 1 fire
+   */
+  ShieldBash = "ShieldBash",
 }
 
 export enum GuardianSkillId {
   // ---------------
   // Bulwark (Pure Tank)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Raise your shield high, forming an impenetrable barrier.
+   * - **Effect:** Gain DefenseUp buff for 3 turns (4 at level 5)
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 earth
+   */
   ShieldUp = "ShieldUp",
-  // Common
-  // Raise your shield high, forming an impenetrable barrier.
-  // Gain DefenseUp buff for 3 turns (4 at level 5)
   
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Strike a heroic pose, channeling your inner strength.
+   * - **Save:** Roll DC(15 - skill level) (DC(10 - skill level) at level 5)
+   * - **On Success:** Restore VIT mod + skill level HP
+   * - The higher your skill, the easier it becomes to inspire yourself.
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 neutral
+   */
   HerosPose = "HerosPose",
-  // Common
-  // Strike a heroic pose, channeling your inner strength.
-  // Roll DC(15 - skill level) (10 - skill level at level 5). On success, restore VIT mod + skill level HP.
-  // The higher your skill, the easier it becomes to inspire yourself.
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Enter an unbreakable fortress stance.
+   * - **Effect:** Gain Fortress Stance buff for 3 turns (4 at level 5)
+   * - **Fortress Stance Buff:** Gain +3 pDEF and +2 mDEF
+   * - **Damage Reduction:** Reduce all incoming damage by 1 per attack (2 at level 5)
+   * - **Restriction:** Cannot use while you have Taunt buff
+   * 
+   * **Consume:** 4 SP, 1 earth
+   * **Produce:** 1 neutral
+   */
   FortressStance = "FortressStance",
-  // Uncommon
-  // Self-buff for 3 turns (4 at level 5)
-  // Fortress Stance: Gain +3 pDEF and +2 mDEF
-  // Additionally, reduce all incoming damage by 1 per attack (2 at level 5)
-  // Cannot use while you have Taunt buff
-  // consume 4 SP, 1 earth, produce 1 neutral
 
   // ---------------
   // Sentinel (Taunt, Bash)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Roar defiantly and draw all enemy attention to yourself.
+   * - **Effect:** Gain Taunt buff for 2 + floor(0.5 × skill level) + floor(CHA mod / 2) turns
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 fire
+   */
   Taunt = "Taunt",
-  // Common
-  // Roar defiantly and draw all enemy attention to yourself.
-  // Gain Taunt buff for 2 + floor(0.5 × skill level) + floor(CHA mod / 2) turns
 
+  /**
+   * **Tier:** Common
+   * 
+   * Slam your weapon with overwhelming force, crushing your enemy's defenses.
+   * - **Damage:** Weapon damage × position modifier
+   * - **Save:** Target must roll DC8 + STR mod END save or become Stunned for 1 turn
+   * 
+   * **Consume:** 3 SP, 2 earth
+   * **Produce:** 1 fire
+   */
   Bash = "Bash",
-  // Common
-  // Slam your weapon with overwhelming force, crushing your enemy's defenses.
-  // Deal weapon damage * position modifier damage.
-  // Target must roll DC8 + STR mod END save or become Stun for 1 turn.
-  // consume 2 earth, produce 1 fire
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Fulfill your sentinel duty, attacking while drawing enemy attention.
+   * - **Damage:** Weapon damage + STR mod × skill level multiplier
+   * - **Effect:** Apply Taunt buff to self for 2 turns (3 at level 5)
+   * - **Save:** Target must roll DC10 + STR mod END save or gain Dazed debuff for 1 turn
+   * 
+   * **Consume:** 3 SP, 1 earth
+   * **Produce:** 1 fire
+   */
   SentinelDuty = "SentinelDuty",
-  // Uncommon
-  // Single target enemy
-  // Deal (weapon damage + STR mod) * (1 + 0.1 * skill level) * skill level multiplier damage
-  // Apply Taunt buff to self for 2 turns (3 at level 5)
-  // Target must roll DC10 + STR mod END save or gain Dazed debuff for 1 turn
-  // consume 3 SP, 1 earth, produce 1 fire
 
   // ---------------
   // Bastion (Protection)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Stand guard over an ally, protecting them from harm.
+   * - **Target:** 1 random ally (2 at level 5)
+   * - **Effect:** Grant DefenseUp buff to target for 2 turns (3 at level 5)
+   * - **Bonus:** Gain Taunt buff for 1 turn - enemies are more likely to target you instead
+   * - **Level 5:** If target takes damage while DefenseUp is active, restore 1d4 + VIT mod HP to target
+   * 
+   * **Consume:** 3 SP, 1 earth
+   * **Produce:** 1 earth
+   */
   GuardAlly = "GuardAlly",
-  // Uncommon
-  // Target 1 random ally (2 at level 5)
-  // Grant DefenseUp buff to target for 2 turns (3 at level 5)
-  // Additionally, gain Taunt buff for 1 turn - enemies are more likely to target you instead
-  // consume 3 SP, produce 1 earth
-  // At level 5: If target takes damage while DefenseUp is active, restore 1d4 + VIT mod HP to target
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Erect a protective barrier around all allies.
+   * - **Effect:** All allies gain +2 pDEF for 2 turns (3 at level 5)
+   * - **Bonus:** You gain +3 pDEF and Taunt buff for the same duration
+   * 
+   * **Consume:** 5 SP, 2 earth
+   * **Produce:** 1 neutral
+   */
   ProtectiveBarrier = "ProtectiveBarrier",
-  // Rare
-  // All allies gain +2 pDEF for 2 turns (3 at level 5)
-  // Additionally, you gain +3 pDEF and Taunt buff for the same duration
-  // consume 5 SP, 2 earth, produce 1 neutral
 }
 
 export enum PaladinSkillId {
   // ---------------
   // Aegis (Protection)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Activate a powerful shield of holy energy that mitigates incoming damage.
+   * - **Effect:** Gain Aegis Shield buff for 3 stacks (4 stacks at level 5) (must not already have it)
+   * - **Aegis Shield Buff:** Each stack can mitigate 5 + WIL mod points of incoming damage
+   *   - Example: Taking 5 damage with 0 WIL mod: mitigates 5 damage, decreases 1 stack
+   *   - Taking 7 damage: mitigates 7 damage, decreases 2 stacks
+   * - **On Depletion:** When Aegis Shield is depleted, gain Aegis Pulse buff for 1 turn
+   * 
+   * **Consume:** 4 SP, 3 order
+   * **Produce:** 1 neutral
+   */
   AegisShield = "AegisShield",
-  // Uncommon
-  // Active - Activate Aegis Shield for 3 stack (4 at lvl5)
-  // Must not have Aegis Shield buff
-  // Aegis Shield: each stack can mitigate 5 + (willpower mod) points of incoming damage.
-  // example, (will power mod = 0), taking 5 damage: Aegis shield will mitigate 5 damage and decrease 1 stack.
-  // Taking 7 damage: Aegis shield will mitigate 7 damage and decrease 2 stack.
-  // When Aegis Shield is depleted, add Aegis Pulse buff for 1 turn.
-  // consume 3 order, produce 1 neutral.
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Emit a wave of holy light from your depleted shield.
+   * - **Requirement:** Must have Aegis Pulse buff (removed after use)
+   * - **Healing:** All allies heal for (1d4 + WIL mod) × skill level multiplier HP
+   * - **Damage:** All enemies take (1d4 + WIL mod) × skill level multiplier holy damage
+   * 
+   * **Consume:** 0 (removes Aegis Pulse buff)
+   * **Produce:** 0
+   */
   AegisPulse = "AegisPulse",
-  // Uncommon
-  // Must have Aegis Pulse buff
-  // ACTIVE — Emit a wave of holy light.
-  // Healing allies for 1d4 + willpower mod * (1 + 0.1 * skill level) HP.
-  // Dealing small holy damage to all enemies. for 1d4 + willpower mod * (1 + 0.1 * skill level) holy damage.
-  // consume nothing but will remove Aegis Pulse buff.
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Ward an ally with divine protection.
+   * - **Target:** 1 random ally (2 at level 5)
+   * - **Effect:** Grant DefenseUp buff for 2 turns (3 at level 5)
+   * - **Regen:** Target gains Regen buff for 2 turns: restore 1d4 + WIL mod HP at the start of each turn
+   * 
+   * **Consume:** 4 SP, 2 order
+   * **Produce:** 1 neutral
+   */
   AegisWard = "AegisWard",
-  // Rare
-  // Target 1 random ally (2 at level 5)
-  // Grant DefenseUp buff for 2 turns (3 at level 5)
-  // Additionally, target gains Regen buff for 2 turns: restore 1d4 + WIL mod HP at the start of each turn
-  // consume 4 SP, 2 order, produce 1 neutral
 
   // ---------------
   // Retribution (Damaging)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike with a melee attack blessed with holy energy.
+   * - **Damage:** (1.2× weapon damage + STR mod + WIL mod) × skill level multiplier × position modifier holy damage
+   * - **Undead/Fiend Bonus:** If enemy is undead or fiend, deal additional 1d6 holy damage (1d10 at level 5)
+   * - **Requirement:** Must have any weapon but not bow, orb, wand, book
+   * - **Target:** One enemy, front first, melee
+   * 
+   * **Consume:** 3 SP, 2 order
+   * **Produce:** 1 neutral
+   */
   DivineStrike = "DivineStrike",
-  // Uncommon
-  // ACTIVE — A melee attack blessed with holy energy.
-  // target one, front first, melee.
-  // Must have any weapon but not bow, orb, wand, book,
-  // Deal (weapon damage * 1.2 + (str mod) + (will mod)) * (skill level multiplier) * (position modifier) holy damage.
-  // If enemy is undead or fiend, deal additional 1d6 holy damage. (1d10 at lvl5)
-  // consume 2 order, produce 1 neutral.
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Deliver righteous retribution against those who have harmed your allies.
+   * - **Damage:** (1.3× weapon damage + STR mod + WIL mod) × skill level multiplier holy damage
+   * - **Retribution Bonus:** If enemy has dealt damage to any ally in the last 2 turns, deal +50% damage (+75% at level 5)
+   * - **Undead/Fiend Bonus:** If enemy is undead or fiend, deal additional +1d6 holy damage
+   * 
+   * **Consume:** 3 SP, 2 order
+   * **Produce:** 1 neutral
+   */
   RighteousSmite = "RighteousSmite",
-  // Uncommon
-  // Single target melee attack
-  // Deal (weapon damage * 1.3 + STR mod + WIL mod) * (1 + 0.1 * skill level) * skill level multiplier holy damage
-  // If enemy has dealt damage to any ally in the last 2 turns: Deal +50% damage
-  // If enemy is undead or fiend: Deal additional +1d6 holy damage
-  // consume 3 SP, 2 order, produce 1 neutral
-  // At level 5: Bonus damage increases to +75%
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Unleash divine wrath upon your enemies.
+   * - **Damage:** (1d8 + STR mod + WIL mod) × skill level multiplier holy damage to all enemies in front row
+   * - **Undead/Fiend Bonus:** Enemies who are undead or fiend take +1d6 additional damage
+   * - **Save:** Enemies must roll DC10 + WIL mod WIL save or gain Exposed debuff for 2 turns
+   * 
+   * **Consume:** 5 SP, 3 order
+   * **Produce:** 1 neutral
+   */
   DivineWrath = "DivineWrath",
-  // Rare
-  // AoE front row
-  // Deal (1d8 + STR mod + WIL mod) * (1 + 0.1 * skill level) * skill level multiplier holy damage to all enemies in front row
-  // Enemies who are undead or fiend take +1d6 additional damage
-  // Enemies must roll DC10 + WIL mod WIL save or gain Exposed debuff for 2 turns
-  // consume 5 SP, 3 order, produce 1 neutral
 
   // ---------------
   // Leadership (Team Buff - Different from Knight)
   // ---------------
+  /**
+   * **Tier:** Common
+   * 
+   * Rally your allies with an inspiring cry.
+   * - **Effect:** All allies gain +2 STR and +1 END for 2 turns (3 turns at level 5)
+   * - **Bless:** All allies gain Bless buff for 1 turn (2 turns at level 5)
+   * 
+   * **Consume:** 4 SP, 1 order
+   * **Produce:** 1 neutral
+   */
   RallyingCry = "RallyingCry",
-  // Common
-  // All allies gain +2 STR and +1 END for 2 turns (3 at level 5)
-  // Additionally, all allies gain Bless buff for 1 turn (2 turns at level 5)
-  // consume 4 SP, 1 order, produce 1 neutral
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Project an inspiring presence that bolsters your allies.
+   * - **Effect:** Gain Inspiring Presence buff for 3 turns (4 turns at level 5)
+   * - **Inspiring Presence Buff:** All allies gain +1 to all saving throws
+   * - **Regen:** At the start of each turn, restore 1d3 HP to all allies (1d4 at level 5)
+   * 
+   * **Consume:** 5 SP, 2 order
+   * **Produce:** 1 order
+   */
   InspiringPresence = "InspiringPresence",
-  // Uncommon
-  // Self-buff for 3 turns (4 at level 5)
-  // Inspiring Presence: All allies gain +1 to all saving throws
-  // Additionally, at the start of each turn, restore 1d3 HP to all allies
-  // consume 5 SP, 2 order, produce 1 order
-  // At level 5: HP restoration becomes 1d4
 }
 
 export enum DruidSkillId {
   // ---------------
   // Nature's Wrath
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Whip a target with thorny vines, dealing nature damage.
+   * - **Damage:** 1d6 + WIL mod × skill level multiplier nature damage
+   * - **Save:** Target rolls DC7 END save or becomes Entangled for 1 turn
+   * - **Entangled Debuff:** When taking turns, must roll DC10 STR save or skip the turn
+   * 
+   * **Consume:** 3 MP
+   * **Produce:** 1 earth
+   */
   VineWhip = "VineWhip",
-  // Common
-  // Deal 1d6 + (willpower mod) * (1 + 0.1 * skill level) nature damage.
-  // target roll DC7 endurance save or get entangled for 1 turn.
-  // Entangled: when take turns, must roll DC10 strength save or skip the turn.
-  // produce 1 earth.
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Release a burst of thorns that cuts through the enemy front line.
+   * - **Damage:** 1d6 + WIL mod × skill level multiplier nature damage to all enemies in front row
+   * - **Save:** Enemies must roll DC10 + WIL mod END save or gain Bleed debuff for 2 turns (1d3 damage per turn)
+   * - **Level 5:** Also apply Slow debuff for 1 turn to enemies who fail save
+   * 
+   * **Consume:** 3 MP, 1 earth
+   * **Produce:** 1 neutral
+   */
   ThornBurst = "ThornBurst",
-  // Uncommon
-  // AoE front row
-  // Deal 1d6 + WIL mod * (1 + 0.1 * skill level) * skill level multiplier nature damage to all enemies in front row
-  // Enemies must roll DC10 + WIL mod END save or gain Bleed debuff for 2 turns (1d3 damage per turn)
-  // consume 3 MP, 1 earth, produce 1 neutral
-  // At level 5: Also apply Slow debuff for 1 turn to enemies who fail save
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Grasp a target with nature's powerful vines.
+   * - **Damage:** 1d8 + WIL mod × skill level multiplier nature damage
+   * - **Save:** Target must roll DC10 + WIL mod END save or become Entangled for 2 turns (3 turns at level 5)
+   * - **Entangled Bonus:** If target is already Entangled, deal +50% damage
+   * 
+   * **Consume:** 4 MP, 2 earth
+   * **Produce:** 1 earth
+   */
   NaturesGrasp = "NaturesGrasp",
-  // Rare
-  // Single target
-  // Deal 1d8 + WIL mod * (1 + 0.1 * skill level) * skill level multiplier nature damage
-  // Target must roll DC10 + WIL mod END save or become Entangled for 2 turns (3 at level 5)
-  // Additionally, if target is already Entangled, deal +50% damage
-  // consume 4 MP, 2 earth, produce 1 earth
 
   // ---------------
   // Growth (Healing/Support)
   // ---------------
+  /**
+   * **Tier:** Rare
+   * 
+   * Release a gentle natural mist that rejuvenates your party.
+   * - **Effect:** All allies gain Regen buff for 2 turns (3 turns at level 5, 4 turns at level 7)
+   * - **Regen Buff:** Restore (1d4 + WIL mod) HP at the start of each turn (at level 7: WIL mod + 2)
+   * 
+   * **Consume:** 4 MP, 1 earth
+   * **Produce:** 1 earth
+   */
   RejuvenatingMist = "RejuvenatingMist",
-  // Rare
-  // Release a gentle natural mist around the party.
-  // All allies gain Regen buff for 2 turns: the perm value will be used for remember will mod: restore (1d4 + WIL mod) HP at the start of their turn.
-  // At level 5, lasts 3 turns. at level 7 will mod remember + 2
-  // consume 4 MP, produce 1 earth
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Nurture an ally with blooming life force.
+   * - **Target:** 1 random injured ally (2 at level 5)
+   * - **Healing:** Restore (2d4 + WIL mod) × skill level multiplier HP
+   * - **Regen:** Grant Regen buff for 2 turns: restore 1d4 + WIL mod HP at the start of each turn
+   * - **Level 5:** Also remove 1 random debuff from target
+   * 
+   * **Consume:** 3 MP, 1 earth
+   * **Produce:** 1 neutral
+   */
   NurturingBloom = "NurturingBloom",
-  // Uncommon
-  // Target 1 random injured ally (2 at level 5)
-  // Restore (2d4 + WIL mod) * skill level multiplier HP
-  // Additionally, grant Regen buff for 2 turns: restore 1d4 + WIL mod HP at the start of each turn
-  // consume 3 MP, 1 earth, produce 1 neutral
-  // At level 5: Also remove 1 random debuff from target
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Grant natural resilience to an ally.
+   * - **Target:** 1 random ally (2 at level 5)
+   * - **Effect:** Grant Bless buff for 2 turns (3 turns at level 5)
+   * - **Bonus:** Target gains +1 END while Bless is active
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 earth
+   */
   NaturalResilience = "NaturalResilience",
-  // Common
-  // Target 1 random ally (2 at level 5)
-  // Grant Bless buff for 2 turns (3 at level 5)
-  // Additionally, target gains +1 END while Bless is active
-  // consume 2 MP, produce 1 earth
 
   // ---------------
   // Wild (Primal/Hybrid)
   // ---------------
+  /**
+   * **Tier:** Rare
+   * 
+   * Hurl your spear with primal force, dealing damage based on range.
+   * - **Damage:** Weapon damage × range multiplier + skill level (no skill level multiplier)
+   *   - Front to front: 0.8× + skill level (1.0× at level 5)
+   *   - Front to back: 1.2× + skill level (1.4× at level 5)
+   *   - Back to back: 1.6× + skill level (1.8× at level 5)
+   * - **Requirement:** Must equip Spear
+   * 
+   * **Consume:** 3 SP, 2 neutral
+   * **Produce:** 1 earth
+   */
   ThrowSpear = "ThrowSpear",
-  // Rare
-  // Must equip Spear
-  // deal damage based on range.
-  // if front - front 0.8 + skillLevel
-  // if front - back 1.2 + skillLevel
-  // if back - back 1.6 + skillLevel
-  // Note that this skill don't have level multiplier but add the level into damage directly.
-  // at level 5, based range damage added 0.2 times (1.0, 1.4, 1.8)
-  // consume 2 neutral, produce 1 earth.
 
+  /**
+   * **Tier:** Common
+   * 
+   * Strike with primal ferocity, combining strength and will.
+   * - **Damage:** (Weapon damage + STR mod + WIL mod) × skill level multiplier nature damage
+   * - **Back Row Bonus:** If used from back row, move to front row first (if available), then deal +1d4 damage (+1d6 at level 5)
+   * 
+   * **Consume:** 3 SP, 1 neutral
+   * **Produce:** 1 earth
+   */
   PrimalStrike = "PrimalStrike",
-  // Common
-  // Melee attack
-  // Deal (weapon damage + STR mod + WIL mod) * (1 + 0.1 * skill level) * skill level multiplier nature damage
-  // If used from back row: Move to front row first (if available), then deal +1d4 damage
-  // consume 3 SP, produce 1 earth
-  // At level 5: Bonus damage increases to +1d6
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Tap into your wild instincts, becoming more ferocious.
+   * - **Effect:** Gain Wild Instinct buff for 2 turns (3 turns at level 5)
+   * - **Wild Instinct Buff:** Gain +2 STR and +2 AGI
+   * - **Regen:** At the start of each turn, restore 1d3 + WIL mod HP
+   * 
+   * **Consume:** 4 SP, 1 earth
+   * **Produce:** 1 neutral
+   */
   WildInstinct = "WildInstinct",
-  // Uncommon
-  // Self-buff for 2 turns (3 at level 5)
-  // Wild Instinct: Gain +2 STR and +2 AGI
-  // Additionally, at the start of each turn, restore 1d3 + WIL mod HP
-  // consume 4 SP, 1 earth, produce 1 neutral
 }
 
 export enum MonkSkillId {
   // ---------------
   // Fist (Offensive)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Deliver a precise melee strike using internal force.
+   * - **Damage:** 1d6 + (STR or DEX mod, whichever is higher) × position modifier blunt damage (1d8 at level 5)
+   * - **Armor Penetration:** Each skill level ignores 1 point of armor
+   * - **Armor Penalty:** If target's armor is NOT cloth, damage reduced by 70%
+   * - **Requirement:** Must equip barehand
+   * - **Target:** One enemy, front first, melee
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 wind
+   */
   PalmStrike = "PalmStrike",
-  // Common
-  // ACTIVE — A precise melee strike using internal force.
-  // target one, front first, melee.
-  // Must equip barehand.
-  // deal 1d6 + (str | dex mod whichever higher) * (position modifier) blunt damage.
-  // Each level ignore 1 point of armor.
-  // at level 5 damage dice = 1d8
-  // produce 1 wind.
-  // If armor is NOT cloth, damageOutput reduce by 70%.
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Perform a flurry of rapid blows with incredible speed.
+   * - **Hits:** 2 hits (3 hits at level 5)
+   * - **Damage per Hit:** Uses Palm Strike damage at your Palm Strike skill level
+   *   - If you don't have Palm Strike, damage = 1d4 + (STR or DEX mod, whichever is higher) × position modifier blunt damage
+   * - **Armor Penalty:** If target's armor is NOT cloth, damage reduced by 70%
+   * - **Requirement:** Must equip barehand
+   * - **Target:** One enemy, front first, melee
+   * 
+   * **Consume:** 3 SP, 2 wind
+   * **Produce:** 1 neutral
+   */
   FlurryOfBlows = "FlurryOfBlows",
-  // Uncommon
-  // ACTIVE — Perform a flurry of rapid blows.
-  // target one, front first, melee.
-  // Must equip barehand.
-  // Deal 2 hits (3 hits at lvl5) of damage *FROM* Palm Strike level that one self had,
-  // (Palm Strike level can be check from character.skills + character.activeSkills + character.conditionalDeck, I think)
-  // If no palm strike, damage = 1d4 + (str | dex mod whichever higher) * (position modifier) blunt damage.
-  // consume 2 wind, produce 1 neutral.
-  // If armor is NOT cloth, damageOutput reduce by 70%.
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike with stunning force, disrupting your enemy.
+   * - **Damage:** (1d6 + (STR or DEX mod, whichever is higher)) × skill level multiplier blunt damage
+   * - **Save:** Target must roll DC10 (DC12 at level 5) + (STR or DEX mod, whichever is higher) END save or become Stunned for 1 turn
+   * - **Requirement:** Must equip barehand
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 wind
+   */
   StunningFist = "StunningFist",
-  // Uncommon
-  // Must equip barehand
-  // Single target melee attack
-  // Deal (1d6 + (STR | DEX mod whichever higher)) * (1 + 0.1 * skill level) * skill level multiplier blunt damage
-  // Target must roll DC10 + (STR | DEX mod whichever higher) END save or become Stun for 1 turn
-  // consume 3 SP, produce 1 wind
-  // At level 5: Save DC increases to DC12
 
   // ---------------
   // Flow (Meditation/Resource)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Meditate to restore your lowest resource.
+   * - **Restoration:** Restore 1d4 + skill level to HP, MP, or SP, whichever is lowest (in percentage)
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 order
+   */
   Meditation = "Meditation",
-  // Common
-  // Restore 1d4 + skillLevel to HP or MP or SP, whichever is lowest (in percent).
-  // produce 1 order.
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Find inner peace, restoring yourself over time.
+   * - **Effect:** Gain Inner Peace buff for 2 turns (3 turns at level 5)
+   * - **Inner Peace Buff:** Restore 1d4 + (STR or DEX mod, whichever is higher) HP at the start of each turn
+   * - **Bonus:** Gain +1 to all saving throws while active
+   * - **Level 5:** Also restore 1 SP per turn
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 order
+   */
   InnerPeace = "InnerPeace",
-  // Uncommon
-  // Self-buff for 2 turns (3 at level 5)
-  // Inner Peace: Restore 1d4 + (STR | DEX mod whichever higher) HP at the start of each turn
-  // Additionally, gain +1 to all saving throws while active
-  // consume 2 MP, produce 1 order
-  // At level 5: Also restore 1 SP per turn
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Channel chi to restore yourself completely.
+   * - **Healing:** Restore 2d4 + (STR or DEX mod, whichever is higher) HP
+   * - **Resources:** Additionally, restore 2 MP and 2 SP
+   * - **Low HP Bonus:** If you're below 30% HP, restore additional 1d4 HP
+   * - **Cooldown:** 4 turns (3 turns at level 5)
+   * 
+   * **Consume:** 0
+   * **Produce:** 1 order
+   */
   ChiFlow = "ChiFlow",
-  // Rare
-  // Restore 2d4 + (STR | DEX mod whichever higher) HP
-  // Additionally, restore 2 MP and 2 SP
-  // If you're below 30% HP: Restore additional 1d4 HP
-  // consume nothing, produce 1 order
-  // Cooldown 4 turns (3 at level 5)
 
   // ---------------
   // Master (Precision/Control)
   // ---------------
+  /**
+   * **Tier:** Common
+   * 
+   * Strike with perfect precision, bypassing defenses.
+   * - **Damage:** (1d6 + (STR or DEX mod, whichever is higher)) × skill level multiplier blunt damage
+   * - **Hit Bonus:** +4 hit roll (+6 at level 5)
+   * - **Armor Penetration:** Each skill level ignores 1 point of armor (same as Palm Strike)
+   * - **Requirement:** Must equip barehand
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 wind
+   */
   PrecisionStrike = "PrecisionStrike",
-  // Common
-  // Must equip barehand
-  // Single target melee attack
-  // Deal (1d6 + (STR | DEX mod whichever higher)) * (1 + 0.1 * skill level) * skill level multiplier blunt damage
-  // +4 hit roll (precision)
-  // Each level ignore 1 point of armor (same as Palm Strike)
-  // consume 2 SP, produce 1 wind
-  // At level 5: Hit roll bonus increases to +6
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike with a dizzying palm technique that disorients enemies.
+   * - **Damage:** (1d4 + (STR or DEX mod, whichever is higher)) × skill level multiplier blunt damage
+   * - **Save:** Target must roll DC10 + (STR or DEX mod, whichever is higher) END save or gain Dazed debuff for 2 turns
+   * - **Level 5:** Also reduce target's AB gauge by 10 if save fails
+   * - **Requirement:** Must equip barehand
+   * 
+   * **Consume:** 3 SP, 1 wind
+   * **Produce:** 1 neutral
+   */
   DizzyingPalm = "DizzyingPalm",
-  // Uncommon
-  // Must equip barehand
-  // Single target melee attack
-  // Deal (1d4 + (STR | DEX mod whichever higher)) * (1 + 0.1 * skill level) * skill level multiplier blunt damage
-  // Target must roll DC10 + (STR | DEX mod whichever higher) END save or gain Dazed debuff for 2 turns
-  // consume 3 SP, 1 wind, produce 1 neutral
-  // At level 5: Also reduce target's AB gauge by 10 if save fails
 }
 
 export enum WarlockSkillId {
   // ---------------
   // Shadow (Offensive)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Launch a bolt of condensed shadow energy.
+   * - **Damage:** 1d6 + planar mod × skill level multiplier arcane damage
+   * - **Save:** Target must roll DC10 + planar mod WIL save or gain Cursed debuff for 1 turn (reduces saving throws)
+   * - **Range:** Ranged single-target magic damage
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 chaos
+   */
   ChaosBolt = "ShadowBolt",
-  // Common
-  // ACTIVE — Launch a bolt of condensed shadow energy.
-  // Ranged single-target magic damage
-  // Deal 1d6 + planar mod * (1 + 0.1 * skill level) * skill level multiplier arcane damage
-  // Target must roll DC10 + planar mod WIL save or gain Cursed debuff for 1 turn (reduces saving throws)
-  // consume 2 MP, produce 1 chaos
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Release a burst of shadow energy that engulfs the enemy front line.
+   * - **Damage:** 1d6 + planar mod × skill level multiplier arcane damage to all enemies in front row
+   * - **Save:** Enemies must roll DC10 + planar mod WIL save or gain Slow debuff for 1 turn
+   * - **Level 5:** Also apply Cursed debuff for 1 turn to enemies who fail save
+   * 
+   * **Consume:** 4 MP, 1 chaos
+   * **Produce:** 1 chaos
+   */
   ShadowBurst = "ShadowBurst",
-  // Uncommon
-  // AoE front row
-  // Deal 1d6 + planar mod * (1 + 0.1 * skill level) * skill level multiplier arcane damage to all enemies in front row
-  // Enemies must roll DC10 + planar mod WIL save or gain Slow debuff for 1 turn
-  // consume 4 MP, 1 chaos, produce 1 chaos
-  // At level 5: Also apply Cursed debuff for 1 turn to enemies who fail save
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Hurl a bolt of void energy that corrupts the target.
+   * - **Damage:** (1d8 + planar mod) × skill level multiplier arcane damage
+   * - **Cursed Bonus:** If target has Cursed debuff, deal +50% damage
+   * - **Save:** Target must roll DC12 + planar mod WIL save or gain Cursed debuff for 2 turns
+   * - **Range:** Single target ranged
+   * 
+   * **Consume:** 5 MP, 2 chaos
+   * **Produce:** 1 chaos
+   */
   VoidBolt = "VoidBolt",
-  // Rare
-  // Single target ranged
-  // Deal (1d8 + planar mod) * (1 + 0.1 * skill level) * skill level multiplier arcane damage
-  // If target has Cursed debuff: Deal +50% damage
-  // Target must roll DC12 + planar mod WIL save or gain Cursed debuff for 2 turns
-  // consume 5 MP, 2 chaos, produce 1 chaos
 
   // ---------------
   // Corruption (Debuff)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Corrupt the target with dark energy.
+   * - **Damage:** 1d4 + planar mod × skill level multiplier arcane damage
+   * - **Save:** Target must roll DC10 + planar mod WIL save or gain Cursed debuff for 2 turns
+   * - **Bonus:** If target already has Cursed debuff, also apply Hexed debuff for 2 turns (reduces endurance by 2 and deals 1d2 damage per turn)
+   * - **Target:** Single target
+   * 
+   * **Consume:** 3 MP, 1 chaos
+   * **Produce:** 1 chaos
+   */
   Corruption = "Corruption",
-  // Uncommon
-  // ACTIVE — Corrupt the target with dark energy.
-  // Single target
-  // Deal 1d4 + planar mod * (1 + 0.1 * skill level) * skill level multiplier arcane damage
-  // Target must roll DC10 + planar mod WIL save or gain Cursed debuff for 2 turns
-  // Additionally, if target already has Cursed debuff, also apply Hexed debuff for 2 turns (reduces endurance by 2 and deals 1d2 damage per turn)
-  // consume 3 MP, 1 chaos, produce 1 chaos
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Curse a target with weakness, reducing their resolve.
+   * - **Save:** Target must roll DC10 + planar mod WIL save or gain Cursed debuff for 2 turns (3 turns at level 5)
+   * - **Damage:** If save fails, also deal 1d3 + planar mod arcane damage
+   * - **Level 5:** Also apply Slow debuff for 1 turn if save fails
+   * - **Target:** Single target
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 chaos
+   */
   CurseOfWeakness = "CurseOfWeakness",
-  // Common
-  // Single target
-  // Target must roll DC10 + planar mod WIL save or gain Cursed debuff for 2 turns (3 at level 5)
-  // If save fails, also deal 1d3 + planar mod arcane damage
-  // consume 2 MP, produce 1 chaos
-  // At level 5: Also apply Slow debuff for 1 turn if save fails
 
   // ---------------
   // Pact (Life Drain/Sacrifice)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Drain vitality from an enemy, restoring your own health.
+   * - **Damage:** 1d6 + planar mod × skill level multiplier arcane damage
+   * - **Lifesteal:** Restore HP equal to 50% of damage dealt (75% at level 5)
+   * - **Target:** Single target
+   * 
+   * **Consume:** 3 MP, 1 chaos
+   * **Produce:** 1 chaos
+   */
   LifeDrain = "LifeDrain",
-  // Uncommon
-  // ACTIVE — Drain vitality from an enemy.
-  // Single target
-  // Deal 1d6 + planar mod * (1 + 0.1 * skill level) * skill level multiplier arcane damage
-  // Restore HP equal to 50% of damage dealt (75% at level 5)
-  // consume 3 MP, 1 chaos, produce 1 chaos
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Form a dark pact, sacrificing your health for immense power.
+   * - **Sacrifice:** Sacrifice 2d4 HP (1d4 at level 5)
+   * - **Effect:** Gain Dark Pact buff for 3 turns (4 turns at level 5)
+   * - **Dark Pact Buff:** All damage dealt increased by +25% (+35% at level 5), but you take +1 damage from all sources
+   * - **Level 5:** Also gain +2 planar mod while active
+   * 
+   * **Consume:** 0 (sacrifices HP instead)
+   * **Produce:** 2 chaos
+   */
   DarkPact = "DarkPact",
-  // Rare
-  // ACTIVE — Ultimate-ish.
-  // Sacrifice 2d4 HP (1d4 at level 5)
-  // Gain Dark Pact buff for 3 turns (4 at level 5)
-  // Dark Pact: All damage dealt increased by +25% (+35% at level 5), but you take +1 damage from all sources
-  // consume nothing, produce 2 chaos
-  // At level 5: Also gain +2 planar mod while active
 }
 
 export enum DuelistSkillId {
   // ---------------
   // Parry (Defensive Counter)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Assume defensive stance, ready to parry and counter.
+   * - **Effect:** Gain Parry buff for 1 turn (2 turns at level 5)
+   * - **Parry:** When attacked, roll DC10 + CONTROL mod END save. If passed, negate the attack and deal (1d6 + DEX mod) × skill level multiplier slash damage back to attacker
+   * 
+   * **Consume:** 3 SP, 1 neutral
+   * **Produce:** 1 wind
+   */
   ParryRiposte = "ParryRiposte",
-  // Uncommon
-  // ACTIVE — Assume defensive stance, ready to parry and counter.
-  // Gain Parry buff for 1 turn (2 at level 5).
-  // When attacked, roll DC10 + CONTROL mod END save. If passed, negate the attack and deal (1d6 + DEX mod) * skill level multiplier slash damage back to attacker.
-  // consume 3 SP, produce 1 wind
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Adopt a focused dueling stance, enhancing precision.
+   * - **Effect:** Gain DuelingStance buff for 3 turns (4 turns at level 5)
+   * - **DuelingStance Buff:** +2 hit roll, +2 crit chance, +1 STR
+   * - **Parry Bonus:** When you parry an attack, gain +5 AB gauge
+   * 
+   * **Consume:** 4 SP, 1 wind
+   * **Produce:** 1 neutral
+   */
   DuelingStance = "DuelingStance",
-  // Rare
-  // ACTIVE — Adopt a focused dueling stance, enhancing precision.
-  // Gain DuelingStance buff for 3 turns (4 at level 5).
-  // DuelingStance: +2 hit roll, +2 crit chance, +1 STR
-  // Additionally, when you parry an attack, gain +5 AB gauge
-  // consume 4 SP, 1 wind, produce 1 neutral
 
+  /**
+   * **Tier:** Common
+   * 
+   * Execute a perfect parrying strike while maintaining your guard.
+   * - **Damage:** (Weapon damage + DEX mod) × skill level multiplier slash damage
+   * - **Effect:** Extend Parry buff duration by 1 turn
+   * - **Requirement:** Must have Parry buff active
+   * - **Target:** Single target melee attack
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 wind
+   */
   PerfectParry = "PerfectParry",
-  // Common
-  // Single target melee attack
-  // Must have Parry buff active
-  // Deal (weapon damage + DEX mod) * (1 + 0.1 * skill level) * skill level multiplier slash damage
-  // Additionally, extend Parry buff duration by 1 turn
-  // consume 2 SP, produce 1 wind
 
   // ---------------
   // Precision (Accurate Strikes)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Execute a precise blade strike with perfect timing.
+   * - **Damage:** (1.0× weapon damage (1.2× at level 5)) × skill level multiplier slash damage
+   * - **Hit Bonus:** +3 hit roll
+   * - **Target:** Single target melee attack
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 wind
+   */
   PreciseStrike = "PreciseStrike",
-  // Common
-  // ACTIVE — Execute a precise blade strike with perfect timing.
-  // Single target melee attack
-  // Deal (weapon damage * (1.0 at base, 1.2 at level 5)) * skill level multiplier slash damage
-  // +3 hit roll
-  // consume 2 SP, produce 1 wind
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Feint to create an opening, then strike with precision.
+   * - **Damage:** (Weapon damage + DEX mod) × skill level multiplier slash damage
+   * - **Hit Bonus:** +4 hit roll (+6 at level 5)
+   * - **On Hit:** Gain +10 AB gauge and target loses 10 AB gauge
+   * - **Target:** Single target melee attack
+   * 
+   * **Consume:** 3 SP, 1 wind
+   * **Produce:** 1 neutral
+   */
   FeintStrike = "FeintStrike",
-  // Uncommon
-  // Single target melee attack
-  // Deal (weapon damage + DEX mod) * (1 + 0.1 * skill level) * skill level multiplier slash damage
-  // +4 hit roll (+6 at level 5)
-  // If this attack hits: Gain +10 AB gauge and target loses 10 AB gauge
-  // consume 3 SP, 1 wind, produce 1 neutral
 
   // ---------------
   // Flow (Multi-hit Combos)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Unleash a rapid flurry of blade strikes.
+   * - **Hits:** 2 hits (3 hits at level 5)
+   * - **Damage per Hit:** (0.7× weapon damage + DEX mod) × skill level multiplier slash damage
+   * - **Target:** Multi-hit melee attack
+   * 
+   * **Consume:** 4 SP, 1 wind
+   * **Produce:** 1 neutral
+   */
   BladeFlurry = "BladeFlurry",
-  // Uncommon
-  // ACTIVE — Unleash a rapid flurry of blade strikes.
-  // Multi-hit melee attack: 2 hits (3 hits at level 5)
-  // Each hit: Deal (weapon damage * 0.7 + DEX mod) * (1 + 0.1 * skill level) * skill level multiplier slash damage
-  // consume 4 SP, 1 wind, produce 1 neutral
 
+  /**
+   * **Tier:** Common
+   * 
+   * Strike in rapid succession, building momentum.
+   * - **Damage:** (Weapon damage + DEX mod) × skill level multiplier slash damage
+   * - **Combo Bonus:** If you've attacked this target in the previous turn, deal +25% damage and gain +5 AB gauge
+   * - **Target:** Single target melee attack
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 wind
+   */
   ComboStrike = "ComboStrike",
-  // Common
-  // Single target melee attack
-  // Deal (weapon damage + DEX mod) * (1 + 0.1 * skill level) * skill level multiplier slash damage
-  // If you've attacked this target in the previous turn: Deal +25% damage and gain +5 AB gauge
-  // consume 3 SP, produce 1 wind
 }
 
 export enum WitchSkillId {
   // ---------------
   // Hex (Marking/Setup)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Place a hex sigil on a target, marking them for increased suffering.
+   * - **Effect:** Apply HexMark debuff to target for 2 turns (3 turns at level 5)
+   * - **HexMark:** While marked, target takes +1d3 extra chaos damage from all sources
+   * - **Target:** Single target
+   * 
+   * **Consume:** 2 MP, 1 chaos
+   * **Produce:** 1 neutral
+   */
   ChaosBrand = "CurseMark",
-  // Uncommon
-  // ACTIVE — Place a hex sigil on a target, marking them for increased suffering.
-  // Single target
-  // Apply HexMark debuff to target for 2 turns (3 at level 5)
-  // While marked, target takes +1d3 extra chaos damage from all sources
-  // consume 2 MP, 1 chaos, produce 1 neutral
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Weave a hex into your attack, marking the target.
+   * - **Damage:** 1d3 + planar mod true damage
+   * - **Effect:** Apply HexMark debuff to target for 2 turns
+   * - **Bonus:** If target already has HexMark, also apply Cursed debuff for 1 turn
+   * - **Target:** Single target
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 chaos
+   */
   HexWeave = "HexWeave",
-  // Common
-  // Single target
-  // Apply HexMark debuff to target for 2 turns
-  // Deal 1d3 + planar mod true damage
-  // If target already has HexMark, also apply Cursed debuff for 1 turn
-  // consume 2 MP, produce 1 chaos
 
   // ---------------
   // Curse (Direct Debuff)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Launch a bolt of cursed energy at the target.
+   * - **Damage:** 1d3 + planar mod true arcane damage
+   * - **Save:** Target must roll DC8 + CONTROL mod WIL save or gain Cursed debuff for 2 turns
+   * - **Range:** Ranged single target
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 chaos
+   */
   PoisonDart = "CurseBolt",
-  // Common
-  // ACTIVE — Launch a bolt of cursed energy at the target.
-  // Ranged single target
-  // Deal 1d3 + planar mod true arcane damage
-  // Target must roll DC8 + CONTROL mod WIL save or gain Cursed debuff for 2 turns
-  // consume 2 MP, produce 1 chaos
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Curse a target with misfortune, hindering their abilities.
+   * - **Save:** Target must roll DC10 + CONTROL mod WIL save or gain Cursed debuff for 2 turns (3 turns at level 5)
+   * - **Slow:** If save fails, also apply Slow debuff for 1 turn
+   * - **Damage:** If target already has Cursed debuff, deal 1d4 + planar mod arcane damage
+   * - **Target:** Single target
+   * 
+   * **Consume:** 3 MP, 1 chaos
+   * **Produce:** 1 chaos
+   */
   MisfortuneCurse = "MisfortuneCurse",
-  // Uncommon
-  // Single target
-  // Target must roll DC10 + CONTROL mod WIL save or gain Cursed debuff for 2 turns (3 at level 5)
-  // Additionally, if save fails, also apply Slow debuff for 1 turn
-  // If target already has Cursed debuff, deal 1d4 + planar mod arcane damage
-  // consume 3 MP, 1 chaos, produce 1 chaos
 
   // ---------------
   // Chaos (Unpredictable Magic)
   // ---------------
+  /**
+   * **Tier:** Rare
+   * 
+   * Bind a target to a small effigy, creating a sympathetic link.
+   * - **Damage:** 1d4 + planar mod × skill level multiplier arcane damage
+   * - **Save:** Target must roll DC10 + CONTROL mod WIL save or gain Hexed debuff for 2 turns (reduces endurance by 2 and deals 1d2 damage per turn)
+   * - **Bonus:** If target has HexMark debuff, also apply Cursed debuff for 1 turn
+   * - **Target:** Single target
+   * 
+   * **Consume:** 4 MP, 1 chaos
+   * **Produce:** 1 neutral
+   */
   ChaosBinding = "HexDoll",
-  // Rare
-  // ACTIVE — Bind a target to a small effigy, creating a sympathetic link.
-  // Single target
-  // Deal 1d4 + planar mod * (1 + 0.1 * skill level) arcane damage
-  // Target must roll DC10 + CONTROL mod WIL save or gain Hexed debuff for 2 turns (reduces endurance by 2 and deals 1d2 damage per turn)
-  // If target has HexMark debuff, also apply Cursed debuff for 1 turn
-  // consume 4 MP, 1 chaos, produce 1 neutral
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Influence an enemy's mind with witchcraft, causing confusion.
+   * - **Save:** Target must roll DC10 + CONTROL mod WIL save or gain Charmed debuff for 1 turn (2 turns at level 5)
+   * - **Charmed Debuff:** On their turn, roll DC12 WIL save. If failed, target a random ally instead of intended target for their action
+   * - **Target:** Single target enemy
+   * 
+   * **Consume:** 3 MP, 1 chaos
+   * **Produce:** 1 neutral
+   */
   Bewitch = "Bewitch",
-  // Uncommon
-  // ACTIVE — Influence an enemy's mind with witchcraft, causing confusion.
-  // Single target enemy
-  // Target must roll DC10 + CONTROL mod WIL save or gain Charmed debuff for 1 turn (2 at level 5)
-  // Charmed: On their turn, roll DC12 WIL save. If failed, target a random ally instead of intended target for their action
-  // consume 3 MP, 1 chaos, produce 1 neutral
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Weave chaotic magic with unpredictable effects.
+   * - **Damage:** 1d4 + planar mod × skill level multiplier arcane damage
+   * - **Random Effect:** Roll 1d4: 1-2: Apply Cursed debuff for 1 turn, 3: Apply Slow debuff for 1 turn, 4: Apply Dazed debuff for 1 turn
+   * - **Target:** Single target
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 chaos
+   */
   ChaoticWeave = "ChaoticWeave",
-  // Common
-  // Single target
-  // Deal 1d4 + planar mod * (1 + 0.1 * skill level) arcane damage
-  // Roll 1d4: 1-2: Apply Cursed debuff for 1 turn, 3: Apply Slow debuff for 1 turn, 4: Apply Dazed debuff for 1 turn
-  // consume 2 MP, produce 1 chaos
 }
 
 export enum InquisitorSkillId {
   // ---------------
   // Smite (Holy Damage)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Launch a focused blast of radiant energy.
+   * - **Damage:** 1d6 + ((WIL + PLANAR) / 2) × skill level multiplier holy damage
+   * - **Save:** Target must roll DC8 + CONTROL mod WIL save or gain Exposed debuff for 2 turns
+   * - **Undead/Fiend Bonus:** +1d4 bonus damage against undead/fiends (1d8 at level 5)
+   * - **Range:** Ranged single target
+   * 
+   * **Consume:** 2 MP, 1 order
+   * **Produce:** 1 neutral
+   */
   RadiantSmite = "RadiantSmite",
-  // Common
-  // ACTIVE — Launch a focused blast of radiant energy.
-  // Ranged single target
-  // Deal 1d6 + ((WIL + PLANAR) / 2) * (1 + 0.1 * skill level) * skill level multiplier holy damage
-  // Target must roll DC8 + CONTROL mod WIL save or gain Exposed debuff for 2 turns
-  // +1d4 bonus damage against undead/fiends (1d8 at level 5)
-  // consume 2 MP, 1 order, produce 1 neutral
 
+  /**
+   * **Tier:** Rare
+   * 
+   * Call down a concentrated pillar of radiant force.
+   * - **Damage:** (2d6 + (WIL + PLANAR) × (1 + 0.15 × skill level)) × skill level multiplier holy damage
+   * - **Exposed Bonus:** +50% damage if target has Exposed debuff
+   * - **Undead/Fiend Bonus:** +1d8 against undead/fiends (2d8 at level 5)
+   * - **Target:** Single target
+   * 
+   * **Consume:** 5 MP, 2 order, 1 fire
+   * **Produce:** 1 neutral
+   */
   JudgmentDay = "JudgmentDay",
-  // Rare
-  // ACTIVE — Call down a concentrated pillar of radiant force.
-  // Single target
-  // Deal (2d6 + (WIL + PLANAR) * (1 + 0.15 * skill level)) * skill level multiplier holy damage
-  // +50% damage if target has Exposed debuff
-  // +1d8 against undead/fiends (2d8 at level 5)
-  // consume 5 MP, 2 order, 1 fire, produce 1 neutral
 
   // ---------------
   // Expose (Vulnerability Setup)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Reveal the enemy's wrongdoing or impurity.
+   * - **Effect:** Apply Exposed debuff for 2 turns (3 turns at level 5)
+   * - **Exposed Debuff:** Takes +1d3 damage from all sources. At level 5, also gain -2 crit defense
+   * - **Bonus:** You gain +(WIL mod / 2) hit roll against exposed enemies
+   * - **Target:** Single target enemy
+   * 
+   * **Consume:** 2 MP, 1 order
+   * **Produce:** 1 fire
+   */
   ExposeWeakness = "ExposeWeakness",
-  // Uncommon
-  // ACTIVE — Reveal the enemy's wrongdoing or impurity.
-  // Single target enemy
-  // Apply Exposed debuff for 2 turns (3 at level 5)
-  // Exposed: takes +1d3 damage from all sources. At level 5, also gain -2 crit defense (using perm value in debuff)
-  // You gain +WIL mod/2 hit roll against exposed enemies
-  // consume 2 MP, 1 order, produce 1 fire
 
   // ---------------
   // Purge (Utility/Dispel)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Attempt to forcibly remove magical buffs from a target.
+   * - **Save:** Target must roll DC10 + CONTROL mod WIL save
+   * - **Failed:** Remove 1-2 random buffs and deal (1d4 + WIL mod) × skill level multiplier holy damage
+   * - **Passed:** Deal half holy damage
+   * - **Target:** Single target
+   * 
+   * **Consume:** 3 MP, 1 fire
+   * **Produce:** 1 order
+   */
   PurgeMagic = "PurgeMagic",
-  // Uncommon
-  // ACTIVE — Attempt to forcibly remove magical buffs from a target.
-  // Single target
-  // Target must roll DC10 + CONTROL mod WIL save
-  // Failed: Remove 1-2 random buffs and deal (1d4 + WIL mod) * skill level multiplier holy damage
-  // Passed: Deal half holy damage
-  // consume 3 MP, 1 fire, produce 1 order
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Cleanse with holy flame while smiting enemies.
+   * - **Damage:** 1d4 + WIL mod × skill level multiplier holy damage
+   * - **Cleanse:** Remove 1 random debuff from self or 1 random ally
+   * - **Undead/Fiend Bonus:** If target is undead or fiend, deal +1d3 damage
+   * - **Target:** Single target enemy
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 order
+   */
   CleansingFlame = "CleansingFlame",
-  // Common
-  // Single target enemy
-  // Deal 1d4 + WIL mod * (1 + 0.1 * skill level) * skill level multiplier holy damage
-  // Remove 1 random debuff from self or 1 random ally
-  // If target is undead or fiend: Deal +1d3 damage
-  // consume 2 MP, produce 1 order
 }
 
 export enum ScholarSkillId {
   // ---------------
   // Analyze (Information/Vulnerability)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Mark a vulnerable spot on the enemy through analysis.
+   * - **Effect:** Apply Exposed debuff for 2 turns (3 turns at level 5)
+   * - **Exposed Debuff:** Takes +1d3 damage from all sources
+   * - **Level 5:** Exposed enemy also gains -2 to critical defense
+   * - **Target:** Single target enemy
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 neutral
+   */
   Analyze = "Analyze",
-  // Uncommon
-  // Single target enemy
-  // Mark a vulnerable spot on the enemy. Apply Exposed debuff for 2 turns (3 at level 5)
-  // Exposed: takes +1d3 damage from all sources
-  // At level 5, the exposed enemy also gains -2 to critical defense (using perm value in debuff)
-  // consume 2 MP, produce 1 neutral
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Study the enemy's weakness and strike.
+   * - **Effect:** Apply Exposed debuff for 1 turn
+   * - **Damage:** Additionally, deal 1d3 + INT mod true arcane damage
+   * - **Target:** Single target enemy
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 neutral
+   */
   WeaknessStudy = "WeaknessStudy",
-  // Common
-  // Single target enemy
-  // Apply Exposed debuff for 1 turn
-  // Additionally, deal 1d3 + INT mod true arcane damage
-  // consume 2 MP, produce 1 neutral
 
   // ---------------
   // Disrupt (Control/Interrupt)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Disrupt the target's combat pattern with knowledge.
+   * - **Save:** Force DC10 WIL save (DC12 at level 5)
+   * - **Failed:** Target gains Dazed debuff for 1 turn
+   * - **Success:** Reduce target's AB gauge by 20 (30 at level 5)
+   * - **Target:** Single target
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 neutral
+   */
   DisruptPattern = "DisruptPattern",
-  // Common
-  // Cantrip
-  // Single target
-  // Force DC10 WIL save (DC12 at level 5)
-  // Fail: target gains Dazed debuff for 1 turn
-  // Success: reduce target's AB gauge by 20 (30 at level 5)
-  // produce 1 neutral
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Interfere with the target's mental processes.
+   * - **Save:** Target must roll DC10 + INT mod WIL save or gain Dazed debuff for 1 turn (2 turns at level 5)
+   * - **AB Reduction:** Additionally, reduce target's AB gauge by 15
+   * - **Target:** Single target
+   * 
+   * **Consume:** 2 MP
+   * **Produce:** 1 neutral
+   */
   MentalInterference = "MentalInterference",
-  // Uncommon
-  // Single target
-  // Target must roll DC10 + INT mod WIL save or gain Dazed debuff for 1 turn (2 at level 5)
-  // Additionally, reduce target's AB gauge by 15
-  // consume 2 MP, produce 1 neutral
 
   // ---------------
   // Overload (Debuff Exploitation)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Overload the target's mind by exploiting existing debuffs.
+   * - **Damage:** 1d4 + INT mod × skill level multiplier true arcane damage (1d6 at level 5, 1d8 if target has ≥3 debuffs)
+   * - **Debuff Refresh:** Refresh 1 random debuff on the target (extend duration by 1 turn)
+   * - **Multi-Debuff Bonus:** If target has ≥3 debuffs, damage becomes 1d6 (1d8 at level 5)
+   * - **Target:** Single target
+   * 
+   * **Consume:** 3 MP
+   * **Produce:** 1 neutral
+   */
   CognitiveOverload = "CognitiveOverload",
-  // Uncommon
-  // Single target
-  // Deal 1d4 + INT mod * (1 + 0.1 * skill level) * skill level multiplier true arcane damage (1d6 at level 5)
-  // Refresh 1 random debuff on the target (extend duration by 1 turn)
-  // If target has ≥3 debuffs, damage becomes 1d6 (1d8 at level 5)
-  // consume 3 MP, produce 1 neutral
 
+  /**
+   * **Tier:** Common
+   * 
+   * Strike with debilitating precision, exploiting vulnerabilities.
+   * - **Damage:** (0.8× weapon damage + INT mod) × skill level multiplier arcane damage
+   * - **Debuff Bonus:** If target has ≥2 debuffs, deal +1d4 damage
+   * - **Multi-Debuff:** If target has ≥3 debuffs, also apply Slow debuff for 1 turn
+   * - **Target:** Single target melee attack
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 neutral
+   */
   DebilitatingStrike = "DebilitatingStrike",
-  // Common
-  // Single target melee attack
-  // Deal (weapon damage * 0.8 + INT mod) * (1 + 0.1 * skill level) * skill level multiplier arcane damage
-  // If target has ≥2 debuffs: Deal +1d4 damage
-  // If target has ≥3 debuffs: Also apply Slow debuff for 1 turn
-  // consume 3 SP, produce 1 neutral
 }
 
 export enum EngineerSkillId {
   // ---------------
   // Trap (Battlefield Control)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Set a bear trap on the battlefield.
+   * - **Trigger:** The next time an enemy uses a melee (physical) attack, the trap triggers
+   * - **Damage:** Deal (1d6 + DEX mod) × skill level multiplier pierce damage and remove the trap
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 fire
+   */
   BearTrap = "BearTrap",
-  // Common
-  // Set a bear trap on the battlefield. The next time an enemy uses a melee (physical) attack, the trap triggers
-  // Deal (1d6 + DEX mod) * skill level multiplier pierce damage and removing the trap
-  // consume 2 SP, produce 1 fire
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Set a tripwire on the battlefield.
+   * - **Trigger:** The next time an enemy moves or uses a melee attack, the trap triggers
+   * - **Save:** Target must roll DC10 + DEX mod AGI save or gain Stun debuff for 1 turn (2 turns at level 5)
+   * - **Damage:** Additionally, deal 1d4 + DEX mod pierce damage
+   * 
+   * **Consume:** 3 SP, 1 fire
+   * **Produce:** 1 neutral
+   */
   Tripwire = "Tripwire",
-  // Uncommon
-  // Set a tripwire on the battlefield. The next time an enemy moves or uses a melee attack, the trap triggers
-  // Target must roll DC10 + DEX mod AGI save or gain Stun debuff for 1 turn (2 at level 5)
-  // Additionally, deal 1d4 + DEX mod pierce damage
-  // consume 3 SP, 1 fire, produce 1 neutral
 
   // ---------------
   // Explosive (AoE Damage)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Fire an explosive bolt at a target.
+   * - **Damage:** (1d8 + DEX mod) × skill level multiplier fire damage to a target
+   * - **Splash:** If hit, deals 50% splash damage to adjacent enemies in the same row
+   * - **Requirement:** Requires bow (ranged attack)
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 fire
+   */
   ExplosiveBolt = "ExplosiveBolt",
-  // Common
-  // Ranged attack (requires bow)
-  // Fire an explosive bolt that deals (1d8 + DEX mod) * skill level multiplier fire damage to a target
-  // If hit, deals 50% splash damage to adjacent enemies in the same row
-  // consume 3 SP, produce 1 fire
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Throw a fragmentation grenade at the enemy front line.
+   * - **Damage:** (1d6 + DEX mod) × skill level multiplier fire damage to all enemies in front row
+   * - **Save:** Enemies must roll DC10 + DEX mod END save or gain Bleed debuff for 2 turns (1d3 damage per turn)
+   * - **Level 5:** Also apply Slow debuff for 1 turn to enemies who fail save
+   * 
+   * **Consume:** 4 SP, 1 fire
+   * **Produce:** 1 fire
+   */
   FragmentationGrenade = "FragmentationGrenade",
-  // Uncommon
-  // AoE front row
-  // Deal (1d6 + DEX mod) * (1 + 0.1 * skill level) * skill level multiplier fire damage to all enemies in front row
-  // Enemies must roll DC10 + DEX mod END save or gain Bleed debuff for 2 turns (1d3 damage per turn)
-  // consume 4 SP, 1 fire, produce 1 fire
-  // At level 5: Also apply Slow debuff for 1 turn to enemies who fail save
 
   // ---------------
   // Construct (Mechanical Utilities)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Enter a mechanical overdrive state, enhancing physical capabilities.
+   * - **Effect:** Gain Mechanical Overdrive buff for 2 turns (3 turns at level 5)
+   * - **Mechanical Overdrive Buff:** Gain +2 STR and +2 AGI
+   * - **AB Gauge:** Additionally, gain +5 AB gauge at the start of each turn
+   * 
+   * **Consume:** 4 SP, 1 fire
+   * **Produce:** 1 neutral
+   */
   MechanicalOverdrive = "MechanicalOverdrive",
-  // Uncommon
-  // Self-buff for 2 turns (3 at level 5)
-  // Mechanical Overdrive: Gain +2 STR and +2 AGI
-  // Additionally, gain +5 AB gauge at the start of each turn
-  // consume 4 SP, 1 fire, produce 1 neutral
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Shift gears to boost an ally's performance.
+   * - **Target:** Single target ally (including self)
+   * - **Effect:** Grant Haste buff for 2 turns (3 turns at level 5)
+   * - **SP Restoration:** Additionally, restore 2 SP
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 fire
+   */
   GearShift = "GearShift",
-  // Common
-  // Single target ally (including self)
-  // Grant Haste buff for 2 turns (3 at level 5)
-  // Additionally, restore 2 SP
-  // consume 2 SP, produce 1 fire
 }
 
 export enum NomadSkillId {
   // ---------------
   // Adaptive (Position-Changing)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Strike while adapting your position to the flow of battle.
+   * - **Damage:** Weapon damage + attribute modifier × (1.0 + 0.1 per 2 character levels, max 1.5 at level 10) × skill level multiplier
+   * - **Position Change:** Must change position: front → back or back → front (if slot available)
+   * - **Penalty:** -2 hit roll penalty
+   * - **Range:** This attack has no range penalty
+   * - **Target:** Melee attack that changes position
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 neutral
+   */
   AdaptiveStrike = "AdaptiveStrike",
-  // Common
-  // Melee attack that changes position
-  // Deal weapon damage + attribute modifier according to weapon * (1.0 + 0.1 per 2 character levels, max 1.5 at level 10) * skill level multiplier damage
-  // Must change position: front -> back or back -> front (if slot available)
-  // -2 hit roll penalty
-  // This attack has no range penalty
-  // consume 2 SP, produce 1 neutral
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Retreat tactically while striking back.
+   * - **Movement:** Move to back row (if available) and grant Retreat buff for 1 turn (2 turns at level 5)
+   * - **Damage:** Additionally, deal (0.8× weapon damage + attribute mod) × skill level multiplier damage to closest enemy
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 wind
+   */
   AdaptiveRetreat = "AdaptiveRetreat",
-  // Uncommon
-  // Move to back row (if available) and grant Retreat buff for 1 turn (2 at level 5)
-  // Additionally, deal (weapon damage * 0.8 + attribute mod) * (1 + 0.1 * skill level) * skill level multiplier damage to closest enemy
-  // consume 3 SP, produce 1 wind
 
   // ---------------
   // Tactical (Position-Based Effects)
   // ---------------
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Adapt your stance to your current position.
+   * - **Front Row:** Engulf your weapon with fire and attack, dealing (weapon damage + attribute modifier + 1d4) × skill level multiplier fire damage. Enemy must roll DC10 END save (DC12 at level 5) or gain Burn debuff for 1d3 turns
+   * - **Back Row:** Gain Retreat buff for 1 turn (2 turns at level 5)
+   * - **Requirement:** Must equip dagger or blade
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 fire
+   */
   TacticalSlash = "TacticalSlash",
-  // Uncommon
-  // Self row based: Adapt your stance to your current position
-  // Must equip dagger or blade
-  // Front row: Engulf your weapon with fire and attack, dealing (weapon damage + attribute modifier + 1d4) * skill level multiplier fire damage
-  // Enemy must roll DC10 END save (DC12 at level 5) or gain Burn debuff for 1d3 turns
-  // Back row: Gain Retreat buff for 1 turn (2 at level 5)
-  // consume 3 SP, produce 1 fire
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike adapts to enemy position.
+   * - **Enemy in Front Row:** Throw hot sand into enemy eyes, dealing 1d2 true damage. Enemy must roll DC10 AGI save (DC12 at level 5) or gain Blind debuff for 1 turn (-3 hit roll)
+   * - **Enemy in Back Row:** Launch a powerful shot, dealing (weapon damage + attribute modifier) × (skill level multiplier + 0.3) piercing damage
+   * - **Range:** No range penalty
+   * - **Requirement:** Must equip bow
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 neutral
+   */
   TacticalShot = "TacticalShot",
-  // Uncommon
-  // Enemy row based: Strike adapts to enemy position
-  // Must equip bow
-  // Enemy in front row: Throw hot sand into enemy eyes, dealing 1d2 true damage
-  // Enemy must roll DC10 AGI save (DC12 at level 5) or gain Blind debuff for 1 turn (-3 hit roll)
-  // Enemy in back row: Launch a powerful shot, dealing (weapon damage + attribute modifier) * (skill level multiplier + 0.3) piercing damage
-  // No range penalty
-  // consume 3 SP, produce 1 neutral
 
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Advance tactically while attacking.
+   * - **Movement:** Move to front row (if available) and deal (weapon damage + attribute mod) × skill level multiplier damage
+   * - **Bonus:** If moving from back row, gain +5 AB gauge
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 neutral
+   */
   TacticalAdvance = "TacticalAdvance",
-  // Common
-  // Move to front row (if available) and deal (weapon damage + attribute mod) * (1 + 0.1 * skill level) * skill level multiplier damage
-  // If moving from back row: Gain +5 AB gauge
-  // consume 2 SP, produce 1 neutral
 
   // ---------------
   // Mobility (Movement/Positioning)
   // ---------------
+  /**
+   * **Tier:** Common (Cantrip)
+   * 
+   * Quickly change position with enhanced mobility.
+   * - **Movement:** Change position (front ↔ back) if slot available
+   * - **AB Gauge:** Gain +10 AB gauge
+   * - **Haste:** Additionally, gain Haste buff for 1 turn
+   * 
+   * **Consume:** 2 SP
+   * **Produce:** 1 wind
+   */
   QuickStep = "QuickStep",
-  // Common
-  // Change position (front <-> back) if slot available
-  // Gain +10 AB gauge
-  // Additionally, gain Haste buff for 1 turn
-  // consume 2 SP, produce 1 wind
 
+  /**
+   * **Tier:** Uncommon
+   * 
+   * Strike while repositioning the enemy.
+   * - **Damage:** (Weapon damage + attribute mod) × skill level multiplier
+   * - **Front Row Push:** If target is in front row, push target to back row (if slot available) and deal +1d4 damage
+   * - **Back Row Pull:** If target is in back row, pull target to front row (if slot available) and deal +1d4 damage
+   * - **Level 5:** Also gain +5 AB gauge if position change succeeds
+   * - **Target:** Single target melee attack
+   * 
+   * **Consume:** 3 SP
+   * **Produce:** 1 neutral
+   */
   RepositioningStrike = "RepositioningStrike",
-  // Uncommon
-  // Single target melee attack
-  // Deal (weapon damage + attribute mod) * (1 + 0.1 * skill level) * skill level multiplier damage
-  // If target is in front row: Push target to back row (if slot available) and deal +1d4 damage
-  // If target is in back row: Pull target to front row (if slot available) and deal +1d4 damage
-  // consume 3 SP, produce 1 neutral
-  // At level 5: Also gain +5 AB gauge if position change succeeds
 }

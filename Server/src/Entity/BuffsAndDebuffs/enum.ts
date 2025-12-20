@@ -18,6 +18,7 @@ export enum BuffEnum {
   warCry = "warCry",
   edgeCharge = "edgeCharge",
   spellParry = "spellParry",
+  chargeSurge = "chargeSurge",
   rage = "rage",
   aegisShield = "aegisShield",
   aegisPulse = "aegisPulse",
@@ -31,6 +32,18 @@ export enum BuffEnum {
   arcaneCharge = "arcaneCharge",
   faith = "faith",
   holyWater = "holyWater",
+  lucky = "lucky",
+  badLuck = "badLuck",
+  foreseen = "foreseen",
+  planarGrab = "planarGrab",
+  arcaneBattery = "arcaneBattery",
+  stoneSkin = "stoneSkin",
+  tailwind = "tailwind",
+  windFury = "windFury",
+  wardOfProtection = "wardOfProtection",
+  battleHardened = "battleHardened",
+  challenger = "challenger",
+  battleFormation = "battleFormation",
 }
 
 export enum DebuffEnum {
@@ -46,6 +59,7 @@ export enum DebuffEnum {
   entangled = "entangled",
   hexMark = "hexMark",
   charmed = "charmed",
+  challenged = "challenged",
 
   // Cooldown
   disruptPattern = "disruptPattern",
@@ -62,4 +76,10 @@ export enum DebuffEnum {
   
   // Nomad
   blind = "blind",
+  
+  // Mage - Water
+  soaked = "soaked",
+  
+  // Mage - Earth
+  stoneBounded = "stoneBounded",
 }

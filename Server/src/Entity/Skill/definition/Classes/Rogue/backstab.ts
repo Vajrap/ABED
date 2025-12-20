@@ -36,13 +36,8 @@ export const backstab = new RogueSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 5,
-    elements: [
-      {
-        element: "chaos",
-        value: 1,
-      },
-    ],
+    sp: 3,
+    elements: [],
   },
   produce: {
     hp: 0,
@@ -50,8 +45,8 @@ export const backstab = new RogueSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
-        min: 0,
+        element: "chaos",
+        min: 1,
         max: 1,
       },
     ],

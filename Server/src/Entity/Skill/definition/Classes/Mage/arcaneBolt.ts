@@ -7,9 +7,7 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { MageSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
@@ -19,12 +17,12 @@ export const arcaneBolt = new MageSkill({
   name: { en: "Arcane Bolt", th: "ลูกเวทมนตร์" },
   description: {
     text: {
-      en: "Unleash a focused bolt of raw arcane energy.\nDeal <FORMULA> arcane damage.\n.Given self {5}1d2:1{/} <BuffArcaneCharge> stacks.",
-      th: "ปล่อยลูกพลังงานเวทมนตร์ดิบ\nสร้างความเสียหายอาร์เคน <FORMULA>\nได้รับ <BuffArcaneCharge> สแตค {5}1d2:1{/}",
+      en: "Launch a bolt of arcane energy. Deal <FORMULA> arcane damage to a target. Gain 1 Arcane Charge stack.",
+      th: "ยิงลูกพลังงานอาร์เคน สร้างความเสียหายอาร์เคน <FORMULA> ให้เป้าหมาย ได้รับ 1 สแต็ก Arcane Charge",
     },
     formula: {
-      en: "({5}'1d8':'1d6'{/} + <PlanarMod>) × <SkillLevelMultiplier>",
-      th: "({5}'1d8':'1d6'{/} + <PlanarMod>) × <SkillLevelMultiplier>",
+      en: "(1d6 + <PlanarMod>) × <SkillLevelMultiplier>",
+      th: "(1d6 + <PlanarMod>) × <SkillLevelMultiplier>",
     },
   },
   requirement: {},
@@ -44,26 +42,21 @@ export const arcaneBolt = new MageSkill({
         targets: [],
       };
     }
-    const baseDiceDamage = actor.roll({
-      amount: 1,
-      face: 6,
-      stat: 'planar'
-    })
-    const totalDamage = Math.max(
-      0,
-      (baseDiceDamage) * skillLevelMultiplier(skillLevel),
-    );
+    // Calculate damage: (1d6 + planar mod) × skill level multiplier
+    const levelScalar = skillLevelMultiplier(skillLevel);
+    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar" }) * levelScalar);
+    
     const damageOutput = {
-      damage: Math.floor(totalDamage),
-      hit: actor.rollTwenty({ stat: 'control' }),
-      crit: actor.rollTwenty({ stat: 'luck' }),
+      damage: totalDamage,
+      hit: actor.rollTwenty({}),
+      crit: actor.rollTwenty({}),
       type: DamageType.arcane,
       isMagic: true,
     };
     const totalDamageResult = resolveDamage(actor.id, target.id, damageOutput, location);
-    const arcaneCharge = skillLevel >= 5 ? actor.roll({ amount: 1, face: 2 }) : 1;
-
-    buffsAndDebuffsRepository.arcaneCharge.appender(actor, { turnsAppending: arcaneCharge });
+    
+    // Always gain 1 Arcane Charge stack
+    buffsAndDebuffsRepository.arcaneCharge.appender(actor, { turnsAppending: 1 });
 
     const turnResult: TurnResult = {
       content: {

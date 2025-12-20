@@ -29,20 +29,20 @@ export const planarAbsorption = new MysticSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.rare,
+  tier: TierEnum.uncommon,
   consume: {
     hp: 0,
-    mp: 6,
+    mp: 3,
     sp: 0,
     elements: [
-      { element: "neutral", value: 2 },
+      { element: "water", value: 2 },
     ],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [{ element: "neutral", min: 1, max: 1 }],
   },
   exec: (
     actor: Character,

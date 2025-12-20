@@ -12,6 +12,8 @@ import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
+import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const planarEcho = new SeerSkill({
   id: SeerSkillId.PlanarEcho,
@@ -21,8 +23,8 @@ export const planarEcho = new SeerSkill({
   },
   description: {
     text: {
-      en: "Echo the planar energy around, dealing <FORMULA> arcane damage to a target. If hit, the target must roll DC10 LUKsave or decrease AB gauge by 10.",
-      th: "คาดการณ์อนาคต, ได้รับพระการันตี Precognition ของ 1 รอบ: การคาดการณ์: ศัตรูต� procon",
+      en: "Echo the planar energy around, dealing <FORMULA> arcane damage to a target. If hit, the target must roll DC10 LUK save or decrease AB gauge by 10. On save failed, gain 1 Lucky stack. On save success, gain 1 BadLuck stack.",
+      th: "สะท้อนพลังระนาบ สร้างความเสียหายอาร์เคน <FORMULA> ให้เป้าหมาย หากถูกโจมตี เป้าหมายต้องทอย DC10 LUK save หรือลด AB gauge ลง 10 หากเซฟล้มเหลว ได้รับ 1 Lucky หากเซฟสำเร็จ ได้รับ 1 BadLuck",
     },
     formula: {
       en: "1d6 + <CHAmod> * (1 + 0.1 * skill level)",
@@ -84,6 +86,7 @@ export const planarEcho = new SeerSkill({
     const damageResult = resolveDamage(user.id, target.id, damageOutput, location);
     
     // If hit, target must roll DC10 LUK save or decrease AB gauge by 10
+    // If save failed, gain 1 Lucky stack to self else gain 1 BadLuck stack to self
     let abGaugeReduced = 0;
     if (damageResult.isHit) {
       const saveRoll = target.rollSave("luck");
@@ -94,6 +97,11 @@ export const planarEcho = new SeerSkill({
         const initialGauge = target.abGauge;
         target.abGauge = Math.max(0, target.abGauge - 10);
         abGaugeReduced = initialGauge - target.abGauge;
+        
+        // Gain 1 Lucky stack to self
+        buffsRepository[BuffEnum.lucky].appender(user, { turnsAppending: 1 });
+      } else {
+        buffsRepository[BuffEnum.badLuck].appender(user, { turnsAppending: 1 });
       }
     }
     

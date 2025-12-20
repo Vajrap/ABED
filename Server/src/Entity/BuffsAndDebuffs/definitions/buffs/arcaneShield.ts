@@ -5,38 +5,47 @@ import type { L10N } from "src/InterFacesEnumsAndTypes/L10N";
 
 export const arcaneShield = new BuffDef({
   name: {
-    en: "arcaneShield",
+    en: "Arcane Shield",
     th: "โล่เวทมนตร์",
   },
   description: {
-    en: "A magical shield that protects the character. Each stack absorbs 1 point of damage.",
-    th: "โล่เวทมนตร์ที่ปกป้องตัวละคร สแต็กที่มีอยู่จะดูดซับ 1 หน่วยของความเสียหาย",
+    en: "When attacked, roll d20 + planar mod (stored in counter) END save. If passed, negate that attack and gain 1 Arcane Charge stack. Removed after checking.",
+    th: "เมื่อถูกโจมตี ทอย d20 + planar mod (เก็บไว้ใน counter) END save หากผ่าน จะยกเลิกการโจมตีนั้นและได้รับ 1 สแต็ก Arcane Charge ลบออกหลังการตรวจสอบ",
   },
+  formula: "d20 + planar mod (from counter) END save vs attack",
   appender: function (
     actor: Character,
     options: AppenderOptions,
   ): L10N {
-    const { turnsAppending: value } = options;
+    const { turnsAppending: value, universalCounter: planarMod = 0 } = options;
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.arcaneShield);
     if (!entry) {
       actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.arcaneShield, {
         value: value,
-        counter: 0,
+        counter: planarMod, // Store planar mod for save calculation
       });
     } else {
       entry.value += value;
+      // Keep the highest planar mod if extending
+      if (planarMod > entry.counter) {
+        entry.counter = planarMod;
+      }
     }
 
     return {
-      en: `${actor.name.en} got arcane shield buff: value goes up by ${value}`,
-      th: `${actor.name.th} ได้รับ "โล่เวทมนตร์" ${value} หน่วย`,
+      en: `${actor.name.en} gained Arcane Shield buff for ${value} turn(s)!`,
+      th: `${actor.name.th} ได้รับ "โล่เวทมนตร์" ${value} เทิร์น!`,
     };
   },
-  // Arcane shield won't go down by itself,
   resolver: function (actor: Character): { canAct: boolean; content: L10N } {
     const entry = actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.arcaneShield);
-    if (entry && entry.value === 0) {
-      actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.arcaneShield);
+    if (entry) {
+      if (entry.value > 0) {
+        entry.value -= 1;
+      }
+      if (entry.value === 0) {
+        actor.buffsAndDebuffs.buffs.entry.delete(BuffEnum.arcaneShield);
+      }
     }
 
     return {

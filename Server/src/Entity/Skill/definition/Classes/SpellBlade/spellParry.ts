@@ -26,7 +26,7 @@ export const spellParry = new SpellbladeSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 0,
+    sp: 4,
     elements: [
       { element: "wind", value: 1 },
     ],

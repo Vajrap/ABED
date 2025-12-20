@@ -5,7 +5,7 @@ import {
   type ElementKey,
 } from "src/InterFacesEnumsAndTypes/Enums";
 import type { Character } from "../Character/Character";
-import { BuffAndDebuffEnum, BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
+import { BuffEnum, DebuffEnum } from "../BuffsAndDebuffs/enum";
 import { rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { TraitEnum } from "../Trait/enum";
@@ -171,7 +171,35 @@ class TargetSelector {
       return filtered[0];
     }
 
-    // Check for taunt targets AFTER filtering
+    // Challenge/Challenged mechanic: Prioritize challenge target, bypass taunt
+    // If actor has Challenger buff, target enemy with Challenged debuff
+    // If actor has Challenged debuff, target enemy with Challenger buff
+    const actorHasChallenger = this.actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.challenger)?.value && this.actor.buffsAndDebuffs.buffs.entry.get(BuffEnum.challenger)!.value > 0;
+    const actorHasChallenged = this.actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.challenged)?.value && this.actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.challenged)!.value > 0;
+    
+    if (actorHasChallenger) {
+      // Actor has Challenger buff - look for enemy with Challenged debuff
+      const challengedTargets = filtered.filter((target) => {
+        const challenged = target.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.challenged);
+        return challenged !== undefined && challenged.value > 0;
+      });
+      if (challengedTargets.length > 0) {
+        // Return random from challenged targets (bypass taunt)
+        return challengedTargets[Math.floor(Math.random() * challengedTargets.length)];
+      }
+    } else if (actorHasChallenged) {
+      // Actor has Challenged debuff - look for enemy with Challenger buff
+      const challengerTargets = filtered.filter((target) => {
+        const challenger = target.buffsAndDebuffs.buffs.entry.get(BuffEnum.challenger);
+        return challenger !== undefined && challenger.value > 0;
+      });
+      if (challengerTargets.length > 0) {
+        // Return random from challenger targets (bypass taunt)
+        return challengerTargets[Math.floor(Math.random() * challengerTargets.length)];
+      }
+    }
+
+    // Check for taunt targets AFTER filtering (and after challenge check)
     if (this.tauntCount) {
       const tauntingTargets = filtered.filter((target) => {
         return (

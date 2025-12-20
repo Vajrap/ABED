@@ -44,7 +44,7 @@ export const holyRattle = new ShamanSkill({
   tier: TierEnum.common,
   consume: {
     hp: 0,
-    mp: 0,
+    mp: 2,
     sp: 0,
     elements: [
       {
@@ -74,7 +74,7 @@ export const holyRattle = new ShamanSkill({
   ) => {
     // Calculate number of targets: 1 + 1d(skillLevel)
     let numTargets = 1 + roll(1).d(skillLevel).total;
-    const duration = Math.min(1 + Math.floor(skillLevel * 0.5), skillLevel);
+    const duration = skillLevel >= 5 ? 3 : 2;
     
     // Select random allies (excluding self)
     const allies = actorParty.filter(ally => ally.id !== actor.id);

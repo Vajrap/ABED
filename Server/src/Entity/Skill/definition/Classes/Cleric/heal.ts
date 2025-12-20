@@ -8,6 +8,7 @@ import { ClericSkill } from "./index";
 import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { basicAttack } from "../../basicAttack";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
 export const heal = new ClericSkill({
   id: ClericSkillId.Heal,
@@ -21,8 +22,8 @@ export const heal = new ClericSkill({
       th: "ร่ายเวทย์มนต์รักษา ฟื้นฟู HP ให้กับพันธมิตร \nรักษา <FORMULA> \nจากนั้นทอย D20 + will mod vs DC13 หากผ่าน [b]ลบหนึ่งดีบัฟแบบสุ่ม[/b]จากเป้าหมาย\nหากพันธมิตรทั้งหมดมี HP เต็ม จะโจมตีปกติแทน\nหากรักษาสำเร็จ ได้รับ 1 ศรัทธา",
     },
     formula: {
-      en: "1d4 + <WILmod>",
-      th: "1d4 + <WILmod>",
+      en: "(1d4 + <WILmod>) × <SkillLevelMultiplier>",
+      th: "(1d4 + <WILmod>) × <SkillLevelMultiplier>",
     },
   },
   requirement: {},
@@ -83,11 +84,12 @@ export const heal = new ClericSkill({
         };
       }
 
-      const healAmount = actor.roll({
+      const baseHeal = actor.roll({
         amount: 1,
         face: 4,
         stat: "willpower",
       });
+      const healAmount = Math.max(0, baseHeal * skillLevelMultiplier(skillLevel));
 
       // Apply healing
       const beforeHp = target.vitals.hp.current;

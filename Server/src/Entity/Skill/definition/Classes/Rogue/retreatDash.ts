@@ -18,8 +18,8 @@ export const retreatDash = new RogueSkill({
   },
   description: {
     text: {
-      en: "Make a desperate dash to safety, putting distance between you and danger.\nGain <BuffRetreat> for {5}'2':'1'{/} turn.\nAttempts to move to backline.",
-      th: "วิ่งหนีอย่างสิ้นหวัง สร้างระยะห่างระหว่างคุณกับอันตราย\nได้รับ <BuffRetreat> {5}'3':'2'{/} เทิร์น\nพยายามย้ายไปแถวหลัง",
+      en: "Make a desperate dash to safety, putting distance between you and danger.\nGain <BuffRetreat> for 1 turn.\nAttempts to move to backline.",
+      th: "วิ่งหนีอย่างสิ้นหวัง สร้างระยะห่างระหว่างคุณกับอันตราย\nได้รับ <BuffRetreat> 1 เทิร์น\nพยายามย้ายไปแถวหลัง",
     },
   },
   requirement: {},
@@ -56,7 +56,7 @@ export const retreatDash = new RogueSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    buffsAndDebuffsRepository.retreat.appender(actor, { turnsAppending: skillLevel >= 5 ? 3 : 2 });
+    buffsAndDebuffsRepository.retreat.appender(actor, { turnsAppending: 1 });
     let moved = false;
 
     if (actor.position <= 2) {

@@ -49,6 +49,22 @@ import { blind } from "./definitions/debuffs/blind";
 import { arcaneCharge } from "./definitions/buffs/arcaneCharge";
 import { faith } from "./definitions/buffs/faith";
 import { holyWater } from "./definitions/buffs/holyWater";
+import { lucky } from "./definitions/buffs/lucky";
+import { badLuck } from "./definitions/buffs/badLuck";
+import { foreseen } from "./definitions/buffs/foreseen";
+import { planarGrab } from "./definitions/buffs/planarGrab";
+import { arcaneBattery } from "./definitions/buffs/arcaneBattery";
+import { stoneSkin } from "./definitions/buffs/stoneSkin";
+import { tailwind } from "./definitions/buffs/tailwind";
+import { windFury } from "./definitions/buffs/windFury";
+import { chargeSurge } from "./definitions/buffs/chargeSurge";
+import { wardOfProtection } from "./definitions/buffs/wardOfProtection";
+import { battleHardened } from "./definitions/buffs/battleHardened";
+import { challenger } from "./definitions/buffs/challenger";
+import { battleFormation } from "./definitions/buffs/battleFormation";
+import { soaked } from "./definitions/debuffs/soaked";
+import { stoneBounded } from "./definitions/debuffs/stoneBounded";
+import { challenged } from "./definitions/debuffs/challenged";
 
 export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.haste]: haste,
@@ -79,6 +95,20 @@ export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.precognition]: precognition,
   [BuffEnum.arcaneCharge]: arcaneCharge,
   [BuffEnum.faith]: faith,
+  [BuffEnum.holyWater]: holyWater,
+  [BuffEnum.lucky]: lucky,
+  [BuffEnum.badLuck]: badLuck,
+  [BuffEnum.foreseen]: foreseen,
+  [BuffEnum.planarGrab]: planarGrab,
+  [BuffEnum.arcaneBattery]: arcaneBattery,
+  [BuffEnum.stoneSkin]: stoneSkin,
+  [BuffEnum.tailwind]: tailwind,
+  [BuffEnum.windFury]: windFury,
+  [BuffEnum.chargeSurge]: chargeSurge,
+  [BuffEnum.wardOfProtection]: wardOfProtection,
+  [BuffEnum.battleHardened]: battleHardened,
+  [BuffEnum.challenger]: challenger,
+  [BuffEnum.battleFormation]: battleFormation,
 };
 
 export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
@@ -94,6 +124,7 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   [DebuffEnum.entangled]: entangled,
   [DebuffEnum.hexMark]: hexMark,
   [DebuffEnum.charmed]: charmed,
+  [DebuffEnum.challenged]: challenged,
 
   // Cooldown
   [DebuffEnum.disruptPattern]: disruptPattern,
@@ -110,6 +141,12 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   
   // Nomad
   [DebuffEnum.blind]: blind,
+  
+  // Mage - Water
+  [DebuffEnum.soaked]: soaked,
+  
+  // Mage - Earth
+  [DebuffEnum.stoneBounded]: stoneBounded,
 };
 
 export const buffsAndDebuffsRepository = {

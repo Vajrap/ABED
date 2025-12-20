@@ -22,11 +22,11 @@ export const mistStep = new MysticSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.common,
+  tier: TierEnum.uncommon,
   consume: {
     hp: 0,
-    mp: 3,
-    sp: 0,
+    mp: 0,
+    sp: 3,
     elements: [{ element: "neutral", value: 1 }],
   },
   produce: {
@@ -46,7 +46,7 @@ export const mistStep = new MysticSkill({
     let moved = false;
     let gainedEvasion = false;
 
-    // Remove Slow debuff if present
+    // Remove Slow or Entangled (Bind) debuff if present
     const slowEntry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.slow);
     const hasSlow = !!slowEntry;
     if (hasSlow && slowEntry) {
@@ -56,6 +56,12 @@ export const mistStep = new MysticSkill({
         slowEntry.value,
       );
       actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.slow);
+    }
+    
+    const entangledEntry = actor.buffsAndDebuffs.debuffs.entry.get(DebuffEnum.entangled);
+    const hasEntangled = !!entangledEntry;
+    if (hasEntangled) {
+      actor.buffsAndDebuffs.debuffs.entry.delete(DebuffEnum.entangled);
     }
 
     if (isFrontRow) {
@@ -76,6 +82,7 @@ export const mistStep = new MysticSkill({
 
     const messages: string[] = [];
     if (hasSlow) messages.push("removed Slow");
+    if (hasEntangled) messages.push("removed Bind");
     if (moved) messages.push("moved to backline");
     if (gainedEvasion) messages.push("gained evasion");
     if (!isFrontRow) messages.push(`gained +3 dodge for ${skillLevel >= 5 ? 2 : 1} turn(s)`);
