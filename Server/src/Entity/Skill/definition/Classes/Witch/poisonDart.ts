@@ -10,7 +10,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WitchSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
@@ -34,6 +33,7 @@ export const poisonDart = new WitchSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.common,
+  isFallback: true, // PoisonDart: no elemental resources (produces chaos, but doesn't consume any), no buff requirement
   consume: {
     hp: 0,
     mp: 2,
@@ -75,32 +75,35 @@ export const poisonDart = new WitchSkill({
       };
     }
 
-    // Calculate damage: 1d3 (1d4 at level 5) + INT mod * (1 + 0.1 * skill level) as TRUE damage
-    const intMod = statMod(actor.attribute.getTotal("intelligence"));
+    // Calculate damage: 1d3 + planar mod × skill level multiplier true arcane damage
+    const planarMod = statMod(actor.attribute.getTotal("planar"));
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const levelMultiplier = skillLevelMultiplier(skillLevel);
     
-    const baseDiceDamage = roll(1).d(skillLevel >= 5 ? 4 : 3).total;
-    const totalDamage = Math.max(0, Math.floor((baseDiceDamage + intMod) * levelMultiplier));
+    // Damage dice - should not get bless/curse
+    const baseDiceDamage = actor.roll({ amount: 1, face: 3, stat: "planar", applyBlessCurse: false });
+    const totalDamage = Math.max(0, Math.floor((baseDiceDamage + planarMod) * levelMultiplier));
 
+    // True damage still needs hit/crit rolls for consistency (though true damage bypasses mitigation)
     const damageOutput = {
       damage: totalDamage,
-      hit: 999, // Auto-hit for true damage
-      crit: 0,
-      type: DamageType.dark,
+      hit: actor.rollTwenty({stat: 'willpower'}), // Curse/dark magic uses WIL for hit
+      crit: actor.rollTwenty({stat: 'luck'}),
+      type: DamageType.arcane,
       isMagic: true,
       trueDamage: true, // TRUE DAMAGE - bypasses all mitigation
     };
 
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
 
-    // Check for cursed debuff (DC6 + control mod willpower save) - LOW DC
+    // Check for cursed debuff (DC8 + CONTROL mod WIL save)
     let cursedMessage = "";
-    const willpowerDC = 6 + controlMod; // Low DC as requested
+    const willpowerDC = 8 + controlMod;
     const willpowerSave = target.rollSave("willpower");
     
     if (willpowerSave < willpowerDC) {
-      const cursedDuration = skillLevel >= 5 ? 3 : 2;
+      // Enum says Cursed debuff for 2 turns (no level 5 upgrade mentioned)
+      const cursedDuration = 2;
       buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: cursedDuration });
       cursedMessage = ` ${target.name.en} is cursed!`;
     }

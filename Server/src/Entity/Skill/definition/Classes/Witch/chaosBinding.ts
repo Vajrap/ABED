@@ -28,6 +28,7 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WitchSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const chaosBinding = new WitchSkill({
   id: WitchSkillId.ChaosBinding,
@@ -47,7 +48,8 @@ export const chaosBinding = new WitchSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  tier: TierEnum.uncommon,
+  tier: TierEnum.rare, // Enum says Rare tier
+  isFallback: false, // ChaosBinding: consumes 2 chaos elements
   consume: {
     hp: 0,
     mp: 3,
@@ -94,37 +96,42 @@ export const chaosBinding = new WitchSkill({
       };
     }
 
-    // Calculate immediate damage: 1d4 + INT mod * (1 + 0.1 * skill level)
-    const intMod = statMod(actor.attribute.getTotal("intelligence"));
+    // Calculate immediate damage: 1d4 + planar mod × skill level multiplier arcane damage
+    const planarMod = statMod(actor.attribute.getTotal("planar"));
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const levelMultiplier = skillLevelMultiplier(skillLevel);
     
-    const baseDiceDamage = actor.roll({ amount: 1, face: 4, applyBlessCurse: false });
-    const totalDamage = Math.max(0, Math.floor((baseDiceDamage + intMod) * levelMultiplier));
+    // Damage dice - should not get bless/curse
+    const baseDiceDamage = actor.roll({ amount: 1, face: 4, stat: "planar", applyBlessCurse: false });
+    const totalDamage = Math.max(0, Math.floor((baseDiceDamage + planarMod) * levelMultiplier));
 
+    // Curse/dark magic uses WIL for hit, LUCK for crit
     const damageOutput = {
       damage: totalDamage,
-      hit: 999, // Auto-hit
-      crit: 0,
-      type: DamageType.dark,
+      hit: actor.rollTwenty({stat: 'willpower'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
+      type: DamageType.arcane,
       isMagic: true,
     };
 
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
 
     // Check for hexed debuff (DC10 + control mod willpower save)
+    // Check if target has HexMark debuff BEFORE applying hexed (for bonus)
+    const hadHexMarkBefore = target.buffsAndDebuffs.debuffs.entry.has(DebuffEnum.hexMark);
+    
     let hexedMessage = "";
     const willpowerDC = 10 + controlMod;
     const willpowerSave = target.rollSave("willpower");
     
     if (willpowerSave < willpowerDC) {
-      const hexedDuration = skillLevel >= 5 ? 3 : 2;
+      const hexedDuration = 2; // Enum says 2 turns
       buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: hexedDuration });
       hexedMessage = ` ${target.name.en} is hexed!`;
       
-      // At level 5, also apply cursed debuff
-      if (skillLevel >= 5) {
-        buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: 2 });
+      // Bonus: If target has HexMark debuff, also apply Cursed debuff for 1 turn
+      if (hadHexMarkBefore) {
+        buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: 1 });
         hexedMessage += ` ${target.name.en} is also cursed!`;
       }
     }

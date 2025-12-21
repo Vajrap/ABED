@@ -26,6 +26,7 @@ export const analyze = new ScholarSkill({
   equipmentNeeded: [],
   notExistDebuff: [DebuffEnum.analyze],
   tier: TierEnum.uncommon,
+  isFallback: true, // Analyze: no elemental resources, no buff requirement (has notExistDebuff though)
   consume: {
     hp: 0,
     mp: 2,

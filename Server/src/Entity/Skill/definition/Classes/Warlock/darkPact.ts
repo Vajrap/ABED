@@ -22,7 +22,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { WarlockSkill } from "./index";
 
 export const darkPact = new WarlockSkill({
@@ -44,17 +43,15 @@ export const darkPact = new WarlockSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.rare,
+  isFallback: false, // DarkPact: consumes 1 fire element (and 5 HP)
+  // Note: This skill needs a DarkPact buff definition, currently implemented incorrectly as damage skill
   consume: {
-    hp: 10, // Will be adjusted based on skill level in exec
+    hp: 5, // Enum says 5 HP
     mp: 0,
     sp: 0,
     elements: [
       {
-        element: "chaos",
-        value: 2,
-      },
-      {
-        element: "water",
+        element: "fire",
         value: 1,
       },
     ],
@@ -65,7 +62,7 @@ export const darkPact = new WarlockSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
+        element: "chaos",
         min: 1,
         max: 1,
       },
@@ -109,17 +106,19 @@ export const darkPact = new WarlockSkill({
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const luckMod = statMod(actor.attribute.getTotal("luck"));
     
-    const baseDiceDamage = roll(2).d(10).total;
+    // Damage dice - should not get bless/curse
+    const baseDiceDamage = actor.roll({ amount: 2, face: 10, stat: "planar", applyBlessCurse: false });
     const levelMultiplier = 1 + 0.15 * skillLevel;
     const planarDamage = (2 * planarMod) * levelMultiplier;
-    const extraDamage = skillLevel >= 7 ? roll(1).d(6).total : 0;
+    const extraDamage = skillLevel >= 7 ? actor.roll({ amount: 1, face: 6, applyBlessCurse: false }) : 0;
     
     const totalDamage = Math.max(0, Math.floor(baseDiceDamage + planarDamage + extraDamage));
 
+    // Dark/chaos magic - context suggests CONTROL for hit
     const damageOutput = {
       damage: totalDamage,
-      hit: rollTwenty().total + controlMod,
-      crit: rollTwenty().total + luckMod,
+      hit: actor.rollTwenty({stat: 'control'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.dark,
       isMagic: true,
       trueDamage: true,

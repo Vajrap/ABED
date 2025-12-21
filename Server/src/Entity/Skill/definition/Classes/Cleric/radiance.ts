@@ -51,6 +51,7 @@ export const radiance = new ClericSkill({
       },
     ],
   },
+  isFallback: true, // Radiance: no elemental resources, no buff requirement
   exec: (
     actor: Character,
     actorParty: Character[],
@@ -74,12 +75,17 @@ export const radiance = new ClericSkill({
       };
     }
 
-    let totalDamage = actor.roll({
+    // Base damage dice - should not get bless/curse
+    const baseDamage = actor.roll({
       amount: 1,
       face: 6,
       stat: "willpower",
+      applyBlessCurse: false,
     }) * skillLevelMultiplier(skillLevel);
 
+    let totalDamage = baseDamage;
+
+    // Bonus damage vs undead/fiend - should not get bless/curse
     if (
       target.type === CharacterType.undead ||
       target.type === CharacterType.fiend
@@ -87,12 +93,14 @@ export const radiance = new ClericSkill({
       totalDamage += actor.roll({
         amount: 1,
         face: 4,
+        applyBlessCurse: false,
       });
     }
 
+    // Radiance is divine/holy magic, so use WIL for hit (not CONTROL)
     const damageOutput = {
       damage: Math.floor(totalDamage),
-      hit: actor.rollTwenty({stat: "control"}),
+      hit: actor.rollTwenty({stat: "willpower"}),
       crit: actor.rollTwenty({stat: "luck"}),
       type: DamageType.radiance,
       isMagic: true,

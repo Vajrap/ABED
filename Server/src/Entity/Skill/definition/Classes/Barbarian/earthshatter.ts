@@ -7,7 +7,6 @@ import { getTarget } from "src/Entity/Battle/getTarget";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { BarbarianSkill } from "./index";
 import { statMod } from "src/Utils/statMod";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
@@ -77,13 +76,15 @@ export const earthshatter = new BarbarianSkill({
     const targetMessagesTh: string[] = [];
 
     for (const target of targets) {
-      const baseDamage = roll(1).d(diceFace).total + strMod;
+      // Damage dice - should not get bless/curse
+      const baseDamage = actor.roll({ amount: 1, face: diceFace, stat: "strength", applyBlessCurse: false }) + strMod;
       const scaledDamage = Math.max(0, baseDamage * levelScalar);
 
+      // Physical attacks use DEX for accuracy
       const damageOutput = {
         damage: Math.floor(scaledDamage),
-        hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
-        crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
+        hit: actor.rollTwenty({ stat: "dexterity" }),
+        crit: actor.rollTwenty({ stat: "luck" }),
         type: DamageType.blunt,
         isMagic: false,
       };

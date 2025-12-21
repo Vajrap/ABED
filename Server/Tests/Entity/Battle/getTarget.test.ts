@@ -415,4 +415,664 @@ describe("getTarget", () => {
       expect(result).toBe(target3);
     });
   });
+
+  describe("Guardian Mechanic", () => {
+    let guardian: Character;
+    let ally1: Character;
+    let ally2: Character;
+
+    beforeEach(() => {
+      guardian = CharacterFactory.create()
+        .withName({ en: "Guardian", th: "ผู้คุ้มกัน" })
+        .build();
+      guardian.id = "guardian-1"; // Unique ID
+      guardian.resources.earth = 0;
+      guardian.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 100 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      ally1 = CharacterFactory.create()
+        .withName({ en: "Ally1", th: "พันธมิตร1" })
+        .build();
+      ally1.id = "ally-1"; // Unique ID
+      ally1.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 50 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      ally2 = CharacterFactory.create()
+        .withName({ en: "Ally2", th: "พันธมิตร2" })
+        .build();
+      ally2.id = "ally-2"; // Unique ID
+      ally2.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 75 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+    });
+
+    it("should redirect attack to Guardian when ally is targeted", () => {
+      // Set up Guardian buff on guardian character
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+      // Make sure guardian has higher HP so it's not selected directly
+      guardian.vitals.hp.current = 100;
+      ally1.vitals.hp.current = 50; // Lowest HP
+      ally2.vitals.hp.current = 75;
+
+      const actorParty: Character[] = [];
+      const enemyParty = [guardian, ally1, ally2];
+
+      // Target ally1 (lowest HP), should redirect to guardian
+      const result = getTarget(actor, actorParty, enemyParty, "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Debug: Check if guardian is in filtered targets
+      // The guardian should be in the enemy party and pass all filters
+      expect(result).toBe(guardian);
+      expect(guardian.resources.earth).toBe(1);
+      // Guardian buff should still be present (not consumed immediately, removed by turn resolver)
+      const guardianBuff = guardian.buffsAndDebuffs.buffs.entry.get(BuffEnum.guardian);
+      expect(guardianBuff).toBeDefined();
+      expect(guardianBuff?.value).toBe(1);
+    });
+
+    it("should redirect to Guardian with simple random selection", () => {
+      // Simple test without sorting to isolate Guardian mechanic
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+      guardian.vitals.hp.current = 100;
+      ally1.vitals.hp.current = 50;
+
+      const actorParty: Character[] = [];
+      const enemyParty = [guardian, ally1];
+
+      // Random selection should still trigger Guardian redirect
+      const results: Character[] = [];
+      for (let i = 0; i < 20; i++) {
+        const result = getTarget(actor, actorParty, enemyParty, "enemy").one();
+        if (result) results.push(result);
+      }
+
+      // All results should be guardian (since ally1 is selected, guardian redirects)
+      // Note: This assumes guardian redirect always happens when ally1 is selected
+      const guardianCount = results.filter(r => r.id === guardian.id).length;
+      // With only 2 targets and random selection, we should get some guardian redirects
+      expect(guardianCount).toBeGreaterThan(0);
+    });
+
+    it("should not redirect if Guardian is the selected target", () => {
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+      guardian.vitals.hp.current = 10; // Guardian has lowest HP
+
+      const actorParty: Character[] = [];
+      const enemyParty = [guardian, ally1, ally2];
+
+      const initialEarth = guardian.resources.earth;
+      const result = getTarget(actor, actorParty, enemyParty, "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Should target guardian directly, no redirect
+      expect(result).toBe(guardian);
+      expect(guardian.resources.earth).toBe(initialEarth); // No bonus earth
+      // Guardian buff should still be there (not consumed when guardian is direct target)
+      expect(guardian.buffsAndDebuffs.buffs.entry.get(BuffEnum.guardian)?.value).toBe(1);
+    });
+
+    it("should not redirect if Guardian buff value is 0", () => {
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 0,
+        counter: 0,
+      });
+
+      const actorParty: Character[] = [];
+      const enemyParty = [guardian, ally1, ally2];
+
+      const result = getTarget(actor, actorParty, enemyParty, "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Should target ally1, not guardian
+      expect(result).toBe(ally1);
+      expect(guardian.resources.earth).toBe(0);
+    });
+
+    it("should not redirect if Guardian is not in filtered targets (different target type)", () => {
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+
+      const actorParty = [guardian];
+      const enemyParty = [ally1, ally2];
+
+      // Target enemies, guardian is in actor party so shouldn't redirect
+      const result = getTarget(actor, actorParty, enemyParty, "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      expect(result).toBe(ally1);
+      expect(guardian.resources.earth).toBe(0);
+    });
+
+    it("should redirect when targeting allies and guardian is in ally party", () => {
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+      // Make sure guardian has higher HP so it's not selected directly
+      guardian.vitals.hp.current = 100;
+      ally1.vitals.hp.current = 50; // Lowest HP
+
+      const actorParty = [guardian, ally1, ally2];
+      const enemyParty: Character[] = [];
+
+      // Target allies, should redirect to guardian
+      const result = getTarget(actor, actorParty, enemyParty, "ally")
+        .with("least", "currentHP")
+        .one();
+
+      expect(result).toBe(guardian);
+      expect(guardian.resources.earth).toBe(1);
+      // Guardian buff should still be present (not consumed immediately, removed by turn resolver)
+      const guardianBuff = guardian.buffsAndDebuffs.buffs.entry.get(BuffEnum.guardian);
+      expect(guardianBuff).toBeDefined();
+      expect(guardianBuff?.value).toBe(1);
+    });
+
+    it("should work with taunt - taunt first, then guardian redirect", () => {
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+      ally1.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
+        value: 1,
+        counter: 0,
+      });
+      // Make sure guardian has higher HP so it's not selected directly
+      guardian.vitals.hp.current = 100;
+      ally1.vitals.hp.current = 50;
+
+      const actorParty: Character[] = [];
+      const enemyParty = [guardian, ally1, ally2];
+
+      // Taunt selects ally1, then guardian redirects
+      const result = getTarget(actor, actorParty, enemyParty, "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      expect(result).toBe(guardian);
+      expect(guardian.resources.earth).toBe(1);
+    });
+  });
+
+  describe("Challenge/Challenged Mechanic", () => {
+    let enemy1: Character;
+    let enemy2: Character;
+    let enemy3: Character;
+
+    beforeEach(() => {
+      enemy1 = CharacterFactory.create()
+        .withName({ en: "Enemy1", th: "ศัตรู1" })
+        .build();
+      enemy1.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 100 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      enemy2 = CharacterFactory.create()
+        .withName({ en: "Enemy2", th: "ศัตรู2" })
+        .build();
+      enemy2.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 50 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      enemy3 = CharacterFactory.create()
+        .withName({ en: "Enemy3", th: "ศัตรู3" })
+        .build();
+      enemy3.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 25 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+    });
+
+    it("should prioritize Challenged targets when actor has Challenger buff", () => {
+      actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.challenger, {
+        value: 1,
+        counter: 0,
+      });
+
+      // enemy2 has Challenged debuff and lowest HP
+      enemy2.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.challenged, {
+        value: 1,
+        counter: 0,
+      });
+
+      const result = getTarget(actor, [], [enemy1, enemy2, enemy3], "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Should target enemy2 (has Challenged), not enemy3 (lowest HP)
+      expect(result).toBe(enemy2);
+    });
+
+    it("should prioritize Challenger targets when actor has Challenged debuff", () => {
+      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.challenged, {
+        value: 1,
+        counter: 0,
+      });
+
+      // enemy1 has Challenger buff
+      enemy1.buffsAndDebuffs.buffs.entry.set(BuffEnum.challenger, {
+        value: 1,
+        counter: 0,
+      });
+
+      const result = getTarget(actor, [], [enemy1, enemy2, enemy3], "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Should target enemy1 (has Challenger), not enemy3 (lowest HP)
+      expect(result).toBe(enemy1);
+    });
+
+    it("should bypass taunt when Challenge/Challenged is active", () => {
+      actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.challenger, {
+        value: 1,
+        counter: 0,
+      });
+
+      enemy1.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
+        value: 1,
+        counter: 0,
+      });
+
+      enemy2.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.challenged, {
+        value: 1,
+        counter: 0,
+      });
+
+      const result = getTarget(actor, [], [enemy1, enemy2, enemy3], "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Should target enemy2 (Challenged), not enemy1 (taunt)
+      expect(result).toBe(enemy2);
+    });
+
+    it("should return random from multiple Challenged targets", () => {
+      actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.challenger, {
+        value: 1,
+        counter: 0,
+      });
+
+      enemy1.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.challenged, {
+        value: 1,
+        counter: 0,
+      });
+      enemy2.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.challenged, {
+        value: 1,
+        counter: 0,
+      });
+
+      const results: Character[] = [];
+      for (let i = 0; i < 20; i++) {
+        const result = getTarget(actor, [], [enemy1, enemy2, enemy3], "enemy")
+          .with("least", "currentHP")
+          .one();
+        if (result) results.push(result);
+      }
+
+      // Should only get enemy1 or enemy2 (both have Challenged)
+      const uniqueResults = new Set(results);
+      expect(uniqueResults.size).toBeLessThanOrEqual(2);
+      expect(uniqueResults.has(enemy1)).toBe(true);
+      expect(uniqueResults.has(enemy2)).toBe(true);
+      expect(uniqueResults.has(enemy3)).toBe(false);
+    });
+
+    it("should not prioritize if Challenger buff value is 0", () => {
+      actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.challenger, {
+        value: 0,
+        counter: 0,
+      });
+
+      enemy2.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.challenged, {
+        value: 1,
+        counter: 0,
+      });
+
+      const result = getTarget(actor, [], [enemy1, enemy2, enemy3], "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Should target enemy3 (lowest HP), not enemy2 (Challenged)
+      expect(result).toBe(enemy3);
+    });
+
+    it("should not prioritize if Challenged debuff value is 0", () => {
+      actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.challenger, {
+        value: 1,
+        counter: 0,
+      });
+
+      enemy2.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.challenged, {
+        value: 0,
+        counter: 0,
+      });
+
+      const result = getTarget(actor, [], [enemy1, enemy2, enemy3], "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Should target enemy3 (lowest HP), not enemy2 (Challenged value is 0)
+      expect(result).toBe(enemy3);
+    });
+  });
+
+  describe("Charm Mechanic", () => {
+    let ally1: Character;
+    let ally2: Character;
+    let enemy1: Character;
+    let enemy2: Character;
+
+    beforeEach(() => {
+      ally1 = CharacterFactory.create()
+        .withName({ en: "Ally1", th: "พันธมิตร1" })
+        .build();
+      ally1.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 100 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      ally2 = CharacterFactory.create()
+        .withName({ en: "Ally2", th: "พันธมิตร2" })
+        .build();
+      ally2.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 100 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      enemy1 = CharacterFactory.create()
+        .withName({ en: "Enemy1", th: "ศัตรู1" })
+        .build();
+      enemy1.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 100 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      enemy2 = CharacterFactory.create()
+        .withName({ en: "Enemy2", th: "ศัตรู2" })
+        .build();
+      enemy2.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 100 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+    });
+
+    it("should target wrong party when charmed and can't resist (targeting enemies)", () => {
+      // Set actor to have low willpower so they can't resist
+      actor.attribute.getStat("willpower").base = 1;
+      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.charmed, {
+        value: 1,
+        counter: 0,
+      });
+
+      // Mock rollTwenty to return low value so resistance fails
+      // Note: This test relies on probability, but with willpower 1, resistance is very likely to fail
+      // We'll need to test multiple times or mock the dice roll
+      const actorParty = [ally1, ally2];
+      const enemyParty = [enemy1, enemy2];
+
+      // Run multiple times to account for randomness in resistance check
+      let wrongPartyCount = 0;
+      for (let i = 0; i < 50; i++) {
+        const result = getTarget(actor, actorParty, enemyParty, "enemy").one();
+        // If charmed and can't resist, should target allies instead of enemies
+        if (result && actorParty.includes(result)) {
+          wrongPartyCount++;
+        }
+      }
+
+      // With willpower 1, most attempts should fail resistance
+      // This is a probabilistic test, but should work most of the time
+      expect(wrongPartyCount).toBeGreaterThan(0);
+    });
+
+    it("should target wrong party when charmed and can't resist (targeting allies)", () => {
+      actor.attribute.getStat("willpower").base = 1;
+      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.charmed, {
+        value: 1,
+        counter: 0,
+      });
+
+      const actorParty = [ally1, ally2];
+      const enemyParty = [enemy1, enemy2];
+
+      let wrongPartyCount = 0;
+      for (let i = 0; i < 50; i++) {
+        const result = getTarget(actor, actorParty, enemyParty, "ally").one();
+        // If charmed and can't resist, should target enemies instead of allies
+        if (result && enemyParty.includes(result)) {
+          wrongPartyCount++;
+        }
+      }
+
+      expect(wrongPartyCount).toBeGreaterThan(0);
+    });
+
+    it("should not affect targeting when not charmed", () => {
+      actor.attribute.getStat("willpower").base = 10;
+      // No charmed debuff
+
+      const actorParty = [ally1, ally2];
+      const enemyParty = [enemy1, enemy2];
+
+      const result = getTarget(actor, actorParty, enemyParty, "enemy").one();
+      expect(result).toBeDefined();
+      expect(enemyParty).toContain(result);
+    });
+
+    it("should not affect targeting when charmed but can resist", () => {
+      // High willpower should allow resistance
+      actor.attribute.getStat("willpower").base = 20;
+      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.charmed, {
+        value: 1,
+        counter: 0,
+      });
+
+      const actorParty = [ally1, ally2];
+      const enemyParty = [enemy1, enemy2];
+
+      // With high willpower, should resist charm most of the time
+      let correctPartyCount = 0;
+      for (let i = 0; i < 50; i++) {
+        const result = getTarget(actor, actorParty, enemyParty, "enemy").one();
+        if (result && enemyParty.includes(result)) {
+          correctPartyCount++;
+        }
+      }
+
+      // Should target correct party most of the time with high willpower
+      // With willpower 20, resistance check is rollTwenty + statMod(20) = rollTwenty + 5
+      // This should be > 15 most of the time (only fails on 1-10, so ~50% chance)
+      // But we're testing 50 times, so we should get at least 20 correct targets
+      expect(correctPartyCount).toBeGreaterThan(20);
+    });
+
+    it("should not affect 'any' target type", () => {
+      actor.attribute.getStat("willpower").base = 1;
+      actor.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.charmed, {
+        value: 1,
+        counter: 0,
+      });
+
+      const actorParty = [ally1, ally2];
+      const enemyParty = [enemy1, enemy2];
+
+      // "any" should return all characters regardless of charm
+      const result = getTarget(actor, actorParty, enemyParty, "any").all();
+      expect(result.length).toBe(4);
+      expect(result).toContain(ally1);
+      expect(result).toContain(ally2);
+      expect(result).toContain(enemy1);
+      expect(result).toContain(enemy2);
+    });
+  });
+
+  describe("Complex Combinations", () => {
+    let guardian: Character;
+    let ally1: Character;
+    let enemy1: Character;
+    let enemy2: Character;
+
+    beforeEach(() => {
+      guardian = CharacterFactory.create()
+        .withName({ en: "Guardian", th: "ผู้คุ้มกัน" })
+        .build();
+      guardian.id = "guardian-2"; // Unique ID
+      guardian.resources.earth = 0;
+      guardian.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 100 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      ally1 = CharacterFactory.create()
+        .withName({ en: "Ally1", th: "พันธมิตร1" })
+        .build();
+      ally1.id = "ally-combo-1"; // Unique ID
+      ally1.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 50 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      enemy1 = CharacterFactory.create()
+        .withName({ en: "Enemy1", th: "ศัตรู1" })
+        .build();
+      enemy1.id = "enemy-1"; // Unique ID
+      enemy1.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 100 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+
+      enemy2 = CharacterFactory.create()
+        .withName({ en: "Enemy2", th: "ศัตรู2" })
+        .build();
+      enemy2.id = "enemy-2"; // Unique ID
+      enemy2.vitals = new CharacterVitals({
+        hp: new Vital({ base: 100, current: 75 }) as any,
+        mp: new Vital({ base: 100, current: 100 }) as any,
+        sp: new Vital({ base: 100, current: 100 }) as any,
+      });
+    });
+
+    it("should handle Challenge -> Taunt -> Guardian priority correctly", () => {
+      // Actor has Challenger buff
+      actor.buffsAndDebuffs.buffs.entry.set(BuffEnum.challenger, {
+        value: 1,
+        counter: 0,
+      });
+
+      // enemy1 has Challenged and Taunt
+      enemy1.buffsAndDebuffs.debuffs.entry.set(DebuffEnum.challenged, {
+        value: 1,
+        counter: 0,
+      });
+      enemy1.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
+        value: 1,
+        counter: 0,
+      });
+
+      // enemy2 has lower HP
+      enemy2.vitals.hp.current = 25;
+
+      // Guardian in enemy party with higher HP
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+      guardian.vitals.hp.current = 100;
+
+      const actorParty: Character[] = [];
+      const enemyParty = [guardian, enemy1, enemy2];
+
+      const result = getTarget(actor, actorParty, enemyParty, "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Note: Currently Challenge returns early and bypasses Guardian redirect
+      // This test verifies the current behavior - Challenge selects enemy1 directly
+      // If Guardian redirect should work with Challenge, that would be a code change
+      expect(result).toBe(enemy1);
+    });
+
+    it("should handle Taunt -> Guardian priority correctly (without Challenge)", () => {
+      // No Challenge, just Taunt and Guardian
+      enemy1.buffsAndDebuffs.buffs.entry.set(BuffEnum.taunt, {
+        value: 1,
+        counter: 0,
+      });
+
+      // Guardian in enemy party with higher HP
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+      guardian.vitals.hp.current = 100;
+      enemy1.vitals.hp.current = 50;
+
+      const actorParty: Character[] = [];
+      const enemyParty = [guardian, enemy1, enemy2];
+
+      const result = getTarget(actor, actorParty, enemyParty, "enemy")
+        .with("least", "currentHP")
+        .one();
+
+      // Taunt selects enemy1, then Guardian should redirect
+      expect(result).toBe(guardian);
+      expect(guardian.resources.earth).toBe(1);
+    });
+
+    it("should handle Guardian with dead targets", () => {
+      guardian.buffsAndDebuffs.buffs.entry.set(BuffEnum.guardian, {
+        value: 1,
+        counter: 0,
+      });
+      enemy1.vitals.hp.current = 0; // Dead
+
+      const actorParty: Character[] = [];
+      const enemyParty = [guardian, enemy1];
+
+      // Should exclude dead enemy1, so guardian is the only target
+      const result = getTarget(actor, actorParty, enemyParty, "enemy")
+        .dead("exclude")
+        .one();
+
+      // Should get guardian (enemy1 is dead and excluded)
+      expect(result).toBe(guardian);
+    });
+  });
 });

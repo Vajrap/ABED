@@ -7,7 +7,6 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { PaladinSkill } from "./index";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
@@ -71,7 +70,8 @@ export const aegisPulse = new PaladinSkill({
 
     const willMod = statMod(actor.attribute.getTotal("willpower"));
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const baseHeal = roll(1).d(4).total + willMod;
+    // Healing/damage dice - should not get bless/curse
+    const baseHeal = actor.roll({ amount: 1, face: 4, stat: "willpower", applyBlessCurse: false }) + willMod;
     const healAmount = Math.floor(baseHeal * levelScalar);
     const damageAmount = Math.floor(baseHeal * levelScalar);
 
@@ -94,10 +94,11 @@ export const aegisPulse = new PaladinSkill({
     // Dealing holy damage to all enemies
     const enemies = getTarget(actor, actorParty, targetParty, "enemy").all();
     for (const enemy of enemies) {
+      // Divine/holy magic uses WIL for hit, LUCK for crit
       const damageOutput = {
         damage: damageAmount,
-        hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
-        crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
+        hit: actor.rollTwenty({stat: 'willpower'}),
+        crit: actor.rollTwenty({stat: 'luck'}),
         type: DamageType.radiance,
         isMagic: true,
       };

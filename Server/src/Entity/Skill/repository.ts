@@ -52,6 +52,9 @@ import { challengeStrike } from "./definition/Classes/Warrior/challengeStrike";
 import { finishingBlow } from "./definition/Classes/Warrior/finishingBlow";
 import { taunt } from "./definition/Classes/Guardian/taunt";
 import { shieldUp } from "./definition/Classes/Guardian/shieldUp";
+import { fortressStance } from "./definition/Classes/Guardian/fortressStance";
+import { sentinelDuty } from "./definition/Classes/Guardian/sentinelDuty";
+import { guardian } from "./definition/Classes/Guardian/guardian";
 import { fireBolt } from "./definition/Classes/Mage/fireBolt";
 import { burningHand } from "./definition/Classes/Mage/burningHand";
 import { fireBall } from "./definition/Classes/Mage/fireBall";
@@ -66,6 +69,7 @@ import { wardOfProtection } from "./definition/Classes/Shaman/wardOfProtection";
 import { harmonization } from "./definition/Classes/Shaman/harmonization";
 import { dualNature } from "./definition/Classes/Shaman/dualNature";
 import { arcaneBolt } from "./definition/Classes/Mage/arcaneBolt";
+import { arcaneMissiles } from "./definition/Classes/Mage/arcaneMissiles";
 import { worksYouMaggots } from "./definition/MOBs/Goblin/worksYouMaggots";
 import { commanderScream } from "./definition/MOBs/Goblin/commanderScream";
 import { whip } from "./definition/MOBs/Goblin/whip";
@@ -82,6 +86,9 @@ import { holyWater } from "./definition/Classes/Cleric/holyWater";
 import { analyze } from "./definition/Classes/Scholar/analyze";
 import { disruptPattern } from "./definition/Classes/Scholar/disruptPattern";
 import { cognitiveOverload } from "./definition/Classes/Scholar/cognitiveOverload";
+import { weaknessStudy } from "./definition/Classes/Scholar/weaknessStudy";
+import { mentalInterference } from "./definition/Classes/Scholar/mentalInterference";
+import { debilitatingStrike } from "./definition/Classes/Scholar/debilitatingStrike";
 import { mistStep } from "./definition/Classes/Mystic/mistStep";
 import { mistPierce } from "./definition/Classes/Mystic/mistPierce";
 import { planarAbsorption } from "./definition/Classes/Mystic/planarAbsorption";
@@ -112,28 +119,49 @@ import { shieldBash } from "./definition/Classes/Knight/shieldBash";
 import { divineStrike } from "./definition/Classes/Paladin/divineStrike";
 import { aegisPulse } from "./definition/Classes/Paladin/aegisPulse";
 import { aegisShield } from "./definition/Classes/Paladin/aegisShield";
+import { righteousSmite } from "./definition/Classes/Paladin/righteousSmite";
+import { divineWrath } from "./definition/Classes/Paladin/divineWrath";
+import { rallyingCry } from "./definition/Classes/Paladin/rallyingCry";
+import { inspiringPresence } from "./definition/Classes/Paladin/inspiringPresence";
 import { vineWhip } from "./definition/Classes/Druid/vineWhip";
 import { throwSpear } from "./definition/Classes/Druid/throwSpear";
 import { rejuvenatingMist } from "./definition/Classes/Druid/rejuvenatingMist";
+import { thornBurst } from "./definition/Classes/Druid/thornBurst";
+import { naturesGrasp } from "./definition/Classes/Druid/naturesGrasp";
+import { nurturingBloom } from "./definition/Classes/Druid/nurturingBloom";
+import { naturalResilience } from "./definition/Classes/Druid/naturalResilience";
+import { primalStrike } from "./definition/Classes/Druid/primalStrike";
+import { wildInstinctSkill } from "./definition/Classes/Druid/wildInstinct";
 import { palmStrike } from "./definition/Classes/Monk/palmStrike";
 import { meditation } from "./definition/Classes/Monk/meditation";
 import { flurryOfBlows } from "./definition/Classes/Monk/flurryOfBlows";
+import { stunningFist } from "./definition/Classes/Monk/stunningFist";
+import { precisionStrike } from "./definition/Classes/Monk/precisionStrike";
+import { dizzyingPalm } from "./definition/Classes/Monk/dizzyingPalm";
 import { chaosBolt } from "./definition/Classes/Warlock/shadowBolt";
 import { lifeDrain } from "./definition/Classes/Warlock/lifeDrain";
 import { darkPact } from "./definition/Classes/Warlock/darkPact";
 import { corruption } from "./definition/Classes/Warlock/corruption";
+import { chaosBurst } from "./definition/Classes/Warlock/chaosBurst";
+import { voidBolt } from "./definition/Classes/Warlock/voidBolt";
+import { curseOfWeakness } from "./definition/Classes/Warlock/curseOfWeakness";
 import { preciseStrike } from "./definition/Classes/Duelist/preciseStrike";
 import { parryRiposte } from "./definition/Classes/Duelist/parryRiposte";
 import { bladeFlurry } from "./definition/Classes/Duelist/bladeFlurry";
 import { duelingStance } from "./definition/Classes/Duelist/duelingStance";
+import { feintStrike } from "./definition/Classes/Duelist/feintStrike";
 import { poisonDart } from "./definition/Classes/Witch/poisonDart";
 import { chaosBrand } from "./definition/Classes/Witch/chaosBrand";
 import { chaosBinding } from "./definition/Classes/Witch/chaosBinding";
 import { bewitch } from "./definition/Classes/Witch/bewitch";
+import { hexWeave } from "./definition/Classes/Witch/hexWeave";
+import { misfortuneCurse } from "./definition/Classes/Witch/misfortuneCurse";
+import { chaoticWeave } from "./definition/Classes/Witch/chaoticWeave";
 import { radiantSmite } from "./definition/Classes/Inquisitor/radiantSmite";
 import { exposeWeakness } from "./definition/Classes/Inquisitor/exposeWeakness";
 import { judgmentDay } from "./definition/Classes/Inquisitor/judgmentDay";
 import { purgeMagic } from "./definition/Classes/Inquisitor/purgeMagic";
+import { cleansingFlame } from "./definition/Classes/Inquisitor/cleansingFlame";
 import { precognition } from "./definition/Classes/Seer/precognition";
 import { threadSnip } from "./definition/Classes/Seer/threadSnip";
 import { grabOnPlanarThreadWithBareHand } from "./definition/Classes/Seer/grabOnPlanarThreadWithBareHand";
@@ -142,9 +170,17 @@ import { planarEcho } from "./definition/Classes/Seer/planarEcho";
 import { foreseenStep } from "./definition/Classes/Seer/foreseenStep";
 import { explosiveBolt } from "./definition/Classes/Engineer/explosiveBolt";
 import { bearTrap } from "./definition/Classes/Engineer/bearTrap";
+import { tripwire } from "./definition/Classes/Engineer/tripwire";
+import { fragmentationGrenade } from "./definition/Classes/Engineer/fragmentationGrenade";
+import { mechanicalOverdrive } from "./definition/Classes/Engineer/mechanicalOverdrive";
+import { gearShift } from "./definition/Classes/Engineer/gearShift";
 import { adaptiveStrike } from "./definition/Classes/Nomad/adaptiveStrike";
 import { tacticalSlash } from "./definition/Classes/Nomad/tacticalSlash";
 import { tacticalShot } from "./definition/Classes/Nomad/tacticalShot";
+import { adaptiveRetreat } from "./definition/Classes/Nomad/adaptiveRetreat";
+import { tacticalAdvance } from "./definition/Classes/Nomad/tacticalAdvance";
+import { quickStep } from "./definition/Classes/Nomad/quickStep";
+import { repositioningStrike } from "./definition/Classes/Nomad/repositioningStrike";
 import { fortuneStrike } from "./definition/Classes/Seer/fortuneStrike";
 import { twistOutcome } from "./definition/Classes/Seer/twistOutcome";
 import { arcaneBattery } from "./definition/Classes/Mage/arcaneBattery";
@@ -174,6 +210,7 @@ export const skillRepository: Record<SkillId, Skill> = {
   [RogueSkillId.OpportunistStrike]: opportunistStrike,
   [RogueSkillId.PinningShot]: pinningShot,
   [RogueSkillId.SplitTrajectory]: splitTrajectory,
+
   [WarriorSkillId.Cleave]: cleave,
   [WarriorSkillId.PowerStrike]: powerStrike,
   [WarriorSkillId.WarCry]: warCry,
@@ -183,10 +220,15 @@ export const skillRepository: Record<SkillId, Skill> = {
   [WarriorSkillId.PositioningStrike]: positioningStrike,
   [WarriorSkillId.ChallengeStrike]: challengeStrike,
   [WarriorSkillId.FinishingBlow]: finishingBlow,
+
   [GuardianSkillId.Bash]: bash,
   [GuardianSkillId.Taunt]: taunt,
   [GuardianSkillId.HerosPose]: herosPose,
   [GuardianSkillId.ShieldUp]: shieldUp,
+  [GuardianSkillId.FortressStance]: fortressStance,
+  [GuardianSkillId.SentinelDuty]: sentinelDuty,
+  [GuardianSkillId.Guardian]: guardian,
+
   [ShamanSkillId.HolyRattle]: holyRattle,
   [ShamanSkillId.ChaoticBlessing]: chaoticBlessing,
   [ShamanSkillId.MendSpirit]: mendSpirit,
@@ -196,7 +238,9 @@ export const skillRepository: Record<SkillId, Skill> = {
   [ShamanSkillId.WardOfProtection]: wardOfProtection,
   [ShamanSkillId.Harmonization]: harmonization,
   [ShamanSkillId.DualNature]: dualNature,
+
   [MageSkillId.ArcaneBolt]: arcaneBolt,
+  [MageSkillId.ArcaneMissiles]: arcaneMissiles,
   [MageSkillId.ArcaneShield]: arcaneShield,
   [MageSkillId.PlanarSurge]: planarSurge,
   [MageSkillId.ArcaneBattery]: arcaneBattery,
@@ -217,12 +261,7 @@ export const skillRepository: Record<SkillId, Skill> = {
   [MageSkillId.GaleSlash]: galeSlash,
   [MageSkillId.RazorGust]: razorGust,
   [MageSkillId.WindFury]: windFury,
-  [MobSkillId.WorksYouMaggots]: worksYouMaggots,
-  [MobSkillId.CommanderScream]: commanderScream,
-  [MobSkillId.Whip]: whip,
-  [MobSkillId.ThrowPebble]: throwPebble,
-  [MobSkillId.PanicSlash]: panicSlash,
-  [MobSkillId.Shriek]: shriek,
+
   [ClericSkillId.Heal]: heal,
   [ClericSkillId.MassHeal]: massHeal,
   [ClericSkillId.Radiance]: radiance,
@@ -234,15 +273,21 @@ export const skillRepository: Record<SkillId, Skill> = {
   [ClericSkillId.Bind]: bind,
   [ClericSkillId.HolyWater]: holyWater,
   [ClericSkillId.DivineStrike]: divineStrike,
+
   [ScholarSkillId.Analyze]: analyze,
   [ScholarSkillId.DisruptPattern]: disruptPattern,
   [ScholarSkillId.CognitiveOverload]: cognitiveOverload,
+  [ScholarSkillId.WeaknessStudy]: weaknessStudy,
+  [ScholarSkillId.MentalInterference]: mentalInterference,
+  [ScholarSkillId.DebilitatingStrike]: debilitatingStrike,
+
   [MysticSkillId.MistStep]: mistStep,
   [MysticSkillId.MistPierce]: mistPierce,
   [MysticSkillId.PlanarAbsorption]: planarAbsorption,
   [MysticSkillId.BorrowedMomentum]: borrowedMomentum,
   [MysticSkillId.InnerVeil]: innerVeil,
   [MysticSkillId.ReversalPalm]: reversalPalm,
+
   [SpellbladeSkillId.PlanarEdge]: planarEdge,
   [SpellbladeSkillId.WindSlash]: windSlash,
   [SpellbladeSkillId.SpellParry]: spellParry,
@@ -250,12 +295,14 @@ export const skillRepository: Record<SkillId, Skill> = {
   [SpellbladeSkillId.GaleRush]: galeRush,
   [SpellbladeSkillId.PlanarSiphon]: planarSiphon,
   [SpellbladeSkillId.ChargeSurge]: chargeSurge,
+
   [BarbarianSkillId.Rage]: rage,
   [BarbarianSkillId.RecklessSwing]: recklessSwing,
   [BarbarianSkillId.Earthshatter]: earthshatter,
   [BarbarianSkillId.BloodFrenzy]: bloodFrenzy,
   [BarbarianSkillId.GroundSlam]: groundSlam,
   [BarbarianSkillId.BattleHardened]: battleHardened,
+
   [KnightSkillId.PrecisionThrust]: precisionThrust,
   [KnightSkillId.AdvancingPace]: advancingPaceSkill,
   [KnightSkillId.TacticalCommand]: tacticalCommand,
@@ -264,82 +311,86 @@ export const skillRepository: Record<SkillId, Skill> = {
   [KnightSkillId.DisciplinedAdvance]: disciplinedAdvance,
   [KnightSkillId.ShieldedStrike]: shieldedStrike,
   [KnightSkillId.ShieldBash]: shieldBash,
+
   [PaladinSkillId.AegisPulse]: aegisPulse,
   [PaladinSkillId.AegisShield]: aegisShield,
+  [PaladinSkillId.RighteousSmite]: righteousSmite,
+  [PaladinSkillId.DivineWrath]: divineWrath,
+  [PaladinSkillId.RallyingCry]: rallyingCry,
+  [PaladinSkillId.InspiringPresence]: inspiringPresence,
+
   [DruidSkillId.VineWhip]: vineWhip,
   [DruidSkillId.ThrowSpear]: throwSpear,
   [DruidSkillId.RejuvenatingMist]: rejuvenatingMist,
+  [DruidSkillId.ThornBurst]: thornBurst,
+  [DruidSkillId.NaturesGrasp]: naturesGrasp,
+  [DruidSkillId.NurturingBloom]: nurturingBloom,
+  [DruidSkillId.NaturalResilience]: naturalResilience,
+  [DruidSkillId.PrimalStrike]: primalStrike,
+  [DruidSkillId.WildInstinct]: wildInstinctSkill,
+
   [MonkSkillId.PalmStrike]: palmStrike,
-  [MonkSkillId.Meditation]: meditation,
   [MonkSkillId.FlurryOfBlows]: flurryOfBlows,
+  [MonkSkillId.StunningFist]: stunningFist,
+  [MonkSkillId.PrecisionStrike]: precisionStrike,
+  [MonkSkillId.DizzyingPalm]: dizzyingPalm,
+
   [WarlockSkillId.ChaosBolt]: chaosBolt,
   [WarlockSkillId.LifeDrain]: lifeDrain,
   [WarlockSkillId.Corruption]: corruption,
   [WarlockSkillId.DarkPact]: darkPact,
+  [WarlockSkillId.ChaosBurst]: chaosBurst,
+  [WarlockSkillId.VoidBolt]: voidBolt,
+  [WarlockSkillId.CurseOfWeakness]: curseOfWeakness,
+
   [DuelistSkillId.PreciseStrike]: preciseStrike,
   [DuelistSkillId.ParryRiposte]: parryRiposte,
   [DuelistSkillId.BladeFlurry]: bladeFlurry,
   [DuelistSkillId.DuelingStance]: duelingStance,
+  [DuelistSkillId.FeintStrike]: feintStrike,
+
   [WitchSkillId.PoisonDart]: poisonDart,
   [WitchSkillId.ChaosBrand]: chaosBrand,
   [WitchSkillId.ChaosBinding]: chaosBinding,
   [WitchSkillId.Bewitch]: bewitch,
+  [WitchSkillId.HexWeave]: hexWeave,
+  [WitchSkillId.MisfortuneCurse]: misfortuneCurse,
+  [WitchSkillId.ChaoticWeave]: chaoticWeave,
+
   [InquisitorSkillId.RadiantSmite]: radiantSmite,
   [InquisitorSkillId.ExposeWeakness]: exposeWeakness,
   [InquisitorSkillId.PurgeMagic]: purgeMagic,
   [InquisitorSkillId.JudgmentDay]: judgmentDay,
+  [InquisitorSkillId.CleansingFlame]: cleansingFlame,
+
   [SeerSkillId.Precognition]: precognition,
   [SeerSkillId.ThreadSnip]: threadSnip,
   [SeerSkillId.PlanarEcho]: planarEcho,
-  [EngineerSkillId.ExplosiveBolt]: explosiveBolt,
-  [EngineerSkillId.BearTrap]: bearTrap,
-  [NomadSkillId.AdaptiveStrike]: adaptiveStrike,
-  [NomadSkillId.TacticalSlash]: tacticalSlash,
-  [NomadSkillId.TacticalShot]: tacticalShot,
   [SeerSkillId.ForeseenStep]: foreseenStep,
   [SeerSkillId.FortuneStrike]: fortuneStrike,
   [SeerSkillId.TwistOutcome]: twistOutcome,
   [SeerSkillId.GrabOnPlanarThreadWithBareHand]: grabOnPlanarThreadWithBareHand,
   [SeerSkillId.ThreadBacklash]: threadBacklash,
-  [ScholarSkillId.WeaknessStudy]: undefined,
-  [ScholarSkillId.MentalInterference]: undefined,
-  [ScholarSkillId.DebilitatingStrike]: undefined,
-  [GuardianSkillId.FortressStance]: undefined,
-  [GuardianSkillId.SentinelDuty]: undefined,
-  [GuardianSkillId.GuardAlly]: undefined,
-  [GuardianSkillId.ProtectiveBarrier]: undefined,
-  [PaladinSkillId.AegisWard]: undefined,
-  [PaladinSkillId.RighteousSmite]: undefined,
-  [PaladinSkillId.DivineWrath]: undefined,
-  [PaladinSkillId.RallyingCry]: undefined,
-  [PaladinSkillId.InspiringPresence]: undefined,
-  [DruidSkillId.ThornBurst]: undefined,
-  [DruidSkillId.NaturesGrasp]: undefined,
-  [DruidSkillId.NurturingBloom]: undefined,
-  [DruidSkillId.NaturalResilience]: undefined,
-  [DruidSkillId.PrimalStrike]: undefined,
-  [DruidSkillId.WildInstinct]: undefined,
-  [MonkSkillId.StunningFist]: undefined,
-  [MonkSkillId.InnerPeace]: undefined,
-  [MonkSkillId.ChiFlow]: undefined,
-  [MonkSkillId.PrecisionStrike]: undefined,
-  [MonkSkillId.DizzyingPalm]: undefined,
-  [WarlockSkillId.ShadowBurst]: undefined,
-  [WarlockSkillId.VoidBolt]: undefined,
-  [WarlockSkillId.CurseOfWeakness]: undefined,
-  [DuelistSkillId.PerfectParry]: undefined,
-  [DuelistSkillId.FeintStrike]: undefined,
-  [DuelistSkillId.ComboStrike]: undefined,
-  [WitchSkillId.HexWeave]: undefined,
-  [WitchSkillId.MisfortuneCurse]: undefined,
-  [WitchSkillId.ChaoticWeave]: undefined,
-  [InquisitorSkillId.CleansingFlame]: undefined,
-  [EngineerSkillId.Tripwire]: undefined,
-  [EngineerSkillId.FragmentationGrenade]: undefined,
-  [EngineerSkillId.MechanicalOverdrive]: undefined,
-  [EngineerSkillId.GearShift]: undefined,
-  [NomadSkillId.AdaptiveRetreat]: undefined,
-  [NomadSkillId.TacticalAdvance]: undefined,
-  [NomadSkillId.QuickStep]: undefined,
-  [NomadSkillId.RepositioningStrike]: undefined
+
+  [EngineerSkillId.ExplosiveBolt]: explosiveBolt,
+  [EngineerSkillId.BearTrap]: bearTrap,
+  [EngineerSkillId.Tripwire]: tripwire,
+  [EngineerSkillId.FragmentationGrenade]: fragmentationGrenade,
+  [EngineerSkillId.MechanicalOverdrive]: mechanicalOverdrive,
+  [EngineerSkillId.GearShift]: gearShift,
+
+  [NomadSkillId.AdaptiveStrike]: adaptiveStrike,
+  [NomadSkillId.TacticalSlash]: tacticalSlash,
+  [NomadSkillId.TacticalShot]: tacticalShot,
+  [NomadSkillId.AdaptiveRetreat]: adaptiveRetreat,
+  [NomadSkillId.TacticalAdvance]: tacticalAdvance,
+  [NomadSkillId.QuickStep]: quickStep,
+  [NomadSkillId.RepositioningStrike]: repositioningStrike,
+
+  [MobSkillId.WorksYouMaggots]: worksYouMaggots,
+  [MobSkillId.CommanderScream]: commanderScream,
+  [MobSkillId.Whip]: whip,
+  [MobSkillId.ThrowPebble]: throwPebble,
+  [MobSkillId.PanicSlash]: panicSlash,
+  [MobSkillId.Shriek]: shriek,
 };

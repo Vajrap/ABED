@@ -9,7 +9,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { MageSkill } from "./index";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
@@ -104,17 +103,15 @@ export const burningHand = new MageSkill({
     const levelScalar = skillLevelMultiplier(skillLevel);
     for (const target of targets) {
       // Calculate base damage
-      const baseDiceDamage = roll(1).d(diceSides).total;
+      // Damage dice - should not get bless/curse
+      const baseDiceDamage = actor.roll({ amount: 1, face: diceSides, applyBlessCurse: false });
       const totalDamage = Math.max(0, baseDiceDamage + planarMod) * levelScalar;
 
-      // Hit and crit
-      const hitBonus = controlMod;
-      const critBonus = luckMod;
-
+      // Standard arcane/elemental magic uses CONTROL for hit
       const damageOutput = {
         damage: Math.floor(totalDamage),
-        hit: rollTwenty().total + hitBonus,
-        crit: rollTwenty().total + critBonus,
+        hit: actor.rollTwenty({stat: 'control'}),
+        crit: actor.rollTwenty({stat: 'luck'}),
         type: DamageType.fire,
         isMagic: true,
       };
@@ -126,7 +123,8 @@ export const burningHand = new MageSkill({
       if (totalDamageResult.isHit) {
         const burnSave = target.rollSave('endurance')
         if (burnSave < burnDC) {
-          const burnStacks = roll(1).d(maxBurnStacks).total;
+          // Burn stacks - should not get bless/curse
+          const burnStacks = actor.roll({ amount: 1, face: maxBurnStacks, applyBlessCurse: false });
           const finalBurnStacks = Math.max(burnStacks, minBurnStacks);
           const burnResult = buffsAndDebuffsRepository.burn.appender(target, { turnsAppending: finalBurnStacks });
           burnMessage = burnResult.en;

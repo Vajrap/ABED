@@ -44,6 +44,11 @@ export enum BuffEnum {
   battleHardened = "battleHardened",
   challenger = "challenger",
   battleFormation = "battleFormation",
+  fortressStance = "fortressStance",
+  guardian = "guardian",
+  inspired = "inspired",
+  wildInstinct = "wildInstinct",
+  mechanicalOverdrive = "mechanicalOverdrive",
 }
 
 export enum DebuffEnum {

@@ -4,7 +4,6 @@ import type { Character } from "src/Entity/Character/Character";
 import type { TurnResult } from "../../../types";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { roll } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { MonkSkill } from "./index";
 
@@ -27,6 +26,7 @@ export const meditation = new MonkSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.common,
+  isFallback: true, // Meditation: no elemental resources, no buff requirement
   consume: {
     hp: 0,
     mp: 0,
@@ -73,7 +73,8 @@ export const meditation = new MonkSkill({
     // Restore 1d4 + skillLevel + control mod/2 to the lowest resource (in percent)
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const controlBonus = Math.floor(controlMod / 2);
-    const restorePercent = (roll(1).d(4).total + skillLevel + controlBonus) / 100;
+    // Resource restoration dice - should not get bless/curse
+    const restorePercent = (actor.roll({ amount: 1, face: 4, stat: "control", applyBlessCurse: false }) + skillLevel + controlBonus) / 100;
     
     let restoredAmount = 0;
     let resourceName = "";

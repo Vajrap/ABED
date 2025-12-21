@@ -26,7 +26,7 @@ export const shieldUp = new GuardianSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 3,
+    sp: 2,
     elements: [],
   },
   produce: {
@@ -35,8 +35,8 @@ export const shieldUp = new GuardianSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
-        min: 0,
+        element: "earth",
+        min: 1,
         max: 1,
       },
     ],

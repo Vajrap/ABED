@@ -22,7 +22,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WarlockSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
@@ -46,6 +45,7 @@ export const chaosBolt = new WarlockSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.common,
+  isFallback: true, // ChaosBolt: no elemental resources (produces chaos, but doesn't consume any), no buff requirement
   consume: {
     hp: 0,
     mp: 2,
@@ -92,30 +92,32 @@ export const chaosBolt = new WarlockSkill({
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const luckMod = statMod(actor.attribute.getTotal("luck"));
     
-    const baseDiceDamage = roll(1).d(skillLevel >= 5 ? 8 : 6).total;
+    // Damage dice - should not get bless/curse
+    const baseDiceDamage = actor.roll({ amount: 1, face: skillLevel >= 5 ? 8 : 6, stat: "planar", applyBlessCurse: false });
     const levelMultiplier = skillLevelMultiplier(skillLevel);
     const totalDamage = Math.max(0, Math.floor((baseDiceDamage + planarMod) * levelMultiplier));
 
+    // Curse/chaos magic uses WIL for hit, LUCK for crit
     const damageOutput = {
       damage: totalDamage,
-      hit: rollTwenty().total + controlMod,
-      crit: rollTwenty().total + luckMod,
+      hit: actor.rollTwenty({stat: 'willpower'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.chaos,
       isMagic: true,
     };
 
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
 
-    // Check for cursed debuff (DC8 + planar mod willpower save)
-    let hexedMessage = "";
+    // Check for Cursed debuff (DC10 + planar mod WIL save) - enum says Cursed, not hexed
+    let cursedMessage = "";
     if (damageResult.isHit) {
-      const willpowerDC = 8 + statMod(actor.attribute.getTotal('intelligence'));
+      const willpowerDC = 10 + planarMod; // Enum says DC10 + planar mod
       const willpowerSave = target.rollSave("willpower");
       
       if (willpowerSave < willpowerDC) {
-        const hexedDuration = skillLevel >= 5 ? 3 : 2;
-        buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: hexedDuration });
-        hexedMessage = ` ${target.name.en} is hexed!`;
+        // Enum says Cursed debuff for 1 turn (reduces saving throws)
+        buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: 1 });
+        cursedMessage = ` ${target.name.en} is cursed!`;
       }
     }
 
@@ -128,8 +130,8 @@ export const chaosBolt = new WarlockSkill({
 
     return {
       content: {
-        en: `${message.en}${hexedMessage}`,
-        th: `${message.th}${hexedMessage ? ` ${target.name.th} ถูกสาป!` : ""}`,
+        en: `${message.en}${cursedMessage}`,
+        th: `${message.th}${cursedMessage ? ` ${target.name.th} ถูกสาป!` : ""}`,
       },
       actor: {
         actorId: actor.id,

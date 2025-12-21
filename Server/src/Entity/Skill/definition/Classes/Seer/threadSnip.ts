@@ -72,10 +72,9 @@ export const threadSnip = new SeerSkill({
     const levelScalar = skillLevelMultiplier(skillLevel);
     const totalDamage = Math.floor((diceDamage + chaMod) * levelScalar);
     
-    // Calculate hit/crit
-    // Hit/Crit rolls - apply bless/curse automatically
-    const hitRoll = user.rollTwenty({});
-    const critRoll = user.rollTwenty({});
+    // Arcane magic uses CONTROL for hit, LUCK for crit
+    const hitRoll = user.rollTwenty({stat: 'control'});
+    const critRoll = user.rollTwenty({stat: 'luck'});
     
     const damageOutput = {
       damage: totalDamage,
@@ -88,7 +87,8 @@ export const threadSnip = new SeerSkill({
     const damageResult = resolveDamage(user.id, target.id, damageOutput, location);
     
     let dc = 14 - skillLevel;
-    const stealRoll = user.rollTwenty({});
+    // Skill check for stealing - should get bless/curse
+    const stealRoll = user.rollTwenty({stat: 'charisma'});
 
     let stolenElement: ElementResourceKey | null = null;
     

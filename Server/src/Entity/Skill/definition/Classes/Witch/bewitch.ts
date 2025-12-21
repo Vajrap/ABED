@@ -24,6 +24,7 @@ export const bewitch = new WitchSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.uncommon,
+  isFallback: false, // Bewitch: consumes 2 chaos elements
   consume: {
     hp: 0,
     mp: 3,

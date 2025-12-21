@@ -46,13 +46,15 @@ export const crushingDepths = new MageSkill({
 
     // Calculate damage: (1d12 + planar mod + skill level) × skill level multiplier
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 12, stat: "planar" }) + skillLevel);
+    // Damage dice - should not get bless/curse
+    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 12, stat: "planar", applyBlessCurse: false }) + skillLevel);
     const scaledDamage = Math.floor(totalDamage * levelScalar);
     
+    // Standard arcane/elemental magic uses CONTROL for hit
     const damageOutput = {
       damage: scaledDamage,
-      hit: actor.rollTwenty({}),
-      crit: actor.rollTwenty({}),
+      hit: actor.rollTwenty({stat: 'control'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.water,
       isMagic: true,
     };

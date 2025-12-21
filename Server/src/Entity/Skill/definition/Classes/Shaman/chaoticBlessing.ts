@@ -7,7 +7,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { ShamanSkill } from "./index";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
@@ -58,8 +57,8 @@ export const chaoticBlessing = new ShamanSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    // 50/50 chance to damage or heal
-    const isDamage = rollTwenty().total <= 10;
+    // 50/50 chance to damage or heal - random selection, should not get bless/curse
+    const isDamage = actor.rollTwenty({applyBlessCurse: false}) <= 10;
     
     const additionalDamage =
       (statMod(actor.attribute.getTotal("planar")) +
@@ -71,8 +70,9 @@ export const chaoticBlessing = new ShamanSkill({
 
     if (isDamage) {
       for (const target of targetParty) {
+        // Damage dice - should not get bless/curse
         const total =
-          roll(1).d(skillLevel >= 5 ? 8 : 6).total +
+          actor.roll({ amount: 1, face: skillLevel >= 5 ? 8 : 6, applyBlessCurse: false }) +
           additionalDamage * levelScalar;
         const damageOutput = {
           damage: Math.floor(total),
@@ -106,8 +106,9 @@ export const chaoticBlessing = new ShamanSkill({
       // Heal whole team
       for (const ally of actorParty) {
         if (!ally.vitals.isDead) {
+          // Healing dice - should not get bless/curse
           const total =
-            roll(1).d(skillLevel >= 5 ? 8 : 6).total +
+            actor.roll({ amount: 1, face: skillLevel >= 5 ? 8 : 6, applyBlessCurse: false }) +
             additionalDamage * levelScalar;
           ally.vitals.incHp(Math.floor(total));
           let msg = `${ally.name.en} healed for ${Math.floor(total)} HP!`;

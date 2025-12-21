@@ -25,6 +25,7 @@ export const exposeWeakness = new InquisitorSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.uncommon,
+  isFallback: false, // ExposeWeakness: consumes 1 order element
   consume: {
     hp: 0,
     mp: 2,

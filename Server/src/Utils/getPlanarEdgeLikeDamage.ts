@@ -65,9 +65,10 @@ export function getPlanarEdgeLikeDamage(
       applyBlessCurse: false,
     });
 
-    // Hit/Crit rolls
-    const hit = hitStat.reduce((acc, stat) => acc + actor.rollTwenty({stat: stat}), 0) / hitStat.length;
-    const crit = critStat.reduce((acc, stat) => acc + actor.rollTwenty({stat: stat}), 0) / critStat.length;
+    // Hit/Crit rolls - use first stat from weapon (typically dexterity for hit, luck for crit)
+    // Spellblade skills are physical attacks with magic enhancement, so DEX for accuracy makes sense
+    const hit = actor.rollTwenty({stat: hitStat[0] || 'dexterity'});
+    const crit = actor.rollTwenty({stat: critStat[0] || 'luck'});
 
     return { baseDamage, hit, crit };
   }

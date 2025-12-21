@@ -90,9 +90,9 @@ export const planarSiphon = new SpellbladeSkill({
     
     const hpDamage = Math.max(0, baseDamage * levelScalar);
 
-    // Hit/Crit rolls
-    const hitValue = actor.rollTwenty({});
-    const critValue = actor.rollTwenty({});
+    // Spellblade skills are physical attacks with magic enhancement, so DEX for accuracy
+    const hitValue = actor.rollTwenty({stat: 'dexterity'});
+    const critValue = actor.rollTwenty({stat: 'luck'});
     
     const damageOutput = {
       damage: Math.floor(hpDamage),

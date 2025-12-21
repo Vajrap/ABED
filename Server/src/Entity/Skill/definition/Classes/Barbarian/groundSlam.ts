@@ -76,7 +76,8 @@ export const groundSlam = new BarbarianSkill({
     const splashMultiplier = skillLevel >= 5 ? 0.75 : 0.5;
 
     // Base damage: 1d6 + STR mod × skill level multiplier
-    const baseDamage = actor.roll({ amount: 1, face: 6, stat: "strength" });
+    // Damage dice - should not get bless/curse
+    const baseDamage = actor.roll({ amount: 1, face: 6, stat: "strength", applyBlessCurse: false });
     const totalDamage = Math.floor(baseDamage * levelScalar);
 
     // Target save: DC10 + STR mod END save
@@ -84,9 +85,10 @@ export const groundSlam = new BarbarianSkill({
     const targetSave = target.rollSave("endurance");
 
     // Deal damage to main target
+    // Physical attacks use DEX for accuracy
     const damageOutput = {
       damage: totalDamage,
-      hit: actor.rollTwenty({ stat: "control" }),
+      hit: actor.rollTwenty({ stat: "dexterity" }),
       crit: actor.rollTwenty({ stat: "luck" }),
       type: DamageType.blunt,
       isMagic: false,

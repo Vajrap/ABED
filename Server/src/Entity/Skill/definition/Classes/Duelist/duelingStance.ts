@@ -23,14 +23,15 @@ export const duelingStance = new DuelistSkill({
   requirement: {},
   equipmentNeeded: [],
   notExistBuff: [BuffEnum.duelingStance],
-  tier: TierEnum.uncommon,
+  tier: TierEnum.rare,
+  isFallback: false, // DuelingStance: consumes 1 wind element
   consume: {
     hp: 0,
-    mp: 2,
-    sp: 0,
+    mp: 0,
+    sp: 4,
     elements: [
       {
-        element: "neutral",
+        element: "wind",
         value: 1,
       },
     ],
@@ -41,7 +42,7 @@ export const duelingStance = new DuelistSkill({
     sp: 0,
     elements: [
       {
-        element: "wind",
+        element: "neutral",
         min: 1,
         max: 1,
       },

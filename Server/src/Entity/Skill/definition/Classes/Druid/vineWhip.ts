@@ -9,7 +9,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { DruidSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
@@ -33,6 +32,7 @@ export const vineWhip = new DruidSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.common,
+  isFallback: true, // Vine Whip: no elemental resources, no buff requirement
   consume: {
     hp: 0,
     mp: 2,
@@ -76,13 +76,15 @@ export const vineWhip = new DruidSkill({
     const willMod = statMod(actor.attribute.getTotal("willpower"));
     const controlMod = statMod(actor.attribute.getTotal("control"));
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const baseDamage = roll(1).d(6).total + willMod;
+    // Damage dice - should not get bless/curse
+    const baseDamage = actor.roll({ amount: 1, face: 6, stat: "willpower", applyBlessCurse: false }) + willMod;
     const totalDamage = Math.floor(baseDamage * levelScalar);
 
+    // Nature magic uses CONTROL for hit, LUCK for crit
     const damageOutput = {
       damage: totalDamage,
-      hit: rollTwenty().total + controlMod,
-      crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
+      hit: actor.rollTwenty({stat: 'control'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.nature,
       isMagic: true,
     };

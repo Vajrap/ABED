@@ -144,8 +144,8 @@ export const tacticalShot = new NomadSkill({
 
       const damageOutput = {
         damage: Math.floor(totalDamage * positionModifier),
-        hit: user.rollTwenty({}),
-        crit: user.rollTwenty({}),
+        hit: user.rollTwenty({ stat: "dexterity" }),
+        crit: user.rollTwenty({ stat: "luck" }),
         type: DamageType.pierce,
         isMagic: false,
       };
@@ -177,5 +177,6 @@ export const tacticalShot = new NomadSkill({
       };
     }
   },
+  isFallback: false,
 });
 

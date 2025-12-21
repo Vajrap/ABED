@@ -73,7 +73,8 @@ export const splitTrajectory = new RogueSkill({
     }
 
     // Calculate primary damage: 1d6 + DEX mod x skill level multiplier
-    const baseDamage = actor.roll({ amount: 1, face: 6, stat: "dexterity" }) * skillLevelMultiplier(skillLevel);
+    // Damage dice - should not get bless/curse
+    const baseDamage = actor.roll({ amount: 1, face: 6, stat: "dexterity", applyBlessCurse: false }) * skillLevelMultiplier(skillLevel);
     const primaryDamage = baseDamage;
 
     const primaryDamageOutput = {

@@ -46,7 +46,8 @@ export const aquaBlast = new MageSkill({
 
     // Calculate damage: (1d6 + planar mod) × skill level multiplier
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar" }) * levelScalar);
+    // Damage dice - should not get bless/curse
+    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar", applyBlessCurse: false }) * levelScalar);
     
     const damageOutput = {
       damage: totalDamage,

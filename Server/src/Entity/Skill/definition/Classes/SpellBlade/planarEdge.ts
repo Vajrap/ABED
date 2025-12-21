@@ -44,9 +44,10 @@ export const planarEdge = new SpellbladeSkill({
     mp: 0,
     sp: 0,
     elements: [
-      { element: "neutral", min: 1, max: 1 },
+      { element: "neutral", min: 1, max: 1       },
     ],
   },
+  isFallback: true, // Planar Edge: no elemental resources, no buff requirement
   exec: (
     actor: Character,
     actorParty: Character[],

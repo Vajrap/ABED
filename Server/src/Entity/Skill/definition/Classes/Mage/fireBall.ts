@@ -103,17 +103,12 @@ export const fireBall = new MageSkill({
         baseDiceDamage + planarMod + skillLevelBonus,
       );
 
-      // Hit comes from control mod
-      const hitBonus = controlMod;
-
-      // Crit from luck
-      const critBonus = luckMod;
-
-      // Create damage output
+      // Standard arcane/elemental magic uses CONTROL for hit
+      // Fireball has -3 to hit (AoE penalty)
       const damageOutput = {
         damage: Math.floor(totalDamage),
-        hit: actor.rollTwenty({}) - 3 + hitBonus,
-        crit: actor.rollTwenty({}) + critBonus,
+        hit: actor.rollTwenty({stat: 'control'}) - 3,
+        crit: actor.rollTwenty({stat: 'luck'}),
         type: DamageType.fire,
         isMagic: true,
       };

@@ -33,6 +33,7 @@ export const windSlice = new MageSkill({
     hp: 0, mp: 0, sp: 0,
     elements: [{ element: "wind", min: 1, max: 1 }],
   },
+  isFallback: true, // Wind Slice: no elemental resources, no buff requirement
   exec: (actor: Character, _ally: Character[], enemies: Character[], skillLevel: number, location: LocationsEnum) => {
     const target = getTarget(actor, _ally, enemies, "enemy").one();
     if (!target) {
@@ -44,13 +45,15 @@ export const windSlice = new MageSkill({
     }
     
     // Calculate damage: (1d6 + planar mod) × skill level multiplier
+    // Damage dice - should not get bless/curse
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar" }) * levelScalar);
+    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar", applyBlessCurse: false }) * levelScalar);
     
+    // Standard arcane/elemental magic uses CONTROL for hit
     const damageOutput = {
       damage: totalDamage,
-      hit: actor.rollTwenty({}),
-      crit: actor.rollTwenty({}),
+      hit: actor.rollTwenty({stat: 'control'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.wind,
       isMagic: true,
     };

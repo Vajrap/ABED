@@ -62,11 +62,8 @@ export const hiding = new RogueSkill({
     
     const dc = baseDC + highestEnemyIntMod + rowModifier;
     
-    // Roll D20 + dex mod
-    // Skill check - apply bless/curse automatically
-    const dexMod = statMod(actor.attribute.getTotal("dexterity"));
-    const rollResult = actor.rollTwenty({});
-    const totalRoll = rollResult + dexMod;
+    // Roll D20 + dex mod - this is a skill check, so it should get bless/curse
+    const totalRoll = actor.rollTwenty({stat: 'dexterity'});
     
     if (totalRoll >= dc) {
       // Success: Get hiding buff for 1 turn
@@ -74,8 +71,8 @@ export const hiding = new RogueSkill({
       
       return {
         content: {
-          en: `${actor.name.en} successfully hides! (Roll: ${rollResult} + ${dexMod} = ${totalRoll} vs DC ${dc})`,
-          th: `${actor.name.th} ซ่อนตัวสำเร็จ! (ทอย: ${rollResult} + ${dexMod} = ${totalRoll} vs DC ${dc})`,
+          en: `${actor.name.en} successfully hides! (Roll: ${totalRoll} vs DC ${dc})`,
+          th: `${actor.name.th} ซ่อนตัวสำเร็จ! (ทอย: ${totalRoll} vs DC ${dc})`,
         },
         actor: {
           actorId: actor.id,
@@ -92,8 +89,8 @@ export const hiding = new RogueSkill({
       // Failure
       return {
         content: {
-          en: `${actor.name.en} fails to hide! (Roll: ${rollResult} + ${dexMod} = ${totalRoll} vs DC ${dc})`,
-          th: `${actor.name.th} ซ่อนตัวล้มเหลว! (ทอย: ${rollResult} + ${dexMod} = ${totalRoll} vs DC ${dc})`,
+          en: `${actor.name.en} fails to hide! (Roll: ${totalRoll} vs DC ${dc})`,
+          th: `${actor.name.th} ซ่อนตัวล้มเหลว! (ทอย: ${totalRoll} vs DC ${dc})`,
         },
         actor: {
           actorId: actor.id,

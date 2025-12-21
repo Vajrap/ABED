@@ -27,7 +27,7 @@ export const aegisShield = new PaladinSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 3,
+    sp: 4,
     elements: [
       {
         element: "order",

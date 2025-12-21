@@ -67,12 +67,14 @@ export const earthernGrip = new MageSkill({
 
     // Calculate damage: (1d8 + planar mod) × skill level multiplier
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 8, stat: "planar" }) * levelScalar);
+    // Damage dice - should not get bless/curse
+    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 8, stat: "planar", applyBlessCurse: false }) * levelScalar);
     
+    // Standard arcane/elemental magic uses CONTROL for hit
     const damageOutput = {
       damage: totalDamage,
-      hit: actor.rollTwenty({}),
-      crit: actor.rollTwenty({}),
+      hit: actor.rollTwenty({stat: 'control'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.earth,
       isMagic: true,
     };

@@ -1450,6 +1450,7 @@ export enum GuardianSkillId {
    * 
    * Raise your shield high, forming an impenetrable barrier.
    * - **Effect:** Gain DefenseUp buff for 3 turns (4 at level 5)
+   * - **Must not already have DefenseUp buff to use this skill**
    * 
    * **Consume:** 2 SP
    * **Produce:** 1 earth
@@ -1463,7 +1464,7 @@ export enum GuardianSkillId {
    * - **Save:** Roll DC(15 - skill level) (DC(10 - skill level) at level 5)
    * - **On Success:** Restore VIT mod + skill level HP
    * - The higher your skill, the easier it becomes to inspire yourself.
-   * 
+   * - **On fail OR when HP is full:** Do basic Attack.
    * **Consume:** 2 SP
    * **Produce:** 1 neutral
    */
@@ -1474,9 +1475,9 @@ export enum GuardianSkillId {
    * 
    * Enter an unbreakable fortress stance.
    * - **Effect:** Gain Fortress Stance buff for 3 turns (4 at level 5)
-   * - **Fortress Stance Buff:** Gain +3 pDEF and +2 mDEF
-   * - **Damage Reduction:** Reduce all incoming damage by 1 per attack (2 at level 5)
-   * - **Restriction:** Cannot use while you have Taunt buff
+   * - **Fortress Stance Buff:** Gain +3 pDEF and +2 mDEF, -3 pATK - 3 mATK
+   * - **During Fortress Stance, your turn is SKIPPED, but health is restored every turn for 1d6 + VIT mod HP
+   * - **Must not already have Fortress Stance buff to use this skill**
    * 
    * **Consume:** 4 SP, 1 earth
    * **Produce:** 1 neutral
@@ -1491,9 +1492,11 @@ export enum GuardianSkillId {
    * 
    * Roar defiantly and draw all enemy attention to yourself.
    * - **Effect:** Gain Taunt buff for 2 + floor(0.5 × skill level) + floor(CHA mod / 2) turns
+   * - **When attacked while Taunt is active, gain +1 fire resource
+   * - **Can't be used while Taunt buff is active**
    * 
    * **Consume:** 2 SP
-   * **Produce:** 1 fire
+   * **Produce:** 1 earth
    */
   Taunt = "Taunt",
 
@@ -1504,8 +1507,8 @@ export enum GuardianSkillId {
    * - **Damage:** Weapon damage × position modifier
    * - **Save:** Target must roll DC8 + STR mod END save or become Stunned for 1 turn
    * 
-   * **Consume:** 3 SP, 2 earth
-   * **Produce:** 1 fire
+   * **Consume:** 3 SP, 1 fire
+   * **Produce:** 1 neutral
    */
   Bash = "Bash",
 
@@ -1513,12 +1516,13 @@ export enum GuardianSkillId {
    * **Tier:** Uncommon
    * 
    * Fulfill your sentinel duty, attacking while drawing enemy attention.
-   * - **Damage:** Weapon damage + STR mod × skill level multiplier
-   * - **Effect:** Apply Taunt buff to self for 2 turns (3 at level 5)
+   * - **Damage:** Weapon damage × skill level multiplier
+   * - **Effect:** Apply Taunt buff to self for 1 turn if not existed.
+   * - **If Taunt is already active, gain 1 turn of defense up buff.
    * - **Save:** Target must roll DC10 + STR mod END save or gain Dazed debuff for 1 turn
    * 
-   * **Consume:** 3 SP, 1 earth
-   * **Produce:** 1 fire
+   * **Consume:** 3 SP, 2 earth
+   * **Produce:** 1 neutral
    */
   SentinelDuty = "SentinelDuty",
 
@@ -1530,26 +1534,15 @@ export enum GuardianSkillId {
    * 
    * Stand guard over an ally, protecting them from harm.
    * - **Target:** 1 random ally (2 at level 5)
-   * - **Effect:** Grant DefenseUp buff to target for 2 turns (3 at level 5)
-   * - **Bonus:** Gain Taunt buff for 1 turn - enemies are more likely to target you instead
-   * - **Level 5:** If target takes damage while DefenseUp is active, restore 1d4 + VIT mod HP to target
-   * 
-   * **Consume:** 3 SP, 1 earth
+   * - **If the ally became a target of getTarget with one() method, change the target to you.`
+   * - **When you change target to yours, gain +1 earth resource
+   * - **After one triggered, remove the buff
+   * (This means we need to add buff to 2 characters, one is the user and one is the target, when target get picked, just check if he has the buff or not, if yes, check in the party for another character who have the other buff, and pick another target instead)
+   * (Guarded and Guardian buffs)
+   * **Consume:** 3 SP, 1 neutral
    * **Produce:** 1 earth
    */
-  GuardAlly = "GuardAlly",
-
-  /**
-   * **Tier:** Rare
-   * 
-   * Erect a protective barrier around all allies.
-   * - **Effect:** All allies gain +2 pDEF for 2 turns (3 at level 5)
-   * - **Bonus:** You gain +3 pDEF and Taunt buff for the same duration
-   * 
-   * **Consume:** 5 SP, 2 earth
-   * **Produce:** 1 neutral
-   */
-  ProtectiveBarrier = "ProtectiveBarrier",
+  Guardian = "Guardian",
 }
 
 export enum PaladinSkillId {
@@ -1584,18 +1577,6 @@ export enum PaladinSkillId {
    */
   AegisPulse = "AegisPulse",
 
-  /**
-   * **Tier:** Rare
-   * 
-   * Ward an ally with divine protection.
-   * - **Target:** 1 random ally (2 at level 5)
-   * - **Effect:** Grant DefenseUp buff for 2 turns (3 at level 5)
-   * - **Regen:** Target gains Regen buff for 2 turns: restore 1d4 + WIL mod HP at the start of each turn
-   * 
-   * **Consume:** 4 SP, 2 order
-   * **Produce:** 1 neutral
-   */
-  AegisWard = "AegisWard",
 
   // ---------------
   // Retribution (Damaging)
@@ -1647,8 +1628,7 @@ export enum PaladinSkillId {
    * **Tier:** Common
    * 
    * Rally your allies with an inspiring cry.
-   * - **Effect:** All allies gain +2 STR and +1 END for 2 turns (3 turns at level 5)
-   * - **Bless:** All allies gain Bless buff for 1 turn (2 turns at level 5)
+   * - **Effect:** All allies gain your CHA Mod * Skill level multiplier HP MP and SP restored, + CHA mod AB gauge. Except you.
    * 
    * **Consume:** 4 SP, 1 order
    * **Produce:** 1 neutral
@@ -1659,11 +1639,10 @@ export enum PaladinSkillId {
    * **Tier:** Uncommon
    * 
    * Project an inspiring presence that bolsters your allies.
-   * - **Effect:** Gain Inspiring Presence buff for 3 turns (4 turns at level 5)
-   * - **Inspiring Presence Buff:** All allies gain +1 to all saving throws
-   * - **Regen:** At the start of each turn, restore 1d3 HP to all allies (1d4 at level 5)
+   * - **Effect:** Give Inspired buff to all allies for 2 turns (3 turns at level 5) (Except you)
+   * - **Inspired:** Gain +1 to all saving throws + At the start of each turn, restore 1d3 HP every turns
    * 
-   * **Consume:** 5 SP, 2 order
+   * **Consume:** 5 SP, 2 neutral
    * **Produce:** 1 order
    */
   InspiringPresence = "InspiringPresence",
@@ -1674,11 +1653,11 @@ export enum DruidSkillId {
   // Nature's Wrath
   // ---------------
   /**
-   * **Tier:** Common (Cantrip)
+   * **Tier:** Common (Fallback)
    * 
    * Whip a target with thorny vines, dealing nature damage.
    * - **Damage:** 1d6 + WIL mod × skill level multiplier nature damage
-   * - **Save:** Target rolls DC7 END save or becomes Entangled for 1 turn
+   * - **Save:** Target rolls DC6 END save or becomes Entangled for 1 turn
    * - **Entangled Debuff:** When taking turns, must roll DC10 STR save or skip the turn
    * 
    * **Consume:** 3 MP
@@ -1695,7 +1674,7 @@ export enum DruidSkillId {
    * - **Level 5:** Also apply Slow debuff for 1 turn to enemies who fail save
    * 
    * **Consume:** 3 MP, 1 earth
-   * **Produce:** 1 neutral
+   * **Produce:** 1 water
    */
   ThornBurst = "ThornBurst",
 
@@ -1707,8 +1686,8 @@ export enum DruidSkillId {
    * - **Save:** Target must roll DC10 + WIL mod END save or become Entangled for 2 turns (3 turns at level 5)
    * - **Entangled Bonus:** If target is already Entangled, deal +50% damage
    * 
-   * **Consume:** 4 MP, 2 earth
-   * **Produce:** 1 earth
+   * **Consume:** 4 MP, 1 earth 1 water
+   * **Produce:** 1 neutral
    */
   NaturesGrasp = "NaturesGrasp",
 
@@ -1719,11 +1698,12 @@ export enum DruidSkillId {
    * **Tier:** Rare
    * 
    * Release a gentle natural mist that rejuvenates your party.
-   * - **Effect:** All allies gain Regen buff for 2 turns (3 turns at level 5, 4 turns at level 7)
-   * - **Regen Buff:** Restore (1d4 + WIL mod) HP at the start of each turn (at level 7: WIL mod + 2)
+   * - **Effect:** All allies gain Regen buff for 2 turns (3 turns at level 5)
+   * - **Immediate Effect:** Restore 1d3 + Will mod * skill level multiplier HP to all allies except you
+   * - **Regen Buff:** Restore (1d4 + WIL mod) HP at the start of each turn
    * 
-   * **Consume:** 4 MP, 1 earth
-   * **Produce:** 1 earth
+   * **Consume:** 4 MP, 1 earth 1 water
+   * **Produce:** 1 neutral
    */
   RejuvenatingMist = "RejuvenatingMist",
 
@@ -1736,8 +1716,8 @@ export enum DruidSkillId {
    * - **Regen:** Grant Regen buff for 2 turns: restore 1d4 + WIL mod HP at the start of each turn
    * - **Level 5:** Also remove 1 random debuff from target
    * 
-   * **Consume:** 3 MP, 1 earth
-   * **Produce:** 1 neutral
+   * **Consume:** 3 MP, 2 neutral
+   * **Produce:** 1 earth
    */
   NurturingBloom = "NurturingBloom",
 
@@ -1776,8 +1756,8 @@ export enum DruidSkillId {
    * **Tier:** Common
    * 
    * Strike with primal ferocity, combining strength and will.
-   * - **Damage:** (Weapon damage + STR mod + WIL mod) × skill level multiplier nature damage
-   * - **Back Row Bonus:** If used from back row, move to front row first (if available), then deal +1d4 damage (+1d6 at level 5)
+   * - **Damage:** (Weapon damage without mod + STR mod + WIL mod) × skill level multiplier nature damage
+   * - **Back Row Bonus:** If used from back row, move to front row first (if available), then deal +1d4 damage first (+1d6 at level 5)
    * 
    * **Consume:** 3 SP, 1 neutral
    * **Produce:** 1 earth
@@ -1790,7 +1770,7 @@ export enum DruidSkillId {
    * Tap into your wild instincts, becoming more ferocious.
    * - **Effect:** Gain Wild Instinct buff for 2 turns (3 turns at level 5)
    * - **Wild Instinct Buff:** Gain +2 STR and +2 AGI
-   * - **Regen:** At the start of each turn, restore 1d3 + WIL mod HP
+   * - **Must not have Wild Instinct buff to use this skill**
    * 
    * **Consume:** 4 SP, 1 earth
    * **Produce:** 1 neutral
@@ -1806,9 +1786,9 @@ export enum MonkSkillId {
    * **Tier:** Common (Cantrip)
    * 
    * Deliver a precise melee strike using internal force.
-   * - **Damage:** 1d6 + (STR or DEX mod, whichever is higher) × position modifier blunt damage (1d8 at level 5)
-   * - **Armor Penetration:** Each skill level ignores 1 point of armor
-   * - **Armor Penalty:** If target's armor is NOT cloth, damage reduced by 70%
+   * - **Damage:** 1d6 + (STR or DEX mod, whichever is higher) × position modifier blunt damage
+   * - **Armor Penetration:** Ignore 2 point of pDef
+   * - **Armor Penalty:** If your armor is NOT cloth, damage reduced by 70%
    * - **Requirement:** Must equip barehand
    * - **Target:** One enemy, front first, melee
    * 
@@ -1824,7 +1804,7 @@ export enum MonkSkillId {
    * - **Hits:** 2 hits (3 hits at level 5)
    * - **Damage per Hit:** Uses Palm Strike damage at your Palm Strike skill level
    *   - If you don't have Palm Strike, damage = 1d4 + (STR or DEX mod, whichever is higher) × position modifier blunt damage
-   * - **Armor Penalty:** If target's armor is NOT cloth, damage reduced by 70%
+   * - **Armor Penalty:** If your armor is NOT cloth, damage reduced by 70%
    * - **Requirement:** Must equip barehand
    * - **Target:** One enemy, front first, melee
    * 
@@ -1840,53 +1820,13 @@ export enum MonkSkillId {
    * - **Damage:** (1d6 + (STR or DEX mod, whichever is higher)) × skill level multiplier blunt damage
    * - **Save:** Target must roll DC10 (DC12 at level 5) + (STR or DEX mod, whichever is higher) END save or become Stunned for 1 turn
    * - **Requirement:** Must equip barehand
+   * - **Armor Penalty:** If your armor is NOT cloth, damage reduced by 70% DC reduced by 3
+   * - **Target:** One enemy, front first, melee
    * 
    * **Consume:** 3 SP
    * **Produce:** 1 wind
    */
   StunningFist = "StunningFist",
-
-  // ---------------
-  // Flow (Meditation/Resource)
-  // ---------------
-  /**
-   * **Tier:** Common (Cantrip)
-   * 
-   * Meditate to restore your lowest resource.
-   * - **Restoration:** Restore 1d4 + skill level to HP, MP, or SP, whichever is lowest (in percentage)
-   * 
-   * **Consume:** 2 MP
-   * **Produce:** 1 order
-   */
-  Meditation = "Meditation",
-
-  /**
-   * **Tier:** Uncommon
-   * 
-   * Find inner peace, restoring yourself over time.
-   * - **Effect:** Gain Inner Peace buff for 2 turns (3 turns at level 5)
-   * - **Inner Peace Buff:** Restore 1d4 + (STR or DEX mod, whichever is higher) HP at the start of each turn
-   * - **Bonus:** Gain +1 to all saving throws while active
-   * - **Level 5:** Also restore 1 SP per turn
-   * 
-   * **Consume:** 2 MP
-   * **Produce:** 1 order
-   */
-  InnerPeace = "InnerPeace",
-
-  /**
-   * **Tier:** Rare
-   * 
-   * Channel chi to restore yourself completely.
-   * - **Healing:** Restore 2d4 + (STR or DEX mod, whichever is higher) HP
-   * - **Resources:** Additionally, restore 2 MP and 2 SP
-   * - **Low HP Bonus:** If you're below 30% HP, restore additional 1d4 HP
-   * - **Cooldown:** 4 turns (3 turns at level 5)
-   * 
-   * **Consume:** 0
-   * **Produce:** 1 order
-   */
-  ChiFlow = "ChiFlow",
 
   // ---------------
   // Master (Precision/Control)
@@ -1899,9 +1839,12 @@ export enum MonkSkillId {
    * - **Hit Bonus:** +4 hit roll (+6 at level 5)
    * - **Armor Penetration:** Each skill level ignores 1 point of armor (same as Palm Strike)
    * - **Requirement:** Must equip barehand
+   * - **Armor Penalty:** If your armor is NOT cloth, damage reduced by 70% DC reduced by 3
+   * - **Target:** One enemy, front first, melee
+   
    * 
-   * **Consume:** 2 SP
-   * **Produce:** 1 wind
+   * **Consume:** 2 SP 1 wind
+   * **Produce:** 1 neutral
    */
   PrecisionStrike = "PrecisionStrike",
 
@@ -1913,7 +1856,9 @@ export enum MonkSkillId {
    * - **Save:** Target must roll DC10 + (STR or DEX mod, whichever is higher) END save or gain Dazed debuff for 2 turns
    * - **Level 5:** Also reduce target's AB gauge by 10 if save fails
    * - **Requirement:** Must equip barehand
-   * 
+   * - **Armor Penalty:** If your armor is NOT cloth, damage reduced by 70% DC reduced by 3
+   * - **Target:** One enemy, front first, melee
+   *
    * **Consume:** 3 SP, 1 wind
    * **Produce:** 1 neutral
    */
@@ -1927,15 +1872,14 @@ export enum WarlockSkillId {
   /**
    * **Tier:** Common (Cantrip)
    * 
-   * Launch a bolt of condensed shadow energy.
-   * - **Damage:** 1d6 + planar mod × skill level multiplier arcane damage
+   * Launch a bolt of condensed chaos energy.
+   * - **Damage:** 1d6 + planar mod × skill level multiplier chaos damage
    * - **Save:** Target must roll DC10 + planar mod WIL save or gain Cursed debuff for 1 turn (reduces saving throws)
-   * - **Range:** Ranged single-target magic damage
    * 
    * **Consume:** 2 MP
    * **Produce:** 1 chaos
    */
-  ChaosBolt = "ShadowBolt",
+  ChaosBolt = "ChaosBolt",
 
   /**
    * **Tier:** Uncommon
@@ -1946,9 +1890,9 @@ export enum WarlockSkillId {
    * - **Level 5:** Also apply Cursed debuff for 1 turn to enemies who fail save
    * 
    * **Consume:** 4 MP, 1 chaos
-   * **Produce:** 1 chaos
+   * **Produce:** 1 neutral
    */
-  ShadowBurst = "ShadowBurst",
+  ChaosBurst = "ChaosBurst",
 
   /**
    * **Tier:** Rare
@@ -1960,7 +1904,7 @@ export enum WarlockSkillId {
    * - **Range:** Single target ranged
    * 
    * **Consume:** 5 MP, 2 chaos
-   * **Produce:** 1 chaos
+   * **Produce:** 1 neutral
    */
   VoidBolt = "VoidBolt",
 
@@ -1976,7 +1920,7 @@ export enum WarlockSkillId {
    * - **Bonus:** If target already has Cursed debuff, also apply Hexed debuff for 2 turns (reduces endurance by 2 and deals 1d2 damage per turn)
    * - **Target:** Single target
    * 
-   * **Consume:** 3 MP, 1 chaos
+   * **Consume:** 3 MP, 2 neutral
    * **Produce:** 1 chaos
    */
   Corruption = "Corruption",
@@ -1987,7 +1931,6 @@ export enum WarlockSkillId {
    * Curse a target with weakness, reducing their resolve.
    * - **Save:** Target must roll DC10 + planar mod WIL save or gain Cursed debuff for 2 turns (3 turns at level 5)
    * - **Damage:** If save fails, also deal 1d3 + planar mod arcane damage
-   * - **Level 5:** Also apply Slow debuff for 1 turn if save fails
    * - **Target:** Single target
    * 
    * **Consume:** 2 MP
@@ -2006,8 +1949,8 @@ export enum WarlockSkillId {
    * - **Lifesteal:** Restore HP equal to 50% of damage dealt (75% at level 5)
    * - **Target:** Single target
    * 
-   * **Consume:** 3 MP, 1 chaos
-   * **Produce:** 1 chaos
+   * **Consume:** 3 MP, 2 chaos
+   * **Produce:** 1 fire
    */
   LifeDrain = "LifeDrain",
 
@@ -2015,13 +1958,13 @@ export enum WarlockSkillId {
    * **Tier:** Rare
    * 
    * Form a dark pact, sacrificing your health for immense power.
-   * - **Sacrifice:** Sacrifice 2d4 HP (1d4 at level 5)
    * - **Effect:** Gain Dark Pact buff for 3 turns (4 turns at level 5)
    * - **Dark Pact Buff:** All damage dealt increased by +25% (+35% at level 5), but you take +1 damage from all sources
    * - **Level 5:** Also gain +2 planar mod while active
+   * - **Must not have dark pact buff to use this skill**
    * 
-   * **Consume:** 0 (sacrifices HP instead)
-   * **Produce:** 2 chaos
+   * **Consume:** 5 HP, 1 fire
+   * **Produce:** 1 chaos
    */
   DarkPact = "DarkPact",
 }
@@ -2055,19 +1998,6 @@ export enum DuelistSkillId {
    */
   DuelingStance = "DuelingStance",
 
-  /**
-   * **Tier:** Common
-   * 
-   * Execute a perfect parrying strike while maintaining your guard.
-   * - **Damage:** (Weapon damage + DEX mod) × skill level multiplier slash damage
-   * - **Effect:** Extend Parry buff duration by 1 turn
-   * - **Requirement:** Must have Parry buff active
-   * - **Target:** Single target melee attack
-   * 
-   * **Consume:** 2 SP
-   * **Produce:** 1 wind
-   */
-  PerfectParry = "PerfectParry",
 
   // ---------------
   // Precision (Accurate Strikes)
@@ -2089,7 +2019,7 @@ export enum DuelistSkillId {
    * **Tier:** Uncommon
    * 
    * Feint to create an opening, then strike with precision.
-   * - **Damage:** (Weapon damage + DEX mod) × skill level multiplier slash damage
+   * - **Damage:** Weapon damage × skill level multiplier weapon pdamage type damage
    * - **Hit Bonus:** +4 hit roll (+6 at level 5)
    * - **On Hit:** Gain +10 AB gauge and target loses 10 AB gauge
    * - **Target:** Single target melee attack
@@ -2110,23 +2040,10 @@ export enum DuelistSkillId {
    * - **Damage per Hit:** (0.7× weapon damage + DEX mod) × skill level multiplier slash damage
    * - **Target:** Multi-hit melee attack
    * 
-   * **Consume:** 4 SP, 1 wind
-   * **Produce:** 1 neutral
+   * **Consume:** 4 SP, 1 wind, 1 neutral
+   * **Produce:** 1 fire
    */
   BladeFlurry = "BladeFlurry",
-
-  /**
-   * **Tier:** Common
-   * 
-   * Strike in rapid succession, building momentum.
-   * - **Damage:** (Weapon damage + DEX mod) × skill level multiplier slash damage
-   * - **Combo Bonus:** If you've attacked this target in the previous turn, deal +25% damage and gain +5 AB gauge
-   * - **Target:** Single target melee attack
-   * 
-   * **Consume:** 3 SP
-   * **Produce:** 1 wind
-   */
-  ComboStrike = "ComboStrike",
 }
 
 export enum WitchSkillId {
@@ -2202,7 +2119,7 @@ export enum WitchSkillId {
    * - **Bonus:** If target has HexMark debuff, also apply Cursed debuff for 1 turn
    * - **Target:** Single target
    * 
-   * **Consume:** 4 MP, 1 chaos
+   * **Consume:** 4 MP, 2 chaos
    * **Produce:** 1 neutral
    */
   ChaosBinding = "HexDoll",
@@ -2215,7 +2132,7 @@ export enum WitchSkillId {
    * - **Charmed Debuff:** On their turn, roll DC12 WIL save. If failed, target a random ally instead of intended target for their action
    * - **Target:** Single target enemy
    * 
-   * **Consume:** 3 MP, 1 chaos
+   * **Consume:** 3 MP, 2 chaos
    * **Produce:** 1 neutral
    */
   Bewitch = "Bewitch",
@@ -2310,7 +2227,7 @@ export enum InquisitorSkillId {
    * - **Target:** Single target enemy
    * 
    * **Consume:** 2 MP
-   * **Produce:** 1 order
+   * **Produce:** 1 fire
    */
   CleansingFlame = "CleansingFlame",
 }
@@ -2368,11 +2285,11 @@ export enum ScholarSkillId {
    * 
    * Interfere with the target's mental processes.
    * - **Save:** Target must roll DC10 + INT mod WIL save or gain Dazed debuff for 1 turn (2 turns at level 5)
-   * - **AB Reduction:** Additionally, reduce target's AB gauge by 15
+   * - **AB Reduction:** Additionally, reduce target's AB gauge by 10
    * - **Target:** Single target
    * 
-   * **Consume:** 2 MP
-   * **Produce:** 1 neutral
+   * **Consume:** 2 MP 1 neutral
+   * **Produce:** 1 order
    */
   MentalInterference = "MentalInterference",
 
@@ -2388,7 +2305,7 @@ export enum ScholarSkillId {
    * - **Multi-Debuff Bonus:** If target has ≥3 debuffs, damage becomes 1d6 (1d8 at level 5)
    * - **Target:** Single target
    * 
-   * **Consume:** 3 MP
+   * **Consume:** 3 MP 1 order 1 chaos
    * **Produce:** 1 neutral
    */
   CognitiveOverload = "CognitiveOverload",
@@ -2402,8 +2319,8 @@ export enum ScholarSkillId {
    * - **Multi-Debuff:** If target has ≥3 debuffs, also apply Slow debuff for 1 turn
    * - **Target:** Single target melee attack
    * 
-   * **Consume:** 3 SP
-   * **Produce:** 1 neutral
+   * **Consume:** 3 SP 1 order
+   * **Produce:** 1 chaos
    */
   DebilitatingStrike = "DebilitatingStrike",
 }
@@ -2462,7 +2379,7 @@ export enum EngineerSkillId {
    * - **Level 5:** Also apply Slow debuff for 1 turn to enemies who fail save
    * 
    * **Consume:** 4 SP, 1 fire
-   * **Produce:** 1 fire
+   * **Produce:** 1 neutral
    */
   FragmentationGrenade = "FragmentationGrenade",
 
@@ -2486,9 +2403,10 @@ export enum EngineerSkillId {
    * **Tier:** Common (Cantrip)
    * 
    * Shift gears to boost an ally's performance.
-   * - **Target:** Single target ally (including self)
-   * - **Effect:** Grant Haste buff for 2 turns (3 turns at level 5)
+   * - **Target:** self
+   * - **Effect:** Grant Haste buff for 2 turns
    * - **SP Restoration:** Additionally, restore 2 SP
+   * - **Must not have Haste buff to use this skill**
    * 
    * **Consume:** 2 SP
    * **Produce:** 1 fire
@@ -2520,9 +2438,9 @@ export enum NomadSkillId {
    * 
    * Retreat tactically while striking back.
    * - **Movement:** Move to back row (if available) and grant Retreat buff for 1 turn (2 turns at level 5)
-   * - **Damage:** Additionally, deal (0.8× weapon damage + attribute mod) × skill level multiplier damage to closest enemy
+   * - **Damage:** Additionally, deal (0.8× weapon damage + attribute mod) × skill level multiplier damage to a random
    * 
-   * **Consume:** 3 SP
+   * **Consume:** 3 SP 1 neutral
    * **Produce:** 1 wind
    */
   AdaptiveRetreat = "AdaptiveRetreat",
@@ -2538,7 +2456,7 @@ export enum NomadSkillId {
    * - **Back Row:** Gain Retreat buff for 1 turn (2 turns at level 5)
    * - **Requirement:** Must equip dagger or blade
    * 
-   * **Consume:** 3 SP
+   * **Consume:** 3 SP 1 wind
    * **Produce:** 1 fire
    */
   TacticalSlash = "TacticalSlash",
@@ -2552,8 +2470,8 @@ export enum NomadSkillId {
    * - **Range:** No range penalty
    * - **Requirement:** Must equip bow
    * 
-   * **Consume:** 3 SP
-   * **Produce:** 1 neutral
+   * **Consume:** 3 SP 1 neutral
+   * **Produce:** 1 wind
    */
   TacticalShot = "TacticalShot",
 
@@ -2565,7 +2483,7 @@ export enum NomadSkillId {
    * - **Bonus:** If moving from back row, gain +5 AB gauge
    * 
    * **Consume:** 2 SP
-   * **Produce:** 1 neutral
+   * **Produce:** 1 wind
    */
   TacticalAdvance = "TacticalAdvance",
 
@@ -2595,7 +2513,7 @@ export enum NomadSkillId {
    * - **Level 5:** Also gain +5 AB gauge if position change succeeds
    * - **Target:** Single target melee attack
    * 
-   * **Consume:** 3 SP
+   * **Consume:** 3 SP 1 wind 1 fire
    * **Produce:** 1 neutral
    */
   RepositioningStrike = "RepositioningStrike",

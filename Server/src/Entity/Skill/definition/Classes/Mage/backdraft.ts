@@ -9,7 +9,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
-import { roll } from "src/Utils/Dice";
 import { MageSkill } from "./index";
 
 export const backdraft = new MageSkill({
@@ -86,8 +85,10 @@ export const backdraft = new MageSkill({
         totalBurnStacks += burnStacks;
 
         // Deal damage equal to burn stacks
+        // Damage dice - should not get bless/curse
+        const bonusDamage = skillLevel >= 5 ? actor.roll({ amount: 1, face: 2, applyBlessCurse: false }) : 0;
         const damageOutput = {
-          damage: burnStacks + (skillLevel === 5 ? roll(1).d(2).total : 0),
+          damage: burnStacks + bonusDamage,
           hit: 999,
           crit: 0,
           type: DamageType.inferno,
@@ -123,9 +124,9 @@ export const backdraft = new MageSkill({
     // At level >= 5: totalBurnStacks * (0.1 * skillLevel) + 1d2 per stack
     let additionalHeal = 0;
     if (skillLevel >= 5) {
-      // Roll 1d2 for each stack
+      // Roll 1d2 for each stack - healing dice, should not get bless/curse
       for (let i = 0; i < totalBurnStacks; i++) {
-        additionalHeal += roll(1).d(2).total;
+        additionalHeal += actor.roll({ amount: 1, face: 2, applyBlessCurse: false });
       }
     } else {
       // +1 per stack at level < 5

@@ -33,6 +33,7 @@ export class Skill {
   notExistDebuff?: DebuffEnum[];
   class?: ClassEnum;
   cooldown: number;
+  isFallback: boolean;
   exec: (
     user: Character,
     userParty: Character[],
@@ -55,6 +56,7 @@ export class Skill {
     notExistDebuff?: DebuffEnum[];
     class?: ClassEnum;
     cooldown?: number;
+    isFallback?: boolean;
     exec: (
       user: Character,
       userParty: Character[],
@@ -79,6 +81,11 @@ export class Skill {
     this.notExistBuff = data.notExistBuff;
     this.notExistDebuff = data.notExistDebuff;
     this.cooldown = data.cooldown ?? 0;
+    // isFallback: true if no elemental resources consumed AND no buff requirement
+    this.isFallback = data.isFallback ?? (
+      (data.consume.elements.length === 0) && 
+      (data.existBuff === undefined)
+    );
   }
 }
 

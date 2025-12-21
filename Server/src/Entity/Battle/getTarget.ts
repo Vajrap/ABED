@@ -200,6 +200,7 @@ class TargetSelector {
     }
 
     // Check for taunt targets AFTER filtering (and after challenge check)
+    let selectedTarget: Character | undefined;
     if (this.tauntCount) {
       const tauntingTargets = filtered.filter((target) => {
         return (
@@ -208,18 +209,49 @@ class TargetSelector {
         );
       });
       if (tauntingTargets.length > 0) {
-        return tauntingTargets[
+        selectedTarget = tauntingTargets[
           Math.floor(Math.random() * tauntingTargets.length)
         ];
       }
     }
 
-    // For "one", we select based on type configuration or random
-    if (this.type.direction && this.type.target) {
-      return this.selectByType(filtered, 1)[0]!;
+    // If no taunt target, select normally
+    if (!selectedTarget) {
+      if (this.type.direction && this.type.target) {
+        selectedTarget = this.selectByType(filtered, 1)[0];
+      } else {
+        selectedTarget = this.selectRandomOne(filtered);
+      }
     }
 
-    return this.selectRandomOne(filtered);
+    // Guardian mechanic: Redirect attacks to Guardian if one exists in the target's party
+    // Check if selected target's party has a Guardian character AFTER selection
+    if (selectedTarget) {
+      // Determine which party contains the selected target
+      const targetParty = this.actorParty.includes(selectedTarget) 
+        ? this.actorParty 
+        : this.enemyParty;
+      
+      // Find any Guardian character in that party
+      const guardianCharacter = targetParty.find((char) => {
+        const guardianBuff = char.buffsAndDebuffs.buffs.entry.get(BuffEnum.guardian);
+        return guardianBuff !== undefined && guardianBuff.value > 0;
+      });
+      
+      // Guardian must be in the filtered list (same target type) and not be the selected target
+      if (guardianCharacter && guardianCharacter.id !== selectedTarget.id && filtered.includes(guardianCharacter)) {
+        // Redirect to guardian and trigger the effect
+        // Grant +1 earth resource to guardian
+        guardianCharacter.resources.earth += 1;
+        
+        // Note: Guardian buff is not consumed here - it will be removed by the turn resolver
+        
+        // Return the guardian as the target
+        return guardianCharacter;
+      }
+    }
+
+    return selectedTarget;
   }
 
   // TODO: This method seems to allow picking the same target multiple times by default, needed to fix, might need a new arg, 'filterSelected: boolean = true'

@@ -12,7 +12,6 @@ import { getWeaponDamageOutput } from "src/Utils/getWeaponDamgeOutput";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
-import { roll } from "src/Utils/Dice";
 
 export const relentlessCharge = new KnightSkill({
   id: KnightSkillId.RelentlessCharge,
@@ -105,7 +104,8 @@ export const relentlessCharge = new KnightSkill({
     let bonusMessage = "";
     if (hasAdvancingPace) {
       const bonusDice = skillLevel >= 5 ? 6 : 4;
-      const bonusDamage = roll(1).d(bonusDice).total;
+      // Bonus damage dice - should not get bless/curse
+      const bonusDamage = actor.roll({ amount: 1, face: bonusDice, applyBlessCurse: false });
       damageOutput.damage += bonusDamage;
       actor.abGauge = Math.min(100, actor.abGauge + 10);
       bonusMessage = ` ${actor.name.en} gains +10 AB gauge!`;

@@ -52,13 +52,14 @@ export const razorGust = new MageSkill({
     // Calculate number of repeats: every 2 stacks of Tailwind = 1 repeat
     // So with 0 stacks = 1 attack, 2 stacks = 2 attacks, 4 stacks = 3 attacks, etc.
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const baseDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar" }) * levelScalar);
+    // Damage dice - should not get bless/curse
+    const baseDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar", applyBlessCurse: false }) * levelScalar);
 
-    // Calculate damage: (1d6 + planar mod) × skill level multiplier
+    // Standard arcane/elemental magic uses CONTROL for hit
     const damageOutput = {
       damage: baseDamage,
-      hit: actor.rollTwenty({}),
-      crit: actor.rollTwenty({}),
+      hit: actor.rollTwenty({stat: 'control'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.wind,
       isMagic: true,
     };

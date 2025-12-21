@@ -30,6 +30,7 @@ export const throwSpear = new DruidSkill({
   requirement: {},
   equipmentNeeded: ["spear"],
   tier: TierEnum.uncommon,
+  isFallback: false, // Throw Spear: consumes 2 neutral elements
   consume: {
     hp: 0,
     mp: 0,
@@ -91,8 +92,7 @@ export const throwSpear = new DruidSkill({
 
     // Note: this skill doesn't have level multiplier but add the level into damage directly
     damageOutput.damage = Math.floor((damageOutput.damage * rangeMultiplier) + skillLevel);
-    damageOutput.hit = actor.rollTwenty({}) + damageOutput.hit;
-    damageOutput.crit = actor.rollTwenty({}) + damageOutput.crit;
+    // Hit/crit already come from getWeaponDamageOutput with correct stats (DEX for physical attacks)
 
     const totalDamage = resolveDamage(actor.id, target.id, damageOutput, location);
     const message = buildCombatMessage(

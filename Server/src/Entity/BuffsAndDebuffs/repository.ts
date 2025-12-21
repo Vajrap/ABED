@@ -62,6 +62,11 @@ import { wardOfProtection } from "./definitions/buffs/wardOfProtection";
 import { battleHardened } from "./definitions/buffs/battleHardened";
 import { challenger } from "./definitions/buffs/challenger";
 import { battleFormation } from "./definitions/buffs/battleFormation";
+import { fortressStance } from "./definitions/buffs/fortressStance";
+import { guardian } from "./definitions/buffs/guardian";
+import { inspired } from "./definitions/buffs/inspired";
+import { wildInstinct } from "./definitions/buffs/wildInstinct";
+import { mechanicalOverdrive } from "./definitions/buffs/mechanicalOverdrive";
 import { soaked } from "./definitions/debuffs/soaked";
 import { stoneBounded } from "./definitions/debuffs/stoneBounded";
 import { challenged } from "./definitions/debuffs/challenged";
@@ -109,6 +114,11 @@ export const buffsRepository: Record<BuffEnum, BuffDef> = {
   [BuffEnum.battleHardened]: battleHardened,
   [BuffEnum.challenger]: challenger,
   [BuffEnum.battleFormation]: battleFormation,
+  [BuffEnum.fortressStance]: fortressStance,
+  [BuffEnum.guardian]: guardian,
+  [BuffEnum.inspired]: inspired,
+  [BuffEnum.wildInstinct]: wildInstinct,
+  [BuffEnum.mechanicalOverdrive]: mechanicalOverdrive,
 };
 
 export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
@@ -125,6 +135,7 @@ export const debuffsRepository: Record<DebuffEnum, DebuffDef> = {
   [DebuffEnum.hexMark]: hexMark,
   [DebuffEnum.charmed]: charmed,
   [DebuffEnum.challenged]: challenged,
+  
 
   // Cooldown
   [DebuffEnum.disruptPattern]: disruptPattern,

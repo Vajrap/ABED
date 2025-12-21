@@ -49,6 +49,7 @@ export const basicAttack = new Skill({
       },
     ],
   },
+  isFallback: true, // Basic attack: no elemental resources, no buff requirement
   exec: (
     actor: Character,
     actorParty: Character[],

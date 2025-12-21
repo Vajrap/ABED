@@ -50,6 +50,7 @@ export const fireBolt = new MageSkill({
       },
     ],
   },
+  isFallback: true, // Fire Bolt: no elemental resources, no buff requirement
   exec: (
     actor: Character,
     actorParty: Character[],
@@ -94,11 +95,11 @@ export const fireBolt = new MageSkill({
     const critBonus = luckMod;
 
     // Create damage output
-    // Hit/Crit rolls - apply bless/curse automatically
+    // Standard arcane/elemental magic uses CONTROL for hit
     const damageOutput = {
       damage: Math.floor(totalDamage),
-      hit: actor.rollTwenty({}) + hitBonus, // DC 13 base
-      crit: actor.rollTwenty({}) + critBonus,
+      hit: actor.rollTwenty({stat: 'control'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.fire,
       isMagic: true,
     };

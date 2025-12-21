@@ -9,7 +9,6 @@ import { ScholarSkill } from "./index";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 
@@ -32,19 +31,22 @@ export const cognitiveOverload = new ScholarSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.uncommon,
+  isFallback: false, // CognitiveOverload: consumes 1 order and 1 chaos elements
   consume: {
     hp: 0,
-    mp: 4,
+    mp: 3,
     sp: 0,
-    elements: [{ element: "neutral", value: 2 }],
+    elements: [
+      { element: "order", value: 1 },
+      { element: "chaos", value: 1 },
+    ],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
     elements: [
-      { element: "chaos", min: 0, max: 1 },
-      { element: "order", min: 0, max: 1 },
+      { element: "neutral", min: 1, max: 1 },
     ],
   },
   exec: (
@@ -84,7 +86,8 @@ export const cognitiveOverload = new ScholarSkill({
         skillLevel >= 5 ? { dice: 1, face: 6 } : { dice: 1, face: 4 };
     }
 
-    const baseDamage = roll(damageDice.dice).d(damageDice.face).total;
+    // Damage dice - should not get bless/curse
+    const baseDamage = actor.roll({ amount: damageDice.dice, face: damageDice.face, stat: "intelligence", applyBlessCurse: false });
     const totalDamage = Math.max(0, (baseDamage + intMod) * levelScalar);
 
     // Refresh 1 random debuff (extend duration by 1 turn)
@@ -93,7 +96,9 @@ export const cognitiveOverload = new ScholarSkill({
       const debuffEntries = Array.from(
         target.buffsAndDebuffs.debuffs.entry.entries(),
       );
-      const randomIndex = Math.floor(Math.random() * debuffEntries.length);
+      // Random selection - should use actor.roll for consistency (1-based index)
+      const randomRoll = actor.roll({ amount: 1, face: debuffEntries.length, applyBlessCurse: false });
+      const randomIndex = randomRoll - 1; // Convert to 0-based index
       const [debuffId, entry] = debuffEntries[randomIndex]!;
       entry.value += 1; // Refresh by adding 1 turn
       debuffRefreshed = ` ${target.name.en}'s ${debuffId} debuff was refreshed.`;
@@ -101,8 +106,8 @@ export const cognitiveOverload = new ScholarSkill({
 
     const damageOutput = {
       damage: Math.floor(totalDamage),
-      hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
-      crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
+      hit: actor.rollTwenty({stat: 'control'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.arcane,
       isMagic: true,
       trueDamage: true,

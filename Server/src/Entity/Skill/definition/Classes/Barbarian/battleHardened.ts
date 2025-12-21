@@ -8,7 +8,6 @@ import { BarbarianSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { statMod } from "src/Utils/statMod";
-import { roll } from "src/Utils/Dice";
 
 export const battleHardened = new BarbarianSkill({
   id: BarbarianSkillId.BattleHardened,
@@ -64,7 +63,8 @@ export const battleHardened = new BarbarianSkill({
     // Level 5 Bonus: Also heal for 1d4 + END mod HP
     if (skillLevel >= 5) {
       const endMod = statMod(actor.attribute.getTotal("endurance"));
-      const healAmount = roll(1).d(4).total + endMod;
+      // Healing dice - should not get bless/curse
+      const healAmount = actor.roll({ amount: 1, face: 4, stat: "endurance", applyBlessCurse: false }) + endMod;
       actor.vitals.incHp(healAmount);
       message += ` Healed for ${healAmount} HP!`;
       messageTh += ` รักษา ${healAmount} HP!`;

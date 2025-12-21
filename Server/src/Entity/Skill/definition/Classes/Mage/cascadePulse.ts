@@ -59,10 +59,11 @@ export const cascadePulse = new MageSkill({
         // Deal damage: 1d6 + planar + skill level
         const baseDamage = actor.roll({ amount: 1, face: 6, applyBlessCurse: false }) + planarMod + skillLevel;
         const damage = Math.floor(baseDamage * levelScalar);
+        // Standard arcane/elemental magic uses CONTROL for hit
         const damageOutput = {
           damage,
-          hit: actor.rollTwenty({}),
-          crit: actor.rollTwenty({}),
+          hit: actor.rollTwenty({stat: 'control'}),
+          crit: actor.rollTwenty({stat: 'luck'}),
           type: DamageType.water,
           isMagic: true,
         };

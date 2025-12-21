@@ -40,6 +40,7 @@ export const chaosBrand = new WitchSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.uncommon,
+  isFallback: false, // ChaosBrand: consumes 1 chaos element
   consume: {
     hp: 0,
     mp: 2,

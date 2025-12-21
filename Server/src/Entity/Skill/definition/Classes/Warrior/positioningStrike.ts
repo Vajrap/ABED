@@ -10,7 +10,6 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WarriorSkill } from ".";
-import { roll } from "src/Utils/Dice";
 
 export const positioningStrike = new WarriorSkill({
   id: WarriorSkillId.PositioningStrike,
@@ -90,7 +89,8 @@ export const positioningStrike = new WarriorSkill({
         if (!allOccupiedPositions.includes(position)) {
           target.position = position;
           positionChanged = true;
-          bonusDamage = roll(1).d(4).total;
+          // Bonus damage dice - should not get bless/curse
+          bonusDamage = actor.roll({ amount: 1, face: 4, applyBlessCurse: false });
           positionMessage = ` Pushed ${target.name.en} to back row!`;
           break;
         }
@@ -104,7 +104,8 @@ export const positioningStrike = new WarriorSkill({
         if (!allOccupiedPositions.includes(position)) {
           target.position = position;
           positionChanged = true;
-          bonusDamage = roll(1).d(4).total;
+          // Bonus damage dice - should not get bless/curse
+          bonusDamage = actor.roll({ amount: 1, face: 4, applyBlessCurse: false });
           positionMessage = ` Pulled ${target.name.en} to front row!`;
           break;
         }

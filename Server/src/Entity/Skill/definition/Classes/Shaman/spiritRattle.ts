@@ -19,7 +19,6 @@ import { ShamanSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { roll } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { ShamanSkill } from "./index";
 
@@ -73,7 +72,8 @@ export const holyRattle = new ShamanSkill({
     location: LocationsEnum,
   ) => {
     // Calculate number of targets: 1 + 1d(skillLevel)
-    let numTargets = 1 + roll(1).d(skillLevel).total;
+    // Random selection - should not get bless/curse
+    let numTargets = 1 + actor.roll({ amount: 1, face: skillLevel, applyBlessCurse: false });
     const duration = skillLevel >= 5 ? 3 : 2;
     
     // Select random allies (excluding self)

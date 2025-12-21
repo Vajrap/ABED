@@ -9,9 +9,10 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll } from "src/Utils/Dice";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { WarlockSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
+import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 
 export const corruption = new WarlockSkill({
   id: WarlockSkillId.Corruption,
@@ -32,14 +33,15 @@ export const corruption = new WarlockSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.uncommon,
+  isFallback: false, // Corruption: consumes 2 neutral elements
   consume: {
     hp: 0,
     mp: 3,
     sp: 0,
     elements: [
       {
-        element: "chaos",
-        value: 1,
+        element: "neutral",
+        value: 2,
       },
     ],
   },
@@ -49,7 +51,7 @@ export const corruption = new WarlockSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
+        element: "chaos",
         min: 1,
         max: 1,
       },
@@ -78,44 +80,43 @@ export const corruption = new WarlockSkill({
       };
     }
 
-    // Calculate immediate damage: 1d4 + planar mod
+    // Calculate immediate damage: 1d4 + planar mod × skill level multiplier
     const planarMod = statMod(actor.attribute.getTotal("planar"));
-    const controlMod = statMod(actor.attribute.getTotal("control"));
+    const levelMultiplier = skillLevelMultiplier(skillLevel);
     
-    const baseDiceDamage = roll(1).d(4).total;
-    const totalDamage = Math.max(0, baseDiceDamage + planarMod);
+    // Damage dice - should not get bless/curse
+    const baseDiceDamage = actor.roll({ amount: 1, face: 4, stat: "planar", applyBlessCurse: false });
+    const totalDamage = Math.max(0, Math.floor((baseDiceDamage + planarMod) * levelMultiplier));
 
+    // Curse/chaos magic uses WIL for hit, LUCK for crit
     const damageOutput = {
       damage: totalDamage,
-      hit: 999, // Auto-hit
-      crit: 0,
-      type: DamageType.dark,
+      hit: actor.rollTwenty({stat: 'willpower'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
+      type: DamageType.arcane, // Enum says arcane damage
       isMagic: true,
     };
 
     const damageResult = resolveDamage(actor.id, target.id, damageOutput, location);
 
-    // Check for debuff application (DC10 + control mod endurance save)
-    let debuffMessage = "";
-    const enduranceDC = 10 + controlMod;
-    const saveRoll = target.rollSave("endurance");
+    // Check if target already has Cursed debuff BEFORE applying new one (for bonus)
+    const hadCursedBefore = target.buffsAndDebuffs.debuffs.entry.has(DebuffEnum.cursed);
     
-    if (saveRoll < enduranceDC) {
-      // Apply cursed for 3 turns
-      buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: 3 });
+    // Check for debuff application (DC10 + planar mod WIL save) - enum says WIL save, not END
+    let debuffMessage = "";
+    const willpowerDC = 10 + planarMod;
+    const saveRoll = target.rollSave("willpower");
+    
+    if (saveRoll < willpowerDC) {
+      // Apply Cursed for 2 turns (enum says 2 turns, not 3)
+      buffsAndDebuffsRepository.cursed.appender(target, { turnsAppending: 2 });
+      debuffMessage = ` ${target.name.en} is cursed!`;
       
-      // Apply hexed for 2 turns
-      buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: 2 });
-      
-      debuffMessage = ` ${target.name.en} is corrupted!`;
-      
-      // At level 5, also apply 2 stack of burn
-      if (skillLevel >= 5) {
-        buffsAndDebuffsRepository.burn.appender(target, { turnsAppending: 2 });
-        debuffMessage += ` ${target.name.en} is burning!`;
+      // Bonus: If target already has Cursed debuff, also apply Hexed debuff for 2 turns
+      if (hadCursedBefore) {
+        buffsAndDebuffsRepository.hexed.appender(target, { turnsAppending: 2 });
+        debuffMessage += ` ${target.name.en} is also hexed!`;
       }
-    } else {
-      debuffMessage = ` ${target.name.en} resisted the corruption!`;
     }
 
     const message = buildCombatMessage(
@@ -128,7 +129,7 @@ export const corruption = new WarlockSkill({
     return {
       content: {
         en: `${message.en}${debuffMessage}`,
-        th: `${message.th}${debuffMessage.includes("corrupted") ? ` ${target.name.th} ถูกทำให้เสื่อมสลาย!` : debuffMessage.includes("resisted") ? ` ${target.name.th} ต้านทานการเสื่อมสลาย!` : ""}`,
+        th: `${message.th}${debuffMessage}`,
       },
       actor: {
         actorId: actor.id,

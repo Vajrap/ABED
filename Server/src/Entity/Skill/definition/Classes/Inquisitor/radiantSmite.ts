@@ -11,7 +11,7 @@ import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { InquisitorSkill } from "./index";
-import { CharacterAlignmentEnum, CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
+import { CharacterType } from "src/InterFacesEnumsAndTypes/Enums";
 
 export const radiantSmite = new InquisitorSkill({
   id: InquisitorSkillId.RadiantSmite,
@@ -32,11 +32,17 @@ export const radiantSmite = new InquisitorSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.common,
+  isFallback: false, // RadiantSmite: consumes 1 order element
   consume: {
     hp: 0,
     mp: 2,
     sp: 0,
-    elements: [],
+    elements: [
+      {
+        element: "order",
+        value: 1,
+      },
+    ],
   },
   produce: {
     hp: 0,
@@ -44,7 +50,7 @@ export const radiantSmite = new InquisitorSkill({
     sp: 0,
     elements: [
       {
-        element: "order",
+        element: "neutral",
         min: 1,
         max: 1,
       },
@@ -86,19 +92,14 @@ export const radiantSmite = new InquisitorSkill({
     const attributeMod = (willMod + planarMod) / 2;
     const totalDamage = Math.max(0, Math.floor((baseDiceDamage + attributeMod) * levelMultiplier));
 
-    // Bonus damage against undead/fiends
+    // Bonus damage against undead/fiends (enum says +1d4, 1d8 at level 5)
     const isUndeadOrFiend = target.type === CharacterType.undead || target.type === CharacterType.fiend;
-    let bonusDamage = isUndeadOrFiend ? actor.roll({ amount: 1, face: 4, applyBlessCurse: false }) : 0;
-
-    const evilAlignments = [CharacterAlignmentEnum.Cruel, CharacterAlignmentEnum.Vile, CharacterAlignmentEnum.Tyrant, CharacterAlignmentEnum.Infernal];
-    const isTargetEvil = evilAlignments.includes(target.alignment.alignment());
-    bonusDamage += isTargetEvil ? actor.roll({ amount: 1, face: 4, applyBlessCurse: false }) : 0;
-
+    let bonusDamage = isUndeadOrFiend ? actor.roll({ amount: 1, face: skillLevel >= 5 ? 8 : 4, applyBlessCurse: false }) : 0;
 
     const damageOutput = {
       damage: totalDamage + bonusDamage,
-      hit: actor.rollTwenty({}) + controlMod,
-      crit: actor.rollTwenty({}) + luckMod,
+      hit: actor.rollTwenty({stat: 'willpower'}), // Divine/holy magic uses WIL for hit
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.radiance,
       isMagic: true,
     };
@@ -112,13 +113,7 @@ export const radiantSmite = new InquisitorSkill({
       damageResult,
     );
 
-    let bonusMessage = bonusDamage > 0 ? ` +${bonusDamage}` : "";
-    if (isTargetEvil) {
-      bonusMessage += ` vs evil`;
-    }
-    if (isUndeadOrFiend) {
-      bonusMessage += ` vs undead/fiends`;
-    }
+    const bonusMessage = bonusDamage > 0 ? ` +${bonusDamage} vs undead/fiends` : "";
 
     return {
       content: {

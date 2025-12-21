@@ -95,10 +95,11 @@ export const planarEruption = new MageSkill({
       const target = targets.find(e => e.id === targetId);
       if (!target) continue;
 
+      // Standard arcane/elemental magic uses CONTROL for hit
       const damageOutput = {
         damage: totalDamage,
-        hit: user.rollTwenty({}),
-        crit: user.rollTwenty({}),
+        hit: user.rollTwenty({stat: 'control'}),
+        crit: user.rollTwenty({stat: 'luck'}),
         type: DamageType.arcane,
         isMagic: true,
       };

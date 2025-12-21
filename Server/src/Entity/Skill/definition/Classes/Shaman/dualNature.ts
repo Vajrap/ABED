@@ -90,7 +90,8 @@ export const dualNature = new ShamanSkill({
     const levelMultiplier = skillLevelMultiplier(skillLevel);
 
     // Base damage: (1d6 + planar mod) × skill level multiplier
-    const baseDamage = actor.roll({ amount: 1, face: 6, stat: 'planar' });
+    // Damage dice - should not get bless/curse
+    const baseDamage = actor.roll({ amount: 1, face: 6, stat: 'planar', applyBlessCurse: false });
     let totalDamage = Math.floor(baseDamage * levelMultiplier);
     const baseDamageType = order === chaos ? DamageType.arcane : order > chaos ? DamageType.order : DamageType.chaos;
 

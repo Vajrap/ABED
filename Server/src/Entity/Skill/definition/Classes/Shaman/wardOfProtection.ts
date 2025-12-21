@@ -3,7 +3,6 @@ import { ShamanSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { roll } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { ShamanSkill } from "./index";
 
@@ -57,7 +56,10 @@ export const wardOfProtection = new ShamanSkill({
     location: LocationsEnum,
   ) => {
     // Determine number of targets: 1d2 at base, 1d3 at level 5
-    const numTargets = skillLevel >= 5 ? roll(1).d(3).total : roll(1).d(2).total;
+    // Random selection - should not get bless/curse
+    const numTargets = skillLevel >= 5 
+      ? actor.roll({ amount: 1, face: 3, applyBlessCurse: false })
+      : actor.roll({ amount: 1, face: 2, applyBlessCurse: false });
 
     // Select random allies (excluding self)
     const allies = actorParty.filter(ally => ally.id !== actor.id && !ally.vitals.isDead);

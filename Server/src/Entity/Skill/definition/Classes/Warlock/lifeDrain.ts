@@ -9,7 +9,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { WarlockSkill } from "./index";
 
 export const lifeDrain = new WarlockSkill({
@@ -31,13 +30,14 @@ export const lifeDrain = new WarlockSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.uncommon,
+  isFallback: false, // LifeDrain: consumes 2 chaos elements
   consume: {
     hp: 0,
     mp: 3,
     sp: 0,
     elements: [
       {
-        element: "neutral",
+        element: "chaos",
         value: 2,
       },
     ],
@@ -48,7 +48,7 @@ export const lifeDrain = new WarlockSkill({
     sp: 0,
     elements: [
       {
-        element: "water",
+        element: "fire",
         min: 1,
         max: 1,
       },
@@ -77,21 +77,21 @@ export const lifeDrain = new WarlockSkill({
       };
     }
 
-    // Calculate damage: 1d8 + planar mod + willpower mod
+    // Calculate damage: 1d6 + planar mod × skill level multiplier (enum says 1d6, not 1d8)
     const planarMod = statMod(actor.attribute.getTotal("planar"));
-    const willpowerMod = statMod(actor.attribute.getTotal("willpower"));
     const vitalityMod = statMod(actor.attribute.getTotal("vitality"));
-    const controlMod = statMod(actor.attribute.getTotal("control"));
-    const luckMod = statMod(actor.attribute.getTotal("luck"));
+    const levelMultiplier = skillLevelMultiplier(skillLevel);
     
-    const baseDiceDamage = roll(1).d(skillLevel >= 5 ? 10 : 8).total;
-    const totalDamage = Math.max(0, baseDiceDamage + planarMod + willpowerMod);
+    // Damage dice - should not get bless/curse
+    const baseDiceDamage = actor.roll({ amount: 1, face: 6, stat: "planar", applyBlessCurse: false });
+    const totalDamage = Math.max(0, Math.floor((baseDiceDamage + planarMod) * levelMultiplier));
 
+    // Erosion/drain magic uses WIL for hit, LUCK for crit
     const damageOutput = {
       damage: totalDamage,
-      hit: rollTwenty().total + controlMod,
-      crit: rollTwenty().total + luckMod,
-      type: DamageType.erosion,
+      hit: actor.rollTwenty({stat: 'willpower'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
+      type: DamageType.arcane, // Enum says arcane damage
       isMagic: true,
     };
 

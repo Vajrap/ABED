@@ -4,7 +4,6 @@ import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { statMod } from "src/Utils/statMod";
-import { roll } from "src/Utils/Dice";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { DebuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { ShamanSkill } from "./index";
@@ -86,7 +85,8 @@ export const cleansingBlessing = new ShamanSkill({
         }
       } else {
         //Case Heal
-        const healAmount = roll(1).d(4).total + wilMod;
+        // Healing dice - should not get bless/curse
+        const healAmount = actor.roll({ amount: 1, face: 4, stat: "willpower", applyBlessCurse: false }) + wilMod;
         target.vitals.incHp(healAmount);
         messages.push(`${target.name.en} was cleansed and healed for ${healAmount} HP.`);
         targetEffects.push({

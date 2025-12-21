@@ -10,7 +10,6 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
@@ -67,13 +66,14 @@ export const planarEcho = new SeerSkill({
     
     // Calculate damage: 1d6 + CHA mod * (1 + 0.1 * skill level)
     const chaMod = statMod(user.attribute.getTotal("charisma"));
-    const diceDamage = roll(1).d(6).total;
+    // Damage dice - should not get bless/curse
+    const diceDamage = user.roll({ amount: 1, face: 6, stat: "charisma", applyBlessCurse: false });
     const multiplier = skillLevelMultiplier(skillLevel);
     const totalDamage = Math.floor(diceDamage + (chaMod * multiplier));
     
-    // Calculate hit/crit
-    const hitRoll = rollTwenty().total;
-    const critRoll = rollTwenty().total;
+    // Arcane magic uses CONTROL for hit, LUCK for crit
+    const hitRoll = user.rollTwenty({stat: 'control'});
+    const critRoll = user.rollTwenty({stat: 'luck'});
     
     const damageOutput = {
       damage: totalDamage,

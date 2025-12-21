@@ -31,14 +31,19 @@ export const bladeFlurry = new DuelistSkill({
   },
   requirement: {},
   equipmentNeeded: ["blade", 'sword', 'dagger'],
-  tier: TierEnum.common,
+  tier: TierEnum.uncommon,
+  isFallback: false, // BladeFlurry: consumes 1 wind and 1 neutral elements
   consume: {
     hp: 0,
     mp: 0,
-    sp: 2,
+    sp: 4,
     elements: [
       {
-        element: "fire",
+        element: "wind",
+        value: 1,
+      },
+      {
+        element: "neutral",
         value: 1,
       },
     ],
@@ -49,7 +54,7 @@ export const bladeFlurry = new DuelistSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
+        element: "fire",
         min: 1,
         max: 1,
       },
@@ -89,28 +94,30 @@ export const bladeFlurry = new DuelistSkill({
     const messagesTh: string[] = [];
     let totalDamageDealt = 0;
 
-    const weaponDamage = weapon.weaponData.damage.physicalDamageDice;
-    const weaponDamagePercentage = 0.7;
-
-
     for (let i = 0; i < numHits; i++) {
       // Select target randomly, can repeat
       const randomIndex = Math.floor(Math.random() * aliveTargets.length);
-      const target = getTarget(actor, actorParty, targetParty, "enemy").from('frontFirst').one();
+      const target = aliveTargets[randomIndex];
       if (!target) {
         continue;
       }
       
       const positionModifier = getPositionModifier(actor.position, target.position, weapon);
       
-      // Damage per hit: 1d4 + DEX mod * skillScalar
-      const baseDamage = (actor.roll({ amount: weaponDamage.dice, face: weaponDamage.face, applyBlessCurse: false }) * weaponDamagePercentage) + dexMod * levelScalar;
-      const hitDamage = Math.floor((baseDamage + dexMod * levelScalar) * positionModifier);
+      // Get base weapon damage (without attribute mods for the 0.7x calculation)
+      const weaponDamageDice = weapon.weaponData.damage.physicalDamageDice;
+      // Damage dice - should not get bless/curse
+      const weaponRoll = actor.roll({ amount: weaponDamageDice.dice, face: weaponDamageDice.face, applyBlessCurse: false });
+      
+      // Damage per hit: (0.7× weapon damage + DEX mod) × skill level multiplier
+      const baseDamage = (weaponRoll * 0.7) + dexMod;
+      const hitDamage = Math.floor(baseDamage * levelScalar * positionModifier);
 
+      // Physical attacks use DEX for hit, LUCK for crit
       const damageOutput = {
         damage: hitDamage,
-        hit: 999, // Auto-hit
-        crit: 0,
+        hit: actor.rollTwenty({stat: 'dexterity'}),
+        crit: actor.rollTwenty({stat: 'luck'}),
         type: DamageType.slash,
         isMagic: false,
       };

@@ -28,6 +28,7 @@ export const rejuvenatingMist = new DruidSkill({
   equipmentNeeded: [],
   tier: TierEnum.rare,
   cooldown: 3,
+  isFallback: true, // Rejuvenating Mist: no elemental resources, no buff requirement
   consume: {
     hp: 0,
     mp: 4,

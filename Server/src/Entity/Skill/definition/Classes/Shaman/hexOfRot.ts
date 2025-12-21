@@ -94,7 +94,8 @@ export const hexOfRot = new ShamanSkill({
 
     // Calculate damage
     const controlMod = statMod(actor.attribute.getTotal("control"));
-    const damageRoll = actor.roll({ amount: 1, face: 4, stat: "planar" });
+    // Damage dice - should not get bless/curse
+    const damageRoll = actor.roll({ amount: 1, face: 4, stat: "planar", applyBlessCurse: false });
     const totalDamage = damageRoll * skillLevelMultiplier(skillLevel);
 
     const damageOutput = {

@@ -10,7 +10,6 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { MonkSkill } from "./index";
 import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
 import { ArmorClass } from "src/Entity/Item/Equipment/Armor/Armor";
@@ -36,6 +35,7 @@ export const flurryOfBlows = new MonkSkill({
   requirement: {},
   equipmentNeeded: ["bareHand"],
   tier: TierEnum.uncommon,
+  isFallback: false, // Flurry of Blows: consumes 2 wind elements
   consume: {
     hp: 0,
     mp: 0,
@@ -139,7 +139,8 @@ export const flurryOfBlows = new MonkSkill({
         if (palmStrike) {
           // Simulate Palm Strike damage calculation
           const diceFace = palmStrikeLevel >= 5 ? 8 : 6;
-          const baseDamage = roll(1).d(diceFace).total;
+          // Damage dice - should not get bless/curse
+          const baseDamage = actor.roll({ amount: 1, face: diceFace, stat: higherMod === strMod ? "strength" : "dexterity", applyBlessCurse: false });
           hitDamage = baseDamage + higherMod;
           hitDamage = Math.floor(hitDamage * positionModifier);
           // Each level ignore 1 point of armor
@@ -147,7 +148,8 @@ export const flurryOfBlows = new MonkSkill({
         }
       } else {
         // If no palm strike, damage = 1d4 + (str | dex mod whichever higher) * (position modifier) blunt damage
-        const baseDamage = roll(1).d(4).total;
+        // Damage dice - should not get bless/curse
+        const baseDamage = actor.roll({ amount: 1, face: 4, stat: higherMod === strMod ? "strength" : "dexterity", applyBlessCurse: false });
         hitDamage = baseDamage + higherMod;
         hitDamage = Math.floor(hitDamage * positionModifier);
       }
@@ -155,10 +157,11 @@ export const flurryOfBlows = new MonkSkill({
       // Apply armor penalty
       hitDamage = Math.floor(hitDamage * armorPenaltyMultiplier);
 
+      // Physical attacks use DEX for accuracy
       const damageOutput = {
         damage: hitDamage,
-        hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
-        crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
+        hit: actor.rollTwenty({stat: 'dexterity'}),
+        crit: actor.rollTwenty({stat: 'luck'}),
         type: DamageType.blunt,
         isMagic: false,
       };

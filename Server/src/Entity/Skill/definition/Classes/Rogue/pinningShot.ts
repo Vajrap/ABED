@@ -71,7 +71,8 @@ export const pinningShot = new RogueSkill({
     }
 
     // Calculate damage: 1d6 + DEX mod
-    const baseDamage = actor.roll({ amount: 1, face: 6, stat: "dexterity" }) * skillLevelMultiplier(skillLevel);
+    // Damage dice - should not get bless/curse
+    const baseDamage = actor.roll({ amount: 1, face: 6, stat: "dexterity", applyBlessCurse: false }) * skillLevelMultiplier(skillLevel);
 
     const damageOutput = {
       damage: baseDamage,

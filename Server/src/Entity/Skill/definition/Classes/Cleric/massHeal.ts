@@ -74,9 +74,11 @@ export const massHeal = new ClericSkill({
 
     for (const ally of livingAllies) {
       // Healing effectiveness enhanced by charisma (inspiring presence)
+      // Healing dice - should not get bless/curse
       const healAmount = actor.roll({
         amount: 1,
         face: 6,
+        applyBlessCurse: false,
       }) + totalMod + skillLevel;
       ally.vitals.incHp(healAmount);
 

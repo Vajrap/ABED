@@ -75,12 +75,14 @@ export const divineStrike = new ClericSkill({
     const faithStacks = faithEntry?.value || 0;
 
     // Calculate base damage: (1d6 + WIL mod) × skill level multiplier
+    // Damage dice - should not get bless/curse
     const levelScalar = skillLevelMultiplier(skillLevel);
     const baseDamageWithScalar = Math.floor(
       actor.roll({
         amount: 1,
         face: 6,
         stat: "willpower",
+        applyBlessCurse: false,
       }) * levelScalar
     );
 
@@ -100,10 +102,10 @@ export const divineStrike = new ClericSkill({
 
     const totalDamage = baseDamageWithScalar + faithBonusDamage;
 
-    // Create damage output
+    // Divine Strike is divine/holy magic, so use WIL for hit (not CONTROL)
     const damageOutput = {
       damage: totalDamage,
-      hit: actor.rollTwenty({ stat: "control" }),
+      hit: actor.rollTwenty({ stat: "willpower" }),
       crit: actor.rollTwenty({ stat: "luck" }),
       type: DamageType.radiance,
       isMagic: true,

@@ -35,16 +35,14 @@ export const explosiveBolt = new EngineerSkill({
     hp: 0,
     mp: 0,
     sp: 3,
-    elements: [
-      { element: "fire", value: 1 },
-    ],
+    elements: [],
   },
   produce: {
     hp: 0,
     mp: 0,
     sp: 0,
     elements: [
-        { element: "earth", min: 1, max: 1 },
+      { element: "fire", min: 1, max: 1 },
     ],
   },
   exec: (
@@ -76,9 +74,9 @@ export const explosiveBolt = new EngineerSkill({
     const levelScalar = skillLevelMultiplier(skillLevel);
     const totalDamage = Math.floor((diceDamage + dexMod) * levelScalar);
 
-    // Calculate hit/crit
-    const hitRoll = user.rollTwenty({});
-    const critRoll = user.rollTwenty({});
+    // Calculate hit/crit - fire damage, use CONTROL for hit (magical)
+    const hitRoll = user.rollTwenty({ stat: "control" });
+    const critRoll = user.rollTwenty({ stat: "luck" });
 
     const damageOutput = {
       damage: totalDamage,
@@ -168,5 +166,6 @@ export const explosiveBolt = new EngineerSkill({
       targets: targetEffects,
     };
   },
+  isFallback: false,
 });
 

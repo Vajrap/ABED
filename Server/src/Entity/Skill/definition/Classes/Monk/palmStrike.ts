@@ -10,7 +10,6 @@ import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { getPositionModifier } from "src/Utils/getPositionModifier";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { MonkSkill } from "./index";
 import { BareHandId } from "src/Entity/Item/Equipment/Weapon/type";
 import { ArmorClass } from "src/Entity/Item/Equipment/Armor/Armor";
@@ -35,6 +34,7 @@ export const palmStrike = new MonkSkill({
   requirement: {},
   equipmentNeeded: ["bareHand"],
   tier: TierEnum.common,
+  isFallback: true, // Palm Strike: no elemental resources, no buff requirement
   consume: {
     hp: 0,
     mp: 0,
@@ -90,13 +90,15 @@ export const palmStrike = new MonkSkill({
       };
     }
 
-    // deal 1d6 + (str | dex mod whichever higher) * (position modifier) blunt damage
-    // at level 5 damage dice = 1d8
-    const diceFace = skillLevel >= 5 ? 8 : 6;
-    const baseDamage = roll(1).d(diceFace).total;
     const strMod = statMod(actor.attribute.getTotal("strength"));
     const dexMod = statMod(actor.attribute.getTotal("dexterity"));
     const higherMod = Math.max(strMod, dexMod);
+
+    // deal 1d6 + (str | dex mod whichever higher) * (position modifier) blunt damage
+    // at level 5 damage dice = 1d8
+    const diceFace = skillLevel >= 5 ? 8 : 6;
+    // Damage dice - should not get bless/curse
+    const baseDamage = actor.roll({ amount: 1, face: diceFace, stat: higherMod === strMod ? "strength" : "dexterity", applyBlessCurse: false });
 
     const positionModifier = getPositionModifier(actor.position, target.position, weapon);
     let totalDamage = baseDamage + higherMod;
@@ -106,10 +108,11 @@ export const palmStrike = new MonkSkill({
     const armorIgnore = skillLevel;
     totalDamage += armorIgnore;
 
+    // Physical attacks use DEX for accuracy
     const damageOutput = {
       damage: totalDamage,
-      hit: rollTwenty().total + statMod(actor.attribute.getTotal("control")),
-      crit: rollTwenty().total + statMod(actor.attribute.getTotal("luck")),
+      hit: actor.rollTwenty({stat: 'dexterity'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.blunt,
       isMagic: false,
     };

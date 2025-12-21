@@ -32,6 +32,7 @@ export const hydroLash = new MageSkill({
     hp: 0, mp: 0, sp: 0,
     elements: [{ element: "water", min: 1, max: 1 }],
   },
+  isFallback: true, // Hydro Lash: no elemental resources, no buff requirement
   exec: (actor: Character, allies: Character[], enemies: Character[], skillLevel: number, location: LocationsEnum) => {
     const target = getTarget(actor, allies, enemies, "enemy").one();
     if (!target) {
@@ -43,9 +44,11 @@ export const hydroLash = new MageSkill({
     }
 
     // Calculate damage: (1d6 + planar mod) × skill level multiplier
+    // Damage dice - should not get bless/curse
     const levelScalar = skillLevelMultiplier(skillLevel);
-    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar" }) * levelScalar);
+    const totalDamage = Math.max(0, actor.roll({ amount: 1, face: 6, stat: "planar", applyBlessCurse: false }) * levelScalar);
     
+    // Standard arcane/elemental magic uses CONTROL for hit
     const damageOutput = {
       damage: totalDamage,
       hit: actor.rollTwenty({stat: 'control'}),
@@ -55,14 +58,16 @@ export const hydroLash = new MageSkill({
     };
     const totalDamageResult = resolveDamage(actor.id, target.id, damageOutput, location);
     
-    // Chance to spill and heal an ally for 1d3 HP (30% chance)
-    const spillRoll = actor.rollTwenty({});
+    // Chance to spill and heal an ally for 1d3 HP (55% chance = d20 >= 10)
+    // This is a random chance check, not a skill check, so should not get bless/curse
+    const spillRoll = actor.rollTwenty({applyBlessCurse: false});
     let healMessageEn = "";
     let healMessageTh = "";
     if (spillRoll >= 10) {
       const ally = getTarget(actor, allies, enemies, "ally").one();
       if (ally && ally.id !== actor.id) {
-        const healAmount = actor.roll({ amount: 1, face: 3 });
+        // Healing dice - should not get bless/curse
+        const healAmount = actor.roll({ amount: 1, face: 3, applyBlessCurse: false });
         const healResult = ally.receiveHeal({ actor, healing: healAmount });
         healMessageEn = ` Water spilled and healed ${ally.name.en} for ${healResult.heal} HP!`;
         healMessageTh = ` น้ำไหลล้นและรักษา ${ally.name.th} ${healResult.heal} HP!`;

@@ -53,10 +53,10 @@ export const divineStrike = new PaladinSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 2,
+    sp: 3,
     elements: [
       {
-        element: "neutral",
+        element: "order",
         value: 2,
       },
     ],
@@ -67,7 +67,7 @@ export const divineStrike = new PaladinSkill({
     sp: 0,
     elements: [
       {
-        element: "order",
+        element: "neutral",
         min: 1,
         max: 1,
       },
@@ -153,9 +153,10 @@ export const divineStrike = new PaladinSkill({
     }
 
     holyDamageOutput.damage = Math.floor(holyDamageOutput.damage);
-    // Hit/Crit rolls - apply bless/curse automatically
-    holyDamageOutput.hit = actor.rollTwenty({}) + holyDamageOutput.hit;
-    holyDamageOutput.crit = actor.rollTwenty({}) + holyDamageOutput.crit;
+    // Hit/Crit rolls already come from getWeaponDamageOutput with correct stats
+    // For divine/holy magic, we want WIL for hit, but getWeaponDamageOutput uses weapon stats
+    // Since this is a physical strike with divine energy, DEX makes sense for accuracy
+    // We'll use the weapon's hit/crit values which already have the right stats
 
     const totalDamage = resolveDamage(
       actor.id,

@@ -100,14 +100,15 @@ export const judgmentDay = new InquisitorSkill({
       totalDamage = Math.floor(totalDamage * 1.5);
     }
 
-    // Bonus damage against undead/fiends
+    // Bonus damage against undead/fiends (enum says +1d8, 2d8 at level 5)
     const isUndeadOrFiend = target.type === CharacterType.undead || target.type === CharacterType.fiend;
-    const bonusDamage = isUndeadOrFiend ? actor.roll({ amount: 1, face: 8, applyBlessCurse: false }) : 0;
+    const bonusDamage = isUndeadOrFiend ? actor.roll({ amount: skillLevel >= 5 ? 2 : 1, face: 8, applyBlessCurse: false }) : 0;
 
+    // Divine/holy magic uses WIL for hit, LUCK for crit
     const damageOutput = {
       damage: totalDamage + bonusDamage,
-      hit: actor.rollTwenty({}) + controlMod,
-      crit: actor.rollTwenty({}) + luckMod,
+      hit: actor.rollTwenty({stat: 'willpower'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.radiance,
       isMagic: true,
     };

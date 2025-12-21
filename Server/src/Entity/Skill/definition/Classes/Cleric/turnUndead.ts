@@ -81,14 +81,17 @@ export const turnUndead = new ClericSkill({
 
     if (!isUndead) {
       // Non-undead: deal 1d4 true damage
+      // Damage dice - should not get bless/curse
       const damage = actor.roll({
         amount: 1,
         face: 4,
         stat: "willpower",
+        applyBlessCurse: false,
       });
+      // Turn Undead is divine/holy magic, so use WIL for hit (not CONTROL)
       const damageOutput = {
         damage,
-        hit: actor.rollTwenty({stat: "control"}),
+        hit: actor.rollTwenty({stat: "willpower"}),
         crit: actor.rollTwenty({stat: "luck"}),
         type: DamageType.radiance,
         trueDamage: true,
@@ -157,11 +160,13 @@ export const turnUndead = new ClericSkill({
         ],
       };
     } else {
-      // Save failed: deal 1d12 holy damage
+      // Save succeeded: deal 1d12 holy damage
+      // Damage dice - should not get bless/curse
       const damage = actor.roll({
         amount: 1,
         face: 12,
         stat: "willpower",
+        applyBlessCurse: false,
       });
       const damageOutput = {
         damage,

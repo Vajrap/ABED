@@ -3,7 +3,6 @@ import { ShamanSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { roll, rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { ShamanSkill } from "./index";
 import { debuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
@@ -80,12 +79,13 @@ export const mendSpirit = new ShamanSkill({
     // Pick random injured ally
     const target = injuredAllies[Math.floor(Math.random() * injuredAllies.length)]!;
 
-    // Check for side effects, use D20
-    const sideEffect = rollTwenty().total;
+    // Check for side effects, use D20 - this is a skill check, should get bless/curse
+    const sideEffect = actor.rollTwenty({stat: 'willpower'});
     let message = "";
     let healAmount = 0;
 
-    const baseHeal = (roll(1).d(4).total + statMod(actor.attribute.getTotal("willpower"))) * skillLevelMultiplier(skillLevel);
+    // Healing dice - should not get bless/curse
+    const baseHeal = (actor.roll({ amount: 1, face: 4, stat: "willpower", applyBlessCurse: false }) + statMod(actor.attribute.getTotal("willpower"))) * skillLevelMultiplier(skillLevel);
 
     if (sideEffect <= 10) {
       // Full healing (roll <= 10 means <= 10, so 11+ is the halved case)

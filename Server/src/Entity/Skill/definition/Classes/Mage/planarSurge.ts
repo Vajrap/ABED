@@ -78,27 +78,30 @@ export const planarSurge = new MageSkill({
     const hasChargeBonus = arcaneChargeStacks >= 3;
 
     // Calculate base damage: 1d8 + planar mod (+2 raw damage at level 5)
-    const baseDamage = user.roll({ amount: 1, face: 8, stat: "planar" });
+    // Damage dice - should not get bless/curse
+    const baseDamage = user.roll({ amount: 1, face: 8, stat: "planar", applyBlessCurse: false });
     const level5Bonus = skillLevel >= 5 ? 2 : 0;
     const levelScalar = skillLevelMultiplier(skillLevel);
     const baseTotalDamage = Math.floor((baseDamage + level5Bonus) * levelScalar);
 
     // Charge bonus: +1d4 damage if charges ≥ 3
+    // Damage dice - should not get bless/curse
     let chargeBonusDamage = 0;
     if (hasChargeBonus) {
-      chargeBonusDamage = user.roll({ amount: 1, face: 4 });
+      chargeBonusDamage = user.roll({ amount: 1, face: 4, applyBlessCurse: false });
     }
 
     const targetEffects: { actorId: string; effect: TargetEffect[] }[] = [];
     let totalDamageDealt = 0;
 
     // Deal damage to all front row enemies
+    // Standard arcane/elemental magic uses CONTROL for hit
     for (const enemy of frontRowEnemies) {
       const totalDamage = baseTotalDamage + chargeBonusDamage;
       const damageOutput = {
         damage: totalDamage,
-        hit: user.rollTwenty({}),
-        crit: user.rollTwenty({}),
+        hit: user.rollTwenty({stat: 'control'}),
+        crit: user.rollTwenty({stat: 'luck'}),
         type: DamageType.arcane,
         isMagic: true,
       };

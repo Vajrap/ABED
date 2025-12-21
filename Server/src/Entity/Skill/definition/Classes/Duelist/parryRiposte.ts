@@ -26,13 +26,14 @@ export const parryRiposte = new DuelistSkill({
   requirement: {},
   equipmentNeeded: ["blade", 'sword', 'dagger'],
   tier: TierEnum.uncommon,
+  isFallback: false, // ParryRiposte: consumes 1 neutral element
   consume: {
     hp: 0,
     mp: 0,
-    sp: 2,
+    sp: 3,
     elements: [
       {
-        element: "wind",
+        element: "neutral",
         value: 1,
       },
     ],
@@ -43,7 +44,7 @@ export const parryRiposte = new DuelistSkill({
     sp: 0,
     elements: [
       {
-        element: "fire",
+        element: "wind",
         min: 1,
         max: 1,
       },

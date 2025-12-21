@@ -6,7 +6,6 @@ import { ActorEffect, TargetEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
-import { roll } from "src/Utils/Dice";
 import { ShamanSkill } from "./index";
 
 export const harmonization = new ShamanSkill({
@@ -81,8 +80,9 @@ export const harmonization = new ShamanSkill({
     if (order > 0 && order === chaos) {
       // Deal 1d4 Order damage AND 1d4 Chaos damage
       // Gain +1 damage per Order and Chaos resource
-      const orderDamage = actor.roll({ amount: 1, face: 4, stat: 'planar' }) + order;
-      const chaosDamage = actor.roll({ amount: 1, face: 4, stat: 'planar' }) + chaos;
+      // Damage dice - should not get bless/curse
+      const orderDamage = actor.roll({ amount: 1, face: 4, stat: 'planar', applyBlessCurse: false }) + order;
+      const chaosDamage = actor.roll({ amount: 1, face: 4, stat: 'planar', applyBlessCurse: false }) + chaos;
       // attack twice
       const orderDamageOutput = {
         damage: orderDamage,
@@ -135,7 +135,8 @@ export const harmonization = new ShamanSkill({
       
       // Deal 1d6 damage of the converted type (the one that was reduced)
       const damageType = higherRes === 'order' ? DamageType.chaos : DamageType.order;
-      const baseDamage = actor.roll({ amount: 1, face: 6, stat: 'planar' });
+      // Damage dice - should not get bless/curse
+      const baseDamage = actor.roll({ amount: 1, face: 6, stat: 'planar', applyBlessCurse: false });
       const totalDamage = baseDamage + shiftAmount;
 
       const damageOutput = {
@@ -167,7 +168,8 @@ export const harmonization = new ShamanSkill({
     }
     // Fallback: No Order and no Chaos
     else {
-      const baseDamage = roll(1).d(6).total;
+      // Damage dice - should not get bless/curse
+      const baseDamage = actor.roll({ amount: 1, face: 6, stat: 'planar', applyBlessCurse: false });
       const damageOutput = {
         damage: baseDamage,
         hit: actor.rollTwenty({stat: 'intelligence'}), // Auto-hit spell

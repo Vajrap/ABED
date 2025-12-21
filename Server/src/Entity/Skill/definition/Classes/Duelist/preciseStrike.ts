@@ -33,6 +33,7 @@ export const preciseStrike = new DuelistSkill({
   requirement: {},
   equipmentNeeded: ["blade", 'sword', 'dagger'],
   tier: TierEnum.common,
+  isFallback: true, // Precise Strike: no elemental resources, no buff requirement
   consume: {
     hp: 0,
     mp: 0,
@@ -77,7 +78,11 @@ export const preciseStrike = new DuelistSkill({
     const weapon = actor.getWeapon();
    
     const type = getWeaponDamageType(weapon.weaponType);
+    // Physical attacks use DEX for hit, LUCK for crit
     const damageOutput = getWeaponDamageOutput(actor, weapon, type);
+    // Override hit/crit to use proper stat-based rolls
+    damageOutput.hit = actor.rollTwenty({stat: 'dexterity'});
+    damageOutput.crit = actor.rollTwenty({stat: 'luck'});
     const positionModifier = getPositionModifier(actor.position, target.position, weapon);
 
     const levelScalar = skillLevelMultiplier(skillLevel);
@@ -88,9 +93,8 @@ export const preciseStrike = new DuelistSkill({
     const weaponMultiplier = skillLevel >= 5 ? 1.2 : 1.0;
     damageOutput.damage = Math.floor((damageOutput.damage * weaponMultiplier * levelScalar) * positionModifier);
     
-    // +DEX mod to hit roll (for precision)
-    const dexMod = statMod(actor.attribute.getTotal("dexterity"));
-    damageOutput.hit += dexMod;
+    // +3 hit roll bonus (from enum description)
+    damageOutput.hit += 3;
     
     // +2 crit at level 5
     if (skillLevel >= 5) {

@@ -48,6 +48,7 @@ export const heal = new ClericSkill({
       },
     ],
   },
+  isFallback: true, // Heal: no elemental resources, no buff requirement (cooldown is fine)
   exec: (
     actor: Character,
     actorParty: Character[],
@@ -84,10 +85,12 @@ export const heal = new ClericSkill({
         };
       }
 
+      // Healing dice - should not get bless/curse
       const baseHeal = actor.roll({
         amount: 1,
         face: 4,
         stat: "willpower",
+        applyBlessCurse: false,
       });
       const healAmount = Math.max(0, baseHeal * skillLevelMultiplier(skillLevel));
 

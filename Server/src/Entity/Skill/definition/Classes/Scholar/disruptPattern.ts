@@ -28,6 +28,7 @@ export const disruptPattern = new ScholarSkill({
   equipmentNeeded: [],
   notExistDebuff: [DebuffEnum.disruptPattern],
   tier: TierEnum.common,
+  isFallback: true, // DisruptPattern: no elemental resources, no buff requirement (has notExistDebuff though)
   consume: {
     hp: 0,
     mp: 2,

@@ -8,7 +8,6 @@ import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 import { statMod } from "src/Utils/statMod";
-import { roll } from "src/Utils/Dice";
 import { getTarget } from "src/Entity/Battle/getTarget";
 
 export const tacticalCommand = new KnightSkill({
@@ -57,7 +56,8 @@ export const tacticalCommand = new KnightSkill({
     _location: LocationsEnum,
   ): TurnResult => {
     const leadershipMod = statMod(actor.attribute.getTotal("leadership"));
-    const numTargets = roll(1).d(2).total + leadershipMod;
+    // Random selection - should not get bless/curse
+    const numTargets = actor.roll({ amount: 1, face: 2, applyBlessCurse: false }) + leadershipMod;
     const duration = skillLevel >= 5 ? 3 : 2;
 
     // Get allies excluding self and dead ones

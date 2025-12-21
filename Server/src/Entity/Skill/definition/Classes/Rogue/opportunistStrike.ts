@@ -80,7 +80,8 @@ export const opportunistStrike = new RogueSkill({
 
     let speedBonusMessage = "";
     if (isTargetSlower) {
-      const bonusDamage = actor.roll({ amount: 1, face: 4 });
+      // Bonus damage dice - should not get bless/curse
+      const bonusDamage = actor.roll({ amount: 1, face: 4, stat: "dexterity", applyBlessCurse: false });
       damageOutput.damage += bonusDamage;
       speedBonusMessage = ` (Speed bonus: +${bonusDamage})`;
     }

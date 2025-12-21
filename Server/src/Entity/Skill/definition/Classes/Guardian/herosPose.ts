@@ -3,9 +3,9 @@ import { GuardianSkillId } from "../../../enums";
 import type { Character } from "src/Entity/Character/Character";
 import { ActorEffect } from "../../../effects";
 import { LocationsEnum } from "src/InterFacesEnumsAndTypes/Enums/Location";
-import { rollTwenty } from "src/Utils/Dice";
 import { statMod } from "src/Utils/statMod";
 import { GuardianSkill } from ".";
+import { basicAttack } from "../../basicAttack";
 
 export const herosPose = new GuardianSkill({
   id: GuardianSkillId.HerosPose,
@@ -51,14 +51,23 @@ export const herosPose = new GuardianSkill({
     skillLevel: number,
     location: LocationsEnum,
   ) => {
-    const DC = 15 - skillLevel;
-    const roll = rollTwenty().total;
+    // Check if HP is full - if so, do basic attack instead
+    const isHpFull = actor.vitals.hp.current >= actor.vitals.hp.max;
+    
+    if (isHpFull) {
+      // Do basic attack when HP is full
+      return basicAttack.exec(actor, actorParty, targetParty, skillLevel, location);
+    }
+
+    // Calculate DC: DC(15 - skill level) normally, DC(10 - skill level) at level 5
+    const DC = skillLevel >= 5 ? 10 - skillLevel : 15 - skillLevel;
+    // Skill check - uses vitality for channeling inner strength, should get bless/curse
+    const roll = actor.rollTwenty({stat: 'vitality'});
     const success = roll >= DC;
 
     if (success) {
-      const healAmount = Math.floor(
-        statMod(actor.attribute.getStat("vitality").total) + skillLevel,
-      );
+      const vitMod = statMod(actor.attribute.getStat("vitality").total);
+      const healAmount = vitMod + skillLevel;
       actor.vitals.incHp(healAmount);
 
       return {
@@ -73,17 +82,8 @@ export const herosPose = new GuardianSkill({
         targets: [],
       };
     } else {
-      return {
-        content: {
-          en: `${actor.name.en} struck a heroic pose but nothing happened.`,
-          th: `${actor.name.th} ใช้ท่าเชิงฮีโร่แต่ไม่มีอะไรเกิดขึ้น`,
-        },
-        actor: {
-          actorId: actor.id,
-          effect: [ActorEffect.TestSkill],
-        },
-        targets: [],
-      };
+      // On fail, do basic attack
+      return basicAttack.exec(actor, actorParty, targetParty, skillLevel, location);
     }
   },
 });

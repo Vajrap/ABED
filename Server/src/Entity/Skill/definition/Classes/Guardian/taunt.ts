@@ -32,7 +32,7 @@ export const taunt = new GuardianSkill({
   consume: {
     hp: 0,
     mp: 0,
-    sp: 3,
+    sp: 2,
     elements: [],
   },
   produce: {

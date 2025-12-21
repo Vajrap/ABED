@@ -41,9 +41,10 @@ export const throwingKnives = new RogueSkill({
     mp: 0,
     sp: 0,
     elements: [
-      {element: 'neutral', min: 1, max: 1},
+      {element: 'neutral', min: 1, max: 1      },
     ],
   },
+  isFallback: true, // Throwing Knives: no elemental resources, no buff requirement
   exec: (
     actor: Character,
     actorParty: Character[],
@@ -65,7 +66,8 @@ export const throwingKnives = new RogueSkill({
       }
 
       // Each knife deals 1d3 damage (no modifiers, cantrip)
-      const totalDamage = actor.roll({ amount: 1, face: 3, stat: "dexterity" }) * skillLevelMultiplier(skillLevel);
+      // Damage dice - should not get bless/curse
+      const totalDamage = actor.roll({ amount: 1, face: 3, stat: "dexterity", applyBlessCurse: false }) * skillLevelMultiplier(skillLevel);
 
       const damageOutput = {
         damage: totalDamage,

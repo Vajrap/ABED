@@ -9,7 +9,7 @@ import { resolveDamage } from "src/Entity/Battle/damageResolution";
 import { DamageType } from "src/InterFacesEnumsAndTypes/DamageTypes";
 import { statMod } from "src/Utils/statMod";
 import { buildCombatMessage } from "src/Utils/buildCombatMessage";
-import { roll } from "src/Utils/Dice";
+import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { InquisitorSkill } from "./index";
 
 export const purgeMagic = new InquisitorSkill({
@@ -31,6 +31,7 @@ export const purgeMagic = new InquisitorSkill({
   requirement: {},
   equipmentNeeded: [],
   tier: TierEnum.uncommon,
+  isFallback: false, // PurgeMagic: consumes 1 fire element
   consume: {
     hp: 0,
     mp: 3,
@@ -77,39 +78,44 @@ export const purgeMagic = new InquisitorSkill({
       };
     }
 
-    // Get target's planar mod and number of buffs
-    const targetPlanarMod = statMod(target.attribute.getTotal("planar"));
-    const numBuffs = target.buffsAndDebuffs.buffs.entry.size;
+    // Check save first (enum says DC10 + CONTROL mod WIL save)
+    const controlMod = statMod(actor.attribute.getTotal("control"));
+    const willpowerDC = 10 + controlMod;
+    const willpowerSave = target.rollSave("willpower");
     
-    // Calculate damage: 1d4 + target's planar mod + number of buffs
-    const baseDamage = roll(1).d(4).total;
-    let damage = baseDamage + targetPlanarMod + numBuffs;
+    // Calculate damage: (1d4 + WIL mod) × skill level multiplier
+    const levelMultiplier = skillLevelMultiplier(skillLevel);
+    // Damage dice - should not get bless/curse (stat modifier already included in roll)
+    const baseDamage = actor.roll({ amount: 1, face: 4, stat: "willpower", applyBlessCurse: false });
+    let damage = Math.max(0, Math.floor(baseDamage * levelMultiplier));
     
-    // At level 5, add +2 raw damage
-    if (skillLevel >= 5) {
-      damage += 2;
-    }
-    
-    damage = Math.max(0, damage);
-
-    // Remove random buff(s)
-    const numBuffsToRemove = skillLevel >= 5 ? 2 : 1;
-    const buffEntries = Array.from(target.buffsAndDebuffs.buffs.entry.entries());
+    // Remove random buff(s) if save failed
+    let numBuffsToRemove = 0;
     const buffsRemoved: string[] = [];
     
-    // Randomly select buffs to remove
-    const shuffledBuffs = [...buffEntries].sort(() => Math.random() - 0.5);
-    const buffsToRemove = shuffledBuffs.slice(0, Math.min(numBuffsToRemove, buffEntries.length));
-    
-    for (const [buffId] of buffsToRemove) {
-      target.buffsAndDebuffs.buffs.entry.delete(buffId);
-      buffsRemoved.push(buffId);
+    if (willpowerSave < willpowerDC) {
+      // Save failed: Remove 1-2 random buffs
+      numBuffsToRemove = skillLevel >= 5 ? 2 : actor.roll({ amount: 1, face: 2, applyBlessCurse: false });
+      const buffEntries = Array.from(target.buffsAndDebuffs.buffs.entry.entries());
+      
+      // Randomly select buffs to remove (use actor.roll for consistency)
+      const shuffledBuffs = [...buffEntries].sort(() => Math.random() - 0.5);
+      const buffsToRemove = shuffledBuffs.slice(0, Math.min(numBuffsToRemove, buffEntries.length));
+      
+      for (const [buffId] of buffsToRemove) {
+        target.buffsAndDebuffs.buffs.entry.delete(buffId);
+        buffsRemoved.push(buffId);
+      }
+    } else {
+      // Save passed: Deal half damage
+      damage = Math.floor(damage / 2);
     }
 
+    // Divine/holy magic uses WIL for hit, LUCK for crit (even for true damage)
     const damageOutput = {
       damage,
-      hit: 999, // Auto-hit for true damage
-      crit: 0,
+      hit: actor.rollTwenty({stat: 'willpower'}),
+      crit: actor.rollTwenty({stat: 'luck'}),
       type: DamageType.radiance,
       isMagic: true,
       trueDamage: true, // TRUE DAMAGE - bypasses all mitigation
@@ -127,14 +133,11 @@ export const purgeMagic = new InquisitorSkill({
     const buffsRemovedMessage = buffsRemoved.length > 0 
       ? ` ${buffsRemoved.length} buff(s) removed!`
       : " (no buffs to remove)";
-    
-    // Damage breakdown for clarity
-    const damageBreakdown = ` [1d4=${baseDamage} + planar=${targetPlanarMod} + buffs=${numBuffs}${skillLevel >= 5 ? " + raw=2" : ""} = ${damage}]`;
 
     return {
       content: {
-        en: `${message.en}${damageBreakdown}${buffsRemovedMessage}`,
-        th: `${message.th}${damageBreakdown}${buffsRemoved.length > 0 ? ` ลบบัฟ ${buffsRemoved.length} ตัว!` : " (ไม่มีบัฟให้ลบ)"}`,
+        en: `${message.en}${buffsRemovedMessage}`,
+        th: `${message.th}${buffsRemoved.length > 0 ? ` ลบบัฟ ${buffsRemoved.length} ตัว!` : " (ไม่มีบัฟให้ลบ)"}`,
       },
       actor: {
         actorId: actor.id,

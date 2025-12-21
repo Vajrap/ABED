@@ -13,7 +13,6 @@ import { buildCombatMessage } from "src/Utils/buildCombatMessage";
 import { skillLevelMultiplier } from "src/Utils/skillScaling";
 import { BuffEnum } from "src/Entity/BuffsAndDebuffs/enum";
 import { buffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
-import { roll } from "src/Utils/Dice";
 
 export const disciplinedAdvance = new KnightSkill({
   id: KnightSkillId.DisciplinedAdvance,

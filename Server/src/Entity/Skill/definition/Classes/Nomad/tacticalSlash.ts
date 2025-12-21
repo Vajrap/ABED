@@ -38,7 +38,7 @@ export const tacticalSlash = new NomadSkill({
     mp: 0,
     sp: 3,
     elements: [
-      { element: "neutral", value: 1 },
+      { element: "wind", value: 1 },
     ],
   },
   produce: {
@@ -93,8 +93,8 @@ export const tacticalSlash = new NomadSkill({
 
       const damageOutput = {
         damage: Math.floor(totalDamage * positionModifier),
-        hit: user.rollTwenty({}),
-        crit: user.rollTwenty({}),
+        hit: user.rollTwenty({ stat: "dexterity" }),
+        crit: user.rollTwenty({ stat: "luck" }),
         type: DamageType.fire,
         isMagic: true,
       };
@@ -153,5 +153,6 @@ export const tacticalSlash = new NomadSkill({
       };
     }
   },
+  isFallback: false,
 });
 
