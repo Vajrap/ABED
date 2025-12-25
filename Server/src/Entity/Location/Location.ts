@@ -53,7 +53,6 @@ import Report from "../../Utils/Reporter";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import type { ResourceType } from "src/InterFacesEnumsAndTypes/ResourceTypes";
 import type { L10N } from "../../InterFacesEnumsAndTypes/L10N";
-import { subregionRepository } from "./SubRegion/repository";
 import {
   RailStationEnum,
 } from "../../InterFacesEnumsAndTypes/Enums/RailStation";
@@ -124,7 +123,7 @@ export class Location {
   id: LocationsEnum;
   name: L10N;
   subRegion: SubRegionEnum;
-  region: RegionEnum;
+  private _region: RegionEnum | null = null;
   parties: Party[] = [];
   innType: LocationInns;
   connectedLocations: { location: Location; distance: number }[] = [];
@@ -169,7 +168,8 @@ export class Location {
     this.id = id;
     this.name = name;
     this.subRegion = subRegion;
-    this.region = subregionRepository[subRegion].region;
+    // Region will be lazily loaded via getter to avoid circular dependency
+    this._region = null;
     this.connectedLocations = connectedLocations;
     
     // Handle both legacy flat array and new phase-specific format
@@ -286,10 +286,38 @@ export class Location {
   }
 
   partyMovesIn(party: Party) {
+    // Capture old location before updating (only if location is actually changing)
+    const oldLocation = party.location !== this.id ? party.location : undefined;
+    
+    // Update party location
+    party.location = this.id;
+    
+    // Update character locations
+    const characters = party.getCharacters();
+    for (const character of characters) {
+      character.location = this.id;
+    }
+    
     this.parties.push(party);
     
     // Update quest progress for travel/explore objectives
     QuestProgressTracker.onLocationArrival(party, this.id);
+    
+    // Notify about character arrivals (for player characters only)
+    // Only emit if location actually changed
+    if (oldLocation) {
+      const { locationCharactersEventService } = require("../../Services/LocationCharactersEventService");
+      for (const character of characters) {
+        // Only notify for player characters (userId is not null)
+        if (character.userId) {
+          locationCharactersEventService.notifyCharacterArrived(
+            character.id,
+            this.id,
+            oldLocation
+          );
+        }
+      }
+    }
   }
 
   partyMoveOut(party: Party) {
@@ -319,26 +347,13 @@ export class Location {
   ): Promise<NewsDistribution> {
     const results: NewsDistribution = createEmptyNewsStructure();
     if (this.parties.length === 0) {
-      console.log("No parties at location to process actions", {
-        locationId: this.id,
-        day,
-        phase,
-      });
       return results;
     }
-
-    console.log("Processing actions for parties at location", {
-      locationId: this.id,
-      day,
-      phase,
-      partyCount: this.parties.length,
-      partyIds: this.parties.map(p => p.partyID),
-    });
 
     for (const party of this.parties) {
       const action = party.actionSequence[day][phase];
       
-      console.log("Processing party action", {
+      Report.debug("Processing party action", {
         partyId: party.partyID,
         day,
         phase,
@@ -351,7 +366,7 @@ export class Location {
         action === ActionInput.RailTravel ||
         specialActions.includes(action)
       ) {
-        console.log("Skipping party action (travel or special)", {
+        Report.debug("Skipping party action (travel or special)", {
           partyId: party.partyID,
           action,
         });
@@ -361,7 +376,7 @@ export class Location {
       const context = buildNewsContext(this, party);
 
       if (isGroupRest(party.actionSequence[day][phase])) {
-        console.log("Party has group rest action", {
+        Report.debug("Party has group rest action", {
           partyId: party.partyID,
           action,
         });
@@ -383,14 +398,14 @@ export class Location {
 
       // Get phase-specific (and optionally day-specific) available actions
       const validActions = this.getAvailableActions(phase, day);
-      console.log("Valid actions for phase", {
+      Report.debug("Valid actions for phase", {
         locationId: this.id,
         day,
         phase,
         validActions: validActions.map(a => String(a)),
       });
       const groups = groupCharacterActions(party, day, phase, validActions);
-      console.log("Character groups created", {
+      Report.debug("Character groups created", {
         partyId: party.partyID,
         restingCount: groups.resting.length,
         trainAttributeCount: groups.trainAttribute.size,
@@ -568,9 +583,22 @@ export class Location {
     return { ...this.resourceGeneration.stockpile };
   }
 
+  get region(): RegionEnum {
+    if (this._region === null) {
+      // Lazy import to avoid circular dependency
+      const { subregionRepository } = require("./repository");
+      this._region = subregionRepository[this.subRegion]?.region;
+      if (!this._region) {
+        Report.error(`SubRegion ${this.subRegion} not found in repository`);
+        throw new Error(`SubRegion ${this.subRegion} not found`);
+      }
+    }
+    return this._region;
+  }
+
   getWeather(): Weather {
     // Lazy import to avoid circular dependency
-    const { subregionRepository } = require("./SubRegion/repository");
+    const { subregionRepository } = require("./repository");
     const subRegion = subregionRepository[this.subRegion];
     const weather = subRegion.getWeather(this.weatherScale);
     if (!weather) {
@@ -640,7 +668,7 @@ function groupCharacterActions(
   for (const character of party.characters.filter((c) => c !== "none")) {
     const action = character.actionSequence[day][phase];
     
-    console.log("Processing character action", {
+    Report.debug("Processing character action", {
       characterId: character.id,
       characterName: typeof character.name === 'string' ? character.name : character.name?.en,
       day,
@@ -662,7 +690,7 @@ function groupCharacterActions(
 
     if (action.type === ActionInput.Travel) continue;
     if (!validActions.includes(action.type)) {
-      console.log("Character action not in validActions, defaulting to rest", {
+      Report.debug("Character action not in validActions, defaulting to rest", {
         characterId: character.id,
         characterName: typeof character.name === 'string' ? character.name : character.name?.en,
         actionType: action.type,
@@ -863,7 +891,7 @@ function processCharacterGroups(
 
   // Rest
   if (groups.resting.length > 0) {
-    console.log("Processing resting characters", {
+    Report.debug("Processing resting characters", {
       restingCount: groups.resting.length,
       characterIds: groups.resting.map(c => c.id),
       characterNames: groups.resting.map(c => typeof c.name === 'string' ? c.name : c.name?.en),
@@ -894,7 +922,7 @@ function processCharacterGroups(
       allNews.push(...result);
     }
     
-    console.log("After rest action", {
+    Report.debug("After rest action", {
       characterId: c.id,
       characterName: typeof c.name === 'string' ? c.name : c.name?.en,
       moodBefore,

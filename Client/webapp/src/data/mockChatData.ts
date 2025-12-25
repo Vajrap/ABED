@@ -44,7 +44,8 @@ import { ChatMessage, Friend, ChatScope } from "@/types/chat";
  *   Query params: ?filter=all|lovers|closeFriends|friends|npcs
  *   Returns: { success: boolean; friends: Friend[] }
  *   Description: Get friends list with optional filtering
- *   Note: Location NPCs are fetched separately via GET /api/location/npcs
+ *   Note: Location characters are fetched separately via GET /api/location/characters
+ *   Only Location and Party chat are supported
  * 
  * GET /api/social/lovers
  *   Returns: { success: boolean; friends: Friend[] }

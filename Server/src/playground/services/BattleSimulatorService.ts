@@ -1,7 +1,7 @@
 import { Battle } from "src/Entity/Battle/Battle";
 import { Party } from "src/Entity/Party/Party";
 import { PartyBehavior } from "src/Entity/Party/PartyBehavior";
-import { locationRepository } from "src/Entity/Location/Location/repository";
+import { locationRepository } from "src/Entity/Location/repository";
 import { GameTime } from "src/Game/GameTime/GameTime";
 import type { Character } from "src/Entity/Character/Character";
 import { CharacterBuilderService } from "./CharacterBuilderService";

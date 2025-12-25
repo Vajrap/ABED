@@ -1,6 +1,6 @@
 import { GlobalEventCard } from "../GlobalEventCard";
 import { GlobalEventCardEnum } from "../types";
-import { locationRepository } from "../../../Repository/location";
+import { locationRepository } from "../../../Location/repository";
 import { createNews, newsToStructure } from "../../../News/News";
 import { NewsSignificance } from "../../../../InterFacesEnumsAndTypes/NewsEnums";
 
@@ -32,7 +32,7 @@ export const mildSeason = new GlobalEventCard({
   
   onDraw: () => {
     // Apply 5% boost to all crop capacities globally
-    for (const location of locationRepository.values()) {
+    for (const location of Object.values(locationRepository)) {
       // Store original values for cleanup
       originalCapacities.set(location.id, {
         grain: location.resourceGeneration.capacity.grain,
@@ -77,7 +77,7 @@ export const mildSeason = new GlobalEventCard({
   
   onEnd: () => {
     // Restore original capacities
-    for (const location of locationRepository.values()) {
+    for (const location of Object.values(locationRepository)) {
       const original = originalCapacities.get(location.id);
       if (original) {
         location.resourceGeneration.capacity.grain = original.grain;

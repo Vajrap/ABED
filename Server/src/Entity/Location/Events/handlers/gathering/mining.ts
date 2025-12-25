@@ -1,7 +1,7 @@
 import type { Character } from "../../../../Character/Character";
 import type { NewsContext, News } from "../../../../News/News";
 import { createNews } from "../../../../News/News";
-import { locationRepository } from "src/Entity/Location/Location/repository";
+import { locationRepository } from "src/Entity/Location/repository";
 import { statMod } from "src/Utils/statMod";
 import { QuestProgressTracker } from "../../../../Quest/QuestProgressTracker";
 

@@ -47,11 +47,11 @@ class LocationService {
   }
 
   /**
-   * Get all NPCs at the current location
+   * Get all characters (NPCs and players) at the current location
    */
-  async getLocationNPCs(): Promise<{
+  async getLocationCharacters(): Promise<{
     success: boolean;
-    npcs?: Array<{
+    characters?: Array<{
       id: string;
       name: string;
       portrait?: any; // PortraitData or string
@@ -59,6 +59,8 @@ class LocationService {
       race: string;
       gender: "MALE" | "FEMALE" | "NONE";
       background: string | null;
+      isPlayer: boolean;
+      isOnline?: boolean; // Only for player characters
     }>;
     locationId?: string;
     messageKey?: string;
@@ -66,7 +68,7 @@ class LocationService {
     try {
       const response = await restHandler.get<{
         success: boolean;
-        npcs?: Array<{
+        characters?: Array<{
           id: string;
           name: string;
           portrait?: any;
@@ -74,19 +76,21 @@ class LocationService {
           race: string;
           gender: "MALE" | "FEMALE" | "NONE";
           background: string | null;
+          isPlayer: boolean;
+          isOnline?: boolean;
         }>;
         locationId?: string;
         messageKey?: string;
       }>(
-        "/api/location/npcs",
+        "/api/location/characters",
         true // requireAuth
       );
       return response;
     } catch (error) {
-      console.error("Get location NPCs error:", error);
+      console.error("Get location characters error:", error);
       return {
         success: false,
-        messageKey: error instanceof Error ? error.message : "location.npcsFetchFailed",
+        messageKey: error instanceof Error ? error.message : "location.charactersFetchFailed",
       };
     }
   }

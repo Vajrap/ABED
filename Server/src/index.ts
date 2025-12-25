@@ -29,6 +29,7 @@ import { itemRoutes } from "./API/item";
 import { shopRoutes } from "./API/shop";
 import { questRoutes } from "./API/quest";
 import { adminRoutes } from "./API/admin";
+import { skillRoutes } from "./API/skill";
 import { loadQuestDefinitions } from "./Entity/Quest/loadQuestDefinitions";
 
 dotenv.config();
@@ -88,6 +89,7 @@ async function startServer() {
           .use(shopRoutes)
           .use(questRoutes)
           .use(adminRoutes)
+          .use(skillRoutes)
       )
       // Global error handler
       .onError(({ code, error, set }) => {

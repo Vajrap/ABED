@@ -105,7 +105,7 @@ export async function logPrivateMessage(
  * Log a public chat message
  */
 export async function logPublicMessage(
-  scope: "global" | "region" | "location" | "party",
+  scope: "location" | "party",
   scopeId: string | null,
   senderId: string,
   message: string

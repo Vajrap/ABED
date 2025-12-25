@@ -95,10 +95,26 @@ export type DeckCondition = Record<string, any>; // TODO: Define properly
 // Skill Interfaces (matching backend)
 // ============================================
 
+export interface SkillConsume {
+  hp: number;
+  mp: number;
+  sp: number;
+  elements: Array<{ element: string; value: number }>;
+}
+
+export interface SkillProduce {
+  hp: number;
+  mp: number;
+  sp: number;
+  elements: Array<{ element: string; min: number; max: number }>;
+}
+
 export interface CharacterSkillInterface {
   id: SkillId;
   level: TierEnum;
   exp: number;
+  consume?: SkillConsume;
+  produce?: SkillProduce;
 }
 
 export interface CharacterBreathingSkillInterface {

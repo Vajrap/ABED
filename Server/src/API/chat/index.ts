@@ -12,6 +12,9 @@ import { shouldSummarizeConversation, summarizeConversationHistory } from "../..
 import { isThreateningMessage, requestBattleInitiation } from "../../Services/BattleInitiationService";
 import { executeTool, type ToolContext, type ToolExecutionResult } from "../../Services/ToolExecutionService";
 import { checkRateLimit } from "../../Services/ChatRateLimitService";
+import { chatEventService } from "../../Services/ChatEventService";
+import { getChatHistoryForUI, getLocationChatHistory, getPartyChatHistory } from "../../Services/ChatHistoryService";
+import { getOrCreateChatRoom } from "../../Services/ChatLoggingService";
 
 /**
  * Chat API Routes
@@ -24,8 +27,6 @@ import { checkRateLimit } from "../../Services/ChatRateLimitService";
 
 const SendMessageSchema = t.Object({
   scope: t.Union([
-    t.Literal("global"),
-    t.Literal("region"),
     t.Literal("location"),
     t.Literal("party"),
     t.Literal("private"),
@@ -51,7 +52,7 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
    * Send a chat message
    * 
    * Body: {
-   *   scope: "global" | "region" | "location" | "party" | "private",
+   *   scope: "location" | "party" | "private",
    *   recipientId?: string, // Required for private chats
    *   content: string
    * }
@@ -474,28 +475,37 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
             recipientId: recipient.id,
           });
 
-          // TODO: Implement player-to-player messaging
-          // - Store message in database
-          // - Send via WebSocket if recipient is online
-          // - Return message object
+          // Log private message to database
+          // For player-to-player chat, isNPCChat is false
+          const roomId = await getOrCreateChatRoom(sender.id, recipient.id, false);
+          await logPrivateMessage(roomId, sender.id, recipient.id, content);
+
+          // Create message object
+          const messageId = `chat-${Date.now()}`;
+          const message = {
+            id: messageId,
+            scope: "private" as const,
+            senderId: sender.id,
+            senderName: typeof sender.name === 'string' ? sender.name : sender.name?.en || "Player",
+            senderPortrait: sender.portrait,
+            content,
+            timestamp: new Date(),
+            recipientId: recipient.id,
+          };
+
+          // Send via WebSocket if recipient is online (they must be a player character)
+          if (recipient.userId) {
+            chatEventService.sendPrivateMessage(message, recipient.userId);
+          }
 
           return {
             success: true,
-            message: {
-              id: `chat-${Date.now()}`,
-              scope: "private",
-              senderId: sender.id,
-              senderName: typeof sender.name === 'string' ? sender.name : sender.name?.en || "Player",
-              senderPortrait: sender.portrait,
-              content,
-              timestamp: new Date(),
-              recipientId: recipient.id,
-            },
+            message,
             isNPC: false,
           };
         }
 
-        // 8. Handle public chats (global, region, location, party)
+        // 8. Handle public chats (location, party)
         Report.info("Public chat message", {
           senderId: sender.id,
           scope,
@@ -503,50 +513,45 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
 
         // Determine scopeId based on scope
         let scopeId: string | null = null;
-        if (scope === "region" || scope === "location") {
+        if (scope === "location") {
           // Get from character's party location
           if (sender.partyID) {
             const { partyManager } = await import("../../Game/PartyManager");
             try {
               const party = partyManager.getPartyByID(sender.partyID);
-              if (scope === "location") {
-                scopeId = party.location;
-              } else if (scope === "region") {
-                // Get region from location
-                const { locationManager } = await import("../../Entity/Location/Manager/LocationManager");
-                const location = locationManager.locations[party.location];
-                if (location) {
-                  scopeId = location.region;
-                }
-              }
+              scopeId = party.location;
             } catch (error) {
-              Report.warn("Could not determine scopeId for public chat", { error });
+              Report.warn("Could not determine scopeId for location chat", { error });
             }
           }
         } else if (scope === "party" && sender.partyID) {
           scopeId = sender.partyID;
         }
-        // global scope has scopeId = null
 
         // Log public message (only for public scopes)
         if (scope !== "private") {
           await logPublicMessage(scope, scopeId, sender.id, content);
         }
 
-        // TODO: Broadcast to all relevant players via WebSocket
-        // For now, just return message object
+        // Create message object
+        const messageId = `chat-${Date.now()}`;
+        const message = {
+          id: messageId,
+          scope,
+          senderId: sender.id,
+          senderName: typeof sender.name === 'string' ? sender.name : sender.name?.en || "Player",
+          senderPortrait: sender.portrait,
+          content,
+          timestamp: new Date(),
+          scopeId, // Include scopeId so recipients are determined based on message scope, not sender's current location
+        };
+
+        // Broadcast to all relevant players via WebSocket
+        chatEventService.broadcastChatMessage(message, user.id);
 
         return {
           success: true,
-          message: {
-            id: `chat-${Date.now()}`,
-            scope,
-            senderId: sender.id,
-            senderName: typeof sender.name === 'string' ? sender.name : sender.name?.en || "Player",
-            senderPortrait: sender.portrait,
-            content,
-            timestamp: new Date(),
-          },
+          message,
           isNPC: false,
         };
       } catch (error) {
@@ -561,5 +566,278 @@ export const chatRoutes = new Elysia({ prefix: "/chat" })
     {
       body: SendMessageSchema,
     }
-  );
+  )
+  /**
+   * GET /api/chat/location/history
+   * Get location chat history for current location
+   * Query params: ?limit=20 (optional, default 20)
+   */
+  .get("/location/history", async ({ headers, query, set }) => {
+    Report.debug("Location chat history request received", {
+      route: "/chat/location/history",
+    });
+
+    try {
+      // 1. Validate session
+      const authHeader = headers.authorization;
+      const token = authHeader?.split(" ")[1];
+      
+      if (!token) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.noToken" };
+      }
+
+      const user = await SessionService.validateSession(token);
+      if (!user) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.invalidSession" };
+      }
+
+      // 2. Get character
+      const currentCharacter = characterManager.getUserCharacterByUserId(user.id);
+      if (!currentCharacter) {
+        Report.warn("Character not found for user", { userId: user.id });
+        set.status = 404;
+        return { success: false, messageKey: "character.notFound" };
+      }
+
+      // 3. Get location from character's party
+      if (!currentCharacter.partyID) {
+        Report.warn("Character has no party ID", { characterId: currentCharacter.id });
+        set.status = 404;
+        return { success: false, messageKey: "party.notFound" };
+      }
+
+      const { partyManager } = await import("../../Game/PartyManager");
+      const party = partyManager.getPartyByID(currentCharacter.partyID);
+      if (!party) {
+        Report.warn("Party not found", { partyId: currentCharacter.partyID });
+        set.status = 404;
+        return { success: false, messageKey: "party.notFound" };
+      }
+
+      const locationId = currentCharacter.location || party.location;
+      if (!locationId) {
+        set.status = 404;
+        return { success: false, messageKey: "location.notFound" };
+      }
+
+      // 4. Get limit from query params
+      const limit = query.limit ? parseInt(query.limit as string, 10) : 20;
+      if (isNaN(limit) || limit < 1 || limit > 100) {
+        set.status = 400;
+        return { success: false, messageKey: "chat.invalidLimit" };
+      }
+
+      // 5. Fetch location chat history
+      const history = await getLocationChatHistory(locationId, limit);
+
+      // 6. Map to ChatMessage format
+      const messages = history.map((msg) => ({
+        id: msg.id,
+        scope: msg.scope,
+        senderId: msg.senderId,
+        senderName: msg.senderName,
+        senderPortrait: msg.senderPortrait,
+        content: msg.content,
+        timestamp: msg.timestamp,
+        scopeId: msg.scopeId,
+      }));
+
+      Report.debug(`Retrieved ${messages.length} location chat history messages`, {
+        locationId,
+        limit,
+      });
+
+      return {
+        success: true,
+        messages,
+      };
+    } catch (error) {
+      Report.error("Location chat history fetch error", {
+        error,
+      });
+      set.status = 500;
+      return { success: false, messageKey: "chat.historyFetchFailed" };
+    }
+  })
+  /**
+   * GET /api/chat/party/history
+   * Get party chat history for current party
+   * Query params: ?limit=20 (optional, default 20)
+   */
+  .get("/party/history", async ({ headers, query, set }) => {
+    Report.debug("Party chat history request received", {
+      route: "/chat/party/history",
+    });
+
+    try {
+      // 1. Validate session
+      const authHeader = headers.authorization;
+      const token = authHeader?.split(" ")[1];
+      
+      if (!token) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.noToken" };
+      }
+
+      const user = await SessionService.validateSession(token);
+      if (!user) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.invalidSession" };
+      }
+
+      // 2. Get character
+      const currentCharacter = characterManager.getUserCharacterByUserId(user.id);
+      if (!currentCharacter) {
+        Report.warn("Character not found for user", { userId: user.id });
+        set.status = 404;
+        return { success: false, messageKey: "character.notFound" };
+      }
+
+      // 3. Get party
+      if (!currentCharacter.partyID) {
+        Report.warn("Character has no party ID", { characterId: currentCharacter.id });
+        set.status = 404;
+        return { success: false, messageKey: "party.notFound" };
+      }
+
+      const { partyManager } = await import("../../Game/PartyManager");
+      const party = partyManager.getPartyByID(currentCharacter.partyID);
+      if (!party) {
+        Report.warn("Party not found", { partyId: currentCharacter.partyID });
+        set.status = 404;
+        return { success: false, messageKey: "party.notFound" };
+      }
+
+      // 4. Get limit from query params
+      const limit = query.limit ? parseInt(query.limit as string, 10) : 20;
+      if (isNaN(limit) || limit < 1 || limit > 100) {
+        set.status = 400;
+        return { success: false, messageKey: "chat.invalidLimit" };
+      }
+
+      // 5. Fetch party chat history
+      const history = await getPartyChatHistory(party.partyID, limit);
+
+      // 6. Map to ChatMessage format
+      const messages = history.map((msg) => ({
+        id: msg.id,
+        scope: msg.scope,
+        senderId: msg.senderId,
+        senderName: msg.senderName,
+        senderPortrait: msg.senderPortrait,
+        content: msg.content,
+        timestamp: msg.timestamp,
+        scopeId: msg.scopeId,
+      }));
+
+      Report.debug(`Retrieved ${messages.length} party chat history messages`, {
+        partyId: party.partyID,
+        limit,
+      });
+
+      return {
+        success: true,
+        messages,
+      };
+    } catch (error) {
+      Report.error("Party chat history fetch error", {
+        error,
+      });
+      set.status = 500;
+      return { success: false, messageKey: "chat.historyFetchFailed" };
+    }
+  })
+  /**
+   * GET /api/chat/private/:characterId/history
+   * Get private chat history with a specific character
+   * Query params: ?limit=20 (optional, default 20)
+   */
+  .get("/private/:characterId/history", async ({ params, headers, query, set }) => {
+    Report.debug("Private chat history request received", {
+      route: "/chat/private/:characterId/history",
+      targetCharacterId: params.characterId,
+    });
+
+    try {
+      // 1. Validate session
+      const authHeader = headers.authorization;
+      const token = authHeader?.split(" ")[1];
+      
+      if (!token) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.noToken" };
+      }
+
+      const user = await SessionService.validateSession(token);
+      if (!user) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.invalidSession" };
+      }
+
+      // 2. Get current character
+      const currentCharacter = characterManager.getUserCharacterByUserId(user.id);
+      if (!currentCharacter) {
+        Report.warn("Character not found for user", { userId: user.id });
+        set.status = 404;
+        return { success: false, messageKey: "character.notFound" };
+      }
+
+      // 3. Validate target character exists
+      const targetCharacterId = params.characterId;
+      let targetCharacter;
+      try {
+        targetCharacter = characterManager.getCharacterByID(targetCharacterId);
+      } catch (error) {
+        Report.warn("Target character not found", { characterId: targetCharacterId });
+        set.status = 404;
+        return { success: false, messageKey: "chat.recipientNotFound" };
+      }
+
+      // 4. Get limit from query params
+      const limit = query.limit ? parseInt(query.limit as string, 10) : 20;
+      if (isNaN(limit) || limit < 1 || limit > 100) {
+        set.status = 400;
+        return { success: false, messageKey: "chat.invalidLimit" };
+      }
+
+      // 5. Get or create chat room
+      const isNPCChat = targetCharacter.userId === null;
+      const roomId = await getOrCreateChatRoom(currentCharacter.id, targetCharacterId, isNPCChat);
+
+      // 6. Fetch private chat history
+      const history = await getChatHistoryForUI(roomId, limit);
+
+      // 7. Map to ChatMessage format
+      const messages = history.map((msg) => ({
+        id: msg.id,
+        scope: "private" as const,
+        senderId: msg.senderId,
+        senderName: msg.senderName,
+        senderPortrait: msg.senderPortrait,
+        content: msg.message,
+        timestamp: msg.timestamp,
+        recipientId: msg.receiverId === currentCharacter.id ? msg.senderId : msg.receiverId,
+      }));
+
+      Report.debug(`Retrieved ${messages.length} private chat history messages`, {
+        roomId,
+        limit,
+        currentCharacterId: currentCharacter.id,
+        targetCharacterId,
+      });
+
+      return {
+        success: true,
+        messages,
+      };
+    } catch (error) {
+      Report.error("Private chat history fetch error", {
+        error,
+      });
+      set.status = 500;
+      return { success: false, messageKey: "chat.historyFetchFailed" };
+    }
+  });
 

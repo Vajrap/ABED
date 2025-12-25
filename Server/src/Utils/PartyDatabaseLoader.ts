@@ -6,7 +6,7 @@ import { PartyBehavior } from "../Entity/Party/PartyBehavior";
 import { characterManager } from "../Game/CharacterManager";
 import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import { defaultPartyAction } from "../Entity/Party/ActionlSequence/PartyActionSequence";
-import { locationRepository } from "../Entity/Location/Location/repository";
+import { locationRepository } from "../Entity/Location/repository";
 import Report from "./Reporter";
 
 /**
@@ -72,7 +72,13 @@ export async function loadPartiesFromDatabase(): Promise<void> {
  */
 function restorePartyFromDatabase(record: typeof parties.$inferSelect): Party {
   // Get leader character from characterManager (must be loaded first)
-  const leader = characterManager.getCharacterByID(record.leaderID);
+  let leader;
+  try {
+    leader = characterManager.getCharacterByID(record.leaderID);
+  } catch (error) {
+    throw new Error(`Leader character ${record.leaderID} not found in characterManager`);
+  }
+  
   if (!leader) {
     throw new Error(`Leader character ${record.leaderID} not found in characterManager`);
   }

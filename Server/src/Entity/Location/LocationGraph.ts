@@ -1,5 +1,5 @@
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
-import { locationRepository } from "./Location/repository";
+import { locationRepository } from "./repository";
 import Report from "../../Utils/Reporter";
 
 /**

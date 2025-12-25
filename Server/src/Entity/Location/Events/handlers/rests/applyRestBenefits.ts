@@ -31,7 +31,7 @@ export function applyRestBenefits(
     character.needs.incMood(addedMood);
     character.needs.incEnergy(addedEnergy);
     
-    console.log("Rest benefits applied", {
+    Report.debug("Rest benefits applied", {
       characterId: character.id,
       characterName: typeof character.name === 'string' ? character.name : character.name?.en,
       moodBefore,

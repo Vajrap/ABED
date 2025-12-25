@@ -1,6 +1,8 @@
 import type { TierEnum } from "./Tiers";
 import type { LocationsEnum } from "./Enums/Location";
 import type {Character} from "src/Entity/Character/Character.ts";
+import { locationRepository } from "src/Entity/Location/repository";
+import { PortraitData } from "./PortraitData";
 
 /**
  * L10N - Localization Type with Markup Support
@@ -36,7 +38,7 @@ export interface CharacterTooltipData {
   level: number;
   title: { en: string; th: string };
   lastSeenLocation?: LocationsEnum;
-  portraitUrl?: string;
+  portrait: PortraitData | null;
 }
 
 export interface ItemTooltipData {
@@ -140,7 +142,7 @@ export function L10NWithEntities(
             th: char.title.string().th
         },
         lastSeenLocation: context.locations ? context.locations.length >= 1 ? context.locations[0] : undefined : undefined,
-        portraitUrl: char.portrait ?? undefined,
+        portrait: char.portrait,
       };
     }
   }
@@ -149,21 +151,18 @@ export function L10NWithEntities(
   if (context.locations && context.locations.length > 0) {
     entities.locs = {};
     // Import locationRepository dynamically to avoid circular deps
-    const { locationRepository } = require("../Entity/Repository/location");
+
 
     for (const locId of context.locations) {
-      const loc = locationRepository.get(locId);
+      const loc = locationRepository[locId];
       if (!loc) continue;
 
       entities.locs[locId] = {
         name: {
-          en: loc.name || locId,
-          th: loc.nameThai || loc.name || locId
+          en: loc.name.en || locId,
+          th: loc.name.th || locId
         },
-        description: loc.description ? {
-          en: loc.description,
-          th: loc.descriptionThai || loc.description
-        } : undefined,
+        
         region: loc.region,
         subRegion: loc.subRegion,
       };

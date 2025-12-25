@@ -30,6 +30,7 @@ import { PartyBehavior } from "../Entity/Party/PartyBehavior";
 import { characterManager } from "../Game/CharacterManager";
 import { eq } from "drizzle-orm";
 import { characters } from "./Schema";
+import { locationRepository } from "src/Entity/Location/repository";
 
 // Get the directory of the current file (works in both CommonJS and ESM)
 const __filename = fileURLToPath(import.meta.url);
@@ -249,7 +250,6 @@ async function initializeNPCParties(): Promise<void> {
             partyManager.addParty(party);
             
             // Register party at its location
-            const { locationRepository } = await import("../Entity/Location/Location/repository");
             const locationEntity = locationRepository[location];
             if (locationEntity) {
               locationEntity.partyMovesIn(party);

@@ -8,6 +8,7 @@ import { createNews, type News } from "../News/News";
 import { NewsSignificance, NewsPropagation } from "../../InterFacesEnumsAndTypes/NewsEnums";
 import Report from "../../Utils/Reporter";
 import { questStatePostman } from "./QuestStatePostman";
+import { locationRepository } from "../Location/repository";
 
 /**
  * Quest Progress Tracker
@@ -249,7 +250,6 @@ export class QuestProgressTracker {
 
         // Lazy import to avoid circular dependency
         // Location/repository → Location → handleArtisans → foraging → QuestProgressTracker
-        const { locationRepository } = require("../Location/Location/repository");
         const location = locationRepository[character.location];
         if (!location) {
           return null; // Location not found

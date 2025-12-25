@@ -1,6 +1,5 @@
 import type { Location } from "../../Entity/Location/Location";
-import { locationRepository } from "../../Entity/Location/Location/repository";
-import { subregionRepository } from "../../Entity/Location/SubRegion/repository";
+import { locationRepository, subregionRepository } from "../../Entity/Location/repository";
 import type { Party } from "../../Entity/Party/Party";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { statMod } from "../../Utils/statMod";

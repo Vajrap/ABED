@@ -5,7 +5,8 @@
  */
 
 import { db } from "../Database/connection";
-import { chatRooms, chatLogs } from "../Database/Schema";
+import { chatRooms, chatLogs, publicChatLogs } from "../Database/Schema";
+import { characters } from "../Database/Schema/character";
 import { eq, and, or, desc } from "drizzle-orm";
 import Report from "../Utils/Reporter";
 
@@ -80,27 +81,43 @@ export async function getChatHistoryForAI(
 
 /**
  * Get chat history for UI display
- * Returns all messages in a room, ordered chronologically
+ * Returns messages in a room, ordered chronologically, with sender information
  */
 export async function getChatHistoryForUI(
   roomId: string,
-  limit: number = 100
+  limit: number = 20
 ): Promise<Array<{
+  id: string;
   senderId: string;
+  senderName: string;
+  senderPortrait?: any;
   receiverId: string;
   message: string;
   timestamp: Date;
 }>> {
   try {
+    // Get last N messages (ordered by timestamp DESC, then reverse for chronological)
     const messages = await db
-      .select()
+      .select({
+        sender: chatLogs.sender,
+        receiver: chatLogs.receiver,
+        message: chatLogs.message,
+        timestamp: chatLogs.timestamp,
+        senderName: characters.name,
+        senderPortrait: characters.portrait,
+      })
       .from(chatLogs)
+      .innerJoin(characters, eq(chatLogs.sender, characters.id))
       .where(eq(chatLogs.roomId, roomId))
-      .orderBy(chatLogs.timestamp)
+      .orderBy(desc(chatLogs.timestamp))
       .limit(limit);
 
-    return messages.map((msg) => ({
+    // Reverse to get chronological order (oldest first)
+    return messages.reverse().map((msg) => ({
+      id: `chat-${msg.timestamp.getTime()}-${msg.sender}`,
       senderId: msg.sender,
+      senderName: typeof msg.senderName === 'string' ? msg.senderName : msg.senderName?.en || "Unknown",
+      senderPortrait: msg.senderPortrait,
       receiverId: msg.receiver,
       message: msg.message,
       timestamp: msg.timestamp,
@@ -109,6 +126,126 @@ export async function getChatHistoryForUI(
     Report.error("Error getting chat history for UI", {
       error: error instanceof Error ? error.message : String(error),
       roomId,
+    });
+    return [];
+  }
+}
+
+/**
+ * Get location chat history for UI display
+ * Returns last N messages for a specific location, ordered chronologically
+ */
+export async function getLocationChatHistory(
+  locationId: string,
+  limit: number = 20
+): Promise<Array<{
+  id: string;
+  scope: "location";
+  senderId: string;
+  senderName: string;
+  senderPortrait?: any;
+  content: string;
+  timestamp: Date;
+  scopeId: string;
+}>> {
+  try {
+    // Get last N messages (ordered by timestamp DESC, then reverse for chronological)
+    const messages = await db
+      .select({
+        id: publicChatLogs.id,
+        sender: publicChatLogs.sender,
+        message: publicChatLogs.message,
+        timestamp: publicChatLogs.timestamp,
+        scopeId: publicChatLogs.scopeId,
+        senderName: characters.name,
+        senderPortrait: characters.portrait,
+      })
+      .from(publicChatLogs)
+      .innerJoin(characters, eq(publicChatLogs.sender, characters.id))
+      .where(
+        and(
+          eq(publicChatLogs.scope, "location"),
+          eq(publicChatLogs.scopeId, locationId)
+        )
+      )
+      .orderBy(desc(publicChatLogs.timestamp))
+      .limit(limit);
+
+    // Reverse to get chronological order (oldest first)
+    return messages.reverse().map((msg) => ({
+      id: msg.id,
+      scope: "location" as const,
+      senderId: msg.sender,
+      senderName: typeof msg.senderName === 'string' ? msg.senderName : msg.senderName?.en || "Unknown",
+      senderPortrait: msg.senderPortrait,
+      content: msg.message,
+      timestamp: msg.timestamp,
+      scopeId: msg.scopeId || locationId,
+    }));
+  } catch (error) {
+    Report.error("Error getting location chat history", {
+      error: error instanceof Error ? error.message : String(error),
+      locationId,
+    });
+    return [];
+  }
+}
+
+/**
+ * Get party chat history for UI display
+ * Returns last N messages for a specific party, ordered chronologically
+ */
+export async function getPartyChatHistory(
+  partyId: string,
+  limit: number = 20
+): Promise<Array<{
+  id: string;
+  scope: "party";
+  senderId: string;
+  senderName: string;
+  senderPortrait?: any;
+  content: string;
+  timestamp: Date;
+  scopeId: string;
+}>> {
+  try {
+    // Get last N messages (ordered by timestamp DESC, then reverse for chronological)
+    const messages = await db
+      .select({
+        id: publicChatLogs.id,
+        sender: publicChatLogs.sender,
+        message: publicChatLogs.message,
+        timestamp: publicChatLogs.timestamp,
+        scopeId: publicChatLogs.scopeId,
+        senderName: characters.name,
+        senderPortrait: characters.portrait,
+      })
+      .from(publicChatLogs)
+      .innerJoin(characters, eq(publicChatLogs.sender, characters.id))
+      .where(
+        and(
+          eq(publicChatLogs.scope, "party"),
+          eq(publicChatLogs.scopeId, partyId)
+        )
+      )
+      .orderBy(desc(publicChatLogs.timestamp))
+      .limit(limit);
+
+    // Reverse to get chronological order (oldest first)
+    return messages.reverse().map((msg) => ({
+      id: msg.id,
+      scope: "party" as const,
+      senderId: msg.sender,
+      senderName: typeof msg.senderName === 'string' ? msg.senderName : msg.senderName?.en || "Unknown",
+      senderPortrait: msg.senderPortrait,
+      content: msg.message,
+      timestamp: msg.timestamp,
+      scopeId: msg.scopeId || partyId,
+    }));
+  } catch (error) {
+    Report.error("Error getting party chat history", {
+      error: error instanceof Error ? error.message : String(error),
+      partyId,
     });
     return [];
   }

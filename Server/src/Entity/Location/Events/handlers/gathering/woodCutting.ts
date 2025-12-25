@@ -1,4 +1,4 @@
-import { locationRepository } from "src/Entity/Location/Location/repository";
+import { locationRepository } from "src/Entity/Location/repository";
 import type { Character } from "../../../../Character/Character";
 import type { NewsContext, News } from "../../../../News/News";
 import { createNews } from "../../../../News/News";

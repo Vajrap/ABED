@@ -223,7 +223,7 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
 
   // Restore skills (database stores as JSONB, convert to Map)
   if (record.skills) {
-    console.log(record.skills);
+    // Skills loaded from database
     const skillsData = record.skills as any;
     if (typeof skillsData === 'object' && !Array.isArray(skillsData)) {
       for (const [skillId, skillData] of Object.entries(skillsData)) {
@@ -298,8 +298,6 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
 
   // Mark as player if it has a userId
   character.isPlayer = !!character.userId;
-
-  console.log(character);
 
   return character;
 }

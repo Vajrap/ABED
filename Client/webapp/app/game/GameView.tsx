@@ -10,6 +10,7 @@ import {
   NewsModal,
   ChatPanel,
   GameTimeAndLocation,
+  SkillsModal,
 } from "@/components/GameView";
 import { ActionScheduleModal } from "@/components/GameView/ActionScheduleModal";
 import { CharacterStatsModal } from "@/components/GameView/CharacterStatsModal";
@@ -32,6 +33,7 @@ export default function GameView() {
   const [statsModalOpen, setStatsModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [newsModalOpen, setNewsModalOpen] = useState(false);
+  const [skillsModalOpen, setSkillsModalOpen] = useState(false);
 
   // Custom hooks
   const { isCheckingAuth } = useGameAuth();
@@ -167,7 +169,7 @@ export default function GameView() {
         {/* Left: Sidebar */}
         <GameSidebar
           onScheduleClick={() => setScheduleModalOpen(true)}
-          onSkillsClick={() => console.log("Skills clicked")}
+          onSkillsClick={() => setSkillsModalOpen(true)}
           onInventoryClick={() => console.log("Inventory clicked")}
           onNewsClick={() => setNewsModalOpen(true)}
         />
@@ -368,6 +370,13 @@ export default function GameView() {
         open={newsModalOpen}
         onClose={() => setNewsModalOpen(false)}
         news={news}
+      />
+
+      {/* Skills Modal */}
+      <SkillsModal
+        open={skillsModalOpen}
+        onClose={() => setSkillsModalOpen(false)}
+        character={playerCharacter || null}
       />
 
     </Box>

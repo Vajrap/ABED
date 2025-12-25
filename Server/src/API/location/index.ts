@@ -6,6 +6,7 @@ import { locationManager } from "../../Entity/Location/Manager/LocationManager";
 import { GameTime } from "../../Game/GameTime/GameTime";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { TimeOfDay } from "../../InterFacesEnumsAndTypes/Time";
+import { connectionManager } from "../../Entity/Connection/connectionManager";
 
 export const locationRoutes = new Elysia({ prefix: "/location" })
   .onError(({ code, error, set }) => {
@@ -132,12 +133,12 @@ export const locationRoutes = new Elysia({ prefix: "/location" })
     }
   })
   /**
-   * GET /api/location/npcs
-   * Get all NPCs at the current location
+   * GET /api/location/characters
+   * Get all characters (NPCs and players) at the current location
    */
-  .get("/npcs", async ({ headers, set }) => {
-    Report.debug("Location NPCs request received", {
-      route: "/location/npcs",
+  .get("/characters", async ({ headers, set }) => {
+    Report.debug("Location characters request received", {
+      route: "/location/characters",
     });
 
     try {
@@ -157,76 +158,87 @@ export const locationRoutes = new Elysia({ prefix: "/location" })
       }
 
       // 2. Get character from in-memory manager
-      const character = characterManager.getUserCharacterByUserId(user.id);
-      if (!character) {
+      const currentCharacter = characterManager.getUserCharacterByUserId(user.id);
+      if (!currentCharacter) {
         Report.warn("Character not found for user", { userId: user.id });
         set.status = 404;
         return { success: false, messageKey: "character.notFound" };
       }
 
       // 3. Get party to find location
-      if (!character.partyID) {
-        Report.warn("Character has no party ID", { characterId: character.id });
+      if (!currentCharacter.partyID) {
+        Report.warn("Character has no party ID", { characterId: currentCharacter.id });
         set.status = 404;
         return { success: false, messageKey: "party.notFound" };
       }
 
       // Import partyManager here to avoid circular dependencies
       const { partyManager } = await import("../../Game/PartyManager");
-      const party = partyManager.getPartyByID(character.partyID);
+      const party = partyManager.getPartyByID(currentCharacter.partyID);
       if (!party) {
         Report.warn("Party not found for character", {
-          characterId: character.id,
-          partyId: character.partyID,
+          characterId: currentCharacter.id,
+          partyId: currentCharacter.partyID,
         });
         set.status = 404;
         return { success: false, messageKey: "party.notFound" };
       }
 
       // 4. Get location - prefer character location, fallback to party location
-      const locationId = character.location || party.location;
+      const locationId = currentCharacter.location || party.location;
       if (!locationId) {
         Report.warn("No location found for character or party", { 
-          characterId: character.id,
+          characterId: currentCharacter.id,
           partyId: party.partyID 
         });
         set.status = 404;
         return { success: false, messageKey: "location.notFound" };
       }
 
-      // 5. Get all NPCs at this location (characters with userId = null and matching location)
+      // 5. Get all characters at this location (excluding current user's character)
       const allCharacters = characterManager.characters;
-      const locationNPCs = allCharacters.filter(
-        (char) => char.userId === null && char.location === locationId
+      const locationCharacters = allCharacters.filter(
+        (char) => char.location === locationId && char.id !== currentCharacter.id
       );
 
-      // 6. Map NPCs to frontend-friendly format
-      const npcs = locationNPCs.map((npc) => {
-        const name = typeof npc.name === 'string' ? npc.name : npc.name?.en || npc.id;
+      // 6. Map characters to frontend-friendly format with isPlayer and isOnline flags
+      const characters = locationCharacters.map((char) => {
+        const name = typeof char.name === 'string' ? char.name : char.name?.en || char.id;
+        const isPlayer = char.userId !== null;
+        
+        // Check online status for player characters
+        let isOnline: boolean | undefined = undefined;
+        if (isPlayer && char.userId) {
+          const connection = connectionManager.getConnectionByUserId(char.userId);
+          isOnline = connection !== null;
+        }
+
         return {
-          id: npc.id,
+          id: char.id,
           name,
-          portrait: npc.portrait,
-          level: npc.level,
-          race: npc.race,
-          gender: npc.gender,
-          background: npc.background || null,
+          portrait: char.portrait,
+          level: char.level,
+          race: char.race,
+          gender: char.gender,
+          background: char.background || null,
+          isPlayer,
+          isOnline,
         };
       });
 
-      Report.debug(`Found ${npcs.length} NPCs at location ${locationId}`);
+      Report.debug(`Found ${characters.length} characters at location ${locationId} (excluding current user)`);
 
       return {
         success: true,
-        npcs,
+        characters,
         locationId,
       };
     } catch (error) {
-      Report.error("Location NPCs fetch error", {
+      Report.error("Location characters fetch error", {
         error,
       });
       set.status = 500;
-      return { success: false, messageKey: "location.npcsFetchFailed" };
+      return { success: false, messageKey: "location.charactersFetchFailed" };
     }
   });
 

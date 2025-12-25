@@ -7,7 +7,7 @@ import type {
 } from "./types";
 import { ResourceProductionTracker } from "./ResourceProductionTracker";
 import { calculateLocalShortageFactor } from "./PriceModifiers";
-import { locationRepository } from "../Location/Location/repository";
+import { locationRepository } from "../Location/repository";
 import type { ResourceType } from "src/InterFacesEnumsAndTypes/ResourceTypes";
 /**
  * Central market system

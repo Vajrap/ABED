@@ -13,7 +13,7 @@ import { PartyBehavior } from "../Entity/Party/PartyBehavior";
 import { Battle } from "../Entity/Battle/Battle";
 import { GameTime } from "../Game/GameTime/GameTime";
 import Report from "../Utils/Reporter";
-import { locationRepository } from "src/Entity/Location/Location/repository";
+import { locationRepository } from "src/Entity/Location/repository";
 import { BattleType } from "src/Entity/Battle/types";
 
 export interface BattleInitiationRequest {

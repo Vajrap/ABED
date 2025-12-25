@@ -1,7 +1,7 @@
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { ItemId } from "../Item/type";
 import { market } from "../Market/Market";
-import { locationRepository } from "../Location/Location/repository";
+import { locationRepository } from "../Location/repository";
 import { getItem } from "../Item/repository";
 
 export enum ShopType {

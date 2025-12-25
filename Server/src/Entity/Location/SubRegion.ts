@@ -12,6 +12,7 @@ import { GameTime } from "../../Game/GameTime/GameTime";
 import type { WeatherInterpreter } from "./Weather/types";
 import Report from "../../Utils/Reporter";
 import { L10N } from "src/InterFacesEnumsAndTypes/L10N";
+import { locationRepository } from "./repository";
 
 export class SubRegion {
   id: SubRegionEnum;
@@ -80,7 +81,6 @@ export class SubRegion {
 
     for (const locaEnum of this.locations) {
       // Lazy import to avoid circular dependency
-      const { locationRepository } = require("./Location/repository");
       const location = locationRepository[locaEnum];
       if (!location) {
         Report.warn(`  Location ${locaEnum} not found in repository`);

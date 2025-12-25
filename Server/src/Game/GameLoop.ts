@@ -25,11 +25,11 @@ type RunGameLoopOptions = {
   now?: Date;
   force?: boolean;
   label?: string;
+  skipBacklog?: boolean;
 };
 
 type ProcessPhaseOptions = RunGameLoopOptions & {
   label: string;
-  skipBacklog?: boolean;
 };
 
 const loopMetrics = {
@@ -65,7 +65,7 @@ export async function runSchedule() {
   }
 
   try {
-    await runGameLoop({ label: "startup" });
+    await runGameLoop({ label: "startup", skipBacklog: true });
   } catch (error) {
     Report.error("Initial game loop run failed during scheduler start", {
       error,
@@ -103,6 +103,7 @@ export async function runGameLoop(options: RunGameLoopOptions = {}) {
     processPhaseInternal({
       ...options,
       label,
+      skipBacklog: options.skipBacklog,
     });
   const taskPromise = runQueue.then(task);
   runQueue = taskPromise.catch(() => {});

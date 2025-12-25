@@ -71,7 +71,7 @@ export class Character {
   race: RaceEnum | string = ""; // Allow string for backwards compatibility, but prefer RaceEnum
   type: CharacterType = CharacterType.humanoid;
   level: number = 1;
-  portrait: PortraitData | string | null = null; // Support both new PortraitData and legacy string format
+  portrait: PortraitData | null = null; // Support both new PortraitData and legacy string format
   background: string | null = null;
 
   alignment: CharacterAlignment = new CharacterAlignment({});
@@ -213,7 +213,7 @@ export class Character {
     gender?: "MALE" | "FEMALE" | "NONE";
     race?: RaceEnum;
     level: number;
-    portrait?: PortraitData | string; // Support both new PortraitData and legacy string format
+    portrait?: PortraitData; // Support both new PortraitData and legacy string format
     background?: string;
     alignment: CharacterAlignment;
     artisans: CharacterArtisans;

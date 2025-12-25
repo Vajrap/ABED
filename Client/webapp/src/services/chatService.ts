@@ -67,6 +67,66 @@ class ChatService {
       };
     }
   }
+
+  /**
+   * Get location chat history
+   */
+  async getLocationHistory(limit: number = 20): Promise<GetMessagesResponse> {
+    try {
+      const response = await restHandler.get<GetMessagesResponse>(
+        `/api/chat/location/history?limit=${limit}`,
+        true // requireAuth
+      );
+      return response;
+    } catch (error) {
+      console.error("Get location history error:", error);
+      return {
+        success: false,
+        messages: [],
+        messageKey: error instanceof Error ? error.message : "chat.historyFetchFailed",
+      };
+    }
+  }
+
+  /**
+   * Get party chat history
+   */
+  async getPartyHistory(limit: number = 20): Promise<GetMessagesResponse> {
+    try {
+      const response = await restHandler.get<GetMessagesResponse>(
+        `/api/chat/party/history?limit=${limit}`,
+        true // requireAuth
+      );
+      return response;
+    } catch (error) {
+      console.error("Get party history error:", error);
+      return {
+        success: false,
+        messages: [],
+        messageKey: error instanceof Error ? error.message : "chat.historyFetchFailed",
+      };
+    }
+  }
+
+  /**
+   * Get private chat history with a specific character
+   */
+  async getPrivateHistory(characterId: string, limit: number = 20): Promise<GetMessagesResponse> {
+    try {
+      const response = await restHandler.get<GetMessagesResponse>(
+        `/api/chat/private/${characterId}/history?limit=${limit}`,
+        true // requireAuth
+      );
+      return response;
+    } catch (error) {
+      console.error("Get private history error:", error);
+      return {
+        success: false,
+        messages: [],
+        messageKey: error instanceof Error ? error.message : "chat.historyFetchFailed",
+      };
+    }
+  }
 }
 
 export const chatService = new ChatService();

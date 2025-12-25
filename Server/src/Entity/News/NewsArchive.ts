@@ -17,6 +17,7 @@ import {
 } from "../../Database/Schema";
 import { eq, inArray } from "drizzle-orm";
 import Report from "../../Utils/Reporter";
+import { locationRepository } from "../Location/repository";
 
 /**
  * NewsRecord - In-memory representation of archived news
@@ -494,7 +495,7 @@ export class NewsArchive {
         break;
       case "subRegionScope":
         // Get all locations in subregion from locationRepository
-        for (const loc of require("../Repository/location").locationRepository.values()) {
+        for (const loc of Object.values(locationRepository)) {
           if (loc.subRegion === news.scope.subRegion) {
             locations.add(loc.id);
           }
@@ -502,7 +503,7 @@ export class NewsArchive {
         break;
       case "regionScope":
         // Get all locations in region
-        for (const loc of Object.values(require("../Location/Location/repository").locationRepository) as any[]) {
+        for (const loc of Object.values(locationRepository)) {
           if (loc.region === news.scope.region) {
             locations.add(loc.id);
           }

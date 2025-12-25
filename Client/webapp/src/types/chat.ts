@@ -1,7 +1,7 @@
 /**
  * Chat message types
  */
-export type ChatScope = "global" | "region" | "location" | "party" | "private";
+export type ChatScope = "location" | "party" | "private";
 
 /**
  * User status for friends list

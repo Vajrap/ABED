@@ -1,8 +1,6 @@
 import type { RemoveLocationError } from "../../../Common/Text/TextEnum";
 import { ActionInput } from "../../Entity/Character/Subclass/Action/CharacterAction";
-import { locationRepository } from "src/Entity/Location/Location/repository";
-import { subregionRepository } from "src/Entity/Location/SubRegion/repository";
-import { regionRepository } from "src/Entity/Location/Region/repository";
+import { locationRepository, subregionRepository, regionRepository } from "src/Entity/Location/repository";
 import {
   createNews,
   emptyNewsDistribution,

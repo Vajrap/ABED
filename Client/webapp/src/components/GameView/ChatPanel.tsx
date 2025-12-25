@@ -9,11 +9,11 @@ import {
   useTheme,
   Avatar,
   IconButton,
-  Tabs,
-  Tab,
   TextField,
   InputAdornment,
   CircularProgress,
+  Chip,
+  Badge,
 } from "@mui/material";
 import { ArrowBack, Send, Fullscreen, Minimize } from "@mui/icons-material";
 import { ChatMessage, Friend, ChatScope, UserStatus } from "@/types/chat";
@@ -22,8 +22,6 @@ import { PortraitRenderer } from "@/components/Portrait/PortraitRenderer";
 import { locationService } from "@/services/locationService";
 import { chatService } from "@/services/chatService";
 import { websocketService } from "@/services/websocketService";
-
-type FriendFilterTab = "lovers" | "closeFriends" | "friends" | "npcs" | "location" | "all";
 
 export interface ChatPanelProps {
   currentUserId?: string; // Current player's user ID
@@ -35,40 +33,44 @@ export interface ChatPanelProps {
  */
 export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-character-001" }) => {
   const theme = useTheme();
-  const [selectedChatType, setSelectedChatType] = useState<ChatScope | "social">("global");
+  const [selectedChatType, setSelectedChatType] = useState<ChatScope | "social">("location");
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
-  const [friendFilterTab, setFriendFilterTab] = useState<FriendFilterTab>("all");
   const [chatInput, setChatInput] = useState<string>("");
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [locationNPCs, setLocationNPCs] = useState<Friend[]>([]);
   const [loadingLocationNPCs, setLoadingLocationNPCs] = useState<boolean>(false);
-  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local message cache
+  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]); // Local message cache (includes history + new messages)
+  const [loadingHistory, setLoadingHistory] = useState<boolean>(false);
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Track unread message counts per channel
+  // Keys: "location", "party", "social:{characterId}"
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   // Get messages based on selected chat type
   const getDisplayMessages = (): ChatMessage[] => {
-    // Combine local messages (from API) with any mock data (for now)
-    const mockMessages = getChatMessagesByScope(
-      selectedChatType === "social" ? "private" : selectedChatType,
-      selectedChatType === "social" ? (selectedFriendId || undefined) : undefined,
-      currentUserId
-    );
+    // Social tab: show private chat if friend selected, otherwise no messages
+    if (selectedChatType === "social") {
+      if (selectedFriendId) {
+        // Filter private messages with selected friend
+        return localMessages.filter((msg) => {
+          return (
+            msg.scope === "private" &&
+            (msg.senderId === selectedFriendId || msg.recipientId === selectedFriendId)
+          );
+        }).sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+      }
+      return [];
+    }
     
     // Filter local messages by current scope
     const filteredLocal = localMessages.filter((msg) => {
-      if (selectedChatType === "social" && selectedFriendId) {
-        return (
-          msg.scope === "private" &&
-          (msg.senderId === selectedFriendId || msg.recipientId === selectedFriendId)
-        );
-      }
       return msg.scope === selectedChatType;
     });
 
-    // Combine and sort by timestamp
-    const allMessages = [...mockMessages, ...filteredLocal];
-    return allMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    // Sort by timestamp (history + new messages)
+    return filteredLocal.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   };
 
   const messages = getDisplayMessages();
@@ -105,12 +107,29 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
     const value = event.target.value as ChatScope | "social";
     setSelectedChatType(value);
     setSelectedFriendId(null); // Reset friend selection when changing chat type
+    
+    // Reset unread count for the selected channel
+    if (value === "location" || value === "party") {
+      setUnreadCounts((prev) => {
+        const updated = { ...prev };
+        delete updated[value];
+        return updated;
+      });
+    }
   };
 
   // Handle friend click (for Social tab)
   const handleFriendClick = (friendId: string) => {
     setSelectedFriendId(friendId);
+    
+    // Reset unread count for this friend's private chat
+    setUnreadCounts((prev) => {
+      const updated = { ...prev };
+      delete updated[`social:${friendId}`];
+      return updated;
+    });
   };
+
 
   // WebSocket message handler
   useEffect(() => {
@@ -129,6 +148,22 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
         timestamp: new Date(chatData.timestamp),
       };
 
+      // Determine which channel this message belongs to
+      let messageChannel: string | null = null;
+      if (chatMessage.scope === "location") {
+        messageChannel = "location";
+      } else if (chatMessage.scope === "party") {
+        messageChannel = "party";
+      } else if (chatMessage.scope === "private") {
+        // For private messages, determine the other participant
+        const otherId = chatMessage.senderId === currentUserId 
+          ? chatMessage.recipientId 
+          : chatMessage.senderId;
+        if (otherId) {
+          messageChannel = `social:${otherId}`;
+        }
+      }
+
       // Only add message if it matches current chat view
       const shouldAdd = (() => {
         if (selectedChatType === "social" && selectedFriendId) {
@@ -137,13 +172,31 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
             chatMessage.scope === "private" &&
             (chatMessage.senderId === selectedFriendId || chatMessage.recipientId === selectedFriendId)
           );
+        } else if (selectedChatType === "social" && !selectedFriendId) {
+          // Social tab but no friend selected - don't show messages
+          return false;
         }
         // Public chats: check if scope matches
         return chatMessage.scope === selectedChatType;
       })();
 
+      // Update unread count if message is not in the currently active channel
+      if (messageChannel && !shouldAdd) {
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [messageChannel!]: (prev[messageChannel!] || 0) + 1,
+        }));
+      }
+
       if (shouldAdd) {
-        setLocalMessages((prev) => [...prev, chatMessage]);
+        setLocalMessages((prev) => {
+          // Check if message already exists (avoid duplicates)
+          const exists = prev.some((m) => m.id === chatMessage.id);
+          if (exists) {
+            return prev;
+          }
+          return [...prev, chatMessage];
+        });
         // Auto-scroll will happen via messagesEndRef effect
       }
     });
@@ -161,8 +214,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
     if (!chatInput.trim() || sendingMessage) return;
 
     const content = chatInput.trim();
-    const scope = selectedChatType === "social" ? "private" : selectedChatType;
-    const recipientId = selectedChatType === "social" ? selectedFriendId || undefined : undefined;
+    const scope = selectedChatType === "social" && selectedFriendId ? "private" : (selectedChatType as ChatScope);
+    const recipientId = selectedChatType === "social" && selectedFriendId ? selectedFriendId : undefined;
+
+    // Don't allow sending if social tab without friend selected
+    if (selectedChatType === "social" && !selectedFriendId) {
+      return;
+    }
 
     // Clear input immediately for better UX
     setChatInput("");
@@ -210,90 +268,227 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
 
   // Check if chat input should be shown
   const shouldShowChatInput = () => {
-    // Show input for all chat types except when viewing friends list in Social tab
+    // Don't show input when viewing character list in Social tab
     if (selectedChatType === "social" && !selectedFriendId) {
-      return false; // Don't show input on friends list
+      return false;
     }
-    // Show input for: global, region, location, party, and private chats (social with selected friend)
+    // Show input for location, party, and private chats (when friend selected in social)
     return true;
   };
 
-  // Fetch location NPCs when location tab is selected
+  // Fetch chat history when chat type or friend selection changes
   useEffect(() => {
-    if (friendFilterTab === "location") {
+    // Clear previous messages when switching chat types (will be replaced by history)
+    setLocalMessages([]);
+    setLoadingHistory(true);
+
+    const fetchHistory = async () => {
+      try {
+        let response;
+        if (selectedChatType === "location") {
+          response = await chatService.getLocationHistory(20);
+        } else if (selectedChatType === "party") {
+          response = await chatService.getPartyHistory(20);
+        } else if (selectedChatType === "social" && selectedFriendId) {
+          response = await chatService.getPrivateHistory(selectedFriendId, 20);
+        } else {
+          // Social tab without friend selected - no history
+          setLoadingHistory(false);
+          return;
+        }
+
+        if (response.success && response.messages) {
+          // Convert timestamp strings to Date objects
+          const messagesWithDates: ChatMessage[] = response.messages.map((msg) => ({
+            ...msg,
+            timestamp: msg.timestamp instanceof Date ? msg.timestamp : new Date(msg.timestamp),
+          }));
+          setLocalMessages(messagesWithDates);
+        }
+      } catch (error) {
+        console.error("Error fetching chat history:", error);
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+
+    fetchHistory();
+    
+    // Reset unread count when switching to a channel
+    if (selectedChatType === "location" || selectedChatType === "party") {
+      setUnreadCounts((prev) => {
+        const updated = { ...prev };
+        delete updated[selectedChatType];
+        return updated;
+      });
+    } else if (selectedChatType === "social" && selectedFriendId) {
+      setUnreadCounts((prev) => {
+        const updated = { ...prev };
+        delete updated[`social:${selectedFriendId}`];
+        return updated;
+      });
+    }
+  }, [selectedChatType, selectedFriendId]);
+
+  // Fetch location characters when location or social tab is selected
+  useEffect(() => {
+    if (selectedChatType === "location" || selectedChatType === "social") {
       setLoadingLocationNPCs(true);
       locationService
-        .getLocationNPCs()
+        .getLocationCharacters()
         .then((response) => {
-          if (response.success && response.npcs) {
-            // Convert NPCs to Friend format
-            const npcFriends: Friend[] = response.npcs.map((npc) => ({
-              id: npc.id,
-              name: npc.name,
-              portrait: npc.portrait,
-              isPlayer: false, // NPCs are not players
-              // No status for NPCs
+          if (response.success && response.characters) {
+            // Convert characters to Friend format
+            const characterFriends: Friend[] = response.characters.map((char) => ({
+              id: char.id,
+              name: char.name,
+              portrait: char.portrait,
+              isPlayer: char.isPlayer,
+              status: char.isPlayer 
+                ? (char.isOnline ? "online" : "offline" as UserStatus)
+                : undefined, // NPCs don't have status
             }));
-            setLocationNPCs(npcFriends);
+            setLocationNPCs(characterFriends);
           } else {
             setLocationNPCs([]);
           }
         })
         .catch((error) => {
-          console.error("Error fetching location NPCs:", error);
+          console.error("Error fetching location characters:", error);
           setLocationNPCs([]);
         })
         .finally(() => {
           setLoadingLocationNPCs(false);
         });
     } else {
-      // Clear location NPCs when switching away from location tab
+      // Clear location characters when switching away from location tab
       setLocationNPCs([]);
     }
-  }, [friendFilterTab]);
+  }, [selectedChatType]);
 
-  // Filter friends based on selected tab
-  const getFilteredFriends = (): Friend[] => {
-    // If location tab, return location NPCs
-    if (friendFilterTab === "location") {
-      return locationNPCs;
-    }
-
-    let filtered = mockFriends;
-
-    switch (friendFilterTab) {
-      case "lovers":
-        filtered = mockFriends.filter((f) => f.relation?.title === "lover");
-        break;
-      case "closeFriends":
-        filtered = mockFriends.filter((f) => f.relation?.title === "closeFriend");
-        break;
-      case "friends":
-        filtered = mockFriends.filter(
-          (f) => f.isPlayer && (f.relation?.title === "friend" || !f.relation)
-        );
-        break;
-      case "npcs":
-        filtered = mockFriends.filter((f) => !f.isPlayer);
-        break;
-      case "all":
-      default:
-        // Show all friends
-        break;
-    }
-
-    return filtered;
-  };
-
-  const filteredFriends = getFilteredFriends();
-
-  // Auto-scroll to bottom when messages change or chat type changes
+  // Handle WebSocket events for location characters
   useEffect(() => {
-    // Only scroll if we're viewing messages (not friends list)
-    if (selectedChatType !== "social" || selectedFriendId) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Only subscribe if we're viewing the location or social tab
+    if (selectedChatType !== "location" && selectedChatType !== "social") {
+      return;
     }
-  }, [messages, selectedChatType, selectedFriendId]);
+
+    // Handle character connected (became online)
+    const unsubscribeConnected = websocketService.onMessage("LOCATION_CHARACTER_CONNECTED", (message) => {
+      const data = message.data;
+      setLocationNPCs((prev) => {
+        // Check if character already exists
+        const existingIndex = prev.findIndex((f) => f.id === data.characterId);
+        if (existingIndex >= 0) {
+          // Update existing character's online status
+          const updated = [...prev];
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            status: "online" as UserStatus,
+          };
+          return updated;
+        } else {
+          // Add new character
+          return [
+            ...prev,
+            {
+              id: data.characterId,
+              name: data.name,
+              portrait: data.portrait,
+              isPlayer: true,
+              status: "online" as UserStatus,
+            },
+          ];
+        }
+      });
+    });
+
+    // Handle character disconnected (became offline)
+    const unsubscribeDisconnected = websocketService.onMessage("LOCATION_CHARACTER_DISCONNECTED", (message) => {
+      const data = message.data;
+      setLocationNPCs((prev) => {
+        const existingIndex = prev.findIndex((f) => f.id === data.characterId);
+        if (existingIndex >= 0) {
+          // Update to offline status
+          const updated = [...prev];
+          updated[existingIndex] = {
+            ...updated[existingIndex],
+            status: "offline" as UserStatus,
+          };
+          return updated;
+        }
+        return prev;
+      });
+    });
+
+    // Handle character arrived at location
+    const unsubscribeArrived = websocketService.onMessage("LOCATION_CHARACTER_ARRIVED", (message) => {
+      const data = message.data;
+      setLocationNPCs((prev) => {
+        // Check if character already exists
+        const existingIndex = prev.findIndex((f) => f.id === data.characterId);
+        if (existingIndex >= 0) {
+          // Update existing character
+          const updated = [...prev];
+          updated[existingIndex] = {
+            id: data.characterId,
+            name: data.name,
+            portrait: data.portrait,
+            isPlayer: data.isPlayer,
+            status: data.isPlayer && data.isOnline !== undefined 
+              ? (data.isOnline ? "online" : "offline" as UserStatus)
+              : undefined,
+          };
+          return updated;
+        } else {
+          // Add new character
+          return [
+            ...prev,
+            {
+              id: data.characterId,
+              name: data.name,
+              portrait: data.portrait,
+              isPlayer: data.isPlayer,
+              status: data.isPlayer && data.isOnline !== undefined 
+                ? (data.isOnline ? "online" : "offline" as UserStatus)
+                : undefined,
+            },
+          ];
+        }
+      });
+    });
+
+    // Handle character left location
+    const unsubscribeLeft = websocketService.onMessage("LOCATION_CHARACTER_LEFT", (message) => {
+      const data = message.data;
+      setLocationNPCs((prev) => prev.filter((f) => f.id !== data.characterId));
+    });
+
+    // Cleanup: unsubscribe when component unmounts or tab changes
+    return () => {
+      unsubscribeConnected();
+      unsubscribeDisconnected();
+      unsubscribeArrived();
+      unsubscribeLeft();
+    };
+  }, [selectedChatType]);
+
+  // For Social tab, show location characters (same as Location chat)
+  const locationCharacters = locationNPCs;
+
+  // Auto-scroll to bottom when messages change, chat type changes, or friend selection changes
+  useEffect(() => {
+    // Only scroll if we're viewing messages (not social tab character list)
+    // Allow scrolling when viewing private chat in Social tab (selectedFriendId is set)
+    if (selectedChatType !== "social" || selectedFriendId) {
+      // Small delay to ensure DOM is updated after history loads
+      const timeoutId = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages, selectedChatType, selectedFriendId, loadingHistory]);
 
   const chatContent = (
     <Box
@@ -341,63 +536,103 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
           }}
         >
           <FormControlLabel
-            value="global"
-            control={<Radio size="small" />}
-            label="Global"
-            sx={{
-              margin: 0,
-              "& .MuiFormControlLabel-label": {
-                fontFamily: "Crimson Text, serif",
-                fontSize: "0.85rem",
-              },
-            }}
-          />
-          <FormControlLabel
-            value="region"
-            control={<Radio size="small" />}
-            label="Region"
-            sx={{
-              margin: 0,
-              "& .MuiFormControlLabel-label": {
-                fontFamily: "Crimson Text, serif",
-                fontSize: "0.85rem",
-              },
-            }}
-          />
-          <FormControlLabel
             value="location"
             control={<Radio size="small" />}
-            label="Location"
+            label={
+              <Badge
+                badgeContent={unreadCounts.location || 0}
+                color="error"
+                max={9}
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: "0.65rem",
+                    minWidth: "18px",
+                    height: "18px",
+                    padding: "0 4px",
+                  },
+                }}
+              >
+                <Typography
+                  component="span"
+                  sx={{
+                    fontFamily: "Crimson Text, serif",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  Location
+                </Typography>
+              </Badge>
+            }
             sx={{
               margin: 0,
-              "& .MuiFormControlLabel-label": {
-                fontFamily: "Crimson Text, serif",
-                fontSize: "0.85rem",
-              },
             }}
           />
           <FormControlLabel
             value="party"
             control={<Radio size="small" />}
-            label="Party"
+            label={
+              <Badge
+                badgeContent={unreadCounts.party || 0}
+                color="error"
+                max={9}
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: "0.65rem",
+                    minWidth: "18px",
+                    height: "18px",
+                    padding: "0 4px",
+                  },
+                }}
+              >
+                <Typography
+                  component="span"
+                  sx={{
+                    fontFamily: "Crimson Text, serif",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  Party
+                </Typography>
+              </Badge>
+            }
             sx={{
               margin: 0,
-              "& .MuiFormControlLabel-label": {
-                fontFamily: "Crimson Text, serif",
-                fontSize: "0.85rem",
-              },
             }}
           />
           <FormControlLabel
             value="social"
             control={<Radio size="small" />}
-            label="Social"
+            label={
+              <Badge
+                badgeContent={
+                  Object.keys(unreadCounts)
+                    .filter((key) => key.startsWith("social:"))
+                    .reduce((sum, key) => sum + (unreadCounts[key] || 0), 0) || 0
+                }
+                color="error"
+                max={9}
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: "0.65rem",
+                    minWidth: "18px",
+                    height: "18px",
+                    padding: "0 4px",
+                  },
+                }}
+              >
+                <Typography
+                  component="span"
+                  sx={{
+                    fontFamily: "Crimson Text, serif",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  Social
+                </Typography>
+              </Badge>
+            }
             sx={{
               margin: 0,
-              "& .MuiFormControlLabel-label": {
-                fontFamily: "Crimson Text, serif",
-                fontSize: "0.85rem",
-              },
             }}
           />
         </RadioGroup>
@@ -413,7 +648,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
         }}
       >
         {selectedChatType === "social" && !selectedFriendId ? (
-          // Friends List View
+          // Social tab - shows Location characters (same as Location chat)
           <Box
             sx={{
               flex: 1,
@@ -422,46 +657,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
               overflow: "hidden",
             }}
           >
-            {/* Filter Tabs */}
-            <Box
-              sx={{
-                borderBottom: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-                backgroundColor: alpha(theme.palette.background.paper, 0.5),
-              }}
-            >
-              <Tabs
-                value={friendFilterTab}
-                onChange={(_, newValue) => setFriendFilterTab(newValue)}
-                variant="scrollable"
-                scrollButtons="auto"
-                sx={{
-                  minHeight: 48,
-                  "& .MuiTab-root": {
-                    fontFamily: "Cinzel, serif",
-                    fontSize: "0.85rem",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    minHeight: 48,
-                    padding: "0 16px",
-                  },
-                  "& .Mui-selected": {
-                    color: theme.palette.primary.main,
-                  },
-                  "& .MuiTabs-indicator": {
-                    backgroundColor: theme.palette.primary.main,
-                  },
-                }}
-              >
-                <Tab label="All" value="all" />
-                <Tab label="Lovers" value="lovers" />
-                <Tab label="Close Friends" value="closeFriends" />
-                <Tab label="Friends" value="friends" />
-                <Tab label="NPCs" value="npcs" />
-                <Tab label="Location" value="location" />
-              </Tabs>
-            </Box>
-
-            {/* Friends List */}
+            {/* Characters List */}
             <Box
               sx={{
                 flex: 1,
@@ -500,10 +696,10 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                       ml: 2,
                     }}
                   >
-                    Loading NPCs...
+                    Loading characters...
                   </Typography>
                 </Box>
-              ) : filteredFriends.length === 0 ? (
+              ) : locationCharacters.length === 0 ? (
                 <Typography
                   sx={{
                     fontFamily: "Crimson Text, serif",
@@ -513,24 +709,10 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                     mt: 4,
                   }}
                 >
-                  {friendFilterTab === "location"
-                    ? "No NPCs found at this location"
-                    : `No ${friendFilterTab === "all" ? "friends" : friendFilterTab} found`}
+                  No characters found at this location
                 </Typography>
               ) : (
-                filteredFriends.map((friend) => {
-                  // Pink background for lovers
-                  const isLover = friend.relation?.title === "lover";
-                  const backgroundColor = isLover
-                    ? alpha("#ff69b4", 0.15) // Pink tint for lovers
-                    : alpha(theme.palette.background.paper, 0.3);
-                  const hoverBackgroundColor = isLover
-                    ? alpha("#ff69b4", 0.25) // Darker pink on hover
-                    : alpha(theme.palette.secondary.main, 0.1);
-                  const borderColor = isLover
-                    ? alpha("#ff69b4", 0.4) // Pink border for lovers
-                    : alpha(theme.palette.divider, 0.2);
-
+                locationCharacters.map((friend) => {
                   return (
                     <Box
                       key={friend.id}
@@ -541,12 +723,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                         gap: 2,
                         padding: 1.5,
                         borderRadius: 1,
-                        cursor: "pointer",
                         mb: 1,
-                        backgroundColor,
-                        border: `1px solid ${borderColor}`,
+                        cursor: "pointer",
+                        backgroundColor: alpha(theme.palette.background.paper, 0.3),
+                        border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
                         "&:hover": {
-                          backgroundColor: hoverBackgroundColor,
+                          backgroundColor: alpha(theme.palette.secondary.main, 0.1),
                         },
                       }}
                     >
@@ -600,16 +782,49 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
 
                       {/* Friend Info */}
                       <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography
-                          sx={{
-                            fontFamily: "Cinzel, serif",
-                            fontSize: "0.95rem",
-                            fontWeight: 600,
-                            color: theme.palette.text.primary,
-                            mb: 0.5,
-                          }}
-                        >
-                          {friend.name}
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+                          <Badge
+                            badgeContent={unreadCounts[`social:${friend.id}`] || 0}
+                            color="error"
+                            max={9}
+                            sx={{
+                              "& .MuiBadge-badge": {
+                                fontSize: "0.65rem",
+                                minWidth: "18px",
+                                height: "18px",
+                                padding: "0 4px",
+                              },
+                            }}
+                          >
+                            <Typography
+                              sx={{
+                                fontFamily: "Cinzel, serif",
+                                fontSize: "0.95rem",
+                                fontWeight: 600,
+                                color: theme.palette.text.primary,
+                              }}
+                            >
+                              {friend.name}
+                            </Typography>
+                          </Badge>
+                          {!friend.isPlayer && (
+                            <Chip
+                              label="NPC"
+                              size="small"
+                              sx={{
+                                height: 18,
+                                fontSize: "0.65rem",
+                                fontFamily: "Crimson Text, serif",
+                                fontWeight: 500,
+                                backgroundColor: alpha(theme.palette.secondary.main, 0.2),
+                                color: theme.palette.secondary.main,
+                                border: `1px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+                                "& .MuiChip-label": {
+                                  padding: "0 6px",
+                                },
+                              }}
+                            />
+                          )}
                           {friend.isPlayer && friend.status && (
                             <Typography
                               component="span"
@@ -618,28 +833,13 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                                 fontSize: "0.75rem",
                                 fontWeight: 400,
                                 color: theme.palette.text.secondary,
-                                ml: 1,
                                 fontStyle: "italic",
                               }}
                             >
                               ({friend.status})
                             </Typography>
                           )}
-                        </Typography>
-                        {friend.lastMessage && (
-                          <Typography
-                            sx={{
-                              fontFamily: "Crimson Text, serif",
-                              fontSize: "0.8rem",
-                              color: theme.palette.text.secondary,
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {friend.lastMessage}
-                          </Typography>
-                        )}
+                        </Box>
                       </Box>
                     </Box>
                   );
@@ -651,11 +851,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
           // Chat Messages View
           <>
             {(() => {
-              // Check if chatting with a lover
-              const selectedFriend = selectedChatType === "social" && selectedFriendId
-                ? mockFriends.find((f) => f.id === selectedFriendId)
-                : null;
-              const isLoverChat = selectedFriend?.relation?.title === "lover";
+              // No lover chat styling needed (private chat removed for now)
+              const isLoverChat = false;
 
               return (
                 <>
@@ -700,23 +897,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                   : {},
               }}
             >
-              {selectedChatType === "social" && selectedFriendId && (
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedFriendId(null);
-                  }}
-                  size="small"
-                  sx={{
-                    color: theme.palette.text.secondary,
-                    "&:hover": {
-                      backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-                    },
-                  }}
-                >
-                  <ArrowBack />
-                </IconButton>
-              )}
               <Typography
                 sx={{
                   fontFamily: "Cinzel, serif",
@@ -727,11 +907,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                   flex: 1,
                 }}
               >
-                {selectedFriendId
-                  ? mockFriends.find((f) => f.id === selectedFriendId)?.name ||
-                    "Chat"
-                  : selectedChatType === "social"
-                  ? "Friends"
+                {selectedChatType === "social"
+                  ? "Characters at Location"
                   : `${selectedChatType} Chat`}
               </Typography>
               <IconButton
@@ -973,12 +1150,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
               <div ref={messagesEndRef} />
             </Box>
 
-            {/* Chat Input - Show for all chat types except friends list */}
+            {/* Chat Input - Show for location and party chats only */}
             {(() => {
-              const selectedFriend = selectedChatType === "social" && selectedFriendId
-                ? mockFriends.find((f) => f.id === selectedFriendId)
-                : null;
-              const isLoverChat = selectedFriend?.relation?.title === "lover";
+              const isLoverChat = false;
               
               if (!shouldShowChatInput()) return null;
 
@@ -998,11 +1172,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
                 >
                   <TextField
                     fullWidth
-                    placeholder={
-                      selectedChatType === "social" && selectedFriendId
-                        ? "Type a private message..."
-                        : `Type a message in ${selectedChatType} chat...`
-                    }
+                    placeholder={`Type a message in ${selectedChatType} chat...`}
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyPress={(e) => {
@@ -1105,20 +1275,6 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
             gap: 1,
           }}
         >
-          {selectedChatType === "social" && selectedFriendId && (
-            <IconButton
-              onClick={() => setSelectedFriendId(null)}
-              size="small"
-              sx={{
-                color: theme.palette.text.secondary,
-                "&:hover": {
-                  backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-                },
-              }}
-            >
-              <ArrowBack />
-            </IconButton>
-          )}
           <Typography
             sx={{
               fontFamily: "Cinzel, serif",
@@ -1129,11 +1285,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ currentUserId = "mock-char
               flex: 1,
             }}
           >
-            {selectedFriendId
-              ? mockFriends.find((f) => f.id === selectedFriendId)?.name ||
-                "Chat"
-              : selectedChatType === "social"
-              ? "Friends"
+            {selectedChatType === "social"
+              ? "Characters at Location"
               : `${selectedChatType} Chat`}
           </Typography>
           <IconButton

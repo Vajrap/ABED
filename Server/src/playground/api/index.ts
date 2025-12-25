@@ -9,7 +9,7 @@ import { LocationsEnum } from 'src/InterFacesEnumsAndTypes/Enums/Location';
 import { BattleType } from 'src/Entity/Battle/types';
 import { skillRepository } from 'src/Entity/Skill/repository';
 import { equipmentRepository } from 'src/Entity/Item/Equipment/repository';
-import { locationRepository } from 'src/Entity/Location/Location/repository';
+import { locationRepository } from 'src/Entity/Location/repository';
 import { mobRepository } from 'src/Entity/Character/MOBs/repository';
 import Report from 'src/Utils/Reporter';
 

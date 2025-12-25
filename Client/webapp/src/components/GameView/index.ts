@@ -55,3 +55,6 @@ export type { ActionSubSelectionModalProps } from "./ActionSubSelectionModal";
 export { TitleSelectionModal } from "./TitleSelectionModal";
 export type { TitleSelectionModalProps } from "./TitleSelectionModal";
 
+export { SkillsModal } from "./SkillsModal";
+export type { SkillsModalProps } from "./SkillsModal";
+

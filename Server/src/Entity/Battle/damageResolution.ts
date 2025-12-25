@@ -58,7 +58,7 @@ import { getCharacter } from "src/Utils/getCharacter";
 import { resolveBreathingSkillInBattle } from "../BreathingSkill/activeBreathingSkill";
 import { statMod } from "src/Utils/statMod";
 import Report from "src/Utils/Reporter";
-import { locationRepository } from "src/Entity/Location/Location/repository.ts";
+import { locationRepository } from "src/Entity/Location/repository";
 import {
   BuffEnum,
   DebuffEnum,

@@ -6,7 +6,7 @@ import type { ResourceType } from "../../InterFacesEnumsAndTypes/ResourceTypes";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import type { SubRegionEnum } from "../../InterFacesEnumsAndTypes/Enums/SubRegion";
 import { calculateYearlyBaseModifier } from "./PriceModifiers";
-import { locationRepository } from "../Location/Location/repository";
+import { locationRepository } from "../Location/repository";
 
 /**
  * Tracks resource production across the year at multiple scopes

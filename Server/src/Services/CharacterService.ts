@@ -19,7 +19,7 @@ import { PartyService } from "./PartyService";
 import { LocationsEnum } from "../InterFacesEnumsAndTypes/Enums/Location";
 import { partyManager } from "../Game/PartyManager";
 import { characterManager } from "../Game/CharacterManager";
-import { locationRepository } from "../Entity/Location/Location/repository";
+import { locationRepository } from "../Entity/Location/repository";
 import { PlayableBackgroundEnum, PlayableClassEnum, PlayableRaceEnum } from "src/API/characterCreation/enums";
 import { classBonus } from "src/API/characterCreation/classes";
 import { backgroundBonus } from "src/API/characterCreation/background";

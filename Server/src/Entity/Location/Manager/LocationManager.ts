@@ -8,9 +8,7 @@ import type {
 import type { NewsDistribution } from "../../News/News";
 import type { Location } from "../Location";
 import type { Region } from "../Regions";
-import { locationRepository } from "../Location/repository";
-import { regionRepository } from "../Region/repository";
-import { subregionRepository } from "../SubRegion/repository";
+import { locationRepository, regionRepository, subregionRepository } from "../repository";
 import type { SubRegion } from "../SubRegion";
 import { market } from "../../Market/Market";
 import { mergeNewsStructures } from "../../../Utils/mergeNewsStructure";

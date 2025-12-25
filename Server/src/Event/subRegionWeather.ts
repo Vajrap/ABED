@@ -1,4 +1,4 @@
-import { subregionRepository } from "src/Entity/Location/SubRegion/repository.ts";
+import { subregionRepository } from "src/Entity/Location/repository";
 import type { News } from "../Entity/News/News.ts";
 import Report from "../Utils/Reporter";
 

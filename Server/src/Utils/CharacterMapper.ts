@@ -1,6 +1,8 @@
 import type { Character } from "../Entity/Character/Character";
 import { type CharacterInterface } from "../InterFacesEnumsAndTypes/CharacterInterface";
 import { CharacterType, CharacterAlignmentEnum } from "../InterFacesEnumsAndTypes/Enums";
+import { skillRepository } from "../Entity/Skill/repository";
+import type { CharacterSkillInterface } from "../InterFacesEnumsAndTypes/CharacterSkillInterface";
 
 // Helper function to extract essential UI values from StatBlock objects
 function extractStatValues(stats: any): Record<string, any> {
@@ -76,6 +78,119 @@ function extractMapValues(mapData: any): Record<string, any> {
   }
 
   return mapData;
+}
+
+// Helper function to enrich skills array with consume/produce data from skillRepository
+function enrichSkillsWithConsumeProduce(skills: Array<{ id: string; level: number; exp: number }>): CharacterSkillInterface[] {
+  return skills.map(skill => {
+    const skillDef = skillRepository[skill.id as keyof typeof skillRepository];
+    const enriched: CharacterSkillInterface = {
+      id: skill.id as any,
+      level: skill.level,
+      exp: skill.exp,
+    };
+
+    if (skillDef) {
+      enriched.consume = {
+        hp: skillDef.consume.hp,
+        mp: skillDef.consume.mp,
+        sp: skillDef.consume.sp,
+        elements: skillDef.consume.elements.map(e => ({
+          element: String(e.element),
+          value: e.value,
+        })),
+      };
+      enriched.produce = {
+        hp: skillDef.produce.hp,
+        mp: skillDef.produce.mp,
+        sp: skillDef.produce.sp,
+        elements: skillDef.produce.elements.map(e => ({
+          element: String(e.element),
+          min: e.min,
+          max: e.max,
+        })),
+      };
+    }
+
+    return enriched;
+  });
+}
+
+// Helper function to enrich skills Map with consume/produce data from skillRepository
+function enrichSkillsMapWithConsumeProduce(skills: Map<string, any> | Record<string, any>): Record<string, CharacterSkillInterface> {
+  const result: Record<string, CharacterSkillInterface> = {};
+  
+  // Handle Map
+  if (skills instanceof Map) {
+    for (const [skillId, skillData] of skills.entries()) {
+      const skillDef = skillRepository[skillId as keyof typeof skillRepository];
+      const enriched: CharacterSkillInterface = {
+        id: skillId as any,
+        level: skillData?.level || 1,
+        exp: skillData?.exp || 0,
+      };
+
+      if (skillDef) {
+        enriched.consume = {
+          hp: skillDef.consume.hp,
+          mp: skillDef.consume.mp,
+          sp: skillDef.consume.sp,
+          elements: skillDef.consume.elements.map(e => ({
+            element: String(e.element),
+            value: e.value,
+          })),
+        };
+        enriched.produce = {
+          hp: skillDef.produce.hp,
+          mp: skillDef.produce.mp,
+          sp: skillDef.produce.sp,
+          elements: skillDef.produce.elements.map(e => ({
+            element: String(e.element),
+            min: e.min,
+            max: e.max,
+          })),
+        };
+      }
+
+      result[skillId] = enriched;
+    }
+  } else {
+    // Handle Record/object
+    for (const [skillId, skillData] of Object.entries(skills)) {
+      const skillDef = skillRepository[skillId as keyof typeof skillRepository];
+      const enriched: CharacterSkillInterface = {
+        id: skillId as any,
+        level: skillData?.level || 1,
+        exp: skillData?.exp || 0,
+      };
+
+      if (skillDef) {
+        enriched.consume = {
+          hp: skillDef.consume.hp,
+          mp: skillDef.consume.mp,
+          sp: skillDef.consume.sp,
+          elements: skillDef.consume.elements.map(e => ({
+            element: String(e.element),
+            value: e.value,
+          })),
+        };
+        enriched.produce = {
+          hp: skillDef.produce.hp,
+          mp: skillDef.produce.mp,
+          sp: skillDef.produce.sp,
+          elements: skillDef.produce.elements.map(e => ({
+            element: String(e.element),
+            min: e.min,
+            max: e.max,
+          })),
+        };
+      }
+
+      result[skillId] = enriched;
+    }
+  }
+
+  return result;
 }
 
 // Map database character to frontend interface
@@ -187,9 +302,9 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
     possibleRoles: character.possibleRoles || [] as any,
     actionSequence: character.actionSequence || {} as any,
     informations: character.information || {} as any,
-    skills: extractMapValues(character.skills || {}) as any,
-    activeSkills: extractMapValues(character.activeSkills || {}) as any,
-    conditionalSkills: extractMapValues(character.conditionalSkills || {}) as any,
+    skills: enrichSkillsMapWithConsumeProduce(character.skills || new Map()) as any,
+    activeSkills: enrichSkillsWithConsumeProduce(character.activeSkills || []) as any,
+    conditionalSkills: enrichSkillsWithConsumeProduce(character.conditionalSkills || []) as any,
     conditionalSkillsCondition: character.conditionalSkillsCondition || {} as any,
     breathingSkills: extractMapValues(character.breathingSkills || {}) as any,
     activeBreathingSkill: character.activeBreathingSkill || null as any,

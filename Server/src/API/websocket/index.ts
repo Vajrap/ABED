@@ -10,6 +10,7 @@ import { PartyService } from "../../Services/PartyService";
 import { getPendingConfirmation, handleMCPResponse } from "../../Services/MCPConfirmationService";
 import { handleBattleConfirmation } from "../../Services/BattleInitiationService";
 import { GoldId } from "src/Entity/Item/Misc";
+import { locationCharactersEventService } from "../../Services/LocationCharactersEventService";
 
 /**
  * WebSocket API Routes
@@ -97,6 +98,13 @@ export const websocketRoutes = new Elysia({ prefix: "/ws" })
         // Register connection
         connectionManager.register(user.id, ws as any, context);
 
+        // Notify other players at the same location that this character connected
+        locationCharactersEventService.notifyCharacterConnected(
+          character.id,
+          party.location,
+          user.id
+        );
+
         // Send initial quest state
         const { questStatePostman } = await import("../../Entity/Quest/QuestStatePostman");
         questStatePostman.sendInitialQuestState(user.id, character);
@@ -161,6 +169,22 @@ export const websocketRoutes = new Elysia({ prefix: "/ws" })
       try {
         const userId = connectionManager.getUserIdByWebSocket(ws as any);
         if (userId) {
+          // Get context before unregistering to get location info
+          const context = connectionManager.getContextByWebSocket(ws as any);
+          
+          if (context) {
+            // Get character to notify about disconnection
+            const character = characterManager.getUserCharacterByUserId(userId);
+            if (character) {
+              // Notify other players at the same location that this character disconnected
+              locationCharactersEventService.notifyCharacterDisconnected(
+                character.id,
+                context.locationId,
+                userId
+              );
+            }
+          }
+          
           connectionManager.unregister(userId);
           Report.info("WebSocket connection closed and unregistered", { userId });
         } else {
