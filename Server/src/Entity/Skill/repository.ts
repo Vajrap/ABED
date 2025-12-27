@@ -229,7 +229,7 @@ export const skillRepository: Record<SkillId, Skill> = {
   [GuardianSkillId.SentinelDuty]: sentinelDuty,
   [GuardianSkillId.Guardian]: guardian,
 
-  [ShamanSkillId.HolyRattle]: holyRattle,
+  [ShamanSkillId.SpiritRattle]: holyRattle,
   [ShamanSkillId.ChaoticBlessing]: chaoticBlessing,
   [ShamanSkillId.MendSpirit]: mendSpirit,
   [ShamanSkillId.HexOfRot]: hexOfRot,
@@ -349,8 +349,8 @@ export const skillRepository: Record<SkillId, Skill> = {
   [DuelistSkillId.DuelingStance]: duelingStance,
   [DuelistSkillId.FeintStrike]: feintStrike,
 
-  [WitchSkillId.PoisonDart]: poisonDart,
-  [WitchSkillId.ChaosBrand]: chaosBrand,
+  [WitchSkillId.CurseBolt]: poisonDart,
+  [WitchSkillId.CurseMark]: chaosBrand,
   [WitchSkillId.ChaosBinding]: chaosBinding,
   [WitchSkillId.Bewitch]: bewitch,
   [WitchSkillId.HexWeave]: hexWeave,

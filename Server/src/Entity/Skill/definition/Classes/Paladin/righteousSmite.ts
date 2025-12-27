@@ -41,7 +41,7 @@ export const righteousSmite = new PaladinSkill({
     sp: 3,
     elements: [
       {
-        element: "order",
+        element: "neutral",
         value: 2,
       },
     ],
@@ -52,7 +52,7 @@ export const righteousSmite = new PaladinSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
+        element: "order",
         min: 1,
         max: 1,
       },

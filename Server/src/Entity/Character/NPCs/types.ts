@@ -8,6 +8,8 @@ import { PartyActionSequence } from "src/Entity/Party/ActionlSequence/PartyActio
 import { CharacterActionSequence } from "../Subclass/Action/CharacterAction";
 import { EquipmentId, ItemId } from "src/Entity/Item";
 import { NPCEnums } from "./enum";
+import { DeckCondition } from "../Subclass/DeckCondition/DeckCondition";
+import { DayOfWeek, TimeOfDay } from "src/InterFacesEnumsAndTypes/Time";
 
 export interface AttributeMods extends Partial<Record<AttributeKey, number>> {}
 export interface ProficiencyMods extends Partial<Record<ProficiencyKey, number>> {}
@@ -48,11 +50,10 @@ export interface NPCTemplate {
     role?: CharacterRoleEnum;
   };
 
-  activeSkills?: Array<{
-    id: SkillId;
-    level: number;
-    exp?: number;
-  }>;
+  activeSkills?: SkillId[];
+  conditionalSkills?: SkillId[];
+  skills?: Map<SkillId, { level: number; exp: number }>;
+  conditionalSkillsCondition?: DeckCondition;
 
   relations?: NPCRelation[];
 
@@ -115,6 +116,10 @@ export interface NPCTemplate {
   };
 
   defaultCharacterActionSequence?: CharacterActionSequence;
+
+  // Travel Schedule - defines when and where NPCs travel between locations
+  // NPCs will "teleport" instantly to their scheduled destinations
+  travelSchedule?: NPCTravelSchedule;
 }
 
 export interface NPCRelation {
@@ -122,3 +127,43 @@ export interface NPCRelation {
   value: number; // Relationship value (-100 to 100)
   status?: "friend" | "rival" | "neutral" | "enemy";
 }
+
+/**
+ * Travel Schedule Event - defines when an NPC travels to a destination
+ */
+export interface NPCTravelScheduleEvent {
+  // Destination location
+  destination: LocationsEnum;
+  
+  // Day of week when travel occurs (optional - if not specified, matches any day)
+  day?: DayOfWeek;
+  
+  // Phase when travel starts
+  phase: TimeOfDay;
+  
+  // How long NPC stays at destination (in phases)
+  // If undefined, stays until next event returns them or returns at end of day
+  durationPhases?: number;
+  
+  // Frequency/pattern
+  frequency: 'daily' | 'weekly' | 'conditional';
+  
+  // Conditional triggers (for future expansion)
+  // For now, we'll use simple day-based patterns or leave as placeholder
+  conditions?: Array<{
+    type: 'dayOfWeek' | 'eventFlag' | 'random';
+    value: any;
+  }>;
+}
+
+/**
+ * Travel Schedule - defines NPC movement patterns between locations
+ */
+export type NPCTravelSchedule = {
+  // Base location where NPC normally resides (home)
+  homeLocation: LocationsEnum;
+  
+  // Array of travel events
+  events: NPCTravelScheduleEvent[];
+};
+

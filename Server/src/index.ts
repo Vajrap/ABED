@@ -17,8 +17,10 @@ import { registerRoutes } from "./API/register";
 import { authRoutes } from "./API/auth";
 import { partyRoutes } from "./API/party";
 import { locationRoutes } from "./API/location";
+import { travelRoutes } from "./API/travel";
 import { newsRoutes } from "./API/news";
 import { updateTitleRoutes } from "./API/character/updateTitle";
+import { updateSkillsRoutes } from "./API/character/updateSkills";
 import { chatRoutes } from "./API/chat";
 import { battleRoutes } from "./API/battle";
 import { websocketRoutes } from "./API/websocket";
@@ -78,8 +80,10 @@ async function startServer() {
           .use(characterCreationRoutes)
           .use(partyRoutes)
           .use(locationRoutes)
+          .use(travelRoutes)
           .use(newsRoutes)
           .use(updateTitleRoutes)
+          .use(updateSkillsRoutes)
           .use(chatRoutes)
           .use(battleRoutes)
           .use(actionsRoutes)

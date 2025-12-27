@@ -35,7 +35,9 @@ export const protection = new ClericSkill({
     hp: 0,
     mp: 0,
     sp: 0,
-    elements: [],
+    elements: [
+      { element: "water", min: 1, max: 1 },
+    ],
   },
   exec: (
     actor: Character,

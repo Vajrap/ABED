@@ -7,6 +7,7 @@ import { DayOfWeek, TimeOfDay } from "src/InterFacesEnumsAndTypes/Time";
 import { NPCsParty, NPCTemplate } from "../../../types";
 import { RaceEnum } from "src/InterFacesEnumsAndTypes/Enums";
 import { NPCEnums } from "../../../enum";
+import { guardianSentinel, rogueStealth } from "../../../utils/NPCskillPreset";
 
 const innStaffPartyActionSequence: PartyActionSequence = {
   [DayOfWeek.laoh]: {
@@ -98,15 +99,15 @@ export const thomas: NPCTemplate = {
   level: 3,
   background: "innkeeper",
   portraitData: {
-    base: "c1",
-    jaw: "jaw1",
-    eyes: "eye1",
+    base: "c4",
+    jaw: "jaw4",
+    eyes: "eye2",
     eyes_color: "c1",
-    face: "face1",
-    beard: 1,
-    hair_top: "m1_top",
-    hair_bot: "m1_bot",
-    hair_color: "c1",
+    face: "face2",
+    beard: 6,
+    hair_top: "m13_top",
+    hair_bot: "m13_bot",
+    hair_color: "c8",
   },
   characterPrompt: `You are Thomas, the innkeeper at the Wayward Inn. You are a middle-aged human man in your early 40s, warm and welcoming but also sharp-witted and observant. You've been running this inn for over a decade and have seen countless travelers pass through.
 
@@ -163,8 +164,16 @@ Conversation style:
     epithet: undefined,
     role: undefined,
   },
-
-  activeSkills: [],
+  // Skills - Innkeeper: Protective skills to defend his inn
+  ...(() => {
+    const preset = guardianSentinel(3);
+    return {
+      activeSkills: preset.activeDeck,
+      conditionalSkills: preset.conditionalDeck,
+      skills: preset.skills,
+      conditionalSkillsCondition: preset.conditionalDeckCondition,
+    };
+  })(),
 
   relations: [
     {
@@ -185,14 +194,14 @@ export const sarah: NPCTemplate = {
   background: "service",
   portraitData: {
     base: "c1",
-    jaw: "jaw1",
-    eyes: "eye1",
-    eyes_color: "c1",
-    face: "face1",
+    jaw: "jaw2",
+    eyes: "eye5",
+    eyes_color: "c3",
+    face: "face3",
     beard: 1,
-    hair_top: "m1_top",
-    hair_bot: "m1_bot",
-    hair_color: "c1",
+    hair_top: "f6_top",
+    hair_bot: "f6_bot",
+    hair_color: "c3",
   },
   characterPrompt: `You are Sarah, a barmaid working at the Wayward Inn. You are a young human woman in your early 20s, cheerful and efficient but also perceptive and independent-minded.
 
@@ -255,8 +264,17 @@ Conversation style:
     epithet: undefined,
     role: undefined,
   },
-  // Skills
-  activeSkills: [],
+  // Skills - Barmaid: Agile skills to handle rowdy customers
+  ...(() => {
+    const preset = rogueStealth(3);
+    return {
+      activeSkills: preset.activeDeck,
+      conditionalSkills: preset.conditionalDeck,
+      skills: preset.skills,
+      conditionalSkillsCondition: preset.conditionalDeckCondition,
+    };
+  })(),
+
   // Relations: Reciprocal relationship with Thomas
   relations: [
     {

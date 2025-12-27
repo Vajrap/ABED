@@ -69,8 +69,9 @@ export async function loadPartiesFromDatabase(): Promise<void> {
 
 /**
  * Restore a Party entity from a database record
+ * Exported for use in rehydrating NPC parties
  */
-function restorePartyFromDatabase(record: typeof parties.$inferSelect): Party {
+export function restorePartyFromDatabase(record: typeof parties.$inferSelect): Party {
   // Get leader character from characterManager (must be loaded first)
   let leader;
   try {

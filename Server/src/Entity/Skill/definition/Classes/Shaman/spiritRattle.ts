@@ -23,7 +23,7 @@ import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository
 import { ShamanSkill } from "./index";
 
 export const holyRattle = new ShamanSkill({
-  id: ShamanSkillId.HolyRattle,
+  id: ShamanSkillId.SpiritRattle,
   name: {
     en: "Holy Rattle",
     th: "กระดิ่งพระพรหม",

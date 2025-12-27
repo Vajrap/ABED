@@ -15,7 +15,7 @@ import { WitchSkill } from "./index";
 import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository";
 
 export const poisonDart = new WitchSkill({
-  id: WitchSkillId.PoisonDart,
+  id: WitchSkillId.CurseBolt,
   name: {
     en: "Poison Dart",
     th: "ลูกบอลคำสาป",

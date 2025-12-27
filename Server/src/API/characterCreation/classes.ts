@@ -311,7 +311,7 @@ const classBonus: Record<ClassEnum, ClassBonus> = {
     },
     startingSkills: [
       WitchSkillId.ChaosBinding, 
-      WitchSkillId.PoisonDart, 
+      WitchSkillId.CurseBolt, 
     ],
     startingEquipments: [
       { id: BodyId.MageRobe, slot: CharacterEquipmentSlot.body },

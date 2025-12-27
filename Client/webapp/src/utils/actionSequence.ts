@@ -79,6 +79,11 @@ export function convertActionSequenceToSchedule(
     if (actionType === "Arcane Academia" && action.action) {
       return `${actionType}|${action.action}`;
     }
+    
+    // Travel action (simple action without parameters)
+    if (actionType === "Travel") {
+      return "Travel";
+    }
 
     // Simple actions without parameters
     return actionType;

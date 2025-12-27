@@ -50,7 +50,7 @@ export const misfortuneCurse = new WitchSkill({
     sp: 0,
     elements: [
       {
-        element: "chaos",
+        element: "wind",
         min: 1,
         max: 1,
       },

@@ -7,6 +7,7 @@ import {
   CharacterActionSequence,
 } from "src/Entity/Character/Subclass/Action/CharacterAction";
 import { NPCEnums } from "../../../enum";
+import { warriorWeaponMaster } from "../../../utils/NPCskillPreset";
 
 const partyActionSequence: PartyActionSequence = {
   [DayOfWeek.laoh]: {
@@ -96,12 +97,12 @@ export const lana: NPCTemplate = {
     base: "c1",
     jaw: "jaw1",
     eyes: "eye1",
-    eyes_color: "c1",
-    face: "face1",
+    eyes_color: "c6",
+    face: "face3",
     beard: null, // Female character, no beard
-    hair_top: "f1_top",
-    hair_bot: "f1_bot",
-    hair_color: "c1",
+    hair_top: "f9_top",
+    hair_bot: "f9_bot",
+    hair_color: "c2",
   },
   characterPrompt: `You are Lana, a warrior and adventurer. You are a young human woman in your early 20s, strong, independent, and battle-hardened.
 
@@ -160,8 +161,17 @@ Conversation style:
     epithet: undefined,
     role: undefined,
   },
-  // Skills
-  activeSkills: [],
+  // Skills - Warrior/Adventurer: Versatile combat skills
+  ...(() => {
+    const preset = warriorWeaponMaster(3);
+    return {
+      activeSkills: preset.activeDeck,
+      conditionalSkills: preset.conditionalDeck,
+      skills: preset.skills,
+      conditionalSkillsCondition: preset.conditionalDeckCondition,
+    };
+  })(),
+
   // Relations: Friendly with Thomas
   relations: [
     {

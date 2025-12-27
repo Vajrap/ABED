@@ -524,3 +524,33 @@ export const getLocationBySubRegion = (subRegion: SubRegionEnum): Location[] => 
   );
 };
 
+// ============================================================================
+// Location Connections
+// ============================================================================
+// Connections are set up here after all locations are created to avoid circular dependencies
+// Distance values represent the total distance needed to travel between locations
+// For reference: ~30 distance per phase for measured pace walking on normal terrain
+// A full day (4 phases) = ~120 distance
+
+function addLocationConnections(locationA: Location, locationB: Location, distance: number) {
+  locationA.connectedLocations.push({ location: locationB, distance });
+  locationB.connectedLocations.push({ location: locationA, distance });
+}
+
+addLocationConnections(waywardInn, greengateStation, 120);
+// Full day walk
+// Old rail corridor, safe but long
+// Explains overnight stays, delayed travel, importance of inn
+
+addLocationConnections(waywardInn, brayhornVillage, 60);
+// Half day walk
+// Regular civilian movement, carts, daily trade possible but tiring
+
+addLocationConnections(waywardInn, goldentideField, 30);
+// One phase walk
+// Fields are close; workers can plausibly return same day
+
+addLocationConnections(waywardInn, stonecrossManor, 60);
+// Half day walk
+// Manor intentionally distant but reachable
+// Reinforces isolation + old power

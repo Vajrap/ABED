@@ -58,3 +58,6 @@ export type { TitleSelectionModalProps } from "./TitleSelectionModal";
 export { SkillsModal } from "./SkillsModal";
 export type { SkillsModalProps } from "./SkillsModal";
 
+export { TravelModal } from "./TravelModal";
+export type { TravelModalProps } from "./TravelModal";
+

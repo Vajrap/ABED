@@ -3,6 +3,7 @@ import { type CharacterInterface } from "../InterFacesEnumsAndTypes/CharacterInt
 import { CharacterType, CharacterAlignmentEnum } from "../InterFacesEnumsAndTypes/Enums";
 import { skillRepository } from "../Entity/Skill/repository";
 import type { CharacterSkillInterface } from "../InterFacesEnumsAndTypes/CharacterSkillInterface";
+import { SkillId } from "src/Entity/Skill/enums";
 
 // Helper function to extract essential UI values from StatBlock objects
 function extractStatValues(stats: any): Record<string, any> {
@@ -80,14 +81,19 @@ function extractMapValues(mapData: any): Record<string, any> {
   return mapData;
 }
 
-// Helper function to enrich skills array with consume/produce data from skillRepository
-function enrichSkillsWithConsumeProduce(skills: Array<{ id: string; level: number; exp: number }>): CharacterSkillInterface[] {
-  return skills.map(skill => {
-    const skillDef = skillRepository[skill.id as keyof typeof skillRepository];
+// Helper function to enrich SkillId[] array with level/exp from skills Map and consume/produce data from skillRepository
+function enrichSkillsWithConsumeProduce(skillIds: string[], character: Character): CharacterSkillInterface[] {
+  return skillIds.map(skillId => {
+    // Lookup level/exp from character.skills Map (O(1) lookup)
+    const skillData = character.skills.get(skillId as SkillId);
+    const level = skillData?.level ?? 1;
+    const exp = skillData?.exp ?? 0;
+    
+    const skillDef = skillRepository[skillId as keyof typeof skillRepository];
     const enriched: CharacterSkillInterface = {
-      id: skill.id as any,
-      level: skill.level,
-      exp: skill.exp,
+      id: skillId as any,
+      level,
+      exp,
     };
 
     if (skillDef) {
@@ -202,9 +208,7 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
     race: typeof character.race === 'string' ? character.race : (character.race ? String(character.race) : ''),
     type: (character.type as CharacterType) || CharacterType.humanoid,
     level: character.level,
-    portrait: typeof character.portrait === 'object' && character.portrait !== null 
-      ? character.portrait 
-      : (character.portrait || ""), // Support both PortraitData and legacy string format
+    portrait: character.portrait || null,
     background: character.background || "",
     alignment: character.alignment.alignment(),
 
@@ -303,8 +307,8 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
     actionSequence: character.actionSequence || {} as any,
     informations: character.information || {} as any,
     skills: enrichSkillsMapWithConsumeProduce(character.skills || new Map()) as any,
-    activeSkills: enrichSkillsWithConsumeProduce(character.activeSkills || []) as any,
-    conditionalSkills: enrichSkillsWithConsumeProduce(character.conditionalSkills || []) as any,
+    activeSkills: enrichSkillsWithConsumeProduce(character.activeSkills || [], character) as any,
+    conditionalSkills: enrichSkillsWithConsumeProduce(character.conditionalSkills || [], character) as any,
     conditionalSkillsCondition: character.conditionalSkillsCondition || {} as any,
     breathingSkills: extractMapValues(character.breathingSkills || {}) as any,
     activeBreathingSkill: character.activeBreathingSkill || null as any,

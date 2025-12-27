@@ -89,11 +89,16 @@ export function elvenWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
   // - Cleave: Wide area melee attack, deals 1d8+STR to all enemies in front
   // - Taunt: Forces enemies to target this character for 2 turns
   // - Bash: Heavy strike, deals 1d10+STR damage, chance to stun
-  character.activeSkills = [
-    {id: WarriorSkillId.Cleave, level: difficulty, exp: 0},
-    
-    
-  ];
+  const activeSkillIds = [WarriorSkillId.Cleave];
+  
+  // Add skills to skills Map
+  activeSkillIds.forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      character.skills.set(skillId, { id: skillId, level: difficulty, exp: 0 });
+    }
+  });
+  
+  character.activeSkills = activeSkillIds;
 
   // TODO: Conditional skills (when HP < 30%)
   // - Shield Up: Raises defense significantly for 3 turns

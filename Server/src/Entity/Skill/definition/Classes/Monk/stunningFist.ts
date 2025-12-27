@@ -35,12 +35,14 @@ export const stunningFist = new MonkSkill({
   requirement: {},
   equipmentNeeded: ["bareHand"],
   tier: TierEnum.uncommon,
-  isFallback: true, // Stunning Fist: no elemental resources, no buff requirement
   consume: {
     hp: 0,
     mp: 0,
     sp: 3,
-    elements: [],
+    elements: [
+      {element: "wind", value: 1},
+      {element: "neutral", value: 1},
+    ],
   },
   produce: {
     hp: 0,
@@ -48,7 +50,7 @@ export const stunningFist = new MonkSkill({
     sp: 0,
     elements: [
       {
-        element: "wind",
+        element: "fire",
         min: 1,
         max: 1,
       },

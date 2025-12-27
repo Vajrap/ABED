@@ -24,9 +24,9 @@ export const analyze = new ScholarSkill({
   },
   requirement: {},
   equipmentNeeded: [],
-  notExistDebuff: [DebuffEnum.analyze],
+  notExistDebuff: [],
   tier: TierEnum.uncommon,
-  isFallback: true, // Analyze: no elemental resources, no buff requirement (has notExistDebuff though)
+  cooldown: 2,
   consume: {
     hp: 0,
     mp: 2,
@@ -62,14 +62,8 @@ export const analyze = new ScholarSkill({
       };
     }
 
-    // Apply Exposed debuff for 2 turns
-    // universalCounter = 1 if skill level >= 5 (for -2 crit defense)
-
     debuffsRepository.exposed.appender(target, { 
       turnsAppending: 2, 
-    });
-    debuffsRepository.analyze.appender(actor, { 
-      turnsAppending: 3, 
     });
     if (skillLevel >= 5) {
       const intMod = Math.max(Math.min(statMod(actor.attribute.getTotal("intelligence")), 3), 1);

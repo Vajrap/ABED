@@ -94,6 +94,35 @@ class LocationService {
       };
     }
   }
+
+  /**
+   * Get connected locations for the logged-in user's character
+   */
+  async getConnectedLocations(): Promise<{
+    success: boolean;
+    currentLocation?: { id: string; name: string };
+    connectedLocations?: Array<{ id: string; name: string; distance: number }>;
+    messageKey?: string;
+  }> {
+    try {
+      const response = await restHandler.get<{
+        success: boolean;
+        currentLocation?: { id: string; name: string };
+        connectedLocations?: Array<{ id: string; name: string; distance: number }>;
+        messageKey?: string;
+      }>(
+        "/api/location/connected",
+        true // requireAuth
+      );
+      return response;
+    } catch (error) {
+      console.error("Get connected locations error:", error);
+      return {
+        success: false,
+        messageKey: error instanceof Error ? error.message : "location.connectedFetchFailed",
+      };
+    }
+  }
 }
 
 // Export singleton instance

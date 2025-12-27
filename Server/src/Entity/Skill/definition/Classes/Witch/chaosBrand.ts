@@ -26,7 +26,7 @@ import { buffsAndDebuffsRepository } from "src/Entity/BuffsAndDebuffs/repository
 import { statMod } from "src/Utils/statMod";
 
 export const chaosBrand = new WitchSkill({
-  id: WitchSkillId.ChaosBrand,
+  id: WitchSkillId.CurseMark,
   name: {
     en: "Chaos Brand",
     th: "ประจุวินาที",

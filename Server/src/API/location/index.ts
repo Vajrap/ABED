@@ -240,5 +240,109 @@ export const locationRoutes = new Elysia({ prefix: "/location" })
       set.status = 500;
       return { success: false, messageKey: "location.charactersFetchFailed" };
     }
+  })
+  /**
+   * GET /api/location/connected
+   * Get current location and all connected locations for the logged-in user's character
+   */
+  .get("/connected", async ({ headers, set }) => {
+    Report.debug("Connected locations request received", {
+      route: "/location/connected",
+    });
+
+    try {
+      // 1. Validate session
+      const authHeader = headers.authorization;
+      const token = authHeader?.split(" ")[1];
+      
+      if (!token) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.noToken" };
+      }
+
+      const user = await SessionService.validateSession(token);
+      if (!user) {
+        set.status = 401;
+        return { success: false, messageKey: "auth.invalidSession" };
+      }
+
+      // 2. Get character from in-memory manager
+      const character = characterManager.getUserCharacterByUserId(user.id);
+      if (!character) {
+        Report.warn("Character not found for user", { userId: user.id });
+        set.status = 404;
+        return { success: false, messageKey: "character.notFound" };
+      }
+
+      // 3. Get party to find location
+      if (!character.partyID) {
+        Report.warn("Character has no party ID", { characterId: character.id });
+        set.status = 404;
+        return { success: false, messageKey: "party.notFound" };
+      }
+
+      // Import partyManager here to avoid circular dependencies
+      const { partyManager } = await import("../../Game/PartyManager");
+      const party = partyManager.getPartyByID(character.partyID);
+      if (!party) {
+        Report.warn("Party not found for character", {
+          characterId: character.id,
+          partyId: character.partyID,
+        });
+        set.status = 404;
+        return { success: false, messageKey: "party.notFound" };
+      }
+
+      // 4. Get location - prefer character location, fallback to party location
+      const locationId = character.location || party.location;
+      if (!locationId) {
+        Report.warn("No location found for character or party", { 
+          characterId: character.id,
+          partyId: party.partyID 
+        });
+        set.status = 404;
+        return { success: false, messageKey: "location.notFound" };
+      }
+
+      const location = locationManager.locations[locationId as LocationsEnum];
+      if (!location) {
+        Report.warn("Location not found in locationManager", { location: locationId });
+        set.status = 404;
+        return { success: false, messageKey: "location.notFound" };
+      }
+
+      // 5. Extract current location name from L10N
+      const currentLocationName = typeof location.name === 'string' 
+        ? location.name 
+        : location.name?.en || location.id;
+
+      // 6. Get connected locations
+      const connectedLocations = location.connectedLocations.map((connected) => {
+        const connectedLocationName = typeof connected.location.name === 'string'
+          ? connected.location.name
+          : connected.location.name?.en || connected.location.id;
+
+        return {
+          id: connected.location.id,
+          name: connectedLocationName,
+          distance: connected.distance,
+        };
+      });
+
+      return {
+        success: true,
+        currentLocation: {
+          id: location.id,
+          name: currentLocationName,
+        },
+        connectedLocations,
+      };
+    } catch (error) {
+      Report.error("Connected locations fetch error", {
+        error,
+      });
+      set.status = 500;
+      return { success: false, messageKey: "location.connectedFetchFailed" };
+    }
   });
 

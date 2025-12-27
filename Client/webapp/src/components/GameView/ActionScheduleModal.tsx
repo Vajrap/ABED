@@ -47,6 +47,8 @@ export interface ActionScheduleModalProps {
   initialSchedule?: Record<string, string>; // Initial schedule to load (from character.actionSequence)
   currentDay?: number; // Current day index (0-5), where 0=laoh, 1=rowana, etc.
   currentPhase?: number; // Current phase index (0-3), where 0=morning, 1=afternoon, 2=evening, 3=night
+  isTraveling?: boolean; // Whether the party is currently traveling
+  travelDestination?: string; // Destination location name
 }
 
 /**
@@ -65,6 +67,8 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
   initialSchedule,
   currentDay,
   currentPhase,
+  isTraveling = false,
+  travelDestination,
 }) => {
   const theme = useTheme();
   const [schedule, setSchedule] = useState<Record<string, string>>({});
@@ -143,9 +147,9 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
             fontWeight: 700,
             color: theme.palette.secondary.main,
             textAlign: "center",
-            pb: 2,
+            pb: 1,
             borderBottom: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
-            mb: 3,
+            mb: 2,
           }}
         >
           Weekly Action Schedule
@@ -424,6 +428,8 @@ export const ActionScheduleModal: React.FC<ActionScheduleModalProps> = ({
           onActionSelect={handleActionSelect}
           availableActionsByPhase={availableActionsByPhase}
           characterSkills={characterSkills}
+          isTraveling={isTraveling}
+          travelDestination={travelDestination}
         />
       )}
     </>

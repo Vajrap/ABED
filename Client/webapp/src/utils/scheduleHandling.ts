@@ -43,6 +43,8 @@ function mapActionToCharacterAction(actionInputValue: string | null): any {
       return { type: "Stroll" };
     case "Tavern":
       return { type: "Tavern" };
+    case "Travel":
+      return { type: "Travel" };
     case "Mining":
       return { type: "Mining" };
     case "Wood Cutting":
@@ -140,7 +142,11 @@ function mapActionToCharacterAction(actionInputValue: string | null): any {
   }
 }
 
-export async function handleScheduleSave(schedule: Record<string, string>): Promise<void> {
+export async function handleScheduleSave(schedule: Record<string, string>): Promise<{
+  status: "SUCCESS" | "FAIL";
+  CAS: Record<string, Record<string, any>>;
+  convertedActions: any[];
+}> {
   console.log("[GameView] Schedule saved:", schedule);
   
   try {
@@ -186,8 +192,14 @@ export async function handleScheduleSave(schedule: Record<string, string>): Prom
       if (response.convertedActions && response.convertedActions.length > 0) {
         console.warn("[GameView] Some actions were converted:", response.convertedActions);
       }
+      return {
+        status: response.status,
+        CAS: response.CAS,
+        convertedActions: response.convertedActions || [],
+      };
     } else {
       console.error("[GameView] Schedule save failed:", response.reason);
+      throw new Error(response.reason || "Failed to save schedule");
     }
   } catch (error) {
     console.error("[GameView] Error saving schedule:", error);

@@ -38,10 +38,7 @@ export const radiantSmite = new InquisitorSkill({
     mp: 2,
     sp: 0,
     elements: [
-      {
-        element: "order",
-        value: 1,
-      },
+     
     ],
   },
   produce: {
@@ -50,7 +47,7 @@ export const radiantSmite = new InquisitorSkill({
     sp: 0,
     elements: [
       {
-        element: "neutral",
+        element: "order",
         min: 1,
         max: 1,
       },

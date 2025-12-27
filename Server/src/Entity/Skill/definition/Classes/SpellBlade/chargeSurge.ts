@@ -29,7 +29,7 @@ export const chargeSurge = new SpellbladeSkill({
     mp: 0,
     sp: 3,
     elements: [
-        { element: "wind", value: 2 },
+        { element: "neutral", value: 2 },
     ],
   },
   produce: {

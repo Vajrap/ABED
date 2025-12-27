@@ -1,5 +1,5 @@
 import { restHandler } from "./RestHandler";
-import type { CharacterInterface } from "@/types/api";
+import type { CharacterInterface, CharacterSkillInterface } from "@/types/api";
 import type { CharacterCreationRequest, CharacterCreationResponse } from "@/types/character";
 
 export interface UpdateTitleRequest {
@@ -9,6 +9,18 @@ export interface UpdateTitleRequest {
 }
 
 export interface UpdateTitleResponse {
+  success: boolean;
+  character?: CharacterInterface;
+  error?: string;
+}
+
+export interface UpdateSkillsRequest {
+  characterId: string;
+  activeSkills?: string[]; // SkillId[]
+  conditionalSkills?: string[]; // SkillId[]
+}
+
+export interface UpdateSkillsResponse {
   success: boolean;
   character?: CharacterInterface;
   error?: string;
@@ -45,6 +57,23 @@ class CharacterService {
       return {
         success: false,
         error: error.message || "Failed to update character title",
+      };
+    }
+  }
+
+  async updateSkills(request: UpdateSkillsRequest): Promise<UpdateSkillsResponse> {
+    try {
+      const response = await restHandler.post<UpdateSkillsRequest, UpdateSkillsResponse>(
+        "/api/character/update-skills",
+        request,
+        true // requireAuth
+      );
+      return response;
+    } catch (error: any) {
+      console.error("Error updating character skills:", error);
+      return {
+        success: false,
+        error: error.message || "Failed to update character skills",
       };
     }
   }

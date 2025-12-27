@@ -46,6 +46,7 @@ export const naturalResilience = new DruidSkill({
       },
     ],
   },
+  cooldown: 3,
   exec: (
     actor: Character,
     actorParty: Character[],

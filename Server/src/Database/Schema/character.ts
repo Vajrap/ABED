@@ -6,6 +6,7 @@ export const characters = pgTable("characters", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }), // Nullable for NPCs
   partyID: varchar("party_id", { length: 255 }), // varchar to match parties.party_id (can be UUID string or NPC party ID string)
+  originalNPCPartyID: varchar("original_npc_party_id", { length: 255 }), // For NPCs: stores their original NPC party ID (NPCEnums value) so they can be restored when leaving player parties
   location: varchar("location", { length: 100 }), // LocationsEnum - denormalized for quick access
   
   // Basic character info (matching Character entity exactly)

@@ -88,6 +88,11 @@ export const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
     name: "Dining",
     icon: Restaurant,
   },
+  "Travel": {
+    id: "Travel",
+    name: "Travel",
+    icon: DirectionsWalk,
+  },
   
   // Training actions (need sub-selection)
   "Train Attribute": {

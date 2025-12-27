@@ -28,10 +28,14 @@ function checkIfCharacterAlreadyKnownSkill(
   character: Character,
   skill: Skill,
 ): boolean {
+  // Check skills Map first (primary source of truth)
+  if (character.skills.has(skill.id)) {
+    return true;
+  }
+  // Then check deck arrays (secondary - IDs only)
   let isKnown =
-    character.activeSkills.some((s) => s.id === skill.id) ||
-    character.conditionalSkills.some((s) => s.id === skill.id) ||
-    character.skills.get(skill.id) !== undefined;
+    character.activeSkills.includes(skill.id) ||
+    character.conditionalSkills.includes(skill.id);
 
   return isKnown;
 }
@@ -57,11 +61,10 @@ function checkSkillLearningRequirement(
 
   if (req.reqSkillId) {
     for (const reqSkill of req.reqSkillId) {
+      // Check skills Map first (primary source of truth)
       const hasSkill =
-        character.skills.has(reqSkill) ||
-        character.activeSkills.some((s) => s.id === reqSkill) ||
-        character.conditionalSkills.some((s) => s.id === reqSkill);
-
+        character.skills.has(reqSkill)
+        
       if (!hasSkill) return false;
     }
   }

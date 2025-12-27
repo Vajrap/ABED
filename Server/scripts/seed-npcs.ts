@@ -43,6 +43,8 @@ import { addBaseVitals } from "../src/Entity/Character/Subclass/Vitals/addBaseVi
 import { activeEpithet, activeRole } from "../src/Entity/Character/Subclass/Title/logics/active";
 import { equip } from "../src/Utils/equip";
 import { makeAttribute, makeProficiencies } from "../src/Entity/Character/MOBs/helpers";
+import { SkillId } from "../src/Entity/Skill/enums";
+import { DeckCondition } from "../src/Entity/Character/Subclass/DeckCondition/DeckCondition";
 
 dotenv.config();
 
@@ -246,15 +248,55 @@ function createNPCFromTemplate(template: NPCTemplate, location: LocationsEnum): 
     activeRole(character, template.title.role);
   }
 
-  // Add active skills
-  if (template.activeSkills) {
-    for (const skill of template.activeSkills) {
-      character.activeSkills.push({
-        id: skill.id,
-        level: skill.level,
-        exp: skill.exp ?? 0,
+  // Add skills to skills Map and store IDs in deck arrays
+  // First, add all skills from template.skills Map if provided
+  if (template.skills) {
+    for (const [skillId, skillData] of template.skills.entries()) {
+      character.skills.set(skillId, {
+        id: skillId,
+        level: skillData.level,
+        exp: skillData.exp ?? 0,
       });
     }
+  }
+  
+  // Add active skills (now just SkillId[])
+  if (template.activeSkills) {
+    const activeSkillIds: SkillId[] = [];
+    for (const skillId of template.activeSkills) {
+      // Ensure skill exists in skills Map (if not already added from template.skills)
+      if (!character.skills.has(skillId)) {
+        character.skills.set(skillId, {
+          id: skillId,
+          level: 1, // Default level if not specified
+          exp: 0,
+        });
+      }
+      activeSkillIds.push(skillId);
+    }
+    character.activeSkills = activeSkillIds;
+  }
+  
+  // Add conditional skills (now just SkillId[])
+  if (template.conditionalSkills) {
+    const conditionalSkillIds: SkillId[] = [];
+    for (const skillId of template.conditionalSkills) {
+      // Ensure skill exists in skills Map (if not already added from template.skills)
+      if (!character.skills.has(skillId)) {
+        character.skills.set(skillId, {
+          id: skillId,
+          level: 1, // Default level if not specified
+          exp: 0,
+        });
+      }
+      conditionalSkillIds.push(skillId);
+    }
+    character.conditionalSkills = conditionalSkillIds;
+  }
+  
+  // Set conditional skills condition if provided
+  if (template.conditionalSkillsCondition) {
+    character.conditionalSkillsCondition = new DeckCondition(template.conditionalSkillsCondition);
   }
 
   // Add relations with other NPCs
@@ -429,13 +471,14 @@ async function seedNPCsForLocation(location: LocationsEnum): Promise<{ created: 
           party.actionSequence = npcsParty.defaultPartyActionSequence;
         }
 
-        // Set partyID on all NPCs in the party
+        // Set partyID and originalNPCPartyID on all NPCs in the party
         for (const npc of partyNPCs) {
           npc.partyID = party.partyID;
-          // Update NPC in database with partyID
+          npc.originalNPCPartyID = party.partyID; // Store original party ID for restoration
+          // Update NPC in database with partyID and originalNPCPartyID
           await db
             .update(characters)
-            .set({ partyID: party.partyID })
+            .set({ partyID: party.partyID, originalNPCPartyID: party.partyID })
             .where(eq(characters.id, npc.id));
         }
 

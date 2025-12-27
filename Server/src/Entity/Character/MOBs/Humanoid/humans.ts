@@ -84,10 +84,16 @@ export function humanWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.race = RaceEnum.Human;
 
-  character.activeSkills = [
-    {id: WarriorSkillId.WarCry, level: 1, exp: 0},
-    {id: WarriorSkillId.PowerStrike, level: 1, exp: 0},
-  ];
+  const activeSkillIds = [WarriorSkillId.WarCry, WarriorSkillId.PowerStrike];
+  
+  // Add skills to skills Map
+  activeSkillIds.forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+    }
+  });
+  
+  character.activeSkills = activeSkillIds;
 
   character.race = RaceEnum.Human;
 
@@ -262,10 +268,16 @@ export function humanCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
   // - Heal: Restores 2d6+WIL HP to target ally
   // - Bless: Grants +2 to all stats for 3 turns to party
   // - Smite: Deals 1d8+WIL holy damage to enemy
-  character.activeSkills = [
-    {id: ClericSkillId.Bless, level: 1, exp: 0},
-    {id: ClericSkillId.Heal, level: 1, exp: 0},
-  ];
+  const activeSkillIds = [ClericSkillId.Bless, ClericSkillId.Heal];
+  
+  // Add skills to skills Map
+  activeSkillIds.forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+    }
+  });
+  
+  character.activeSkills = activeSkillIds;
 
   character.race = RaceEnum.Human;
 
@@ -341,11 +353,16 @@ export function humanPaladin(difficulty: 1 | 2 | 3 | 4 | 5) {
   // - Holy Strike: Deals 1d10+STR+WIL holy damage, heals self for 50% of damage
   // - Aura of Protection: Grants damage reduction to all allies for 3 turns
   // - Lay on Hands: Heals target ally for 2d8+WIL HP
-  character.activeSkills = [
-    {id: PaladinSkillId.AegisPulse, level: 1, exp: 0},
-    {id: PaladinSkillId.AegisShield, level: 1, exp: 0},
-    {id: ClericSkillId.Radiance, level: 1, exp: 0},
-  ];
+  const activeSkillIds = [PaladinSkillId.AegisPulse, PaladinSkillId.AegisShield, ClericSkillId.Radiance];
+  
+  // Add skills to skills Map
+  activeSkillIds.forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+    }
+  });
+  
+  character.activeSkills = activeSkillIds;
 
   character.race = RaceEnum.Human;
 
@@ -521,10 +538,16 @@ export function humanBarbarian(difficulty: 1 | 2 | 3 | 4 | 5) {
   // - Rage: Increases damage by 50% and reduces defense by 25% for 3 turns
   // - Reckless Attack: Deals 2d8+STR damage but takes 1d4 damage in return
   // - Intimidating Shout: Reduces enemy attack by 2 for 2 turns
-  character.activeSkills = [
-    {id: BarbarianSkillId.RecklessSwing, level: 1, exp: 0},
-    {id: BarbarianSkillId.Rage, level: 1, exp: 0},
-  ];  
+  const activeSkillIds = [BarbarianSkillId.RecklessSwing, BarbarianSkillId.Rage];
+  
+  // Add skills to skills Map
+  activeSkillIds.forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+    }
+  });
+  
+  character.activeSkills = activeSkillIds;  
 
   character.race = RaceEnum.Human;
 
@@ -794,10 +817,16 @@ export function humanDruid(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.race = RaceEnum.Human;
 
-  character.activeSkills = [
-    {id: DruidSkillId.ThrowSpear, level: 1, exp: 0},
-    {id: DruidSkillId.VineWhip, level: 1, exp: 0},
-  ];
+  const activeSkillIds = [DruidSkillId.ThrowSpear, DruidSkillId.VineWhip];
+  
+  // Add skills to skills Map
+  activeSkillIds.forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+    }
+  });
+  
+  character.activeSkills = activeSkillIds;
 
   character.race = RaceEnum.Human;
 
@@ -870,11 +899,16 @@ export function humanDuelist(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.race = RaceEnum.Human;
 
-  character.activeSkills = [
-    {id: DuelistSkillId.BladeFlurry, level: 1, exp: 0},
-    {id: DuelistSkillId.ParryRiposte, level: 1, exp: 0},
-    {id: DuelistSkillId.PreciseStrike, level: 1, exp: 0},
-  ];
+  const activeSkillIds = [DuelistSkillId.BladeFlurry, DuelistSkillId.ParryRiposte, DuelistSkillId.PreciseStrike];
+  
+  // Add skills to skills Map
+  activeSkillIds.forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+    }
+  });
+  
+  character.activeSkills = activeSkillIds;
 
   character.race = RaceEnum.Human;
 
@@ -947,11 +981,16 @@ export function humanGuardian(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.race = RaceEnum.Human;
 
-  character.activeSkills = [
-    {id: WarriorSkillId.Cleave, level: 1, exp: 0},
-    {id: GuardianSkillId.ShieldUp, level: 1, exp: 0},
-    {id: GuardianSkillId.Taunt, level: 1, exp: 0},
-  ];
+  const activeSkillIds = [WarriorSkillId.Cleave, GuardianSkillId.ShieldUp, GuardianSkillId.Taunt];
+  
+  // Add skills to skills Map
+  activeSkillIds.forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+    }
+  });
+  
+  character.activeSkills = activeSkillIds;
 
   character.race = RaceEnum.Human;
 

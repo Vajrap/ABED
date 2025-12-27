@@ -41,6 +41,7 @@ import type { SkillId } from "@/L10N/skillEnums";
 // @ts-ignore - Case sensitivity issue with textRenderer.ts vs TextRenderer.tsx
 import { TextRenderer } from "@/utils/TextRenderer";
 import type { SkillConsume, SkillProduce, CharacterSkillInterface } from "@/types/api";
+import { characterService } from "@/services/characterService";
 
 export interface SkillsModalProps {
   open: boolean;
@@ -222,6 +223,15 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
   const [conditionalDeckSkills, setConditionalDeckSkills] = useState<SkillData[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  
+  // Original state tracking for reset functionality
+  const [originalActiveDeckSkills, setOriginalActiveDeckSkills] = useState<SkillData[]>([]);
+  const [originalConditionalDeckSkills, setOriginalConditionalDeckSkills] = useState<SkillData[]>([]);
+  
+  // Confirmation dialog states
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+  const [showSaveConfirmationDialog, setShowSaveConfirmationDialog] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Initialize deck states from character when modal opens or character changes
   useEffect(() => {
@@ -246,6 +256,9 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
         }));
       setActiveDeckSkills(active);
       setConditionalDeckSkills(conditional);
+      // Store original state for reset functionality
+      setOriginalActiveDeckSkills([...active]);
+      setOriginalConditionalDeckSkills([...conditional]);
       setHasUnsavedChanges(false);
     }
   }, [open, character]);
@@ -412,6 +425,14 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
       }
     }
 
+    // Debug logging (can be removed later)
+    console.log("[SkillsModal] Learned skills computation", {
+      totalSkillsInCharacter: character.skills ? Object.keys(character.skills).length : 0,
+      skillsInDecks: deckSkillIds.size,
+      learnedSkillsCount: skills.length,
+      deckSkillIds: Array.from(deckSkillIds),
+    });
+
     return skills.sort((a, b) => {
       const nameA = getSkillName(a.id);
       const nameB = getSkillName(b.id);
@@ -518,7 +539,8 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
     }
 
     // Handle drag from deck to Learned Skills (remove from deck)
-    if ((activeSource === 'active' || activeSource === 'conditional') && overSource === 'learned') {
+    // Check for 'learned-drop' drop zone (the drop zone ID, not a sortable item)
+    if ((activeSource === 'active' || activeSource === 'conditional') && overId === 'learned-drop') {
       if (activeSource === 'active') {
         const newSkills = activeDeckSkills.filter((_, index) => index !== activeIndex);
         setActiveDeckSkills(newSkills);
@@ -536,37 +558,47 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
     // Visual feedback handled by drop zones
   };
 
+  // Reset to original state
+  const resetToOriginalState = () => {
+    setActiveDeckSkills([...originalActiveDeckSkills]);
+    setConditionalDeckSkills([...originalConditionalDeckSkills]);
+    setHasUnsavedChanges(false);
+  };
+
+  // Handle modal close with unsaved changes check
+  const handleModalClose = () => {
+    if (hasUnsavedChanges) {
+      setShowUnsavedChangesDialog(true);
+    } else {
+      resetToOriginalState();
+      onClose();
+    }
+  };
+
+  // Confirm abandon unsaved changes
+  const handleConfirmAbandonChanges = () => {
+    setShowUnsavedChangesDialog(false);
+    resetToOriginalState();
+    onClose();
+  };
+
+  // Cancel abandon changes dialog
+  const handleCancelAbandonChanges = () => {
+    setShowUnsavedChangesDialog(false);
+  };
+
   // Save and Cancel handlers
   const handleSave = () => {
-    // TODO: Implement save to backend
-    console.log("Save clicked - Active:", activeDeckSkills, "Conditional:", conditionalDeckSkills);
-    setHasUnsavedChanges(false);
+    setShowSaveConfirmationDialog(true);
   };
 
   const handleCancel = () => {
     if (hasUnsavedChanges) {
-      // Reset to original values
-      if (character) {
-        const active = (character.activeSkills || []).map(skill => ({
-          id: skill.id as SkillId,
-          level: skill.level || 1,
-          exp: skill.exp || 0,
-          consume: skill.consume,
-          produce: skill.produce,
-        }));
-        const conditional = (character.conditionalSkills || []).map(skill => ({
-          id: skill.id as SkillId,
-          level: skill.level || 1,
-          exp: skill.exp || 0,
-          consume: skill.consume,
-          produce: skill.produce,
-        }));
-        setActiveDeckSkills(active);
-        setConditionalDeckSkills(conditional);
-        setHasUnsavedChanges(false);
-      }
+      setShowUnsavedChangesDialog(true);
+    } else {
+      resetToOriginalState();
+      onClose();
     }
-    onClose();
   };
 
   const currentDeckSkills = activeDeck === "active" ? activeDeckSkills : conditionalDeckSkills;
@@ -582,7 +614,7 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
     >
       <Dialog
         open={open}
-        onClose={handleCancel}
+        onClose={handleModalClose}
         maxWidth={false}
         PaperProps={{
           sx: {
@@ -596,6 +628,7 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
         }}
       >
         <DialogTitle
+          component="div"
           sx={{
             display: "flex",
             justifyContent: "space-between",
@@ -606,6 +639,7 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
         >
           <Typography
             variant="h5"
+            component="div"
             sx={{
               fontFamily: "Cinzel, serif",
               fontWeight: 700,
@@ -1376,6 +1410,104 @@ export const SkillsModal: React.FC<SkillsModalProps> = ({
           );
         })() : null}
       </DragOverlay>
+
+      {/* Unsaved Changes Confirmation Dialog */}
+      <Dialog
+        open={showUnsavedChangesDialog}
+        onClose={handleCancelAbandonChanges}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Cinzel, serif" }}>
+          Unsaved Changes
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontFamily: "Crimson Text, serif" }}>
+            Anything not saved will be lost. Are you sure you want to abandon unsaved changes?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCancelAbandonChanges}
+            variant="outlined"
+            sx={{ textTransform: "none", fontFamily: "Cinzel, serif" }}
+          >
+            No, Keep Editing
+          </Button>
+          <Button
+            onClick={handleConfirmAbandonChanges}
+            variant="contained"
+            color="error"
+            sx={{ textTransform: "none", fontFamily: "Cinzel, serif" }}
+          >
+            Yes, Abandon Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Save Confirmation Dialog */}
+      <Dialog
+        open={showSaveConfirmationDialog}
+        onClose={() => !isSaving && setShowSaveConfirmationDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ fontFamily: "Cinzel, serif" }}>
+          Confirm Save
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontFamily: "Crimson Text, serif" }}>
+            Are you sure you want to overwrite your deck?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setShowSaveConfirmationDialog(false)}
+            variant="outlined"
+            disabled={isSaving}
+            sx={{ textTransform: "none", fontFamily: "Cinzel, serif" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={async () => {
+              if (!character) return;
+              
+              setIsSaving(true);
+              try {
+                const response = await characterService.updateSkills({
+                  characterId: character.id,
+                  activeSkills: activeDeckSkills.map(skill => skill.id),
+                  conditionalSkills: conditionalDeckSkills.map(skill => skill.id),
+                });
+
+                if (response.success && response.character) {
+                  // Update original state to current state since we saved
+                  setOriginalActiveDeckSkills([...activeDeckSkills]);
+                  setOriginalConditionalDeckSkills([...conditionalDeckSkills]);
+                  setHasUnsavedChanges(false);
+                  setShowSaveConfirmationDialog(false);
+                  
+                  // Close modal - parent component should refresh character data
+                  onClose();
+                } else {
+                  alert(`Failed to save: ${response.error || "Unknown error"}`);
+                }
+              } catch (error) {
+                console.error("Error saving skills:", error);
+                alert(`Error saving skills: ${error instanceof Error ? error.message : "Unknown error"}`);
+              } finally {
+                setIsSaving(false);
+              }
+            }}
+            variant="contained"
+            disabled={isSaving}
+            sx={{ textTransform: "none", fontFamily: "Cinzel, serif" }}
+          >
+            {isSaving ? "Saving..." : "Yes, Save"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </DndContext>
   );
 };

@@ -115,59 +115,32 @@ export function goblinScout(difficulty: 1 | 2 | 3 | 4 | 5) {
   character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
-  character.activeSkills = [
-    {
-      id: RogueSkillId.Backstab,
-      level: Math.min(
-        Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
-        5,
-      ),
-      exp: 0,
-    },
-    {
-      id: MobSkillId.PanicSlash,
-      level: Math.min(
-        Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
-        5,
-      ),
-      exp: 0,
-    },
-    {
-      id: MobSkillId.Shriek,
-      level: Math.min(
-        Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
-        5,
-      ),
-      exp: 0,
-    },
-    {
-      id: MobSkillId.ThrowPebble,
-      level: Math.min(
-        Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
-        5,
-      ),
-      exp: 0,
-    },
+  // Add skills to skills Map and store IDs in decks
+  const activeSkillIds = [
+    RogueSkillId.Backstab,
+    MobSkillId.PanicSlash,
+    MobSkillId.Shriek,
+    MobSkillId.ThrowPebble,
+  ];
+  const conditionalSkillIds = [
+    RogueSkillId.RetreatDash,
+    MobSkillId.ThrowPebble,
   ];
 
-  character.conditionalSkills = [
-    {
-      id: RogueSkillId.RetreatDash,
-      level: Math.min(
+  // Add all skills to skills Map
+  [...activeSkillIds, ...conditionalSkillIds].forEach((skillId) => {
+    if (!character.skills.has(skillId)) {
+      const skillLevel = Math.min(
         Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
         5,
-      ),
-      exp: 0,
-    },
-    {
-      id: MobSkillId.ThrowPebble,
-      level: Math.min(
-        Math.max(Math.floor(Math.random() * 3) + difficulty - 1, 1),
-        5,
-      ),
-      exp: 0,
-    },
-  ];
+      );
+      character.skills.set(skillId, { id: skillId, level: skillLevel, exp: 0 });
+    }
+  });
+
+  // Store only IDs in deck arrays
+  character.activeSkills = activeSkillIds;
+  character.conditionalSkills = conditionalSkillIds;
 
   character.conditionalSkillsCondition = new DeckCondition({
     selectedCondition: "SELF",
@@ -257,27 +230,12 @@ export function goblinWarrior(difficulty: 1 | 2 | 3 | 4 | 5) {
   character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
-  character.activeSkills = [
-    { id: WarriorSkillId.WarCry, level: randomSkillLevel(difficulty), exp: 0 },
-    {
-      id: WarriorSkillId.PowerStrike,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-  ];
-
-  character.conditionalSkills = [
-    {
-      id: GuardianSkillId.ShieldUp,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-    {
-      id: GuardianSkillId.HerosPose,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-  ];
+  character.activeSkills = [ WarriorSkillId.WarCry, WarriorSkillId.PowerStrike ];
+  character.skills.set(WarriorSkillId.WarCry, { id: WarriorSkillId.WarCry, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(WarriorSkillId.PowerStrike, { id: WarriorSkillId.PowerStrike, level: randomSkillLevel(difficulty), exp: 0 });
+  character.conditionalSkills = [ GuardianSkillId.ShieldUp, GuardianSkillId.HerosPose ];
+  character.skills.set(GuardianSkillId.ShieldUp, { id: GuardianSkillId.ShieldUp, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(GuardianSkillId.HerosPose, { id: GuardianSkillId.HerosPose, level: randomSkillLevel(difficulty), exp: 0 });
 
   character.conditionalSkillsCondition = new DeckCondition({
     selectedCondition: "SELF",
@@ -372,29 +330,15 @@ export function goblinMage(difficulty: 1 | 2 | 3 | 4 | 5) {
   character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
-  character.activeSkills = [
-    {
-      id:
-        rollTwenty().total >= 10 ? MageSkillId.FireBall : MageSkillId.Backdraft,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-    {
-      id: MageSkillId.BurningHand,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-    { id: MageSkillId.FireBolt, level: randomSkillLevel(difficulty), exp: 0 },
-  ];
+  const skillRoll = rollTwenty().total
+  character.activeSkills = [ skillRoll >= 10 ? MageSkillId.FireBall : MageSkillId.Backdraft, MageSkillId.BurningHand, MageSkillId.FireBolt ];
+  character.skills.set(skillRoll >= 10 ? MageSkillId.FireBall : MageSkillId.Backdraft, { id: skillRoll >= 10 ? MageSkillId.FireBall : MageSkillId.Backdraft, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(MageSkillId.BurningHand, { id: MageSkillId.BurningHand, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(MageSkillId.FireBolt, { id: MageSkillId.FireBolt, level: randomSkillLevel(difficulty), exp: 0 });
 
-  character.conditionalSkills = [
-    {
-      id: MageSkillId.ArcaneShield,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-    { id: MageSkillId.ArcaneBolt, level: randomSkillLevel(difficulty), exp: 0 },
-  ];
+  character.conditionalSkills = [ MageSkillId.ArcaneShield, MageSkillId.ArcaneBolt ];
+  character.skills.set(MageSkillId.ArcaneShield, { id: MageSkillId.ArcaneShield, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(MageSkillId.ArcaneBolt, { id: MageSkillId.ArcaneBolt, level: randomSkillLevel(difficulty), exp: 0 });
 
   character.conditionalSkillsCondition = new DeckCondition({
     selectedCondition: "SELF",
@@ -492,25 +436,18 @@ export function goblinCleric(difficulty: 1 | 2 | 3 | 4 | 5) {
   character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
 
+
   // Goblin Cleric skills - MendSpirit first (no cost, can always use to generate resources)
   character.activeSkills = [
-    {
-      id: ShamanSkillId.ChaoticBlessing,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-    {
-      id: ShamanSkillId.HolyRattle,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-    { id: ShamanSkillId.HexOfRot, level: randomSkillLevel(difficulty), exp: 0 },
-    {
-      id: ShamanSkillId.MendSpirit,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
+    ShamanSkillId.ChaoticBlessing,
+    ShamanSkillId.SpiritRattle,
+    ShamanSkillId.HexOfRot,
+    ShamanSkillId.MendSpirit,
   ];
+  character.skills.set(ShamanSkillId.ChaoticBlessing, { id: ShamanSkillId.ChaoticBlessing, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(ShamanSkillId.SpiritRattle, { id: ShamanSkillId.SpiritRattle, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(ShamanSkillId.HexOfRot, { id: ShamanSkillId.HexOfRot, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(ShamanSkillId.MendSpirit, { id: ShamanSkillId.MendSpirit, level: randomSkillLevel(difficulty), exp: 0 });
 
   // Equip weapon and armor based on difficulty
   equipDirect(
@@ -588,24 +525,11 @@ export function goblinCaptain(difficulty: 1 | 2 | 3 | 4 | 5) {
 
   character.traits = goblinTraits;
   character.race = RaceEnum.Goblin;
-
-  character.activeSkills = [
-    {
-      id: MobSkillId.Whip,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-    {
-      id: MobSkillId.CommanderScream,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-    {
-      id: MobSkillId.WorksYouMaggots,
-      level: randomSkillLevel(difficulty),
-      exp: 0,
-    },
-  ];
+  character.activeSkills = [ MobSkillId.Whip, MobSkillId.CommanderScream, MobSkillId.WorksYouMaggots ];
+  character.skills.set(MobSkillId.Whip, { id: MobSkillId.Whip, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(MobSkillId.CommanderScream, { id: MobSkillId.CommanderScream, level: randomSkillLevel(difficulty), exp: 0 });
+  character.skills.set(MobSkillId.WorksYouMaggots, { id: MobSkillId.WorksYouMaggots, level: randomSkillLevel(difficulty), exp: 0 });
+  
 
   // Equip weapon and armor based on difficulty
   equipDirect(

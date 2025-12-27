@@ -35,7 +35,7 @@ export interface CharacterCreationData {
   name: string;
   gender: "MALE" | "FEMALE" | "NONE";
   race: PlayableRaceEnum;
-  portrait: PortraitData | string; // Support both new PortraitData and legacy string format
+  portrait: PortraitData;
   background: PlayableBackgroundEnum;
   startingClass: PlayableClassEnum;
 }
@@ -108,6 +108,7 @@ export class CharacterService {
       id: character.id,
       userId: character.userId, // Can be null for NPCs
       partyID: character.partyID,
+      originalNPCPartyID: character.originalNPCPartyID || null,
       location: character.location || null, // Include location if it exists
 
       // Basic info - truncate all varchar fields
@@ -222,12 +223,14 @@ export class CharacterService {
     character.proficiencies.mutateBase(classDef.proficiencies.two, 2);
     character.proficiencies.mutateBase(classDef.proficiencies.one, 1);
     for (const skill of classDef.startingSkills) {
-      character.activeSkills.push({
+      character.activeSkills.push(skill);
+      character.skills.set(skill, {
         id: skill,
         level: 1,
         exp: 0
-      })
+      });
     }
+
     for (const item of classDef.startingEquipments) {
       character.inventory.set(item.id, 1);
       equip(character, item.id, item.slot);
@@ -302,7 +305,7 @@ export class CharacterService {
     // Pass JSON strings as parameters and cast them in SQL
     const result = await db.execute(sql`
       INSERT INTO characters (
-        id, user_id, party_id, name, gender, race, type, level, portrait, background,
+        id, user_id, party_id, original_npc_party_id, location, name, gender, race, type, level, portrait, background,
         alignment, artisans, attribute, battle_stats, elements, proficiencies, save_rolls,
         needs, vitals, fame, behavior, title, possible_epithets, possible_roles,
         action_sequence, informations, skills, active_skills, conditional_skills,
@@ -311,7 +314,7 @@ export class CharacterService {
         relations, traits, inventory_size, inventory, equipments, material_resources, stat_tracker, ab_guage,
         created_at, updated_at, created_by, updated_by
       ) VALUES (
-        ${char.id}, ${char.userId}, ${char.partyID || null},
+        ${char.id}, ${char.userId}, ${char.partyID || null}, ${char.originalNPCPartyID || null}, ${char.location || null}, ${char.originalNPCPartyID || null}, ${char.location || null},
         ${String(char.name || '').substring(0, 255)}, ${String(char.gender || '').substring(0, 10)}, ${String(char.race || '').substring(0, 50)}, ${String(char.type || '').substring(0, 50)},
         ${char.level}, ${sql.raw(`'${portraitJson.replace(/'/g, "''")}'::jsonb`)}, ${String(char.background || '').substring(0, 100)},
         ${sql.raw(`'${alignmentJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${artisansJson.replace(/'/g, "''")}'::jsonb`)},

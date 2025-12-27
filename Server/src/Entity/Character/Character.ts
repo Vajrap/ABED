@@ -64,6 +64,7 @@ export class Character {
   id: string = "";
   userId: string | null = null;
   partyID: string | null = null;
+  originalNPCPartyID: string | null = null; // For NPCs: stores their original NPC party ID (NPCEnums value) so they can be restored when leaving player parties
   location: LocationsEnum | null = null; // Current location - denormalized from party for quick access
 
   name: L10N;
@@ -71,7 +72,7 @@ export class Character {
   race: RaceEnum | string = ""; // Allow string for backwards compatibility, but prefer RaceEnum
   type: CharacterType = CharacterType.humanoid;
   level: number = 1;
-  portrait: PortraitData | null = null; // Support both new PortraitData and legacy string format
+  portrait: PortraitData | string | null = null; // Support both new PortraitData and legacy string format
   background: string | null = null;
 
   alignment: CharacterAlignment = new CharacterAlignment({});
@@ -96,8 +97,8 @@ export class Character {
   // Skills
   // TODO: write condition, might be config setting
   skills: Map<SkillId, CharacterSkillObject> = new Map();
-  activeSkills: CharacterSkillObject[] = [];
-  conditionalSkills: CharacterSkillObject[] = [];
+  activeSkills: SkillId[] = [];
+  conditionalSkills: SkillId[] = [];
   conditionalSkillsCondition: DeckCondition = new DeckCondition({});
   skillLearningProgress: Map<SkillId, number> = new Map();
   cooldowns: Map<SkillId, number> = new Map(); // Skill cooldowns: Map<SkillId, turnsRemaining>

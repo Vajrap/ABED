@@ -45,6 +45,11 @@ class LocationManager {
     day: DayOfWeek,
     phase: TimeOfDay,
   ): Promise<NewsDistribution> {
+    // Process NPC travel schedules first, so NPCs are at correct locations
+    // before actions are processed
+    const { processNPCTravelSchedules } = await import("../../Character/NPCs/TravelScheduleProcessor");
+    await processNPCTravelSchedules(day, phase);
+    
     let news: NewsDistribution = {
       worldScope: [],
       regionScope: new Map(),

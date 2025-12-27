@@ -244,7 +244,7 @@ export class CharacterBuilderService {
           exp: 0,
         });
         activeSkills.push({
-          id: WitchSkillId.PoisonDart as SkillId,
+          id: WitchSkillId.CurseBolt as SkillId,
           level: difficulty,
           exp: 0,
         });
@@ -434,7 +434,7 @@ export class CharacterBuilderService {
           exp: 0,
         });
         activeSkills.push({
-          id: ShamanSkillId.HolyRattle,
+          id: ShamanSkillId.SpiritRattle,
           level: Math.max(1, difficulty - 1),
           exp: 0,
         });

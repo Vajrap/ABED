@@ -97,6 +97,7 @@ export enum ClericSkillId {
    * - **DefenseUp Buff:** Increases pDEF and mDEF by 2
    * 
    * **Consume:** 3 MP, 1 order
+   * **Produce:** 1 water
    */
   Protection = "Protection",
 
@@ -265,7 +266,7 @@ export enum SeerSkillId {
    * - **Level 5:** If the attacker misses, you gain 1 order
    * - **Level 7:** When used, roll a d20 + LUK mod. If passed (DC10), gain 1 more turn of Precognition buff
    * 
-   * **Consume:** 1 order, 1 wind
+  * **Consume:** 1 order, 1 wind
    * **Produce:** 1 water
    */
   Precognition = "Precognition",
@@ -891,7 +892,7 @@ export enum SpellbladeSkillId {
    * - **Charge Gain:** If attacked by a spell, gain 1 Edge Charge (2 if 0 damage taken)
    * - **Level 5:** Also gain 1 Edge Charge when used
    * 
-   * **Consume:** 4 SP, 1 wind
+   * **Consume:** 4 SP, 1 neutral
    * **Produce:** 1 chaos
    */
   SpellParry = "SpellParry",
@@ -1003,7 +1004,7 @@ export enum ShamanSkillId {
    * **Consume:** 2 MP, 1 neutral
    * **Produce:** 1 order
    */
-  HolyRattle = "SpiritRattle",
+  SpiritRattle = "SpiritRattle",
 
   /**
    * **Tier:** Uncommon
@@ -1603,8 +1604,8 @@ export enum PaladinSkillId {
    * - **Retribution Bonus:** If enemy has dealt damage to any ally in the last 2 turns, deal +50% damage (+75% at level 5)
    * - **Undead/Fiend Bonus:** If enemy is undead or fiend, deal additional +1d6 holy damage
    * 
-   * **Consume:** 3 SP, 2 order
-   * **Produce:** 1 neutral
+   * **Consume:** 3 SP, 2 neutral
+   * **Produce:** 1 order
    */
   RighteousSmite = "RighteousSmite",
 
@@ -1722,15 +1723,16 @@ export enum DruidSkillId {
   NurturingBloom = "NurturingBloom",
 
   /**
-   * **Tier:** Common (Cantrip)
+   * **Tier:** Common
    * 
    * Grant natural resilience to an ally.
    * - **Target:** 1 random ally (2 at level 5)
    * - **Effect:** Grant Bless buff for 2 turns (3 turns at level 5)
    * - **Bonus:** Target gains +1 END while Bless is active
    * 
+   * **Cooldown:** 3
    * **Consume:** 2 MP
-   * **Produce:** 1 earth
+   * **Produce:** 1 water
    */
   NaturalResilience = "NaturalResilience",
 
@@ -1823,8 +1825,8 @@ export enum MonkSkillId {
    * - **Armor Penalty:** If your armor is NOT cloth, damage reduced by 70% DC reduced by 3
    * - **Target:** One enemy, front first, melee
    * 
-   * **Consume:** 3 SP
-   * **Produce:** 1 wind
+   * **Consume:** 3 SP, 1 wind, 1 neutral
+   * **Produce:** 1 fire
    */
   StunningFist = "StunningFist",
 
@@ -2061,7 +2063,7 @@ export enum WitchSkillId {
    * **Consume:** 2 MP, 1 chaos
    * **Produce:** 1 neutral
    */
-  ChaosBrand = "CurseMark",
+  CurseMark = "CurseMark",
 
   /**
    * **Tier:** Common (Cantrip)
@@ -2091,7 +2093,7 @@ export enum WitchSkillId {
    * **Consume:** 2 MP
    * **Produce:** 1 chaos
    */
-  PoisonDart = "CurseBolt",
+  CurseBolt = "CurseBolt",
 
   /**
    * **Tier:** Uncommon
@@ -2103,7 +2105,7 @@ export enum WitchSkillId {
    * - **Target:** Single target
    * 
    * **Consume:** 3 MP, 1 chaos
-   * **Produce:** 1 chaos
+   * **Produce:** 1 wind
    */
   MisfortuneCurse = "MisfortuneCurse",
 
@@ -2164,8 +2166,8 @@ export enum InquisitorSkillId {
    * - **Undead/Fiend Bonus:** +1d4 bonus damage against undead/fiends (1d8 at level 5)
    * - **Range:** Ranged single target
    * 
-   * **Consume:** 2 MP, 1 order
-   * **Produce:** 1 neutral
+   * **Consume:** 2 MP,
+   * **Produce:** 1 order
    */
   RadiantSmite = "RadiantSmite",
 

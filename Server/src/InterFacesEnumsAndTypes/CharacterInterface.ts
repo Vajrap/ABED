@@ -10,6 +10,7 @@ import type { CharacterBreathingSkillInterface } from "./CharacterBreathingSkill
 import type { CharacterSkillInterface } from "./CharacterSkillInterface";
 import type { ArtisanKey, AttributeKey, BattleStatKey, CharacterAlignmentEnum, CharacterEquipmentSlot, CharacterType, ElementKey, ProficiencyKey, RelationStatusEnum } from "./Enums";
 import type { SubRegionEnum } from "./Enums/SubRegion";
+import { PortraitData } from "./PortraitData";
 
 // Character interface for frontend - only includes fields needed for UI
 export interface CharacterInterface {
@@ -19,7 +20,7 @@ export interface CharacterInterface {
   race: string;
   type: CharacterType;
   level: number;
-  portrait: string;
+  portrait: PortraitData | string | null;
   background: string;
   alignment: CharacterAlignmentEnum;
   artisans: {

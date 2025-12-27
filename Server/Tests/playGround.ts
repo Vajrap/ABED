@@ -143,8 +143,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         wand: 8, staff: 6, book: 5, orb: 4
       });
-      activeSkills.push({ id: WitchSkillId.PoisonDart as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: WitchSkillId.ChaosBrand as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push({ id: WitchSkillId.CurseBolt as SkillId, level: difficulty as any, exp: 0 });
+      activeSkills.push({ id: WitchSkillId.CurseMark as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
       break;
       
     case ClassEnum.Inquisitor:

@@ -58,5 +58,21 @@ export const RACE_ATTRIBUTES: Record<RaceEnum, RaceAttributes> = {
       endurance: 10,
     },
   },
+  [RaceEnum.Goblin]: {
+    attributes: {
+      charisma: 4,
+      luck: 8,
+      intelligence: 6,
+      leadership: 5,
+      vitality: 8,
+      willpower: 6,
+      planar: 7,
+      control: 4,
+      dexterity: 10,
+      agility: 10,
+      strength: 6,
+      endurance: 6,
+    },
+  }
 };
 

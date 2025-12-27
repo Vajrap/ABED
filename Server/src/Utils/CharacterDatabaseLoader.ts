@@ -215,6 +215,7 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
   // Set user, party IDs, location, race, and title (not in constructor)
   character.userId = record.userId;
   character.partyID = record.partyID || null;
+  character.originalNPCPartyID = ((record as any).originalNPCPartyID as string | undefined) || null;
   character.location = ((record as any).location as LocationsEnum | undefined) || null;
   character.race = (record.race as any) || ""; // Restore race from database
   // Note: characterPrompt is stored in DB but not loaded into Character entity yet
@@ -233,11 +234,77 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
   }
 
   // Restore active skills and conditional skills (database stores as arrays)
+  // Handle migration from old format (objects) to new format (IDs)
   if (record.activeSkills && Array.isArray(record.activeSkills)) {
-    character.activeSkills = record.activeSkills as any[];
+    if (record.activeSkills.length > 0) {
+      // Check if old format (objects with id, level, exp) or new format (strings/IDs)
+      const firstItem = record.activeSkills[0];
+      if (typeof firstItem === 'object' && firstItem !== null && 'id' in firstItem) {
+        // Old format: extract IDs and add to skills Map
+        const skillIds: SkillId[] = [];
+        for (const skillObj of record.activeSkills) {
+          const skillId = (skillObj as any).id as SkillId;
+          const level = (skillObj as any).level ?? 1;
+          const exp = (skillObj as any).exp ?? 0;
+          
+          // Add to skills Map if not already present
+          if (!character.skills.has(skillId)) {
+            character.skills.set(skillId, { id: skillId, level, exp });
+          }
+          skillIds.push(skillId);
+        }
+        character.activeSkills = skillIds;
+      } else {
+        // New format: array of IDs
+        const skillIds = record.activeSkills as SkillId[];
+        // Ensure all skills in deck are also in skills Map
+        for (const skillId of skillIds) {
+          if (!character.skills.has(skillId)) {
+            // If skill is in deck but not in skills Map, add it with default values
+            character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+          }
+        }
+        character.activeSkills = skillIds;
+      }
+    } else {
+      character.activeSkills = [];
+    }
   }
+  
   if (record.conditionalSkills && Array.isArray(record.conditionalSkills)) {
-    character.conditionalSkills = record.conditionalSkills as any[];
+    if (record.conditionalSkills.length > 0) {
+      // Check if old format (objects with id, level, exp) or new format (strings/IDs)
+      const firstItem = record.conditionalSkills[0];
+      if (typeof firstItem === 'object' && firstItem !== null && 'id' in firstItem) {
+        // Old format: extract IDs and add to skills Map
+        const skillIds: SkillId[] = [];
+        for (const skillObj of record.conditionalSkills) {
+          const skillId = (skillObj as any).id as SkillId;
+          const level = (skillObj as any).level ?? 1;
+          const exp = (skillObj as any).exp ?? 0;
+          
+          // Add to skills Map if not already present
+          if (!character.skills.has(skillId)) {
+            character.skills.set(skillId, { id: skillId, level, exp });
+          }
+          skillIds.push(skillId);
+        }
+        character.conditionalSkills = skillIds;
+      } else {
+        // New format: array of IDs
+        const skillIds = record.conditionalSkills as SkillId[];
+        // Ensure all skills in deck are also in skills Map
+        for (const skillId of skillIds) {
+          if (!character.skills.has(skillId)) {
+            // If skill is in deck but not in skills Map, add it with default values
+            character.skills.set(skillId, { id: skillId, level: 1, exp: 0 });
+          }
+        }
+        character.conditionalSkills = skillIds;
+      }
+    } else {
+      character.conditionalSkills = [];
+    }
   }
 
   // Restore conditional skills condition

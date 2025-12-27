@@ -231,13 +231,14 @@ async function initializeNPCParties(): Promise<void> {
               party.actionSequence = npcsParty.defaultPartyActionSequence;
             }
             
-            // Set partyID on all NPCs in the party
+            // Set partyID and originalNPCPartyID on all NPCs in the party
             for (const npc of partyNPCs) {
               npc.partyID = party.partyID;
-              // Update NPC in database with partyID
+              npc.originalNPCPartyID = party.partyID; // Store original party ID for restoration
+              // Update NPC in database with partyID and originalNPCPartyID
               await db
                 .update(characters)
-                .set({ partyID: party.partyID })
+                .set({ partyID: party.partyID, originalNPCPartyID: party.partyID })
                 .where(eq(characters.id, npc.id));
             }
             
@@ -264,9 +265,10 @@ async function initializeNPCParties(): Promise<void> {
             for (const npc of partyNPCs) {
               if (npc.partyID !== npcsParty.partyId) {
                 npc.partyID = npcsParty.partyId;
+                npc.originalNPCPartyID = npcsParty.partyId; // Store original party ID for restoration
                 await db
                   .update(characters)
-                  .set({ partyID: npcsParty.partyId })
+                  .set({ partyID: npcsParty.partyId, originalNPCPartyID: npcsParty.partyId })
                   .where(eq(characters.id, npc.id));
                 needsUpdate = true;
               }

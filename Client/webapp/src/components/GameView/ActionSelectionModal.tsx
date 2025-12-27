@@ -11,6 +11,7 @@ import {
 import { getActionsForPhase, getActionById } from "@/config/actions";
 import { ActionSubSelectionModal } from "./ActionSubSelectionModal";
 import { getSubSelectionOptions } from "@/config/subSelectionOptions";
+import { DirectionsWalk } from "@mui/icons-material";
 
 export interface ActionSelectionModalProps {
   open: boolean;
@@ -25,6 +26,8 @@ export interface ActionSelectionModalProps {
     evening: string[];
     night: string[];
   }; // Phase-specific actions from backend
+  isTraveling?: boolean; // Whether the party is currently traveling
+  travelDestination?: string; // Destination location name
 }
 
 const PHASE_NAMES = ["Morning", "Afternoon", "Evening", "Night"];
@@ -40,6 +43,8 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
   onActionSelect,
   characterSkills,
   availableActionsByPhase,
+  isTraveling = false,
+  travelDestination,
 }) => {
   const theme = useTheme();
   
@@ -89,7 +94,7 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
       PaperProps={{
         sx: {
           borderRadius: 2,
-          padding: 2,
+          padding: 1,
           fontFamily: "Crimson Text, serif",
           backgroundColor: theme.palette.background.paper,
           border: `3px solid ${theme.palette.tertiary.main}`,
@@ -144,6 +149,70 @@ export const ActionSelectionModal: React.FC<ActionSelectionModalProps> = ({
             overflowY: "auto",
           }}
         >
+          {/* Travel Action - shown when party is traveling */}
+          {isTraveling && (
+            <Box
+              onClick={() => {
+                onActionSelect("Travel");
+                onClose();
+              }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.25,
+                padding: 1.25,
+                borderRadius: 1,
+                border: `2px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                cursor: "pointer",
+                transition: "all 0.2s ease-out",
+                mb: 1,
+                "&:hover": {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                  border: `2px solid ${theme.palette.primary.main}`,
+                  boxShadow: `0 0 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                },
+                "&:active": {
+                  transform: "translateX(1px)",
+                },
+              }}
+            >
+              <DirectionsWalk
+                sx={{
+                  fontSize: "1.25rem",
+                  color: theme.palette.primary.main,
+                  flexShrink: 0,
+                }}
+              />
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Crimson Text, serif",
+                    fontSize: "0.95rem",
+                    fontWeight: 600,
+                    color: theme.palette.text.primary,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Travel
+                </Typography>
+                {travelDestination && (
+                  <Typography
+                    sx={{
+                      fontFamily: "Crimson Text, serif",
+                      fontSize: "0.8rem",
+                      color: theme.palette.text.secondary,
+                      lineHeight: 1.2,
+                      mt: 0.25,
+                    }}
+                  >
+                    (to {travelDestination})
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          )}
+          
           {availableActions.map((action) => {
             const ActionIcon = action.icon;
             

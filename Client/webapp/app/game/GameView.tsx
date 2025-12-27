@@ -11,6 +11,7 @@ import {
   ChatPanel,
   GameTimeAndLocation,
   SkillsModal,
+  TravelModal,
 } from "@/components/GameView";
 import { ActionScheduleModal } from "@/components/GameView/ActionScheduleModal";
 import { CharacterStatsModal } from "@/components/GameView/CharacterStatsModal";
@@ -22,7 +23,7 @@ import { getPartyMembers } from "@/utils/characterMapping";
 import { convertActionSequenceToSchedule } from "@/utils/actionSequence";
 import { handleScheduleSave } from "@/utils/scheduleHandling";
 import { getCharacterSkillsMap } from "@/utils/characterHelpers";
-import type { CharacterInterface } from "@/types/api";
+import type { CharacterInterface, PartyInterface } from "@/types/api";
 
 const ENABLE_REDIRECTS = process.env.NEXT_PUBLIC_ENABLE_GAME_REDIRECTS !== "false";
 
@@ -34,6 +35,8 @@ export default function GameView() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [newsModalOpen, setNewsModalOpen] = useState(false);
   const [skillsModalOpen, setSkillsModalOpen] = useState(false);
+  const [travelModalOpen, setTravelModalOpen] = useState(false);
+  const [travelDestinationName, setTravelDestinationName] = useState<string | undefined>(undefined);
 
   // Custom hooks
   const { isCheckingAuth } = useGameAuth();
@@ -46,6 +49,31 @@ export default function GameView() {
     news,
     gameTime,
   } = useGameData(isCheckingAuth);
+  
+  // Sync travel destination name with party state
+  React.useEffect(() => {
+    if (!party?.isTraveling) {
+      setTravelDestinationName(undefined);
+    } else if (party.travelDestination && !travelDestinationName) {
+      // Fetch destination name if we don't have it yet
+      (async () => {
+        try {
+          const { locationService } = await import("@/services/locationService");
+          const response = await locationService.getConnectedLocations();
+          if (response.success && response.connectedLocations) {
+            const destination = response.connectedLocations.find(
+              loc => loc.id === party.travelDestination
+            );
+            if (destination) {
+              setTravelDestinationName(destination.name);
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching destination name:", err);
+        }
+      })();
+    }
+  }, [party?.isTraveling, party?.travelDestination, travelDestinationName]);
   
   useGameWebSocket();
   useGameKeyboardShortcuts({
@@ -62,14 +90,59 @@ export default function GameView() {
 
   const handleScheduleSaveWrapper = async (schedule: Record<string, string>) => {
     try {
-      await handleScheduleSave(schedule);
+      const response = await handleScheduleSave(schedule);
+      
+      // Update character's actionSequence in frontend state after successful save
+      if (response && response.CAS && playerCharacter && setParty && party) {
+        // Update the player character's actionSequence
+        const updatedCharacters = party.characters.map((char) => {
+          if (char && char.id === party.playerCharacterId) {
+            return {
+              ...char,
+              actionSequence: response.CAS,
+            };
+          }
+          return char;
+        });
+        
+        // Update party state with updated character
+        setParty({
+          ...party,
+          characters: updatedCharacters,
+        });
+      }
     } catch (error) {
       console.error("[GameView] Error saving schedule:", error);
     }
   };
 
   const handleTravelClick = () => {
-    console.log("Travel clicked - open travel planning modal");
+    setTravelModalOpen(true);
+  };
+
+  const handleTravelStarted = async (updatedParty: PartyInterface) => {
+    // Update party state with the new travel information
+    if (setParty) {
+      setParty(updatedParty);
+    }
+    
+    // Get destination name from connected locations
+    if (updatedParty.travelDestination) {
+      try {
+        const { locationService } = await import("@/services/locationService");
+        const response = await locationService.getConnectedLocations();
+        if (response.success && response.connectedLocations) {
+          const destination = response.connectedLocations.find(
+            loc => loc.id === updatedParty.travelDestination
+          );
+          if (destination) {
+            setTravelDestinationName(destination.name);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching destination name:", err);
+      }
+    }
   };
 
   const handleRailTravelClick = () => {
@@ -327,6 +400,8 @@ export default function GameView() {
         currentDay={gameTime ? gameTime.dayOfWeek - 1 : undefined}
         currentPhase={gameTime ? gameTime.hour - 1 : undefined}
         characterSkills={getCharacterSkillsMap(playerCharacter || null)}
+        isTraveling={party?.isTraveling || false}
+        travelDestination={travelDestinationName || party?.travelDestination}
       />
 
       {/* Character Stats Modal */}
@@ -377,6 +452,14 @@ export default function GameView() {
         open={skillsModalOpen}
         onClose={() => setSkillsModalOpen(false)}
         character={playerCharacter || null}
+      />
+
+      {/* Travel Modal */}
+      <TravelModal
+        open={travelModalOpen}
+        onClose={() => setTravelModalOpen(false)}
+        currentLocationId={location?.id}
+        onTravelStarted={handleTravelStarted}
       />
 
     </Box>

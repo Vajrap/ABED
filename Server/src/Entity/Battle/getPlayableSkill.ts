@@ -23,14 +23,14 @@ export function getPlayableSkill(
   // Initialize logging (equivalent to i === 0)
 
   for (let i = 0; i < skillDeck.length; i++) {
-    // Safely get skillObj (no undefined)
-    const skillObj = skillDeck[i];
-    if (!skillObj) {
+    // Safely get skillId (no undefined)
+    const skillId = skillDeck[i];
+    if (!skillId) {
       continue;
     }
 
     // Safely get skillRep
-    const skillRep = skillRepository[skillObj.id];
+    const skillRep = skillRepository[skillId];
     if (!skillRep) {
       continue;
     }
@@ -117,13 +117,17 @@ export function getPlayableSkill(
     }
     
     // Cooldown check
-    const cooldownRemaining = actor.cooldowns.get(skillObj.id);
+    const cooldownRemaining = actor.cooldowns.get(skillId);
     if (cooldownRemaining !== undefined && cooldownRemaining > 0) {
       continue;
     }
     
+    // Lookup skill level from skills Map (O(1) lookup)
+    const skillData = actor.skills.get(skillId);
+    const skillLevel = skillData?.level ?? 1;
+    
     // Success - can use this skill!
-    return { skill: skillRep, skillLevel: skillObj.level ?? 1 };  // fallback level 1 if missing
+    return { skill: skillRep, skillLevel };
   }
   
   // No playable skill found
