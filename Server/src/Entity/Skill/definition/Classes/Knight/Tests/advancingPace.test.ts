@@ -13,7 +13,6 @@ import { ActorEffect, TargetEffect } from "../../../../effects";
 import {
   setupSkillTestMocks,
   createTestActor,
-  createTestTarget,
   clearCharacterRegistry,
   DEFAULT_TEST_LOCATION,
 } from "../../../testHelpers";
