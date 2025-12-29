@@ -84,9 +84,9 @@ export const PartyMemberCard: React.FC<PartyMemberCardProps> = ({
       {needs && (
         <Box sx={{ mb: nextAction ? 1.5 : 0 }}>
           <CharacterNeedsBar
-            mood={typeof needs.mood === 'number' ? needs.mood : (needs.mood?.current ?? 0) / (needs.mood?.max ?? 100) * 100}
-            energy={typeof needs.energy === 'number' ? needs.energy : (needs.energy?.current ?? 0) / (needs.energy?.max ?? 100) * 100}
-            satiety={typeof needs.satiety === 'number' ? needs.satiety : (needs.satiety?.current ?? 0) / (needs.satiety?.max ?? 100) * 100}
+            mood={Math.round(typeof needs.mood === 'number' ? needs.mood : (needs.mood?.current ?? 0) / (needs.mood?.max ?? 100) * 100)}
+            energy={Math.round(typeof needs.energy === 'number' ? needs.energy : (needs.energy?.current ?? 0) / (needs.energy?.max ?? 100) * 100)}
+            satiety={Math.round(typeof needs.satiety === 'number' ? needs.satiety : (needs.satiety?.current ?? 0) / (needs.satiety?.max ?? 100) * 100)}
             compact={false}
           />
         </Box>

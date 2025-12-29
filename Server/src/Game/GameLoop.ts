@@ -20,6 +20,7 @@ import { getGameLoopMode } from "../config/gameLoop";
 import { persistLastProcessedPhase } from "../Database/gameStateStore";
 import { saveDailyState } from "../Database/persistence";
 import { railTravelManager } from "./TravelManager/Rail/index.ts";
+import { gameStateEventService } from "../Services/GameStateEventService";
 
 type RunGameLoopOptions = {
   now?: Date;
@@ -215,10 +216,18 @@ async function processEvents(
   
   const phaseDecayNews: News[] = [];
   
+  Report.info(`[GameLoop.processEvents] Applying phase decay to ${characterManager.characters.length} characters`);
+  
   for (const character of characterManager.characters) {
+    const satietyBefore = character.needs.satiety.current;
+    const energyBefore = character.needs.energy.current;
+    const moodBefore = character.needs.mood.current;
+    
     character.needs.decSatiety(3);
     character.needs.decEnergy(2);
     // Mood does not auto-decay
+    
+    Report.info(`[GameLoop.processEvents] Character ${character.id} (${typeof character.name === 'string' ? character.name : character.name?.en || 'unknown'}) needs: satiety ${satietyBefore}->${character.needs.satiety.current} (-3), energy ${energyBefore}->${character.needs.energy.current} (-2), mood ${moodBefore}`);
     
     // Process permanent buff/debuff decay
     // Iterate through buffs with isPerm === true
@@ -336,6 +345,7 @@ async function processEvents(
     phase,
   );
 
+  Report.info(`[GameLoop.processEvents] Processing travel for day=${day}, phase=${phase}`);
   const tra: NewsDistribution = await travelManager.allTravel(day, phase);
   const rail: NewsDistribution = await railTravelManager.allTravel(day, phase);
   
@@ -349,7 +359,13 @@ async function processEvents(
 }
 
 async function sendPartyData(news: NewsDistribution) {
+  // Send news updates via Postman
   postman.deliver(news);
+  
+  // Send game state updates (party, location, game time) to all connected users
+  Report.info("[GameLoop] Calling broadcastGameStateUpdate");
+  gameStateEventService.broadcastGameStateUpdate();
+  Report.info("[GameLoop] Completed broadcastGameStateUpdate");
 }
 
 async function processPhaseInternal(options: ProcessPhaseOptions): Promise<void> {

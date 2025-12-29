@@ -4,6 +4,7 @@ import type { Party } from "../../Entity/Party/Party";
 import type { LocationsEnum } from "../../InterFacesEnumsAndTypes/Enums/Location";
 import { statMod } from "../../Utils/statMod";
 import type { TravelMethodEnum } from "./TravelMethod";
+import Report from "../../Utils/Reporter";
 
 export class TravelingParty {
   party: Party;
@@ -76,9 +77,17 @@ export class TravelingParty {
   }
 
   getTravelSpeedOnSubRegion(): number {
-    const baseSpeed = 30 + statMod(this.getAverageAgility()); // Will need to think of equipment later on
+    const averageAgility = this.getAverageAgility();
+    const agilityMod = statMod(averageAgility);
+    const baseSpeed = 30 + agilityMod;
+    
+    Report.info(`[TravelingParty.getTravelSpeedOnSubRegion] averageAgility=${averageAgility}, agilityMod=${agilityMod}, baseSpeed=${baseSpeed}`);
+    
     let paceModifier = 0;
-    switch (this.party.behavior.travelPace) {
+    const travelPace = this.party.behavior.travelPace;
+    Report.info(`[TravelingParty.getTravelSpeedOnSubRegion] travelPace="${travelPace}"`);
+    
+    switch (travelPace) {
       case "bold":
         paceModifier = 1.3;
         break;
@@ -88,10 +97,43 @@ export class TravelingParty {
       case "careful":
         paceModifier = 0.7;
         break;
+      default:
+        Report.error(`[TravelingParty.getTravelSpeedOnSubRegion] Unknown travel pace: "${travelPace}"`);
+        paceModifier = 1; // Default to measured pace
+        break;
     }
-    const subRegion = subregionRepository[locationRepository[this.currentLocation]!.subRegion]
-      .getSpeedBonusFor(this.currentTravelMethod); // Likely be multiplier like walk:1, horse: 2, caravan: 0.7 etc, base on subRegion context;
-    return baseSpeed * paceModifier * subRegion;
+    
+    Report.info(`[TravelingParty.getTravelSpeedOnSubRegion] paceModifier=${paceModifier}`);
+    
+    const location = locationRepository[this.currentLocation];
+    if (!location) {
+      Report.error(`[TravelingParty.getTravelSpeedOnSubRegion] Location not found: ${this.currentLocation}`);
+      return 0;
+    }
+    
+    const subRegionObj = subregionRepository[location.subRegion];
+    if (!subRegionObj) {
+      Report.error(`[TravelingParty.getTravelSpeedOnSubRegion] SubRegion not found for location ${this.currentLocation}, subRegion=${location.subRegion}`);
+      return 0;
+    }
+    
+    const speedBonus = subRegionObj.getSpeedBonusFor(this.currentTravelMethod); // TravelMethodEnum values match "walk" | "horse" | "caravan"
+    Report.info(`[TravelingParty.getTravelSpeedOnSubRegion] currentTravelMethod=${this.currentTravelMethod}, speedBonus=${speedBonus}`);
+    
+    if (speedBonus === undefined || speedBonus === null) {
+      Report.error(`[TravelingParty.getTravelSpeedOnSubRegion] Speed bonus is undefined/null for travel method ${this.currentTravelMethod}`);
+      return 0;
+    }
+    
+    // speedBonus is an ADDITIVE modifier (like getTravelBonus), not multiplicative
+    // Positive values = bonus, negative values = penalty, 0 = neutral
+    // First calculate base speed with pace modifier, then add terrain bonus
+    const speedWithBonus = baseSpeed + speedBonus;
+    const speedWithPace = speedWithBonus * paceModifier;
+    const result = Math.max(0, speedWithPace); // Ensure non-negative
+    Report.info(`[TravelingParty.getTravelSpeedOnSubRegion] Final calculation: (${baseSpeed} + ${speedBonus}) * ${paceModifier} = ${speedWithBonus} * ${paceModifier} = ${result}`);
+    
+    return result;
   }
 
   getAverageMood(): number {

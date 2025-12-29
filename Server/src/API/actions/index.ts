@@ -74,13 +74,26 @@ function getAllowedActionsForParty(party: Party): ActionInput[] {
     return [ActionInput.None];
   }
 
-  // If traveling, only allow travel-related actions
-  if (travelState.isTraveling || travelState.isOnRail) {
+  // If actively on rail travel, only allow rail-related actions
+  if (travelState.isOnRail) {
     return [ActionInput.None, ActionInput.Rest];
   }
 
-  // Return location's available actions
-  return location.actions || [ActionInput.None];
+  // If party has a destination set (isTraveling = true), they can still do normal actions
+  // Travel will only happen when they schedule Travel action in a specific slot
+  // Return location's available actions plus Travel (if destination is set)
+  const locationActions = location.actions || [ActionInput.None];
+  
+  // Add Travel to available actions if party has a destination set
+  if (travelState.isTraveling) {
+    const travelingParty = travelManager.travelingParties.get(party.partyID);
+    if (travelingParty && travelingParty.path.length > 0) {
+      // Party has a destination, Travel action is available
+      return [...locationActions, ActionInput.Travel];
+    }
+  }
+
+  return locationActions;
 }
 
 // Schema for request validation
@@ -401,8 +414,31 @@ export const actionsRoutes = new Elysia({ prefix: "/actions" })
             // None action is always allowed
             if (actionType === ActionInput.None) continue;
             
-            // Travel and RailTravel are always allowed (they're handled separately)
-            if (actionType === ActionInput.Travel || actionType === ActionInput.RailTravel) {
+            // RailTravel is always allowed (handled separately)
+            if (actionType === ActionInput.RailTravel) {
+              continue;
+            }
+            
+            // Validate Travel action - party must have a destination set
+            if (actionType === ActionInput.Travel) {
+              const travelingParty = travelManager.travelingParties.get(party.partyID);
+              if (!travelingParty || travelingParty.path.length === 0) {
+                // No destination set, convert Travel to Rest
+                updatedCAS[day][time] = { type: ActionInput.Rest } as CharacterAction;
+                convertedActions.push({
+                  day,
+                  time,
+                  originalAction: ActionInput.Travel,
+                  convertedTo: ActionInput.Rest,
+                  reason: "Cannot travel: no destination set. Set a destination first.",
+                });
+                Report.debug("Travel action converted to Rest - no destination set", {
+                  partyId: party.partyID,
+                  day,
+                  time,
+                });
+              }
+              // If destination is set, allow Travel action (continue)
               continue;
             }
             

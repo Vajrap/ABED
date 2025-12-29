@@ -1,5 +1,5 @@
 class RestHandler {
-    private API_BASE_URL = "http://localhost:7890";
+    private API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:7890";
     private DEFAULT_TIMEOUT = 10000;
 
     async makeRequest<REQ, RES>(

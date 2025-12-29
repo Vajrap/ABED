@@ -21,7 +21,7 @@ class WebSocketService {
   private reconnectTimeoutId: NodeJS.Timeout | null = null;
   private messageHandlers: Map<string, MessageHandler[]> = new Map();
   private connectionState: "disconnected" | "connecting" | "connected" = "disconnected";
-  private apiBaseUrl = "http://localhost:7890";
+  private apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:7890";
 
   /**
    * Get current connection state
@@ -53,7 +53,9 @@ class WebSocketService {
     }
 
     this.connectionState = "connecting";
-    const wsUrl = `ws://localhost:7890/ws?token=${encodeURIComponent(token)}`;
+    // Convert http:// to ws:// for WebSocket URL
+    const wsBaseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:7890").replace(/^http/, "ws");
+    const wsUrl = `${wsBaseUrl}/ws?token=${encodeURIComponent(token)}`;
 
     try {
       this.ws = new WebSocket(wsUrl);

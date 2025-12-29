@@ -18,7 +18,7 @@ import Report from "../Utils/Reporter";
 const MAX_EXCHANGES_FREE = 10;
 const MAX_EXCHANGES_VIP = 50; // 5x free limit
 
-export type UserTier = "free" | "vip" | "premium";
+export type UserTier = "free" | "vip" | "premium" | "admin";
 
 export interface RateLimitResult {
   allowed: boolean;

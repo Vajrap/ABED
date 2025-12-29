@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Typography, alpha, useTheme, CircularProgress, Alert } from "@mui/material";
+import { Box, Typography, alpha, useTheme, CircularProgress, Alert, Button } from "@mui/material";
 import {
   GameSidebar,
   PartyMemberCard,
@@ -24,6 +24,9 @@ import { convertActionSequenceToSchedule } from "@/utils/actionSequence";
 import { handleScheduleSave } from "@/utils/scheduleHandling";
 import { getCharacterSkillsMap } from "@/utils/characterHelpers";
 import type { CharacterInterface, PartyInterface } from "@/types/api";
+import { adminService } from "@/services/adminService";
+import { authService } from "@/services/authService";
+import FastForwardIcon from "@mui/icons-material/FastForward";
 
 const ENABLE_REDIRECTS = process.env.NEXT_PUBLIC_ENABLE_GAME_REDIRECTS !== "false";
 
@@ -37,6 +40,8 @@ export default function GameView() {
   const [skillsModalOpen, setSkillsModalOpen] = useState(false);
   const [travelModalOpen, setTravelModalOpen] = useState(false);
   const [travelDestinationName, setTravelDestinationName] = useState<string | undefined>(undefined);
+  const [isTriggeringPhase, setIsTriggeringPhase] = useState(false);
+  const [userTier, setUserTier] = useState<"free" | "vip" | "premium" | "admin" | null>(null);
 
   // Custom hooks
   const { isCheckingAuth } = useGameAuth();
@@ -48,7 +53,28 @@ export default function GameView() {
     location,
     news,
     gameTime,
+    setLocation,
+    setGameTime,
   } = useGameData(isCheckingAuth);
+
+  // Fetch user tier on mount
+  React.useEffect(() => {
+    const fetchUserTier = async () => {
+      try {
+        const response = await authService.autoAuth();
+        console.log("[GameView] autoAuth response:", response);
+        if (response.success && response.user?.tier) {
+          console.log("[GameView] Setting user tier to:", response.user.tier);
+          setUserTier(response.user.tier);
+        } else {
+          console.log("[GameView] No tier found in response:", response);
+        }
+      } catch (error) {
+        console.error("[GameView] Error fetching user tier:", error);
+      }
+    };
+    fetchUserTier();
+  }, []);
   
   // Sync travel destination name with party state
   React.useEffect(() => {
@@ -75,7 +101,26 @@ export default function GameView() {
     }
   }, [party?.isTraveling, party?.travelDestination, travelDestinationName]);
   
-  useGameWebSocket();
+  // Handle game state updates from WebSocket
+  useGameWebSocket({
+    onGameStateUpdate: (data) => {
+      // Update party state
+      if (data.party && setParty) {
+        setParty(data.party);
+      }
+      
+      // Update location state
+      if (data.location && setLocation) {
+        setLocation(data.location);
+      }
+      
+      // Update game time
+      if (data.gameTime && setGameTime) {
+        setGameTime(data.gameTime);
+      }
+    },
+  });
+  
   useGameKeyboardShortcuts({
     onNewsOpen: () => setNewsModalOpen(true),
     onScheduleOpen: () => setScheduleModalOpen(true),
@@ -265,11 +310,12 @@ export default function GameView() {
               position: "absolute",
               top: 24,
               right: 24,
-              zIndex: 5, // Lower z-index so fullscreen chat (9999) appears above
+              zIndex: 100, // Higher z-index to ensure buttons are clickable
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-end",
               gap: 1.5,
+              pointerEvents: "auto", // Ensure clicks work
             }}
           >
             <GameTimeAndLocation
@@ -278,7 +324,36 @@ export default function GameView() {
               subRegion={location.subRegion}
               locationName={location.name}
             />
-            <SettingsButton onClick={() => setSettingsModalOpen(true)} />
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center", pointerEvents: "auto" }}>
+              {userTier === "admin" && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<FastForwardIcon />}
+                  onClick={async () => {
+                    console.log("[GameView] Next Phase button clicked");
+                    setIsTriggeringPhase(true);
+                    try {
+                      const result = await adminService.triggerNextPhase();
+                      console.log("[GameView] Next Phase result:", result);
+                      if (!result.success) {
+                        alert(`Failed to trigger next phase: ${result.error}`);
+                      }
+                    } catch (error) {
+                      console.error("[GameView] Error triggering next phase:", error);
+                      alert("Error triggering next phase");
+                    } finally {
+                      setIsTriggeringPhase(false);
+                    }
+                  }}
+                  disabled={isTriggeringPhase}
+                  sx={{ minWidth: 120, pointerEvents: "auto" }}
+                >
+                  {isTriggeringPhase ? "Processing..." : "Next Phase"}
+                </Button>
+              )}
+              <SettingsButton onClick={() => setSettingsModalOpen(true)} />
+            </Box>
           </Box>
 
           {/* Party Members - Single Row, Left Aligned - Floating inside image box */}

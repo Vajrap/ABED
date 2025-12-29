@@ -17,6 +17,12 @@ export interface AuthResponse {
   token?: string;
   message?: string;
   messageKey?: string;
+  user?: {
+    id: string;
+    email?: string;
+    username: string;
+    tier?: "free" | "vip" | "premium" | "admin";
+  };
 }
 
 export interface ApiError {
@@ -72,11 +78,15 @@ class AuthService {
   }
 
   /**
-   * Auto authentication (placeholder for JWT validation)
+   * Auto authentication (uses Authorization header)
    */
   async autoAuth(): Promise<AuthResponse> {
     try {
-      const response = await restHandler.post<null, AuthResponse>("/api/auth/auto", null);
+      const response = await restHandler.post<null, AuthResponse>(
+        "/api/auth/auto",
+        null,
+        true // requireAuth - sends token in Authorization header
+      );
       return response;
     } catch (error) {
       console.error("Auto auth error:", error);

@@ -106,9 +106,11 @@ export function useGameData(isCheckingAuth: boolean) {
     party,
     setParty,
     location,
+    setLocation,
     news,
     unseenNews,
     gameTime,
+    setGameTime,
   };
 }
 

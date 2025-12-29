@@ -29,9 +29,10 @@ export const CharacterNeedsBar: React.FC<CharacterNeedsBarProps> = ({
 
   // Get label for tooltip
   const getStatusLabel = (value: number, type: string): string => {
-    if (value >= 70) return `${type}: Good (${value}%)`;
-    if (value >= 40) return `${type}: Moderate (${value}%)`;
-    return `${type}: Low (${value}%)`;
+    const roundedValue = Math.round(value);
+    if (roundedValue >= 70) return `${type}: Good (${roundedValue}%)`;
+    if (roundedValue >= 40) return `${type}: Moderate (${roundedValue}%)`;
+    return `${type}: Low (${roundedValue}%)`;
   };
 
   if (compact) {

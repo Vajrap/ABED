@@ -24,18 +24,22 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
     return { success: false, messageKey: "auth.routeError" };
   })
   /**
-   * POST /api/auth/auto - Auto authentication (placeholder for JWT validation)
+   * POST /api/auth/auto - Auto authentication (uses Authorization header)
    */
-  .post("/auto", async ({ body, headers, set }) => {
+  .post("/auto", async ({ headers, set }) => {
   Report.debug("Auth auto route hit", {
     route: "/auth/auto",
   });
   try {
-      const { token } = body as { token?: string };
-
-    if (!token) {
+      const authHeader = headers.authorization;
+      if (!authHeader) {
         return { success: false, messageKey: "auth.noToken" };
-    }
+      }
+
+      const token = authHeader.split(" ")[1];
+      if (!token) {
+        return { success: false, messageKey: "auth.noToken" };
+      }
 
     // Validate the session token
     const user = await SessionService.validateSession(token);
@@ -44,14 +48,15 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
         return { success: false, messageKey: "auth.invalidSession" };
     }
 
-    Report.info(`Auto auth successful for user ${user.email}`);
+    Report.info(`Auto auth successful for user ${user.username || user.id}`);
     
       return {
       success: true,
       user: {
         id: user.id,
-        email: user.email,
-        username: user.username
+        email: user.email || undefined,
+        username: user.username,
+        tier: user.tier
       }
       };
   } catch (error) {

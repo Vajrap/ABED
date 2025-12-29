@@ -923,9 +923,9 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                       const needValue = character.needs?.[key as keyof typeof character.needs];
                       let current = 0;
                       if (typeof needValue === 'number') {
-                        current = needValue;
+                        current = Math.round(needValue);
                       } else if (needValue && typeof needValue === 'object' && 'current' in needValue) {
-                        current = (needValue as any).current ?? 0;
+                        current = Math.round((needValue as any).current ?? 0);
                       }
                       const percentage = Math.min(100, Math.max(0, current));
                       

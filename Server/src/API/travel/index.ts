@@ -148,11 +148,19 @@ export const travelRoutes = new Elysia({ prefix: "/travel" })
           };
         }
 
-        // 13. Set party as traveling
+        // 13. Set party as traveling (has destination, but not actively traveling yet)
+        // The party will start traveling when they schedule Travel action in their action sequence
         party.isTraveling = true;
         const finalTravelingParty = travelManager.travelingParties.get(party.partyID);
         if (finalTravelingParty) {
-          finalTravelingParty.isTraveling = true;
+          // Don't set isTraveling on TravelingParty yet - it will be set when Travel action is actually processed
+          // finalTravelingParty.isTraveling = true;
+          Report.info("Travel destination set - party ready to schedule Travel actions", {
+            partyId: party.partyID,
+            from: party.location,
+            to: destination,
+            path: finalTravelingParty.path,
+          });
         }
 
         // 14. Map party to interface for response

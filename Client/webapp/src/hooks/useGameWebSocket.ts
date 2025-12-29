@@ -1,8 +1,18 @@
 import { useEffect } from "react";
 import { websocketService } from "@/services/websocketService";
 import { questService } from "@/services/questService";
+import type { PartyInterface, GameTimeInterface } from "@/types/api";
+import type { LocationData } from "@/services/locationService";
 
-export function useGameWebSocket() {
+export interface UseGameWebSocketOptions {
+  onGameStateUpdate?: (data: {
+    party: PartyInterface;
+    location: LocationData;
+    gameTime: GameTimeInterface;
+  }) => void;
+}
+
+export function useGameWebSocket(options?: UseGameWebSocketOptions) {
   useEffect(() => {
     if (!websocketService.isConnected()) {
       websocketService.connect();
@@ -25,9 +35,21 @@ export function useGameWebSocket() {
       }
     });
 
+    const unsubscribeGameState = websocketService.onMessage("GAME_STATE_UPDATE", (message) => {
+      const gameStateData = message.data;
+      if (gameStateData && options?.onGameStateUpdate) {
+        options.onGameStateUpdate({
+          party: gameStateData.party,
+          location: gameStateData.location,
+          gameTime: gameStateData.gameTime,
+        });
+      }
+    });
+
     return () => {
       unsubscribeQuestState();
+      unsubscribeGameState();
     };
-  }, []);
+  }, [options?.onGameStateUpdate]);
 }
 

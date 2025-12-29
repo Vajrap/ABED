@@ -248,10 +248,11 @@ export function mapCharacterToInterface(character: Character): CharacterInterfac
       for (const [key, value] of Object.entries(needsData)) {
         if (value && typeof value === 'object' && 'current' in value) {
           // CharacterNeed structure: { bonus, current } - max is always 100
+          // Use ?? instead of || to handle 0 values correctly
           result[key] = {
-            current: (value as any).current || 50,
+            current: (value as any).current ?? 50,
             max: 100,
-            bonus: (value as any).bonus || 0,
+            bonus: (value as any).bonus ?? 0,
           };
         } else if (typeof value === 'number') {
           result[key] = {

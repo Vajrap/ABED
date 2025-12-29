@@ -18,9 +18,22 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET || "change-me-in-production";
 
 /**
  * Check if request is from admin
- * Currently uses ADMIN_SECRET header, but can be extended to check user tier
+ * Checks user tier from session (ADMIN tier) or falls back to ADMIN_SECRET header
  */
-function isAdminRequest(headers: Record<string, string | undefined>): boolean {
+async function isAdminRequest(headers: Record<string, string | undefined>, token?: string): Promise<boolean> {
+  // First, try to check user tier from session
+  if (token) {
+    try {
+      const user = await SessionService.validateSession(token);
+      if (user && user.tier === "admin") {
+        return true;
+      }
+    } catch (error) {
+      // Fall through to admin secret check
+    }
+  }
+  
+  // Fallback to admin secret header check
   const adminSecret = headers["x-admin-secret"];
   return adminSecret === ADMIN_SECRET;
 }
@@ -189,11 +202,13 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
     async ({ headers, set }) => {
       try {
         // Check admin authentication
-        if (!isAdminRequest(headers)) {
+        const authHeader = headers.authorization;
+        const token = authHeader?.split(" ")[1];
+        if (!(await isAdminRequest(headers, token))) {
           set.status = 401;
           return { 
             success: false, 
-            error: "Unauthorized. Admin secret required." 
+            error: "Unauthorized. Admin tier or secret required." 
           };
         }
 
@@ -237,5 +252,69 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       message: "Admin API is running",
       timestamp: new Date().toISOString(),
     };
-  });
+  })
+  /**
+   * POST /api/admin/next-phase
+   * Force the game loop to process the next phase immediately
+   * Requires X-Admin-Secret header
+   * TODO: Check user tier (ADMIN) instead of/in addition to admin secret
+   */
+  .post(
+    "/next-phase",
+    async ({ headers, set }) => {
+      try {
+        // Check admin authentication
+        const authHeader = headers.authorization;
+        const token = authHeader?.split(" ")[1];
+        if (!(await isAdminRequest(headers, token))) {
+          set.status = 401;
+          return { 
+            success: false, 
+            error: "Unauthorized. Admin tier required." 
+          };
+        }
+
+        Report.info("🚀 Admin triggered next phase...");
+        
+        // Import GameTime and runGameLoop here to avoid circular dependencies
+        const { GameTime } = await import("../../Game/GameTime/GameTime");
+        const { runGameLoop } = await import("../../Game/GameLoop");
+        const { getMsPerPhase } = await import("../../config/gameLoop");
+        
+        // Get current phase and advance to next
+        const currentPhaseIndex = GameTime.getCurrentPhaseIndex();
+        const nextPhaseIndex = currentPhaseIndex + 1;
+        
+        // Compute timestamp for the next phase
+        const nextPhaseTimestamp = GameTime.computePhaseTimestamp(nextPhaseIndex);
+        
+        Report.info(`Advancing from phase ${currentPhaseIndex} to phase ${nextPhaseIndex}`);
+        
+        // Process the next phase
+        await runGameLoop({ 
+          now: nextPhaseTimestamp,
+          label: "admin-trigger", 
+          force: true,
+          skipBacklog: true 
+        });
+        
+        Report.info("✅ Next phase processed successfully");
+        
+        return {
+          success: true,
+          message: "Next phase processed successfully",
+        };
+      } catch (error) {
+        Report.error("Error processing next phase", {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
+        set.status = 500;
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        };
+      }
+    }
+  );
 
