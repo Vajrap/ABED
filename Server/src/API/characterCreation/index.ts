@@ -19,15 +19,14 @@ const CharacterCreationSchema = t.Object({
   portrait: t.Union([
     t.String({ minLength: 1 }), // Legacy string format
     t.Object({ // New PortraitData format
-      base: t.String(),
-      jaw: t.String(),
-      eyes: t.String(),
-      eyes_color: t.String(),
-      face: t.String(),
+      base: t.Number(),
+      jaw: t.Number(),
+      eyes: t.Number(),
+      eyes_color: t.Number(),
+      face: t.Number(),
       beard: t.Union([t.Number(), t.Null()]),
-      hair_top: t.String(),
-      hair_bot: t.String(),
-      hair_color: t.String(),
+      hair: t.Number(),
+      hair_color: t.Number(),
     }),
   ]),
   background: t.String(),

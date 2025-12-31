@@ -12,13 +12,12 @@ export interface AssetCatalog {
 }
 
 export interface PortraitPartOptions {
-  base: string[];
-  jaw: string[];
-  eyes: string[];
-  face: string[];
-  beard: number[]; // Beard numbers 1-6 (tied to jaw)
-  hair_top: string[];
-  hair_bot: string[];
+  base: number[];
+  jaw: number[];
+  eyes: number[];
+  face: number[];
+  beard: number[]; // Beard numbers 1-6
+  hair: number[]; // Hair style numbers
 }
 
 // Race to body color mapping
@@ -92,21 +91,30 @@ class PortraitAssetService {
    * Get available base colors, filtered by race
    * Includes filtered colors (c7, c8, etc.) that are CSS-filtered versions of c1
    */
-  async getBaseColors(race?: string): Promise<string[]> {
+  async getBaseColors(race?: string): Promise<number[]> {
     const catalog = await this.getPortraitCatalog();
     const basePath = "/img/portraits/base";
     const allBases = catalog[basePath] || [];
 
-    if (!race) {
-      // Include all physical files plus filtered variants
-      return [...allBases, "base_c7.png", "base_c8.png"];
-    }
-
     // Filter by race body color preferences
-    const raceKey = race.charAt(0).toUpperCase() + race.slice(1).toLowerCase();
+    const raceKey = race ? race.charAt(0).toUpperCase() + race.slice(1).toLowerCase() : "Human";
     const preferredColors = RACE_BODY_COLOR_MAP[raceKey] || RACE_BODY_COLOR_MAP["Human"];
 
-    const result: string[] = [];
+    const result: Set<number> = new Set();
+    
+    if (!race) {
+       // If no race, find all cX numbers
+        allBases.forEach((base) => {
+            const colorMatch = base.match(/c(\d+)/);
+            if (colorMatch) {
+                result.add(parseInt(colorMatch[1], 10));
+            }
+        });
+        // Add defaults just in case
+        result.add(7);
+        result.add(8);
+        return Array.from(result).sort((a,b) => a-b);
+    }
     
     // Add physical files that match preferred colors
     allBases.forEach((base) => {
@@ -114,173 +122,104 @@ class PortraitAssetService {
       if (!colorMatch) return;
       const colorNum = parseInt(colorMatch[1], 10);
       if (preferredColors.includes(colorNum)) {
-        result.push(base);
+        result.add(colorNum);
       }
     });
 
     // Add filtered variants (c7, c8, etc.) if they're in preferred colors
-    if (preferredColors.includes(7)) {
-      result.push("base_c7.png");
-    }
-    if (preferredColors.includes(8)) {
-      result.push("base_c8.png");
-    }
+    if (preferredColors.includes(7)) result.add(7);
+    if (preferredColors.includes(8)) result.add(8);
 
-    return result;
+    return Array.from(result).sort((a,b) => a-b);
   }
 
   /**
    * Get available jaw options
    */
-  async getJawOptions(): Promise<string[]> {
+  async getJawOptions(): Promise<number[]> {
     const catalog = await this.getPortraitCatalog();
-    const jaws: string[] = [];
+    const jaws: Set<number> = new Set();
 
     // Extract unique jaw IDs from paths like "/img/portraits/jaw/jaw1"
     Object.keys(catalog).forEach((path) => {
       if (path.includes("/jaw/jaw")) {
         const match = path.match(/jaw(\d+)/);
-        if (match && !jaws.includes(`jaw${match[1]}`)) {
-          jaws.push(`jaw${match[1]}`);
+        if (match) {
+          jaws.add(parseInt(match[1], 10));
         }
       }
     });
 
-    return jaws.sort((a, b) => {
-      // Extract numeric part for numeric sorting (e.g., "jaw1" -> 1, "jaw10" -> 10)
-      const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
-      const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
-      return numA - numB;
-    });
+    return Array.from(jaws).sort((a, b) => a - b);
   }
 
   /**
    * Get available eye options
    */
-  async getEyesOptions(): Promise<string[]> {
+  async getEyesOptions(): Promise<number[]> {
     const catalog = await this.getPortraitCatalog();
-    const eyes: string[] = [];
+    const eyes: Set<number> = new Set();
 
     Object.keys(catalog).forEach((path) => {
       // Assetmaker uses /img/portraits/eyes/eye1 structure
       if (path.includes("/eyes/eye") && !path.includes("/beard")) {
         const match = path.match(/\/eyes\/(eye\d+)/);
-        if (match && !eyes.includes(match[1])) {
-          eyes.push(match[1]); // Returns eye1, eye2, etc.
+        if (match) {
+            const num = parseInt(match[1].replace("eye", ""), 10);
+            eyes.add(num);
         }
       }
     });
 
-    return eyes.sort((a, b) => {
-      // Extract numeric part for numeric sorting (e.g., "eye1" -> 1, "eye10" -> 10)
-      const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
-      const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
-      return numA - numB;
-    });
+    return Array.from(eyes).sort((a, b) => a - b);
   }
 
   /**
    * Get available face options
    */
-  async getFaceOptions(): Promise<string[]> {
+  async getFaceOptions(): Promise<number[]> {
     const catalog = await this.getPortraitCatalog();
-    const faces: string[] = [];
+    const faces: Set<number> = new Set();
 
     Object.keys(catalog).forEach((path) => {
       if (path.includes("/face/face")) {
         const match = path.match(/face(\d+)/);
-        if (match && !faces.includes(`face${match[1]}`)) {
-          faces.push(`face${match[1]}`);
+        if (match) {
+          faces.add(parseInt(match[1], 10));
         }
       }
     });
 
-    return faces.sort((a, b) => {
-      // Extract numeric part for numeric sorting (e.g., "face1" -> 1, "face10" -> 10)
-      const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
-      const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
-      return numA - numB;
-    });
+    return Array.from(faces).sort((a, b) => a - b);
   }
 
   /**
    * Get all available beard options (independent of jaw)
    */
-  async getBeardOptions(): Promise<string[]> {
-    const catalog = await this.getPortraitCatalog();
-    const beards: string[] = [];
-
-    // Extract all beard options regardless of jaw
-    // Paths like "/img/portraits/beard/jaw1_beard/jaw1_beard1"
-    Object.keys(catalog).forEach((path) => {
-      if (path.includes("/beard/") && path.match(/\/beard\/jaw\d+_beard\//)) {
-        // Match the full beard ID like "jaw1_beard1" from path "/img/portraits/beard/jaw1_beard/jaw1_beard1"
-        const match = path.match(/\/beard\/jaw\d+_beard\/(jaw\d+_beard\d+)$/);
-        if (match && !beards.includes(match[1])) {
-          beards.push(match[1]);
-        }
-      }
-    });
-
-    return beards.sort((a, b) => {
-      // Extract jaw and beard numbers for numeric sorting (e.g., "jaw1_beard1" -> jaw: 1, beard: 1)
-      const matchA = a.match(/jaw(\d+)_beard(\d+)/);
-      const matchB = b.match(/jaw(\d+)_beard(\d+)/);
-      if (!matchA || !matchB) return a.localeCompare(b); // Fallback to string sort if format doesn't match
-      
-      const jawA = parseInt(matchA[1], 10);
-      const jawB = parseInt(matchB[1], 10);
-      if (jawA !== jawB) {
-        return jawA - jawB; // Sort by jaw first
-      }
-      
-      const beardA = parseInt(matchA[2], 10);
-      const beardB = parseInt(matchB[2], 10);
-      return beardA - beardB; // Then sort by beard number
-    });
+  async getBeardOptions(): Promise<number[]> {
+      // Beards are always 1-6
+      return [1, 2, 3, 4, 5, 6]; 
   }
 
   /**
-   * Get available hair options
+   * Get available hair options (numbers)
    */
-  async getHairOptions(): Promise<string[]> {
+  async getHairOptions(): Promise<number[]> {
     const catalog = await this.getPortraitCatalog();
-    const hairs: Set<string> = new Set();
+    const hairNums: Set<number> = new Set();
 
     Object.keys(catalog).forEach((path) => {
       // Assetmaker uses /img/portraits/hair/f1/top or /img/portraits/hair/m1/top
       if (path.includes("/hair/") && path.includes("/top")) {
-        // Match f1, f2, etc. (female hair) - keep as f1, f2
-        const fMatch = path.match(/\/hair\/(f\d+)\//);
-        if (fMatch) {
-          hairs.add(fMatch[1]); // Keep as f1, f2, etc.
-        }
-        // Match m1, m2, etc. (male hair) - keep as m1, m2
-        const mMatch = path.match(/\/hair\/(m\d+)\//);
-        if (mMatch) {
-          hairs.add(mMatch[1]); // Keep as m1, m2, etc.
-        }
-        // Also handle hair1, hair2 format if it exists
-        const hairMatch = path.match(/\/hair\/(hair\d+)\//);
-        if (hairMatch) {
-          hairs.add(hairMatch[1]);
+        // Match f1, m1, hair1
+        const numMatch = path.match(/\/hair\/[fm]?hair?(\d+)/) || path.match(/\/hair\/[fm](\d+)/);
+        if (numMatch) {
+          hairNums.add(parseInt(numMatch[1], 10));
         }
       }
     });
 
-    return Array.from(hairs).sort((a, b) => {
-      // Extract numeric part for numeric sorting (e.g., "m1" -> 1, "m10" -> 10, "f1" -> 1)
-      // Handle both "m1", "f1", "hair1" formats
-      const numA = parseInt(a.match(/\d+/)?.[0] || "0", 10);
-      const numB = parseInt(b.match(/\d+/)?.[0] || "0", 10);
-      // First sort by prefix (f, m, hair), then by number
-      const prefixA = a.match(/^(f|m|hair)/)?.[0] || "";
-      const prefixB = b.match(/^(f|m|hair)/)?.[0] || "";
-      if (prefixA !== prefixB) {
-        return prefixA.localeCompare(prefixB);
-      }
-      return numA - numB;
-    });
+    return Array.from(hairNums).sort((a, b) => a - b);
   }
 
   /**
@@ -296,24 +235,15 @@ class PortraitAssetService {
     ]);
 
     // Extract color numbers from base filenames for use in other parts
-    const baseColorNums = baseColors
-      .map((base) => {
-        const match = base.match(/c(\d+)/);
-        return match ? parseInt(match[1], 10) : null;
-      })
-      .filter((num): num is number => num !== null);
-
-    // Get hair options using the dedicated function
-    const hairOptions = await this.getHairOptions();
+    // (Already numbers now)
 
     return {
-      base: baseColorNums.map((num) => `c${num}`),
+      base: baseColors,
       jaw: jaws,
-      eyes: eyes, // Already in eye1, eye2 format from getEyesOptions
+      eyes: eyes,
       face: faces,
       beard: [1, 2, 3, 4, 5, 6], // Beard numbers 1-6 (tied to jaw)
-      hair_top: hairOptions.map((hair) => `${hair}_top`), // f1_top, m1_top, etc.
-      hair_bot: hairOptions.map((hair) => `${hair}_bot`), // f1_bot, m1_bot, etc.
+      hair: hairs, // [1, 2, 3...]
     };
   }
 
@@ -322,8 +252,8 @@ class PortraitAssetService {
    */
   async getPortraitPartPath(
     part: keyof PortraitData, 
-    value: string, 
-    baseColor?: string,
+    value: number, 
+    baseColor: number = 1,
     portrait?: PortraitData
   ): Promise<string | null> {
     const catalog = await this.getPortraitCatalog();
@@ -333,63 +263,54 @@ class PortraitAssetService {
       const files = catalog[basePath] || [];
       
       // Handle filtered colors (c7, c8, etc.) - these use c1 as base with CSS filters
-      const colorMatch = value.match(/c(\d+)/);
-      if (colorMatch) {
-        const colorNum = parseInt(colorMatch[1], 10);
-        if (colorNum >= 7) {
+      if (value >= 7) {
           // Filtered colors use c1 as the base image
-          // The filter will be applied in PortraitRenderer
           const c1File = files.find((f) => f.includes("c1"));
           return c1File ? `${basePath}/${c1File}` : null;
-        }
       }
       
-      const file = files.find((f) => f === value || f.includes(value));
+      const file = files.find((f) => f === `base_c${value}.png` || f.includes(`c${value}`));
       return file ? `${basePath}/${file}` : null;
     }
 
     if (part === "jaw") {
-      const jawPath = `/img/portraits/jaw/${value}`;
+      const jawPath = `/img/portraits/jaw/jaw${value}`;
       const files = catalog[jawPath] || [];
       // Find file matching base color
-      const color = baseColor || "c1";
-      const file = files.find((f) => f.includes(color));
+      const color = portrait?.base || baseColor || 1;
+      const file = files.find((f) => f.includes(`c${color}`));
       return file ? `${jawPath}/${file}` : null;
     }
 
     if (part === "eyes") {
-      // Handle both "eye1" (assetmaker) and "eyes1" (our code) naming
-      const eyeId = value.replace(/^eyes/, "eye"); // Convert "eyes1" -> "eye1"
       // Assetmaker uses /img/portraits/eyes/eye1 structure (2 levels deep)
-      const eyesPath = `/img/portraits/eyes/${eyeId}`;
+      const eyesPath = `/img/portraits/eyes/eye${value}`;
       const files = catalog[eyesPath] || [];
       if (files.length > 0) {
-        // Use eyes_color from portrait if available, otherwise fallback to baseColor or c1
-        // Files are named like eye1_c1.png, eye1_c2.png, so match with _c prefix
-        const color = portrait?.eyes_color || baseColor || "c1";
-        const file = files.find((f) => f.includes(`_${color}.png`) || f.includes(`_${color}_`));
+        // Use eyes_color from portrait if available, otherwise fallback to baseColor
+        const color = portrait?.eyes_color || baseColor || 1;
+        const file = files.find((f) => f.includes(`_c${color}.png`) || f.includes(`_c${color}_`));
         return file ? `${eyesPath}/${file}` : null;
       }
       return null;
     }
 
     if (part === "face") {
-      const facePath = `/img/portraits/face/${value}`;
+      const facePath = `/img/portraits/face/face${value}`;
       const files = catalog[facePath] || [];
-      const color = baseColor || "c1";
-      const file = files.find((f) => f.includes(color));
+      const color = portrait?.base || baseColor || 1;
+      const file = files.find((f) => f.includes(`c${color}`));
       return file ? `${facePath}/${file}` : null;
     }
 
     if (part === "beard" && value) {
       // Beard path structure: /img/portraits/beard/jaw1_beard/jaw1_beard6/jaw1_beard6_c3.png
-      // Value is now a number (1-6), jaw comes from portrait.jaw, color from portrait.hair_color
       if (!portrait) return null;
       
-      const jawNum = portrait.jaw.match(/\d+/)?.[0];
+      const jawNum = portrait.jaw; // Now a number
       if (!jawNum) return null;
       
-      const beardNum = typeof value === "number" ? value : parseInt(value, 10);
+      const beardNum = value;
       if (!beardNum || beardNum < 1 || beardNum > 6) return null;
       
       // Build path: /img/portraits/beard/jaw1_beard/jaw1_beard6
@@ -398,34 +319,42 @@ class PortraitAssetService {
       
       if (files.length > 0) {
         // Use hair_color for beard color
-        const color = portrait.hair_color || baseColor || "c1";
-        const file = files.find((f) => f.includes(`_${color}.png`) || f.includes(`_${color}_`));
+        const color = portrait.hair_color || baseColor || 1;
+        const file = files.find((f) => f.includes(`_c${color}.png`) || f.includes(`_c${color}_`));
         return file ? `${beardPath}/${file}` : null;
       }
       return null;
     }
+    
+    return null;
+  }
 
-    if (part === "hair_top" || part === "hair_bot") {
-      const layer = part === "hair_top" ? "top" : "bot";
-      // Match f1_top, m1_top, hair1_top, etc.
-      // Value format: "f1_top", "m1_top", etc.
-      const hairMatch = value.match(/^(f\d+|m\d+|hair\d+)_(top|bot)$/);
-      if (hairMatch) {
-        const [, hairId] = hairMatch;
-        // Hair path is 3 levels deep: /img/portraits/hair/f1/top
-        const hairPath = `/img/portraits/hair/${hairId}/${layer}`;
-        const files = catalog[hairPath] || [];
-        if (files.length > 0) {
-          // Use hair_color from portrait if available, otherwise fallback to baseColor or c1
-          // Files are named like m1_c1_top.png, m1_c2_top.png, so match with _c prefix
-          const color = portrait?.hair_color || baseColor || "c1";
-          const file = files.find((f) => f.includes(`_${color}_${layer}.png`) || f.includes(`_${color}_`));
-          return file ? `${hairPath}/${file}` : null;
-        }
-      }
-      return null;
+  /**
+   * Get specific hair path (top or bottom)
+   */
+  async getHairPath(
+    layer: "top" | "bot",
+    hairNum: number,
+    gender: "MALE" | "FEMALE" | "NONE" = "MALE",
+    hairColor: number = 1
+  ): Promise<string | null> {
+    const catalog = await this.getPortraitCatalog();
+    
+    // Determine prefix based on gender (m or f)
+    // For NONE gender or if assets missing, fallback to male?
+    const prefix = gender === "FEMALE" ? "f" : "m";
+    const hairId = `${prefix}${hairNum}`; // e.g. m1, f1
+
+    // Hair path is 3 levels deep: /img/portraits/hair/f1/top
+    const hairPath = `/img/portraits/hair/${hairId}/${layer}`;
+    const files = catalog[hairPath] || [];
+    
+    if (files.length > 0) {
+      // Use hair_color
+      const file = files.find((f) => f.includes(`_c${hairColor}_${layer}.png`) || f.includes(`_c${hairColor}_`));
+      return file ? `${hairPath}/${file}` : null;
     }
-
+    
     return null;
   }
 
@@ -435,24 +364,18 @@ class PortraitAssetService {
   async generateDefaultPortrait(gender: "MALE" | "FEMALE", race?: string): Promise<PortraitData> {
     const options = await this.getPortraitPartOptions(race);
     
-    // Use gender-specific hair naming: f1 for female, m1 for male
-    const hairPrefix = gender === "MALE" ? "m" : "f";
-    const defaultHairNum = "1";
-
     return {
-      base: options.base[0] || "c1",
-      jaw: options.jaw[0] || "jaw1",
-      eyes: options.eyes[0] || "eye1", // Use "eye1" to match assetmaker
-      eyes_color: "c1",
-      face: options.face[0] || "face1",
-      beard: null, // Default to no beard - user can enable it via checkbox
-      hair_top: `${hairPrefix}${defaultHairNum}_top`, // f1_top or m1_top
-      hair_bot: `${hairPrefix}${defaultHairNum}_bot`, // f1_bot or m1_bot
-      hair_color: "c1",
+      base: options.base[0] || 1,
+      jaw: options.jaw[0] || 1,
+      eyes: options.eyes[0] || 1,
+      eyes_color: 1,
+      face: options.face[0] || 1,
+      beard: null, // Default to no beard
+      hair: 1, // Default to hair 1 instead of string path
+      hair_color: 1,
     };
   }
 }
 
 // Export singleton instance
 export const portraitAssetService = new PortraitAssetService();
-

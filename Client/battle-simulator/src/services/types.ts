@@ -6,7 +6,7 @@ export interface L10N {
 }
 
 export type RaceEnum = 'Human' | 'Elven' | 'Orc' | 'Dwarf' | 'Halfling' | 'Goblin';
-export type ClassEnum = 'Cleric' | 'Seer' | 'Mage' | 'Mystic' | 'Rogue' | 'SpellBlade' | 'Shaman' | 'Barbarian' | 'Warrior' | 'Knight' | 'Guardian' | 'Paladin' | 'Druid' | 'Monk' | 'Warlock' | 'Duelist' | 'Witch' | 'Inquisitor' | 'Scholar' | 'Engineer' | 'Nomad';
+export type ClassEnum = 'Cleric' | 'Seer' | 'Mage' | 'Mystic' | 'Rogue' | 'Spellblade' | 'Shaman' | 'Barbarian' | 'Warrior' | 'Knight' | 'Guardian' | 'Paladin' | 'Druid' | 'Monk' | 'Warlock' | 'Duelist' | 'Witch' | 'Inquisitor' | 'Scholar' | 'Engineer' | 'Nomad';
 export type BattleType = 'Normal' | 'Training' | 'Arena' | 'Scripted' | 'NoReward';
 export type CharacterEquipmentSlot = 'headWear' | 'body' | 'leg' | 'hand' | 'foot' | 'util' | 'ringL' | 'ringR' | 'earL' | 'earR' | 'neck' | 'rightHand' | 'leftHand';
 

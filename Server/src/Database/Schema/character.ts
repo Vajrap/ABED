@@ -15,7 +15,7 @@ export const characters = pgTable("characters", {
   race: varchar("race", { length: 50 }).notNull(),
   type: varchar("type", { length: 50 }).default("humanoid").notNull(),
   level: integer("level").default(1).notNull(),
-  portrait: jsonb("portrait"), // PortraitData object: { base, jaw, eyes, face, beard?, hair_top, hair_bot }
+  // portrait: jsonb("portrait"), // REMOVED - Moved to separate 'portraits' table
   background: varchar("background", { length: 100 }),
 
   alignment: jsonb("alignment").default({}).notNull(),

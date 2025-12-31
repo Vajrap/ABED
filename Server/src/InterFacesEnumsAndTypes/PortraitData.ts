@@ -6,15 +6,14 @@
  */
 
 export interface PortraitData {
-  base: string; // e.g., "c1", "c2" - base body/color
-  jaw: string; // e.g., "jaw1", "jaw2" - jaw shape
-  eyes: string; // e.g., "eye1", "eye2" - eye type/style
-  eyes_color: string; // e.g., "c1", "c2" - eye color (c1-c7)
-  face: string; // e.g., "face1", "face2" - face features
-  beard?: number | null; // e.g., 1, 2, 3, 4, 5, 6 - beard style number (tied to jaw, uses hair_color)
-  hair_top: string; // e.g., "m1_top", "f1_top" - hair type and layer
-  hair_bot: string; // e.g., "m1_bot", "f1_bot" - hair type and layer
-  hair_color: string; // e.g., "c1", "c2" - hair color (c1-c10), also used for beard color
+  base: number; // e.g., 1, 2, 7 - base body/color (replaces "c1", "c2")
+  jaw: number; // e.g., 1, 2 - jaw shape (replaces "jaw1", "jaw2")
+  eyes: number; // e.g., 1, 2 - eye type/style (replaces "eye1", "eye2")
+  eyes_color: number; // e.g., 1, 2 - eye color (replaces "c1", "c2")
+  face: number; // e.g., 1, 2 - face features (replaces "face1", "face2")
+  beard?: number | null; // e.g., 1, 2, 3 - beard style (replaces 1, 2, 3)
+  hair: number; // e.g., 1, 2, 3 - hair style
+  hair_color: number; // e.g., 1, 2 - hair color (replaces "c1", "c2")
 }
 
 /**
@@ -24,14 +23,13 @@ export function isPortraitData(value: any): value is PortraitData {
   return (
     typeof value === "object" &&
     value !== null &&
-    typeof value.base === "string" &&
-    typeof value.jaw === "string" &&
-    typeof value.eyes === "string" &&
-    typeof value.eyes_color === "string" &&
-    typeof value.face === "string" &&
-    typeof value.hair_top === "string" &&
-    typeof value.hair_bot === "string" &&
-    typeof value.hair_color === "string" &&
+    typeof value.base === "number" &&
+    typeof value.jaw === "number" &&
+    typeof value.eyes === "number" &&
+    typeof value.eyes_color === "number" &&
+    typeof value.face === "number" &&
+    typeof value.hair === "number" &&
+    typeof value.hair_color === "number" &&
     (value.beard === null || value.beard === undefined || typeof value.beard === "number")
   );
 }
@@ -42,15 +40,14 @@ export function isPortraitData(value: any): value is PortraitData {
 export function createDefaultPortraitData(gender: "MALE" | "FEMALE" | "NONE"): PortraitData {
   const prefix = gender === "MALE" ? "m" : "f";
   return {
-    base: "c1",
-    jaw: "jaw1",
-    eyes: "eye1",
-    eyes_color: "c1",
-    face: "face1",
+    base: 1,
+    jaw: 1,
+    eyes: 1,
+    eyes_color: 1,
+    face: 1,
     beard: gender === "MALE" ? 1 : null,
-    hair_top: `${prefix}1_top`,
-    hair_bot: `${prefix}1_bot`,
-    hair_color: "c1",
+    hair: 1,
+    hair_color: 1,
   };
 }
 

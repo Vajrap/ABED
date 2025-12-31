@@ -9,6 +9,8 @@ import dotenv from "dotenv";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+// Import NPC seeding script
+import { seedNPCs } from "./seed-npcs";
 
 // Load environment variables
 dotenv.config();
@@ -115,14 +117,16 @@ class DatabaseManager {
       await client.query(`
         CREATE TABLE IF NOT EXISTS "users" (
           "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+          "username" varchar(255) NOT NULL,
           "password" varchar(255) NOT NULL,
-          "email" varchar(255) NOT NULL,
-          "character_id" varchar(255) NOT NULL,
-          "last_news_received" varchar(255) NOT NULL,
+          "email" varchar(255),
+          "last_news_received" varchar(255),
+          "tier" varchar(20) DEFAULT 'free' NOT NULL,
           "created_at" timestamp DEFAULT now() NOT NULL,
           "updated_at" timestamp DEFAULT now() NOT NULL,
           "created_by" varchar(255) NOT NULL,
           "updated_by" varchar(255) NOT NULL,
+          CONSTRAINT "users_username_unique" UNIQUE("username"),
           CONSTRAINT "users_email_unique" UNIQUE("email")
         );
       `);
@@ -153,7 +157,6 @@ class DatabaseManager {
           "name" varchar(255) NOT NULL,
           "gender" varchar(10) NOT NULL,
           "race" varchar(50) NOT NULL,
-          "portrait" varchar(50) NOT NULL,
           "background" varchar(100) NOT NULL,
           "starting_class" varchar(50) NOT NULL,
           "attributes" jsonb NOT NULL,
@@ -171,6 +174,25 @@ class DatabaseManager {
           "created_by" varchar(255) NOT NULL,
           "updated_by" varchar(255) NOT NULL,
           CONSTRAINT "characters_name_unique" UNIQUE("name")
+        );
+      `);
+
+      // Create portraits table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS "portraits" (
+          "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+          "character_id" uuid NOT NULL REFERENCES "characters"("id") ON DELETE CASCADE,
+          "base" integer NOT NULL,
+          "jaw" integer NOT NULL,
+          "eyes" integer NOT NULL,
+          "eyes_color" integer NOT NULL,
+          "face" integer NOT NULL,
+          "beard" integer,
+          "hair" integer NOT NULL,
+          "hair_color" integer NOT NULL,
+          "created_at" timestamp DEFAULT now() NOT NULL,
+          "updated_at" timestamp DEFAULT now() NOT NULL,
+          CONSTRAINT "portraits_character_id_unique" UNIQUE("character_id")
         );
       `);
 
@@ -311,28 +333,29 @@ class DatabaseManager {
       // Insert test user
       await client.query(`
         INSERT INTO users (
-          password, email, character_id, last_news_received,
+          username, password, email, last_news_received, tier,
           created_by, updated_by
         ) VALUES (
+          'test_hero',
           'testpassword123',
           'test@abed.com',
-          'test_hero',
           'news_001',
+          'free',
           'db_seed',
           'db_seed'
-        ) ON CONFLICT (email) DO NOTHING;
+        ) ON CONFLICT (username) DO NOTHING;
       `);
 
       // Insert demo users
       await client.query(`
         INSERT INTO users (
-          password, email, character_id, last_news_received,
+          username, password, email, last_news_received, tier,
           created_by, updated_by
         ) VALUES
-        ('demo123ABC', 'alice@demo.com', 'alice_mage', 'news_001', 'db_seed', 'db_seed'),
-        ('demo123ABC', 'bob@demo.com', 'bob_warrior', 'news_001', 'db_seed', 'db_seed'),
-        ('demo123ABC', 'charlie@demo.com', 'charlie_rogue', 'news_001', 'db_seed', 'db_seed')
-        ON CONFLICT (email) DO NOTHING;
+        ('alice_mage', 'demo123ABC', 'alice@demo.com', 'news_001', 'free', 'db_seed', 'db_seed'),
+        ('bob_warrior', 'demo123ABC', 'bob@demo.com', 'news_001', 'free', 'db_seed', 'db_seed'),
+        ('charlie_rogue', 'demo123ABC', 'charlie@demo.com', 'news_001', 'free', 'db_seed', 'db_seed')
+        ON CONFLICT (username) DO NOTHING;
       `);
 
       client.release();
@@ -340,6 +363,16 @@ class DatabaseManager {
       return true;
     } catch (error) {
       console.error("❌ Test data seeding failed:", error);
+      return false;
+    }
+  }
+  
+  async seedNPCs(): Promise<boolean> {
+    try {
+      await seedNPCs();
+      return true;
+    } catch (error) {
+      console.error("❌ NPC seeding failed:", error);
       return false;
     }
   }
@@ -394,6 +427,7 @@ async function main() {
 
       case "seed":
         await dbManager.seedTestData();
+        await dbManager.seedNPCs();
         break;
 
       case "full-setup":
@@ -401,6 +435,7 @@ async function main() {
         await dbManager.createTables();
         await dbManager.runMigrations();
         await dbManager.seedTestData();
+        await dbManager.seedNPCs();
         await dbManager.getTableInfo();
         break;
 

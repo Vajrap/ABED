@@ -27,16 +27,16 @@ export interface SkillValue {
 }
 
 // Portrait Data Structure - composable portrait built from multiple layers
+// Portrait Data Structure - composable portrait built from multiple layers
 export interface PortraitData {
-  base: string; // e.g., "c1", "c2" - base body/color
-  jaw: string; // e.g., "jaw1", "jaw2" - jaw shape
-  eyes: string; // e.g., "eye1", "eye2" - eye type/style
-  eyes_color: string; // e.g., "c1", "c2" - eye color (c1-c7)
-  face: string; // e.g., "face1", "face2" - face features
-  beard?: number | null; // e.g., 1, 2, 3, 4, 5, 6 - beard style number (tied to jaw, uses hair_color)
-  hair_top: string; // e.g., "m1_top", "f1_top" - hair type and layer
-  hair_bot: string; // e.g., "m1_bot", "f1_bot" - hair type and layer
-  hair_color: string; // e.g., "c1", "c2" - hair color (c1-c10), also used for beard color
+  base: number; // e.g., 1, 2, 7 - base body/color (replaces "c1", "c2")
+  jaw: number; // e.g., 1, 2 - jaw shape (replaces "jaw1", "jaw2")
+  eyes: number; // e.g., 1, 2 - eye type/style (replaces "eye1", "eye2")
+  eyes_color: number; // e.g., 1, 2 - eye color (replaces "c1", "c2")
+  face: number; // e.g., 1, 2 - face features (replaces "face1", "face2")
+  beard?: number | null; // e.g., 1, 2, 3 - beard style (replaces 1, 2, 3)
+  hair: number; // e.g., 1, 2, 3 - hair style
+  hair_color: number; // e.g., 1, 2 - hair color (replaces "c1", "c2")
 }
 
 // Main Character Interface (matches backend CharacterInterface)

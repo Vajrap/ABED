@@ -33,10 +33,7 @@ const CLASS_ENUM_MAP: Record<string, string> = {
   Mage: "Mage",
   Mystic: "Mystic",
   Rogue: "Rogue",
-  SpellBlade: "Spellblade", // Standardized to non-capital B
-  spellBlade: "Spellblade",
   Spellblade: "Spellblade",
-  spellblade: "Spellblade",
   Shaman: "Shaman",
   Barbarian: "Barbarian",
   Warrior: "Warrior",
@@ -135,15 +132,15 @@ const DEFAULT_GENDER: "MALE" | "FEMALE" = "MALE";
 
 // Default portrait data (will be replaced when asset catalog loads)
 const DEFAULT_PORTRAIT: PortraitData = {
-  base: "c1",
-  jaw: "jaw1",
-  eyes: "eye1",
-  eyes_color: "c1",
-  face: "face1",
+  base: 1,
+  jaw: 1,
+  eyes: 1,
+  eyes_color: 1,
+  face: 1,
   beard: null,
-  hair_top: "m1_top", // Will be replaced with gender-specific value when catalog loads
-  hair_bot: "m1_bot",
-  hair_color: "c1",
+
+  hair: 1, // Default hair style number
+  hair_color: 1,
 };
 
 export function useCharacterCreationLogic() {
@@ -225,31 +222,17 @@ export function useCharacterCreationLogic() {
         
         if (cancelled) return;
         
-        // Filter hair options by gender (f1, f2 for female, m1, m2 for male)
-        const genderPrefix = state.formData.gender === "MALE" ? "m" : "f";
-        const filteredHairOptions = options.hair_top.filter((hair) => 
-          hair.startsWith(genderPrefix) || hair.startsWith("hair")
-        );
-        
-        const optionsWithFilteredHair = {
-          ...options,
-          hair_top: filteredHairOptions,
-          hair_bot: filteredHairOptions.map(h => h.replace("_top", "_bot")),
-        };
-        
-        // Beard options are already included in portraitOptions (independent of jaw)
-        const optionsWithBeard = optionsWithFilteredHair;
+        if (cancelled) return;
         
         const defaultPortrait = await portraitAssetService.generateDefaultPortrait(
           state.formData.gender,
           state.formData.race
         );
         
-        if (cancelled) return;
-        
+        // Use all available hair numbers (gender handling is done in renderer)
         setState((prev) => ({
           ...prev,
-          portraitOptions: optionsWithBeard,
+          portraitOptions: options,
           formData: { ...prev.formData, portrait: defaultPortrait },
         }));
       } catch (error) {

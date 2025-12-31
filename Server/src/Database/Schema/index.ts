@@ -14,12 +14,13 @@ export * from "./npc_character_relation";
 export * from "./npc_summary";
 export * from "./quest";
 export * from "./chat_rate_limits";
-export * from "./lore_embeddings";
+export * from "./portrait";
 
 // Export database tables for migrations and queries
 export { users } from "./user";
 export { sessions } from "./session";
 export { characters } from "./character";
+export { portraits } from "./portrait"; // Export portraits table
 export { parties } from "./party";
 export { newsArchive, newsSpreadQueue, characterNewsKnowledge, locationNewsReach } from "./news";
 export { battleReports } from "./battle_report";
@@ -40,6 +41,7 @@ export { loreEmbeddings } from "./lore_embeddings";
 export type { User, InsertUser } from "./user";
 export type { Session, InsertSession } from "./session";
 export type { Character, InsertCharacter } from "./character";
+export type { Portrait, InsertPortrait } from "./portrait"; // Export portrait types
 export type { PartyDB, InsertParty } from "./party";
 export type { BattleReport, InsertBattleReport } from "./battle_report";
 export type { ItemInstance, InsertItemInstance } from "./item_instances";

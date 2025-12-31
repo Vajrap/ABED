@@ -28,6 +28,7 @@ import { equip } from "src/Utils/equip";
 import { activeEpithet } from "src/Entity/Character/Subclass/Title/logics/active";
 import { activeRole } from "src/Entity/Character/Subclass/Title/logics/active";
 import type { PortraitData } from "../InterFacesEnumsAndTypes/PortraitData";
+import { portraits } from "../Database/Schema/portrait";
 import Report from "../Utils/Reporter";
 import { initializeRateLimit } from "./ChatRateLimitService";
 
@@ -35,7 +36,7 @@ export interface CharacterCreationData {
   name: string;
   gender: "MALE" | "FEMALE" | "NONE";
   race: PlayableRaceEnum;
-  portrait: PortraitData;
+  portrait: PortraitData | string;
   background: PlayableBackgroundEnum;
   startingClass: PlayableClassEnum;
 }
@@ -79,7 +80,7 @@ export class CharacterService {
 
       // 4. Save to database
       const insertCharacter = this.characterToInsertCharacter(character);
-      await this.saveCharacterToDatabase(insertCharacter);
+      await this.saveCharacterToDatabase(insertCharacter, character.portrait || undefined);
 
       const insertParty = PartyService.partyToInsertParty(party);
       await PartyService.savePartyToDatabase(insertParty);
@@ -104,6 +105,7 @@ export class CharacterService {
    */
   private static characterToInsertCharacter(character: Character): InsertCharacter {
     // Build insert object - truncate all varchar fields to their schema limits
+    // Note: portrait is NOT included here as it's in a separate table
     const insertData: any = {
       id: character.id,
       userId: character.userId, // Can be null for NPCs
@@ -117,7 +119,7 @@ export class CharacterService {
       race: String(character.race || '').substring(0, 50),
       type: String(character.type || 'humanoid').substring(0, 50),
       level: character.level,
-      portrait: character.portrait,
+      // portrait: character.portrait, // Removed from characters table
       background: String(character.background || '').substring(0, 100),
       // characterPrompt is not in characters table - it's in npc_memory table
 
@@ -264,12 +266,11 @@ export class CharacterService {
     return character;
   }
 
-  static async saveCharacterToDatabase(character: InsertCharacter): Promise<{ character: InsertCharacter; id: string }> {
+  static async saveCharacterToDatabase(character: InsertCharacter, portraitData?: PortraitData | string): Promise<{ character: InsertCharacter; id: string }> {
     // Use raw SQL to avoid issues with missing columns (like location) in older database schemas
     const char = character as any;
     
     // Prepare JSON values as strings for casting
-    const portraitJson = JSON.stringify(char.portrait || null);
     const alignmentJson = JSON.stringify(char.alignment || {});
     const artisansJson = JSON.stringify(char.artisans || {});
     const attributeJson = JSON.stringify(char.attribute || {});
@@ -303,9 +304,10 @@ export class CharacterService {
 
     // Use parameterized queries with proper JSON casting
     // Pass JSON strings as parameters and cast them in SQL
+    // Removed portrait from insert
     const result = await db.execute(sql`
       INSERT INTO characters (
-        id, user_id, party_id, original_npc_party_id, location, name, gender, race, type, level, portrait, background,
+        id, user_id, party_id, original_npc_party_id, location, name, gender, race, type, level, background,
         alignment, artisans, attribute, battle_stats, elements, proficiencies, save_rolls,
         needs, vitals, fame, behavior, title, possible_epithets, possible_roles,
         action_sequence, informations, skills, active_skills, conditional_skills,
@@ -314,9 +316,9 @@ export class CharacterService {
         relations, traits, inventory_size, inventory, equipments, material_resources, stat_tracker, ab_guage,
         created_at, updated_at, created_by, updated_by
       ) VALUES (
-        ${char.id}, ${char.userId}, ${char.partyID || null}, ${char.originalNPCPartyID || null}, ${char.location || null}, ${char.originalNPCPartyID || null}, ${char.location || null},
+        ${char.id}, ${char.userId}, ${char.partyID || null}, ${char.originalNPCPartyID || null}, ${char.location || null},
         ${String(char.name || '').substring(0, 255)}, ${String(char.gender || '').substring(0, 10)}, ${String(char.race || '').substring(0, 50)}, ${String(char.type || '').substring(0, 50)},
-        ${char.level}, ${sql.raw(`'${portraitJson.replace(/'/g, "''")}'::jsonb`)}, ${String(char.background || '').substring(0, 100)},
+        ${char.level}, ${String(char.background || '').substring(0, 100)},
         ${sql.raw(`'${alignmentJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${artisansJson.replace(/'/g, "''")}'::jsonb`)},
         ${sql.raw(`'${attributeJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${battleStatsJson.replace(/'/g, "''")}'::jsonb`)},
         ${sql.raw(`'${elementsJson.replace(/'/g, "''")}'::jsonb`)}, ${sql.raw(`'${proficienciesJson.replace(/'/g, "''")}'::jsonb`)},
@@ -343,6 +345,25 @@ export class CharacterService {
       throw new Error("Failed to create character");
     }
 
+    // Save portrait if provided
+    if (portraitData && typeof portraitData !== 'string') {
+      try {
+        await db.insert(portraits).values({
+          characterId: savedCharacter.id,
+          base: portraitData.base,
+          jaw: portraitData.jaw,
+          eyes: portraitData.eyes,
+          eyesColor: portraitData.eyes_color,
+          face: portraitData.face,
+          beard: portraitData.beard,
+          hair: portraitData.hair,
+          hairColor: portraitData.hair_color,
+        });
+      } catch (err) {
+        Report.error("Failed to save portrait data", { error: err, characterId: savedCharacter.id });
+      }
+    }
+
     return { character: savedCharacter as InsertCharacter, id: savedCharacter.id as string };
   }
 
@@ -361,6 +382,39 @@ export class CharacterService {
           updatedBy: "system",
         })
         .where(eq(characters.id, character.id));
+
+      // Update portrait if it exists and is not a string
+      if (character.portrait && typeof character.portrait !== 'string') {
+        const portraitData = character.portrait as PortraitData;
+        await db
+          .insert(portraits)
+          .values({
+            characterId: character.id,
+            base: portraitData.base,
+            jaw: portraitData.jaw,
+            eyes: portraitData.eyes,
+            eyesColor: portraitData.eyes_color,
+            face: portraitData.face,
+            beard: portraitData.beard,
+            hair: portraitData.hair,
+            hairColor: portraitData.hair_color,
+            updatedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: portraits.characterId,
+            set: {
+              base: portraitData.base,
+              jaw: portraitData.jaw,
+              eyes: portraitData.eyes,
+              eyesColor: portraitData.eyes_color,
+              face: portraitData.face,
+              beard: portraitData.beard,
+              hair: portraitData.hair,
+              hairColor: portraitData.hair_color,
+              updatedAt: new Date(),
+            },
+          });
+      }
     } catch (error) {
       throw error;
     }
@@ -372,29 +426,40 @@ export class CharacterService {
 
   static async getUserCharacter(userId: string): Promise<any | null> {
     try {
+      // Fetch character
       const [character] = await db
         .select()
         .from(characters)
         .where(eq(characters.userId, userId))
         .limit(1);
 
+      if (character) {
+        // Fetch portrait data
+        const [portrait] = await db
+          .select()
+          .from(portraits)
+          .where(eq(portraits.characterId, character.id))
+          .limit(1);
+
+        if (portrait) {
+          // Reassemble portrait data
+          (character as any).portrait = {
+            base: portrait.base,
+            jaw: portrait.jaw,
+            eyes: portrait.eyes,
+            eyes_color: portrait.eyesColor,
+            face: portrait.face,
+            beard: portrait.beard,
+            hair: portrait.hair,
+            hair_color: portrait.hairColor,
+          } as PortraitData;
+        }
+      }
+
       return character || null;
     } catch (error) {
-      // If party_id column doesn't exist yet (during migration), use raw SQL
-      // This handles the migration transition period
-      try {
-        const result = await db.execute(sql`
-          SELECT * FROM characters WHERE user_id = ${userId} LIMIT 1
-        `);
-        
-        if (result.rows && result.rows.length > 0) {
-          return result.rows[0];
-        }
-      } catch (fallbackError) {
-        // If raw SQL also fails, log and return null
-        console.error("Error fetching character (fallback also failed):", fallbackError);
-      }
-      
+      // Return null or handle error
+      console.error("Error fetching character:", error);
       return null;
     }
   }

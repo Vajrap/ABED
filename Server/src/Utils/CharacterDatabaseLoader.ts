@@ -23,6 +23,8 @@ import Report from "./Reporter";
 import { SkillId } from "src/Entity/Skill/enums";
 import { TraitEnum } from "src/Entity/Trait/enum";
 import { PortraitData } from "src/InterFacesEnumsAndTypes/PortraitData";
+import { portraits } from "../Database/Schema/portrait";
+import { eq } from "drizzle-orm";
 
 /**
  * Load all characters from database into CharacterManager
@@ -84,7 +86,29 @@ export async function loadCharactersFromDatabase(): Promise<void> {
     
     if (characterRecords.length === 0) {
       Report.warn("⚠️  No characters found in database!");
-      return;
+    }
+
+    // Fetch all portraits
+    let allPortraits: any[] = [];
+    try {
+      allPortraits = await db.select().from(portraits);
+    } catch (error) {
+      Report.warn("Failed to load portraits (table might not exist yet)", { error });
+    }
+
+    // Create a map of characterId -> PortraitData
+    const portraitMap = new Map<string, PortraitData>();
+    for (const p of allPortraits) {
+      portraitMap.set(p.characterId, {
+        base: p.base,
+        jaw: p.jaw,
+        eyes: p.eyes,
+        eyes_color: p.eyesColor,
+        face: p.face,
+        beard: p.beard,
+        hair: p.hair,
+        hair_color: p.hairColor,
+      });
     }
     
     // First pass: Load all characters
@@ -92,7 +116,8 @@ export async function loadCharactersFromDatabase(): Promise<void> {
     let failedCount = 0;
     for (const record of characterRecords) {
       try {
-        const character = restoreCharacterFromDatabase(record);
+        const portrait = portraitMap.get(record.id);
+        const character = restoreCharacterFromDatabase(record, portrait);
         characterManager.addCharacter(character);
         loadedCount++;
         Report.info(`✓ Loaded character: ${character.id} | userId: ${character.userId} | name: ${typeof character.name === 'string' ? character.name : character.name.en || 'unknown'}`);
@@ -148,7 +173,7 @@ export async function loadCharactersFromDatabase(): Promise<void> {
 /**
  * Restore a Character entity from a database record
  */
-function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): Character {
+function restoreCharacterFromDatabase(record: typeof characters.$inferSelect, portraitData?: PortraitData): Character {
   // Restore complex objects from JSONB
   const alignment = new CharacterAlignment(record.alignment as any || {});
   const artisans = new CharacterArtisans(record.artisans as any || {});
@@ -193,7 +218,7 @@ function restoreCharacterFromDatabase(record: typeof characters.$inferSelect): C
     type: (record.type as CharacterType) || CharacterType.humanoid,
     gender: record.gender as "MALE" | "FEMALE" | "NONE",
     level: record.level,
-    portrait: record.portrait as PortraitData || undefined,
+    portrait: portraitData || (record as any).portrait || undefined, // Use new portrait data or fallback to legacy record.portrait if it exists
     background: record.background || undefined,
     alignment,
     artisans,

@@ -214,7 +214,7 @@ export class Character {
     gender?: "MALE" | "FEMALE" | "NONE";
     race?: RaceEnum;
     level: number;
-    portrait?: PortraitData; // Support both new PortraitData and legacy string format
+    portrait?: PortraitData | string; // Support both new PortraitData and legacy string format
     background?: string;
     alignment: CharacterAlignment;
     artisans: CharacterArtisans;

@@ -29,6 +29,7 @@ export interface BattleSpriteRendererProps {
     body?: string | null;
     // Add other equipment slots as needed
   };
+  gender?: "MALE" | "FEMALE" | "NONE";
   size?: number | string;
   className?: string;
   style?: React.CSSProperties;
@@ -44,6 +45,7 @@ export interface BattleSpriteRendererProps {
 export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
   portrait,
   equipment = {},
+  gender = "MALE",
   size = 100,
   className,
   style,
@@ -79,137 +81,6 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
       }
 
       try {
-        const battleCatalog = await portraitAssetService.getBattleCatalog();
-        const layers: Array<{ path: string; zIndex: number; filter?: string }> = [];
-        const baseColor = portrait.base;
-
-        // Extract base color number to determine if we need CSS filters
-        const baseColorMatch = portrait.base.match(/c(\d+)/);
-        const baseColorNum = baseColorMatch ? parseInt(baseColorMatch[1], 10) : 1;
-
-        // For filtered colors (c7, c8), use c1 as the effective baseColor for other parts
-        // since those parts don't have filtered variants
-        const effectiveBaseColor = baseColorNum >= 7 ? "c1" : baseColor;
-
-        // Determine CSS filter for filtered colors (c7, c8, etc.)
-        // Use color-only adjustments to preserve detail (avoid brightness which washes out details)
-        let skinFilter: string | undefined = undefined;
-        if (baseColorNum === 7) {
-          // Lighter skin: slight hue shift toward warmer tones, increase saturation, brighter
-          skinFilter = "hue-rotate(-5deg) saturate(1.15) brightness(1.15)";
-        } else if (baseColorNum === 8) {
-          // Paler skin: slight hue shift, reduce saturation, brighter
-          skinFilter = "hue-rotate(3deg) saturate(0.75) brightness(1.18)";
-        }
-
-        // Layer order for battle sprites (from back to front):
-        // 1. Skin (from base) - z-index: 1
-        // For filtered colors (c7, c8), use c1 as base and apply CSS filter
-        const skinPath = `/img/battle/skin`;
-        const skinFiles = battleCatalog[skinPath] || [];
-        let skinFile: string | undefined;
-        
-        if (baseColorNum >= 7) {
-          // Filtered colors use c1 as the base image
-          skinFile = skinFiles.find((f) => f.includes("c1"));
-        } else {
-          skinFile = skinFiles.find((f) => f.includes(baseColor));
-        }
-        
-        if (skinFile) {
-          layers.push({ path: `${skinPath}/${skinFile}`, zIndex: 1, filter: skinFilter });
-        }
-
-        // 2. Face (from eyes/face) - z-index: 2
-        // Face color comes from eyes_color (as per assetmaker logic)
-        // Use effectiveBaseColor (c1 for filtered colors) to find matching face files
-        // Apply same filter as skin when using filtered colors (c7, c8) to match skin tone
-        // Note: Face layer may include a collar, but clothing layers (z-index 3, 5) should cover it
-        const facePath = `/img/battle/face`;
-        const faceFiles = battleCatalog[facePath] || [];
-        const faceColor = portrait.eyes_color || effectiveBaseColor;
-        const faceFile = faceFiles.find((f) => f.includes(`_${faceColor}.png`) || f.includes(`_${faceColor}_`));
-        if (faceFile) {
-          // When clothing is equipped, we still render the face but clothing top (z-index 5) should cover the collar
-          // The face collar might still be visible if clothing doesn't fully cover the neck area
-          layers.push({ path: `${facePath}/${faceFile}`, zIndex: 2, filter: skinFilter }); // Apply same filter to face
-        }
-
-        // 3. Clothing bottom (from equipment) - z-index: 3
-        if (equipment.body) {
-          // Map equipment ID to sprite ID
-          const clothSpriteId = getArmorSpriteId(equipment.body);
-          if (clothSpriteId) {
-            const clothPath = `/img/battle/cloth/${clothSpriteId}/bot`;
-            const clothFiles = battleCatalog[clothPath] || [];
-            // Use c1 for now (as requested)
-            const clothFile = clothFiles.find((f) => f.includes("_c1"));
-            if (clothFile) {
-              layers.push({ path: `${clothPath}/${clothFile}`, zIndex: 3 });
-            }
-          }
-        }
-
-        // 4. Hair bottom - z-index: 4
-        // Handle f1_bot, m1_bot, or hair1_bot format
-        const hairBotMatch = portrait.hair_bot.match(/^(f\d+|m\d+|hair\d+)_bot$/);
-        if (hairBotMatch) {
-          const [, hairId] = hairBotMatch;
-          const hairBotPath = `/img/battle/hair/${hairId}/bot`;
-          const hairBotFiles = battleCatalog[hairBotPath] || [];
-          const hairColor = portrait.hair_color || effectiveBaseColor;
-          const hairBotFile = hairBotFiles.find((f) => f.includes(`_${hairColor}_bot.png`) || f.includes(`_${hairColor}_`));
-          if (hairBotFile) {
-            layers.push({ path: `${hairBotPath}/${hairBotFile}`, zIndex: 4 });
-          }
-        }
-
-        // 5. Clothing top (from equipment) - z-index: 5
-        if (equipment.body) {
-          // Map equipment ID to sprite ID
-          const clothSpriteId = getArmorSpriteId(equipment.body);
-          if (clothSpriteId) {
-            const clothTopPath = `/img/battle/cloth/${clothSpriteId}/top`;
-            const clothTopFiles = battleCatalog[clothTopPath] || [];
-            // Use c1 for now (as requested)
-            const clothTopFile = clothTopFiles.find((f) => f.includes("_c1"));
-            if (clothTopFile) {
-              layers.push({ path: `${clothTopPath}/${clothTopFile}`, zIndex: 5 });
-            }
-          }
-        }
-
-        // 6. Weapon bot (from equipment) - z-index: 6 (before hair top)
-        if (equipment.weapon) {
-          const weaponPaths = getWeaponPath(equipment.weapon);
-          if (weaponPaths) {
-            layers.push({ path: weaponPaths.bot, zIndex: 6 });
-          }
-        }
-
-        // 7. Hair top - z-index: 7
-        // Handle f1_top, m1_top, or hair1_top format
-        const hairTopMatch = portrait.hair_top.match(/^(f\d+|m\d+|hair\d+)_top$/);
-        if (hairTopMatch) {
-          const [, hairId] = hairTopMatch;
-          const hairTopPath = `/img/battle/hair/${hairId}/top`;
-          const hairTopFiles = battleCatalog[hairTopPath] || [];
-          const hairColor = portrait.hair_color || effectiveBaseColor;
-          const hairTopFile = hairTopFiles.find((f) => f.includes(`_${hairColor}_top.png`) || f.includes(`_${hairColor}_`));
-          if (hairTopFile) {
-            layers.push({ path: `${hairTopPath}/${hairTopFile}`, zIndex: 7 });
-          }
-        }
-
-        // 8. Weapon top (from equipment) - z-index: 8 (after hair top)
-        if (equipment.weapon) {
-          const weaponPaths = getWeaponPath(equipment.weapon);
-          if (weaponPaths) {
-            layers.push({ path: weaponPaths.top, zIndex: 8 });
-          }
-        }
-
-        setSpriteLayers(layers);
       } catch (error) {
         console.error("Failed to load battle sprite images:", error);
         setSpriteLayers([]);
@@ -219,7 +90,8 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
     };
 
     loadBattleSprites();
-  }, [portraitKey, equipmentKey]);
+    loadBattleSprites();
+  }, [portraitKey, equipmentKey, gender]);
 
   // Reset animation when portrait or equipment changes (to sync all layers)
   useEffect(() => {
@@ -302,16 +174,16 @@ export const BattleSpriteRenderer: React.FC<BattleSpriteRendererProps> = ({
         // Apply filter to skin and face layers (zIndex 1, 2) when filter is defined
         // These layers need the same filter to match skin tone
         const shouldApplyFilter = (zIndex === 1 || zIndex === 2) && filter;
-        
+
         // When clothing is equipped, mask the face layer (zIndex 2) to hide the collar area
         // The face layer has a collar baked in, but clothing should cover it
         const hasEquipment = equipment.body && equipment.body.trim() !== "";
         const isFaceLayer = zIndex === 2;
         const shouldMaskCollar = isFaceLayer && hasEquipment;
-        
+
         // Create unique key that includes zIndex and equipment info to force re-render when equipment changes
         const uniqueKey = `${path}-${zIndex}-${equipmentKey}-${index}`;
-        
+
         return (
           <Box
             key={uniqueKey}

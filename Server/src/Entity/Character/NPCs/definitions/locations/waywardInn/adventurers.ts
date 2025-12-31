@@ -94,15 +94,14 @@ export const lana: NPCTemplate = {
   gender: "FEMALE",
   level: 3,
   portraitData: {
-    base: "c1",
-    jaw: "jaw1",
-    eyes: "eye1",
-    eyes_color: "c6",
-    face: "face3",
+    base: 1,
+    jaw: 1,
+    eyes: 1,
+    eyes_color: 6,
+    face: 3,
     beard: null, // Female character, no beard
-    hair_top: "f9_top",
-    hair_bot: "f9_bot",
-    hair_color: "c2",
+    hair: 9,
+    hair_color: 2,
   },
   characterPrompt: `You are Lana, a warrior and adventurer. You are a young human woman in your early 20s, strong, independent, and battle-hardened.
 

@@ -19,34 +19,7 @@ import {
   humanDruid,
   humanGuardian,
 } from "src/Entity/Character/MOBs/Humanoid/humans";
-import {
-  elvenWarrior,
-  elvenMage,
-  elvenCleric,
-  elvenPaladin,
-  elvenWarlock,
-  elvenBarbarian,
-  elvenSorcerer,
-  elvenRogue,
-  elvenDruid,
-} from "src/Entity/Character/MOBs/Humanoid/elves";
-import {
-  orcWarrior,
-  orcBarbarian,
-  orcPaladin,
-  orcWarlock,
-} from "src/Entity/Character/MOBs/Humanoid/orcs";
-import {
-  halflingRogue,
-  halflingCleric,
-  halflingPaladin,
-} from "src/Entity/Character/MOBs/Humanoid/halflings";
-import {
-  dwarfPaladin,
-  dwarfWarrior,
-  dwarfCleric,
-  dwarfBarbarian,
-} from "src/Entity/Character/MOBs/Humanoid/dwarfs";
+
 import { activeCharacterRegistry } from "src/Entity/Character/repository";
 import { Character } from "src/Entity/Character/Character";
 import { locationRepository } from "src/Entity/Location/Location/repository";
@@ -77,7 +50,7 @@ import {
   WitchSkillId,
   InquisitorSkillId,
   ScholarSkillId,
-  SpellBladeSkillId,
+  SpellbladeSkillId,
   MysticSkillId,
   ShamanSkillId,
   KnightSkillId,
@@ -101,7 +74,7 @@ function createCharacterOfClass(
   
   const attrMods: Record<string, number> = {};
   const proficiencies: Record<string, number> = {};
-  const activeSkills: CharacterSkillObject[] = [];
+  const activeSkills: SkillId[] = [];
   
   // Customize based on class
   switch (className) {
@@ -115,8 +88,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         bareHand: 10, dagger: 3, sword: 4, blade: 5, staff: 3
       });
-      activeSkills.push({ id: MonkSkillId.PalmStrike as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: MonkSkillId.FlurryOfBlows as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(MonkSkillId.PalmStrike as SkillId);
+      activeSkills.push(MonkSkillId.FlurryOfBlows as SkillId);
       break;
       
     case ClassEnum.Duelist:
@@ -129,8 +102,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         blade: 10, sword: 8, dagger: 6, bareHand: 4
       });
-      activeSkills.push({ id: DuelistSkillId.PreciseStrike as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: DuelistSkillId.DuelingStance as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(DuelistSkillId.PreciseStrike as SkillId);
+      activeSkills.push(DuelistSkillId.DuelingStance as SkillId);
       break;
       
     case ClassEnum.Witch:
@@ -143,8 +116,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         wand: 8, staff: 6, book: 5, orb: 4
       });
-      activeSkills.push({ id: WitchSkillId.CurseBolt as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: WitchSkillId.CurseMark as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(WitchSkillId.CurseBolt as SkillId);
+      activeSkills.push(WitchSkillId.CurseMark as SkillId);
       break;
       
     case ClassEnum.Inquisitor:
@@ -157,8 +130,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         sword: 7, blade: 6, staff: 5, book: 4, wand: 4
       });
-      activeSkills.push({ id: InquisitorSkillId.RadiantSmite as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: InquisitorSkillId.ExposeWeakness as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(InquisitorSkillId.RadiantSmite as SkillId);
+      activeSkills.push(InquisitorSkillId.ExposeWeakness as SkillId);
       break;
       
     case ClassEnum.Scholar:
@@ -171,11 +144,11 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         book: 8, staff: 5, wand: 4, orb: 3
       });
-      activeSkills.push({ id: ScholarSkillId.Analyze as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: ScholarSkillId.DisruptPattern as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(ScholarSkillId.Analyze as SkillId);
+      activeSkills.push(ScholarSkillId.DisruptPattern as SkillId);
       break;
       
-    case ClassEnum.SpellBlade:
+    case ClassEnum.Spellblade:
       hp = scaleByDifficulty(20, difficulty);
       mp = scaleByDifficulty(18, difficulty);
       sp = scaleByDifficulty(25, difficulty);
@@ -185,8 +158,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         blade: 8, sword: 7, staff: 5, wand: 4
       });
-      activeSkills.push({ id: SpellBladeSkillId.PlanarEdge as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: SpellBladeSkillId.WindSlash as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(SpellbladeSkillId.PlanarEdge as SkillId);
+      activeSkills.push(SpellbladeSkillId.WindSlash as SkillId);
       break;
       
     case ClassEnum.Mystic:
@@ -199,8 +172,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         staff: 7, wand: 6, orb: 5, book: 4
       });
-      activeSkills.push({ id: MysticSkillId.MistStep as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: MysticSkillId.InnerVeil as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(MysticSkillId.MistStep as SkillId);
+      activeSkills.push(MysticSkillId.InnerVeil as SkillId);
       break;
       
     case ClassEnum.Shaman:
@@ -213,8 +186,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         staff: 7, wand: 5, book: 4, orb: 3
       });
-      activeSkills.push({ id: ShamanSkillId.ChaoticBlessing as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: ShamanSkillId.HexOfRot as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(ShamanSkillId.ChaoticBlessing as SkillId);
+      activeSkills.push(ShamanSkillId.HexOfRot as SkillId);
       break;
       
     case ClassEnum.Knight:
@@ -227,8 +200,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         sword: 10, blade: 8, spear: 7, shield: 9, axe: 6, hammer: 6
       });
-      activeSkills.push({ id: KnightSkillId.PrecisionThrust as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: KnightSkillId.AdvancingPace as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(KnightSkillId.PrecisionThrust as SkillId);
+      activeSkills.push(KnightSkillId.AdvancingPace as SkillId);
       break;
       
     case ClassEnum.Guardian:
@@ -241,8 +214,8 @@ function createCharacterOfClass(
       Object.assign(proficiencies, {
         shield: 10, sword: 8, hammer: 7, axe: 6, spear: 5
       });
-      activeSkills.push({ id: GuardianSkillId.Taunt as SkillId, level: difficulty as any, exp: 0 });
-      activeSkills.push({ id: GuardianSkillId.ShieldUp as SkillId, level: Math.max(1, difficulty - 1) as any, exp: 0 });
+      activeSkills.push(GuardianSkillId.Taunt as SkillId);
+      activeSkills.push(GuardianSkillId.ShieldUp as SkillId);
       break;
       
     default:
@@ -350,7 +323,7 @@ const paladin_B = humanPaladin(3);
 paladin_B.name = { en: "Human Paladin", th: "พาลาดินมนุษย์" };
 paladin_B.position = 1;
 
-const knight_B = createCharacterOfClass(ClassEnum.Knight, RaceEnum.Dwarf, 3, "Dwarf Knight", "อัศวินคนแคระ");
+const knight_B = createCharacterOfClass(ClassEnum.Knight, RaceEnum.Orc, 3, "Dwarf Knight", "อัศวินคนแคระ");
 knight_B.position = 2;
 
 const guardian_B = humanGuardian(3)
@@ -391,10 +364,10 @@ witch_C.position = 2;
 const inquisitor_C = createCharacterOfClass(ClassEnum.Inquisitor, RaceEnum.Human, 3, "Human Inquisitor", "นักสืบมนุษย์");
 inquisitor_C.position = 3;
 
-const spellBlade_C = createCharacterOfClass(ClassEnum.SpellBlade, RaceEnum.Elven, 3, "Elven SpellBlade", "ดาบเวทย์เอลฟ์");
+const spellBlade_C = createCharacterOfClass(ClassEnum.Spellblade, RaceEnum.Elven, 3, "Elven Spellblade", "ดาบเวทย์เอลฟ์");
 spellBlade_C.position = 4;
 
-const mystic_C = createCharacterOfClass(ClassEnum.Mystic, RaceEnum.Halfling, 3, "Halfling Mystic", "นักลึกลับฮาล์ฟลิ่ง");
+const mystic_C = createCharacterOfClass(ClassEnum.Mystic, RaceEnum.Elven, 3, "Halfling Mystic", "นักลึกลับฮาล์ฟลิ่ง");
 mystic_C.position = 5;
 
 const partyC = new Party({
@@ -415,7 +388,7 @@ rogue_D.position = 0;
 const duelist_D = createCharacterOfClass(ClassEnum.Duelist, RaceEnum.Elven, 3, "Elven Duelist", "นักดวลเอลฟ์");
 duelist_D.position = 1;
 
-const monk_D = createCharacterOfClass(ClassEnum.Monk, RaceEnum.Halfling, 3, "Halfling Monk", "นักพรตฮาล์ฟลิ่ง");
+const monk_D = createCharacterOfClass(ClassEnum.Monk, RaceEnum.Human, 3, "Halfling Monk", "นักพรตฮาล์ฟลิ่ง");
 monk_D.position = 2;
 
 const barbarian_D = humanBarbarian(3);
@@ -469,7 +442,7 @@ const battle = new Battle(
 // Uncomment to test Party C (Magic & Hybrid) instead:
 // const battle = new Battle(
 //   partyA,  // Goblins (enemy)
-//   partyC,  // Magic & Hybrid: Mage, Warlock, Witch, Inquisitor, SpellBlade, Mystic
+//   partyC,  // Magic & Hybrid: Mage, Warlock, Witch, Inquisitor, Spellblade, Mystic
 //   locationRepository[LocationsEnum.WaywardInn],
 //   GameTime,
 //   BattleType.Normal,

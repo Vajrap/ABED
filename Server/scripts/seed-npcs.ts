@@ -17,7 +17,7 @@ import { Party } from "../src/Entity/Party/Party";
 import { PartyBehavior } from "../src/Entity/Party/PartyBehavior";
 import dotenv from "dotenv";
 import { db } from "../src/Database/connection";
-import { characters, npcMemory } from "../src/Database/Schema";
+import { characters, npcMemory, portraits } from "../src/Database/Schema";
 import { Character } from "../src/Entity/Character/Character";
 import { CharacterAlignment } from "../src/Entity/Character/Subclass/Alignment/CharacterAlignment";
 import { CharacterArtisans } from "../src/Entity/Character/Subclass/Stats/CharacterArtisans";
@@ -67,7 +67,7 @@ function convertCharacterToInsert(character: Character): InsertCharacter {
     race: String(character.race || '').substring(0, 50),
     type: String(character.type || 'humanoid').substring(0, 50),
     level: character.level,
-    portrait: character.portrait,
+    // portrait: character.portrait, // Removed from characters table
     background: String(character.background || '').substring(0, 100),
     alignment: character.alignment as any,
     artisans: character.artisans as any,
@@ -429,6 +429,25 @@ async function seedNPCsForLocation(location: LocationsEnum): Promise<{ created: 
           };
 
           await db.insert(npcMemory).values(memoryData);
+          
+          // Insert portrait data if available
+          if (npc.portrait && typeof npc.portrait !== 'string') {
+            try {
+              await db.insert(portraits).values({
+               characterId: npc.id,
+               base: npc.portrait.base,
+               jaw: npc.portrait.jaw,
+               eyes: npc.portrait.eyes,
+               eyesColor: npc.portrait.eyes_color,
+               face: npc.portrait.face,
+               beard: npc.portrait.beard,
+               hair: npc.portrait.hair,
+               hairColor: npc.portrait.hair_color,
+             });
+            } catch (portraitError) {
+              Report.warn(`Failed to save portrait for NPC ${template.id}`, { error: portraitError });
+            }
+          }
 
           partyNPCs.push(npc);
           Report.info(`✅ Created NPC: ${template.name.en} (${template.id}) at ${location}`);
@@ -508,7 +527,7 @@ async function seedNPCsForLocation(location: LocationsEnum): Promise<{ created: 
 /**
  * Main seeding function
  */
-async function seedNPCs() {
+export async function seedNPCs() {
   console.log("🌱 Starting NPC seeding...\n");
 
   // Get location from command line args if provided
@@ -550,6 +569,8 @@ async function seedNPCs() {
   }
 }
 
-// Run the seed script
-seedNPCs().catch(console.error);
+// Run if called directly
+if (import.meta.main) {
+  seedNPCs().catch(console.error);
+}
 

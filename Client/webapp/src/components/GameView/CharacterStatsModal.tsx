@@ -66,7 +66,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
   if (!character || !character.name) {
     return null;
   }
-  
+
   // Helper to extract string from L10N or string
   const getString = (value: string | { en: string; th: string } | null | undefined): string => {
     if (!value) return '';
@@ -130,7 +130,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
   // Handle title update
   const handleTitleSave = async (epithet: string | null, role: string | null) => {
     if (!character?.id) return;
-    
+
     try {
       const { characterService } = await import("@/services/characterService");
       const response = await characterService.updateTitle({
@@ -189,7 +189,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
     if (typeof bodyEq === 'string') return bodyEq;
     return bodyEq.itemId || bodyEq.id || null;
   })();
-  
+
   // Debug: Log equipment structure
   console.log("CharacterStatsModal: character.equipment", character.equipment);
   console.log("CharacterStatsModal: equipmentBySlot", equipmentBySlot);
@@ -218,7 +218,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
       { upperBound: 29, modifier: 9 },
       { upperBound: 30, modifier: 10 },
     ];
-    
+
     for (const bound of boundaries) {
       if (total <= bound.upperBound) {
         return bound.modifier;
@@ -237,13 +237,13 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
     return "#00cc99"; // Green for high positive
   };
 
-  const formatStat = (stat: { base?: number; bonus?: number; [key: string]: any } | undefined) => {
+  const formatStat = (stat: { base?: number; bonus?: number;[key: string]: any } | undefined) => {
     if (!stat || typeof stat !== 'object') return "N/A";
-    
+
     // Safely extract base and bonus values, handling different possible structures
     let base: number;
     let bonus: number;
-    
+
     if (typeof stat.base === 'number' && !isNaN(stat.base)) {
       base = stat.base;
     } else if (typeof stat.base === 'string') {
@@ -252,7 +252,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
     } else {
       base = 0;
     }
-    
+
     if (typeof stat.bonus === 'number' && !isNaN(stat.bonus)) {
       bonus = stat.bonus;
     } else if (typeof stat.bonus === 'string') {
@@ -261,7 +261,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
     } else {
       bonus = 0;
     }
-    
+
     const total = base + bonus;
     if (bonus === 0) {
       return total.toString();
@@ -308,7 +308,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                 const total = base + bonus;
                 const modifier = calculateStatMod(total);
                 const color = getStatModifierColor(modifier);
-                
+
                 return (
                   <Typography
                     sx={{
@@ -376,7 +376,7 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
           tooltip: {
             sx: {
               fontFamily: "Crimson Text, serif",
-                fontSize: "0.85rem",
+              fontSize: "0.85rem",
               maxWidth: 300,
               backgroundColor: alpha(theme.palette.background.paper, 0.95),
               border: `1px solid ${color}`,
@@ -499,35 +499,36 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
             flexWrap: "wrap",
           }}
         >
-        {character.portrait && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 1,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 120,
-                        height: 120,
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
-                        backgroundColor: alpha(theme.palette.background.default, 0.5),
-                      }}
-                    >
-                      <PortraitRenderer
-                        portrait={character.portrait}
-                        size={120}
-                        alt={getString(character.name) || "Character"}
+          {character.portrait && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                  backgroundColor: alpha(theme.palette.background.default, 0.5),
+                }}
+              >
+                <PortraitRenderer
+                  portrait={character.portrait}
+                  gender={character.gender as any}
+                  size={120}
+                  alt={getString(character.name) || "Character"}
                   equipment={{
                     body: bodyEquipmentId,
                   }}
-                      />
-                    </Box>
-                  </Box>
+                />
+              </Box>
+            </Box>
           )}
           <Box
             sx={{
@@ -547,41 +548,42 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                 textAlign: "center",
               }}
             >
-          {getString(character.name) || 'Character'}
+              {getString(character.name) || 'Character'}
             </Typography>
           </Box>
           {character.portrait && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 1,
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 150,
+                  height: 150,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  border: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+                  backgroundColor: alpha(theme.palette.background.default, 0.5),
+                }}
+              >
+                <BattleSpriteRenderer
+                  portrait={character.portrait}
+                  gender={character.gender as any}
+                  equipment={{
+                    body: equipmentBySlot.body?.itemId || equipmentBySlot.body?.id || null,
+                    weapon: equipmentBySlot.rightHand?.itemId || equipmentBySlot.rightHand?.id || equipmentBySlot.leftHand?.itemId || equipmentBySlot.leftHand?.id || null,
                   }}
-                >
-                  <Box
-                    sx={{
-                      width: 150,
-                      height: 150,
-                      borderRadius: 2,
-                      overflow: "hidden",
-                      border: `2px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
-                      backgroundColor: alpha(theme.palette.background.default, 0.5),
-                    }}
-                  >
-                    <BattleSpriteRenderer
-                      portrait={character.portrait}
-                      equipment={{
-                        body: equipmentBySlot.body?.itemId || equipmentBySlot.body?.id || null,
-                        weapon: equipmentBySlot.rightHand?.itemId || equipmentBySlot.rightHand?.id || equipmentBySlot.leftHand?.itemId || equipmentBySlot.leftHand?.id || null,
-                      }}
-                      size={200}
-                      style={{ right: -10, top: 10 }}
-                      animated={true}
-                    />
-                  </Box>
-                </Box>
-              )}
+                  size={200}
+                  style={{ right: -10, top: 10 }}
+                  animated={true}
+                />
+              </Box>
+            </Box>
+          )}
         </Box>
         {character.title && (
           <Tooltip
@@ -661,59 +663,59 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
               onToggle={() => toggleSection("basicInfo")}
             />
             <Collapse in={expandedSections.basicInfo}>
-            <Grid container spacing={2}>
-              {/* Portrait Display */}
-              
-              <Grid item xs={6} sm={4}>
-                <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.85rem", color: theme.palette.text.secondary }}>
-                  Level:
-                </Typography>
-                <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "0.9rem", fontWeight: 600 }}>
-                  {character.level || "N/A"}
-                </Typography>
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.85rem", color: theme.palette.text.secondary }}>
-                  Race:
-                </Typography>
-                <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "0.9rem", fontWeight: 600 }}>
-                  {character.race ? (typeof character.race === 'string' ? character.race : getString(character.race)) : "N/A"}
-                </Typography>
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.9rem", color: theme.palette.text.secondary }}>
-                  Background:
-                </Typography>
-                <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "1rem", fontWeight: 600 }}>
-                  {getString(character.background) || "N/A"}
-                </Typography>
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.9rem", color: theme.palette.text.secondary }}>
-                  Gender:
-                </Typography>
-                <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "1rem", fontWeight: 600 }}>
-                  {character.gender || "N/A"}
-                </Typography>
-              </Grid>
-              {character.alignment && (
-                <Grid item xs={12} sm={6}>
-                  <Box>
-                    {createTooltipLabel(
-                      "Alignment",
-                      "The character's moral compass determined by their Good and Evil values. Alignment affects how NPCs and factions react to the character, and can unlock or restrict certain actions and story paths."
-                    )}
-                  </Box>
+              <Grid container spacing={2}>
+                {/* Portrait Display */}
+
+                <Grid item xs={6} sm={4}>
+                  <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.85rem", color: theme.palette.text.secondary }}>
+                    Level:
+                  </Typography>
                   <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "0.9rem", fontWeight: 600 }}>
-                    {typeof character.alignment === 'string' 
-                      ? character.alignment 
-                      : (character.alignment as any)?.good !== undefined 
-                        ? `Good: ${(character.alignment as any).good}, Evil: ${(character.alignment as any).evil}` 
-                        : String(character.alignment)}
+                    {character.level || "N/A"}
                   </Typography>
                 </Grid>
-              )}
-            </Grid>
+                <Grid item xs={6} sm={4}>
+                  <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.85rem", color: theme.palette.text.secondary }}>
+                    Race:
+                  </Typography>
+                  <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "0.9rem", fontWeight: 600 }}>
+                    {character.race ? (typeof character.race === 'string' ? character.race : getString(character.race)) : "N/A"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.9rem", color: theme.palette.text.secondary }}>
+                    Background:
+                  </Typography>
+                  <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "1rem", fontWeight: 600 }}>
+                    {getString(character.background) || "N/A"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <Typography sx={{ fontFamily: "Crimson Text, serif", fontSize: "0.9rem", color: theme.palette.text.secondary }}>
+                    Gender:
+                  </Typography>
+                  <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "1rem", fontWeight: 600 }}>
+                    {character.gender || "N/A"}
+                  </Typography>
+                </Grid>
+                {character.alignment && (
+                  <Grid item xs={12} sm={6}>
+                    <Box>
+                      {createTooltipLabel(
+                        "Alignment",
+                        "The character's moral compass determined by their Good and Evil values. Alignment affects how NPCs and factions react to the character, and can unlock or restrict certain actions and story paths."
+                      )}
+                    </Box>
+                    <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "0.9rem", fontWeight: 600 }}>
+                      {typeof character.alignment === 'string'
+                        ? character.alignment
+                        : (character.alignment as any)?.good !== undefined
+                          ? `Good: ${(character.alignment as any).good}, Evil: ${(character.alignment as any).evil}`
+                          : String(character.alignment)}
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
             </Collapse>
           </Paper>
 
@@ -737,154 +739,154 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
               />
               <Collapse in={expandedSections.vitals}>
                 <Grid container spacing={1}>
-                <Grid item xs={12} sm={4}>
-                  <Box sx={{ mb: 0.25 }}>
-                    {createTooltipLabel(
-                      "Health Points (HP)",
-                      "The character's physical health and vitality. When HP reaches 0, the character becomes incapacitated or dies. Rest and healing restore HP."
-                    )}
-                  </Box>
-                  <Box sx={{ position: "relative", flex: 1 }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={(() => {
-                        const max = character.vitals.hp.base + character.vitals.hp.bonus || 1;
-                        return max > 0 ? (character.vitals.hp.current / max) * 100 : 0;
-                      })()}
-                      sx={{
-                        width: "100%",
-                        height: 24,
-                        borderRadius: 1,
-                        backgroundColor: alpha(getPercentageColor((() => {
+                  <Grid item xs={12} sm={4}>
+                    <Box sx={{ mb: 0.25 }}>
+                      {createTooltipLabel(
+                        "Health Points (HP)",
+                        "The character's physical health and vitality. When HP reaches 0, the character becomes incapacitated or dies. Rest and healing restore HP."
+                      )}
+                    </Box>
+                    <Box sx={{ position: "relative", flex: 1 }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={(() => {
                           const max = character.vitals.hp.base + character.vitals.hp.bonus || 1;
                           return max > 0 ? (character.vitals.hp.current / max) * 100 : 0;
-                        })()), 0.15),
-                        "& .MuiLinearProgress-bar": {
-                          backgroundColor: getPercentageColor((() => {
+                        })()}
+                        sx={{
+                          width: "100%",
+                          height: 24,
+                          borderRadius: 1,
+                          backgroundColor: alpha(getPercentageColor((() => {
                             const max = character.vitals.hp.base + character.vitals.hp.bonus || 1;
                             return max > 0 ? (character.vitals.hp.current / max) * 100 : 0;
-                          })()),
-                          borderRadius: 1,
-                        },
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        fontFamily: "Cinzel, serif",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        color: "#FFFFFF",
-                        textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      {character.vitals.hp.current}/{character.vitals.hp.base + character.vitals.hp.bonus || 1}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Box sx={{ mb: 0.25 }}>
-                    {createTooltipLabel(
-                      "Mana Points (MP)",
-                      "Magical energy used to cast spells and perform magical abilities. MP is consumed when using magic and regenerates over time or through rest."
-                    )}
-                  </Box>
-                  <Box sx={{ position: "relative", flex: 1 }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={(() => {
-                        const max = character.vitals.mp.base + character.vitals.mp.bonus || 1;
-                        return max > 0 ? (character.vitals.mp.current / max) * 100 : 0;
-                      })()}
-                      sx={{
-                        width: "100%",
-                        height: 24,
-                        borderRadius: 1,
-                        backgroundColor: alpha(getPercentageColor((() => {
+                          })()), 0.15),
+                          "& .MuiLinearProgress-bar": {
+                            backgroundColor: getPercentageColor((() => {
+                              const max = character.vitals.hp.base + character.vitals.hp.bonus || 1;
+                              return max > 0 ? (character.vitals.hp.current / max) * 100 : 0;
+                            })()),
+                            borderRadius: 1,
+                          },
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          fontFamily: "Cinzel, serif",
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          color: "#FFFFFF",
+                          textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {character.vitals.hp.current}/{character.vitals.hp.base + character.vitals.hp.bonus || 1}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Box sx={{ mb: 0.25 }}>
+                      {createTooltipLabel(
+                        "Mana Points (MP)",
+                        "Magical energy used to cast spells and perform magical abilities. MP is consumed when using magic and regenerates over time or through rest."
+                      )}
+                    </Box>
+                    <Box sx={{ position: "relative", flex: 1 }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={(() => {
                           const max = character.vitals.mp.base + character.vitals.mp.bonus || 1;
                           return max > 0 ? (character.vitals.mp.current / max) * 100 : 0;
-                        })()), 0.15),
-                        "& .MuiLinearProgress-bar": {
-                          backgroundColor: getPercentageColor((() => {
+                        })()}
+                        sx={{
+                          width: "100%",
+                          height: 24,
+                          borderRadius: 1,
+                          backgroundColor: alpha(getPercentageColor((() => {
                             const max = character.vitals.mp.base + character.vitals.mp.bonus || 1;
                             return max > 0 ? (character.vitals.mp.current / max) * 100 : 0;
-                          })()),
-                          borderRadius: 1,
-                        },
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        fontFamily: "Cinzel, serif",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        color: "#FFFFFF",
-                        textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      {character.vitals.mp.current}/{character.vitals.mp.base + character.vitals.mp.bonus || 1}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Box sx={{ mb: 0.25 }}>
-                    {createTooltipLabel(
-                      "Stamina Points (SP)",
-                      "Physical endurance and energy used for running, dodging, and performing strenuous physical actions. SP depletes during intense activities and recovers during rest."
-                    )}
-                  </Box>
-                  <Box sx={{ position: "relative", flex: 1 }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={(() => {
-                        const max = character.vitals.sp.base + character.vitals.sp.bonus || 1;
-                        return max > 0 ? (character.vitals.sp.current / max) * 100 : 0;
-                      })()}
-                      sx={{
-                        width: "100%",
-                        height: 24,
-                        borderRadius: 1,
-                        backgroundColor: alpha(getPercentageColor((() => {
+                          })()), 0.15),
+                          "& .MuiLinearProgress-bar": {
+                            backgroundColor: getPercentageColor((() => {
+                              const max = character.vitals.mp.base + character.vitals.mp.bonus || 1;
+                              return max > 0 ? (character.vitals.mp.current / max) * 100 : 0;
+                            })()),
+                            borderRadius: 1,
+                          },
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          fontFamily: "Cinzel, serif",
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          color: "#FFFFFF",
+                          textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {character.vitals.mp.current}/{character.vitals.mp.base + character.vitals.mp.bonus || 1}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Box sx={{ mb: 0.25 }}>
+                      {createTooltipLabel(
+                        "Stamina Points (SP)",
+                        "Physical endurance and energy used for running, dodging, and performing strenuous physical actions. SP depletes during intense activities and recovers during rest."
+                      )}
+                    </Box>
+                    <Box sx={{ position: "relative", flex: 1 }}>
+                      <LinearProgress
+                        variant="determinate"
+                        value={(() => {
                           const max = character.vitals.sp.base + character.vitals.sp.bonus || 1;
                           return max > 0 ? (character.vitals.sp.current / max) * 100 : 0;
-                        })()), 0.15),
-                        "& .MuiLinearProgress-bar": {
-                          backgroundColor: getPercentageColor((() => {
+                        })()}
+                        sx={{
+                          width: "100%",
+                          height: 24,
+                          borderRadius: 1,
+                          backgroundColor: alpha(getPercentageColor((() => {
                             const max = character.vitals.sp.base + character.vitals.sp.bonus || 1;
                             return max > 0 ? (character.vitals.sp.current / max) * 100 : 0;
-                          })()),
-                          borderRadius: 1,
-                        },
-                      }}
-                    />
-                    <Typography
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        fontFamily: "Cinzel, serif",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        color: "#FFFFFF",
-                        textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
-                        pointerEvents: "none",
-                      }}
-                    >
-                      {character.vitals.sp.current}/{character.vitals.sp.base + character.vitals.sp.bonus || 1}
-                    </Typography>
-                  </Box>
+                          })()), 0.15),
+                          "& .MuiLinearProgress-bar": {
+                            backgroundColor: getPercentageColor((() => {
+                              const max = character.vitals.sp.base + character.vitals.sp.bonus || 1;
+                              return max > 0 ? (character.vitals.sp.current / max) * 100 : 0;
+                            })()),
+                            borderRadius: 1,
+                          },
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          fontFamily: "Cinzel, serif",
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          color: "#FFFFFF",
+                          textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {character.vitals.sp.current}/{character.vitals.sp.base + character.vitals.sp.bonus || 1}
+                      </Typography>
+                    </Box>
+                  </Grid>
                 </Grid>
-              </Grid>
               </Collapse>
             </Paper>
           )}
@@ -909,64 +911,64 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
               />
               <Collapse in={expandedSections.needs}>
                 <Grid container spacing={1}>
-                {[
-                  { key: "mood", tooltip: "The character's emotional state and happiness. Low mood affects performance and can lead to negative effects." },
-                  { key: "energy", tooltip: "Overall physical and mental energy levels. Low energy reduces effectiveness in all activities and requires rest to recover." },
-                  { key: "satiety", tooltip: "How well-fed and satisfied the character is. Hunger reduces performance and must be maintained through eating food." },
-                ].map(({ key, tooltip }) => (
-                  <Grid item xs={12} sm={4} key={key}>
-                    <Box sx={{ mb: 0.25 }}>
-                      {createTooltipLabel(key.charAt(0).toUpperCase() + key.slice(1), tooltip)}
-                    </Box>
-                    {(() => {
-                      // Needs are already 0-100, extract current value directly
-                      const needValue = character.needs?.[key as keyof typeof character.needs];
-                      let current = 0;
-                      if (typeof needValue === 'number') {
-                        current = Math.round(needValue);
-                      } else if (needValue && typeof needValue === 'object' && 'current' in needValue) {
-                        current = Math.round((needValue as any).current ?? 0);
-                      }
-                      const percentage = Math.min(100, Math.max(0, current));
-                      
-                      return (
-                        <Box sx={{ position: "relative" }}>
-                          <LinearProgress
-                            variant="determinate"
-                            value={percentage}
-                            sx={{
-                              width: "100%",
-                              height: 24,
-                              borderRadius: 1,
-                              backgroundColor: alpha(getPercentageColor(percentage), 0.15),
-                              "& .MuiLinearProgress-bar": {
-                                backgroundColor: getPercentageColor(percentage),
+                  {[
+                    { key: "mood", tooltip: "The character's emotional state and happiness. Low mood affects performance and can lead to negative effects." },
+                    { key: "energy", tooltip: "Overall physical and mental energy levels. Low energy reduces effectiveness in all activities and requires rest to recover." },
+                    { key: "satiety", tooltip: "How well-fed and satisfied the character is. Hunger reduces performance and must be maintained through eating food." },
+                  ].map(({ key, tooltip }) => (
+                    <Grid item xs={12} sm={4} key={key}>
+                      <Box sx={{ mb: 0.25 }}>
+                        {createTooltipLabel(key.charAt(0).toUpperCase() + key.slice(1), tooltip)}
+                      </Box>
+                      {(() => {
+                        // Needs are already 0-100, extract current value directly
+                        const needValue = character.needs?.[key as keyof typeof character.needs];
+                        let current = 0;
+                        if (typeof needValue === 'number') {
+                          current = Math.round(needValue);
+                        } else if (needValue && typeof needValue === 'object' && 'current' in needValue) {
+                          current = Math.round((needValue as any).current ?? 0);
+                        }
+                        const percentage = Math.min(100, Math.max(0, current));
+
+                        return (
+                          <Box sx={{ position: "relative" }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={percentage}
+                              sx={{
+                                width: "100%",
+                                height: 24,
                                 borderRadius: 1,
-                              },
-                            }}
-                          />
-                          <Typography
-                            sx={{
-                              position: "absolute",
-                              top: "50%",
-                              left: "50%",
-                              transform: "translate(-50%, -50%)",
-                              fontFamily: "Cinzel, serif",
-                              fontSize: "0.75rem",
-                              fontWeight: 600,
-                              color: "#FFFFFF",
-                              textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
-                              pointerEvents: "none",
-                            }}
-                          >
-                            {Math.round(current)}/100
-                          </Typography>
-                        </Box>
-                      );
-                    })()}
-                  </Grid>
-                ))}
-              </Grid>
+                                backgroundColor: alpha(getPercentageColor(percentage), 0.15),
+                                "& .MuiLinearProgress-bar": {
+                                  backgroundColor: getPercentageColor(percentage),
+                                  borderRadius: 1,
+                                },
+                              }}
+                            />
+                            <Typography
+                              sx={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                fontFamily: "Cinzel, serif",
+                                fontSize: "0.75rem",
+                                fontWeight: 600,
+                                color: "#FFFFFF",
+                                textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+                                pointerEvents: "none",
+                              }}
+                            >
+                              {Math.round(current)}/100
+                            </Typography>
+                          </Box>
+                        );
+                      })()}
+                    </Grid>
+                  ))}
+                </Grid>
               </Collapse>
             </Paper>
           )}
@@ -995,138 +997,138 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                   fontSize: "1rem",
                   fontWeight: 600,
                   color: theme.palette.secondary.main,
-                mb: 1,
-              }}
-            >
-              Equipment
-            </Typography>
-            
-            {/* RPG-style equipment layout */}
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: 1.5,
-                maxWidth: 400,
-                mx: "auto",
-              }}
-            >
-              {/* Row 1: Head */}
-              <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="headWear"
-                  equipment={equipmentBySlot.headWear}
-                  label="Head"
-                  size="medium"
-                />
-              </Box>
+                  mb: 1,
+                }}
+              >
+                Equipment
+              </Typography>
 
-              {/* Row 2: Accessories */}
-              <Box sx={{ gridColumn: "1", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="earL"
-                  equipment={equipmentBySlot.earL}
-                  label="Ear L"
-                  size="small"
-                />
-              </Box>
-              <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="neck"
-                  equipment={equipmentBySlot.neck}
-                  label="Neck"
-                  size="small"
-                />
-              </Box>
-              <Box sx={{ gridColumn: "3", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="earR"
-                  equipment={equipmentBySlot.earR}
-                  label="Ear R"
-                  size="small"
-                />
-              </Box>
+              {/* RPG-style equipment layout */}
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, 1fr)",
+                  gap: 1.5,
+                  maxWidth: 400,
+                  mx: "auto",
+                }}
+              >
+                {/* Row 1: Head */}
+                <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="headWear"
+                    equipment={equipmentBySlot.headWear}
+                    label="Head"
+                    size="medium"
+                  />
+                </Box>
 
-              {/* Row 3: Shoulders and Body */}
-              <Box sx={{ gridColumn: "1", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <EquipmentSlot
-                  slot="rightHand"
-                  equipment={equipmentBySlot.rightHand}
-                  label="Right Hand"
-                  size="medium"
-                />
-              </Box>
-              <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <EquipmentSlot
-                  slot="body"
-                  equipment={equipmentBySlot.body}
-                  label="Body"
-                  size="large"
-                />
-              </Box>
-              <Box sx={{ gridColumn: "3", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <EquipmentSlot
-                  slot="leftHand"
-                  equipment={equipmentBySlot.leftHand}
-                  label="Left Hand"
-                  size="medium"
-                />
-              </Box>
+                {/* Row 2: Accessories */}
+                <Box sx={{ gridColumn: "1", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="earL"
+                    equipment={equipmentBySlot.earL}
+                    label="Ear L"
+                    size="small"
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="neck"
+                    equipment={equipmentBySlot.neck}
+                    label="Neck"
+                    size="small"
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "3", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="earR"
+                    equipment={equipmentBySlot.earR}
+                    label="Ear R"
+                    size="small"
+                  />
+                </Box>
 
-              {/* Row 4: Rings */}
-              <Box sx={{ gridColumn: "1", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="ringL"
-                  equipment={equipmentBySlot.ringL}
-                  label="Ring L"
-                  size="small"
-                />
-              </Box>
-              <Box sx={{ gridColumn: "3", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="ringR"
-                  equipment={equipmentBySlot.ringR}
-                  label="Ring R"
-                  size="small"
-                />
-              </Box>
+                {/* Row 3: Shoulders and Body */}
+                <Box sx={{ gridColumn: "1", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <EquipmentSlot
+                    slot="rightHand"
+                    equipment={equipmentBySlot.rightHand}
+                    label="Right Hand"
+                    size="medium"
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <EquipmentSlot
+                    slot="body"
+                    equipment={equipmentBySlot.body}
+                    label="Body"
+                    size="large"
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "3", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <EquipmentSlot
+                    slot="leftHand"
+                    equipment={equipmentBySlot.leftHand}
+                    label="Left Hand"
+                    size="medium"
+                  />
+                </Box>
 
-              {/* Row 5: Legs and Feet */}
-              <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="leg"
-                  equipment={equipmentBySlot.leg}
-                  label="Legs"
-                  size="medium"
-                />
-              </Box>
+                {/* Row 4: Rings */}
+                <Box sx={{ gridColumn: "1", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="ringL"
+                    equipment={equipmentBySlot.ringL}
+                    label="Ring L"
+                    size="small"
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "3", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="ringR"
+                    equipment={equipmentBySlot.ringR}
+                    label="Ring R"
+                    size="small"
+                  />
+                </Box>
 
-              {/* Row 6: Hands and Feet */}
-              <Box sx={{ gridColumn: "1", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="hand"
-                  equipment={equipmentBySlot.hand}
-                  label="Hands"
-                  size="small"
-                />
+                {/* Row 5: Legs and Feet */}
+                <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="leg"
+                    equipment={equipmentBySlot.leg}
+                    label="Legs"
+                    size="medium"
+                  />
+                </Box>
+
+                {/* Row 6: Hands and Feet */}
+                <Box sx={{ gridColumn: "1", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="hand"
+                    equipment={equipmentBySlot.hand}
+                    label="Hands"
+                    size="small"
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="foot"
+                    equipment={equipmentBySlot.foot}
+                    label="Feet"
+                    size="small"
+                  />
+                </Box>
+                <Box sx={{ gridColumn: "3", display: "flex", justifyContent: "center" }}>
+                  <EquipmentSlot
+                    slot="util"
+                    equipment={equipmentBySlot.util}
+                    label="Util"
+                    size="small"
+                  />
+                </Box>
               </Box>
-              <Box sx={{ gridColumn: "2", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="foot"
-                  equipment={equipmentBySlot.foot}
-                  label="Feet"
-                  size="small"
-                />
-              </Box>
-              <Box sx={{ gridColumn: "3", display: "flex", justifyContent: "center" }}>
-                <EquipmentSlot
-                  slot="util"
-                  equipment={equipmentBySlot.util}
-                  label="Util"
-                  size="small"
-                />
-              </Box>
-            </Box>
             </Collapse>
           </Paper>
 
@@ -1269,37 +1271,37 @@ export const CharacterStatsModal: React.FC<CharacterStatsModalProps> = ({
                 onToggle={() => toggleSection("planarAptitude")}
               />
               <Collapse in={expandedSections.planarAptitude}>
-              <LinearProgress
-                variant="determinate"
-                value={(() => {
-                  const apt = character.planarAptitude;
-                  if (typeof apt === 'number') return apt;
-                  if (apt && typeof apt === 'object') {
-                    if ('aptitude' in apt) return (apt as any).aptitude as number;
-                    if ('total' in apt) return (apt as any).total as number;
-                  }
-                  return 0;
-                })()}
-                sx={{
-                  height: 24,
-                  borderRadius: 2,
-                  backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-                  "& .MuiLinearProgress-bar": {
-                    backgroundColor: theme.palette.secondary.main,
-                  },
-                }}
-              />
-              <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "0.85rem", mt: 0.5, textAlign: "center" }}>
-                {(() => {
-                  const apt = character.planarAptitude;
-                  if (typeof apt === 'number') return `${apt}%`;
-                  if (apt && typeof apt === 'object') {
-                    if ('aptitude' in apt) return `${(apt as any).aptitude as number}%`;
-                    if ('total' in apt) return `${(apt as any).total as number}%`;
-                  }
-                  return '0%';
-                })()}
-              </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={(() => {
+                    const apt = character.planarAptitude;
+                    if (typeof apt === 'number') return apt;
+                    if (apt && typeof apt === 'object') {
+                      if ('aptitude' in apt) return (apt as any).aptitude as number;
+                      if ('total' in apt) return (apt as any).total as number;
+                    }
+                    return 0;
+                  })()}
+                  sx={{
+                    height: 24,
+                    borderRadius: 2,
+                    backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+                    "& .MuiLinearProgress-bar": {
+                      backgroundColor: theme.palette.secondary.main,
+                    },
+                  }}
+                />
+                <Typography sx={{ fontFamily: "Cinzel, serif", fontSize: "0.85rem", mt: 0.5, textAlign: "center" }}>
+                  {(() => {
+                    const apt = character.planarAptitude;
+                    if (typeof apt === 'number') return `${apt}%`;
+                    if (apt && typeof apt === 'object') {
+                      if ('aptitude' in apt) return `${(apt as any).aptitude as number}%`;
+                      if ('total' in apt) return `${(apt as any).total as number}%`;
+                    }
+                    return '0%';
+                  })()}
+                </Typography>
               </Collapse>
             </Paper>
           )}
