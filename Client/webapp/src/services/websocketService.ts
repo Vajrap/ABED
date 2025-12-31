@@ -162,7 +162,7 @@ class WebSocketService {
         try {
           handler(message);
         } catch (error) {
-          console.error(`Error in message handler for type ${message.type}:`, error);
+          console.error("Error in message handler for type %s:", message.type, error);
         }
       });
     } else {
